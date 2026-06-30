@@ -4,6 +4,12 @@ import SwiftUI
 
 enum CheckStep { case airline, dimensions, result }
 
+private var checkerStatusBarHeight: CGFloat {
+    UIApplication.shared.connectedScenes
+        .compactMap { $0 as? UIWindowScene }
+        .first?.windows.first?.safeAreaInsets.top ?? 50
+}
+
 struct CheckFlowView: View {
     var preselected: Airline?
 
@@ -23,13 +29,11 @@ struct CheckFlowView: View {
         ZStack(alignment: .top) {
             Color(.systemGroupedBackground).ignoresSafeArea()
 
-            VStack(spacing: 0) {
-                // Progress bar + back button
-                header
-
-                // Step content
-                ZStack {
-                    if step == .airline {
+            // Step content – volledig scherm voor stap 2 & 3
+            ZStack {
+                if step == .airline {
+                    VStack(spacing: 0) {
+                        header
                         AirlineStepView(
                             airlines: airlineStore.airlines,
                             isLoading: airlineStore.isLoading,
@@ -40,48 +44,57 @@ struct CheckFlowView: View {
                                 step = .dimensions
                             }
                         }
-                        .transition(.asymmetric(
-                            insertion: .move(edge: .leading).combined(with: .opacity),
-                            removal: .move(edge: .leading).combined(with: .opacity)
-                        ))
                     }
-
-                    if step == .dimensions {
-                        DimensionsStepView(
-                            airline: selectedAirline,
-                            length: $length, width: $width,
-                            depth: $depth, weight: $weight,
-                            isChecking: checkStore.isChecking,
-                            error: checkStore.error
-                        ) {
-                            runCheck()
-                        }
-                        .transition(.asymmetric(
-                            insertion: .move(edge: .trailing).combined(with: .opacity),
-                            removal: .move(edge: .trailing).combined(with: .opacity)
-                        ))
-                    }
-
-                    if step == .result, let result = checkStore.result, let airline = selectedAirline {
-                        ResultStepView(
-                            result: result,
-                            airline: airline,
-                            dimensions: (length, width, depth, weight)
-                        ) {
-                            // Opnieuw checken
-                            withAnimation(.spring(response: 0.4, dampingFraction: 0.85)) {
-                                checkStore.result = nil
-                                step = .airline
-                                selectedAirline = nil
-                            }
-                        }
-                        .transition(.asymmetric(
-                            insertion: .move(edge: .trailing).combined(with: .opacity),
-                            removal: .move(edge: .trailing).combined(with: .opacity)
-                        ))
-                    }
+                    .transition(.asymmetric(
+                        insertion: .move(edge: .leading).combined(with: .opacity),
+                        removal: .move(edge: .leading).combined(with: .opacity)
+                    ))
                 }
-                .animation(.spring(response: 0.4, dampingFraction: 0.85), value: step)
+
+                if step == .dimensions {
+                    DimensionsStepView(
+                        airline: selectedAirline,
+                        length: $length, width: $width,
+                        depth: $depth, weight: $weight,
+                        isChecking: checkStore.isChecking,
+                        error: checkStore.error,
+                        topInset: compactNavHeight
+                    ) {
+                        runCheck()
+                    }
+                    .ignoresSafeArea(edges: .top)
+                    .transition(.asymmetric(
+                        insertion: .move(edge: .trailing).combined(with: .opacity),
+                        removal: .move(edge: .trailing).combined(with: .opacity)
+                    ))
+                }
+
+                if step == .result, let result = checkStore.result, let airline = selectedAirline {
+                    ResultStepView(
+                        result: result,
+                        airline: airline,
+                        dimensions: (length, width, depth, weight),
+                        topInset: compactNavHeight
+                    ) {
+                        withAnimation(.spring(response: 0.4, dampingFraction: 0.85)) {
+                            checkStore.result = nil
+                            step = .airline
+                            selectedAirline = nil
+                        }
+                    }
+                    .ignoresSafeArea(edges: .top)
+                    .transition(.asymmetric(
+                        insertion: .move(edge: .trailing).combined(with: .opacity),
+                        removal: .move(edge: .trailing).combined(with: .opacity)
+                    ))
+                }
+            }
+            .animation(.spring(response: 0.4, dampingFraction: 0.85), value: step)
+
+            // Zwevende compacte nav bovenop content (alleen stap 2 & 3)
+            if step != .airline {
+                compactNav
+                    .transition(.opacity)
             }
         }
         .navigationBarHidden(true)
@@ -101,47 +114,129 @@ struct CheckFlowView: View {
         }
     }
 
-    // MARK: - Header
+    // MARK: - Header (navy gradient, valt over statusbalk)
 
     private var header: some View {
-        HStack(spacing: 12) {
-            Button {
-                withAnimation(.spring(response: 0.4, dampingFraction: 0.85)) {
-                    switch step {
-                    case .airline:    dismiss()
-                    case .dimensions: step = .airline
-                    case .result:
-                        checkStore.result = nil
-                        step = .dimensions
+        Theme.navyGradient
+            .frame(maxWidth: .infinity)
+            .frame(height: checkerStatusBarHeight + 70)
+            .overlay {
+                Circle().fill(.white.opacity(0.04)).frame(width: 160).offset(x: 120, y: -20)
+                Circle().fill(.white.opacity(0.03)).frame(width: 100).offset(x: 150, y: 50)
+            }
+            .overlay(alignment: .bottom) {
+                HStack(spacing: 12) {
+                    // Terug-knop
+                    Button {
+                        withAnimation(.spring(response: 0.4, dampingFraction: 0.85)) {
+                            switch step {
+                            case .airline:    dismiss()
+                            case .dimensions:
+                                step = .airline
+                                selectedAirline = nil
+                            case .result:
+                                checkStore.result = nil
+                                step = .dimensions
+                            }
+                        }
+                    } label: {
+                        Image(systemName: "chevron.left")
+                            .font(.system(size: 16, weight: .semibold))
+                            .foregroundStyle(.white)
+                            .frame(width: 36, height: 36)
+                            .background(.white.opacity(0.15))
+                            .clipShape(Circle())
+                    }
+
+                    // Label + voortgangsdots
+                    VStack(spacing: 6) {
+                        Text(stepLabel)
+                            .font(.system(size: 11, weight: .bold, design: .rounded))
+                            .foregroundStyle(.white.opacity(0.65))
+                            .kerning(1.0)
+
+                        HStack(spacing: 6) {
+                            ForEach([CheckStep.airline, .dimensions, .result], id: \.hashValue) { s in
+                                Capsule()
+                                    .fill(stepIndex(s) <= stepIndex(step)
+                                          ? Color.white
+                                          : Color.white.opacity(0.25))
+                                    .frame(width: stepIndex(s) == stepIndex(step) ? 22 : 7, height: 7)
+                                    .animation(.spring(response: 0.3), value: step)
+                            }
+                        }
+                    }
+                    .frame(maxWidth: .infinity)
+
+                    // Symmetrie-placeholder
+                    Color.clear.frame(width: 36, height: 36)
+                }
+                .padding(.horizontal, 20)
+                .padding(.bottom, 14)
+            }
+            .clipped()
+    }
+
+    // MARK: - Compact nav hoogte (voor scroll-inset van stap 2 & 3)
+
+    private var compactNavHeight: CGFloat { checkerStatusBarHeight + 50 }
+
+    // MARK: - Compact nav (zwevend, stap 2 & 3)
+
+    private var compactNav: some View {
+        VStack(spacing: 0) {
+            Color.clear.frame(height: checkerStatusBarHeight)
+
+            HStack(spacing: 12) {
+                Button {
+                    withAnimation(.spring(response: 0.4, dampingFraction: 0.85)) {
+                        switch step {
+                        case .airline:    dismiss()
+                        case .dimensions: step = .airline; selectedAirline = nil
+                        case .result:
+                            checkStore.result = nil
+                            step = .dimensions
+                        }
+                    }
+                } label: {
+                    HStack(spacing: 6) {
+                        Image(systemName: "chevron.left")
+                            .font(.system(size: 14, weight: .semibold))
+                        Text(step == .result ? "Maten" : "Maatschappij")
+                            .font(.system(size: 14, weight: .semibold, design: .rounded))
+                    }
+                    .foregroundStyle(Theme.navy)
+                }
+
+                Spacer()
+
+                // Stap-indicator pills
+                HStack(spacing: 5) {
+                    ForEach([CheckStep.airline, .dimensions, .result], id: \.hashValue) { s in
+                        Capsule()
+                            .fill(stepIndex(s) <= stepIndex(step)
+                                  ? Theme.navy
+                                  : Theme.navy.opacity(0.15))
+                            .frame(width: stepIndex(s) == stepIndex(step) ? 18 : 6, height: 6)
+                            .animation(.spring(response: 0.3), value: step)
                     }
                 }
-            } label: {
-                Image(systemName: "chevron.left")
-                    .font(.system(size: 16, weight: .semibold))
-                    .foregroundStyle(Theme.textPrimary)
-                    .frame(width: 36, height: 36)
-                    .background(Theme.surface)
-                    .clipShape(Circle())
-                    .shadow(color: .black.opacity(0.07), radius: 4, x: 0, y: 2)
             }
+            .padding(.horizontal, 20)
+            .frame(height: 50)
 
-            // Progress dots
-            HStack(spacing: 6) {
-                ForEach([CheckStep.airline, .dimensions, .result], id: \.hashValue) { s in
-                    Capsule()
-                        .fill(stepIndex(s) <= stepIndex(step) ? Theme.sky : Theme.sky.opacity(0.2))
-                        .frame(width: stepIndex(s) == stepIndex(step) ? 24 : 8, height: 8)
-                        .animation(.spring(response: 0.3), value: step)
-                }
-            }
-            .frame(maxWidth: .infinity)
-
-            // Placeholder for symmetry
-            Color.clear.frame(width: 36, height: 36)
+            Divider().opacity(0.4)
         }
-        .padding(.horizontal, 20)
-        .padding(.top, 12)
-        .padding(.bottom, 8)
+        .background(.ultraThinMaterial)
+        .ignoresSafeArea(edges: .top)
+    }
+
+    private var stepLabel: String {
+        switch step {
+        case .airline:    return "HANDBAGAGE CHECKER"
+        case .dimensions: return "HANDBAGAGE CHECKER"
+        case .result:     return "RESULTAAT"
+        }
     }
 
     private func stepIndex(_ s: CheckStep) -> Int {
@@ -187,16 +282,26 @@ private struct AirlineStepView: View {
             }
             .padding(.horizontal, 20)
 
-            // Search
+            // Zoekbalk
             HStack(spacing: 10) {
-                Image(systemName: "magnifyingglass").foregroundStyle(Theme.textSecondary)
-                TextField("Zoek maatschappij", text: $search)
+                Image(systemName: "magnifyingglass")
+                    .foregroundStyle(Theme.textSecondary)
+                    .font(.system(size: 15))
+                TextField("Zoek maatschappij…", text: $search)
                     .autocorrectionDisabled()
+                    .font(.system(size: 15, design: .rounded))
+                if !search.isEmpty {
+                    Button { search = "" } label: {
+                        Image(systemName: "xmark.circle.fill")
+                            .foregroundStyle(Theme.textSecondary)
+                    }
+                }
             }
-            .padding(12)
-            .background(Theme.surface)
-            .clipShape(RoundedRectangle(cornerRadius: 12))
-            .shadow(color: .black.opacity(0.05), radius: 4, x: 0, y: 1)
+            .padding(.horizontal, 14)
+            .padding(.vertical, 13)
+            .background(Color(.systemBackground))
+            .clipShape(RoundedRectangle(cornerRadius: 14))
+            .shadow(color: .black.opacity(0.07), radius: 8, x: 0, y: 2)
             .padding(.horizontal, 20)
 
             if isLoading {
@@ -265,6 +370,7 @@ private struct DimensionsStepView: View {
     @Binding var weight: Double
     let isChecking: Bool
     let error: String?
+    var topInset: CGFloat = 0
     let onCheck: () -> Void
 
     var body: some View {
@@ -292,11 +398,11 @@ private struct DimensionsStepView: View {
                 // Dimension inputs
                 Card {
                     VStack(spacing: 14) {
-                        DimSlider(label: "Hoogte", value: $length, range: 20...90, color: Theme.sky)
+                        DimSlider(label: "Hoogte", value: $length, range: 20...90, color: Theme.navy)
                         Divider()
-                        DimSlider(label: "Breedte", value: $width,  range: 10...60, color: Theme.sky)
+                        DimSlider(label: "Breedte", value: $width,  range: 10...60, color: Theme.navy)
                         Divider()
-                        DimSlider(label: "Diepte",  value: $depth,  range: 5...50,  color: Theme.sky)
+                        DimSlider(label: "Diepte",  value: $depth,  range: 5...50,  color: Theme.navy)
                     }
                     .padding(16)
                 }
@@ -306,7 +412,7 @@ private struct DimensionsStepView: View {
                 Card {
                     VStack(alignment: .leading, spacing: 10) {
                         HStack {
-                            Image(systemName: "scalemass.fill").foregroundStyle(Theme.sky)
+                            Image(systemName: "scalemass.fill").foregroundStyle(Theme.navy)
                             Text("Gewicht").font(.headline2)
                         }
                         HStack(spacing: 0) {
@@ -315,7 +421,7 @@ private struct DimensionsStepView: View {
                                 UIImpactFeedbackGenerator(style: .light).impactOccurred()
                             } label: {
                                 Image(systemName: "minus.circle.fill")
-                                    .font(.system(size: 28)).foregroundStyle(Theme.sky)
+                                    .font(.system(size: 28)).foregroundStyle(Theme.navy)
                             }
                             Spacer()
                             VStack(spacing: 2) {
@@ -330,7 +436,7 @@ private struct DimensionsStepView: View {
                                 UIImpactFeedbackGenerator(style: .light).impactOccurred()
                             } label: {
                                 Image(systemName: "plus.circle.fill")
-                                    .font(.system(size: 28)).foregroundStyle(Theme.sky)
+                                    .font(.system(size: 28)).foregroundStyle(Theme.navy)
                             }
                         }
                     }
@@ -349,15 +455,19 @@ private struct DimensionsStepView: View {
                                 ProgressView().tint(.white)
                             } else {
                                 Image(systemName: "checkmark.shield.fill")
+                                    .font(.system(size: 16, weight: .semibold))
                             }
                             Text(isChecking ? "Controleren…" : "Controleer nu")
-                                .fontWeight(.semibold)
+                                .font(.system(size: 16, weight: .semibold, design: .rounded))
                         }
                         .frame(maxWidth: .infinity)
-                        .padding(.vertical, 16)
-                        .background(isChecking ? Theme.sky.opacity(0.6) : Theme.sky)
+                        .padding(.vertical, 17)
+                        .background(isChecking
+                            ? AnyShapeStyle(Theme.navy.opacity(0.5))
+                            : AnyShapeStyle(Theme.navyGradient))
                         .foregroundStyle(.white)
                         .clipShape(RoundedRectangle(cornerRadius: 16))
+                        .shadow(color: Theme.navy.opacity(0.30), radius: 10, x: 0, y: 4)
                     }
                     .disabled(isChecking)
 
@@ -369,7 +479,7 @@ private struct DimensionsStepView: View {
                 .padding(.horizontal, 20)
                 .padding(.bottom, 32)
             }
-            .padding(.top, 8)
+            .padding(.top, topInset + 8)
         }
     }
 }
@@ -485,6 +595,7 @@ struct ResultStepView: View {
     let result: CheckResponse
     let airline: Airline
     let dimensions: (Double, Double, Double, Double)
+    var topInset: CGFloat = 0
     let onReset: () -> Void
 
     @State private var bags: [Bag] = []
@@ -497,85 +608,78 @@ struct ResultStepView: View {
 
     var body: some View {
         ScrollView {
-            VStack(spacing: 24) {
-                // Verdict card
-                verdictCard
+            VStack(spacing: 32) {
+                // Verdict hero
+                verdictHero
 
-                // Variant info
+                // Variant details (compact)
                 if let variant = result.variant {
-                    variantCard(variant)
+                    variantRow(variant)
                 }
 
-                // Bag recommendations when not fit
+                // Tas-aanbevelingen
                 if !isFit {
                     bagRecommendations
                 }
 
-                // Lead capture
-                if !leadSent {
-                    leadCard
-                } else {
-                    Label("Bedankt! We sturen je de beste tips.", systemImage: "envelope.badge.fill")
-                        .font(.body1).foregroundStyle(Theme.green)
-                        .padding(.horizontal, 20)
-                }
+                // Opnieuw + disclaimer
+                VStack(spacing: 16) {
+                    Button(action: onReset) {
+                        Label("Opnieuw controleren", systemImage: "arrow.clockwise")
+                            .font(.body1).fontWeight(.semibold)
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 15)
+                            .background(Theme.navy.opacity(0.07))
+                            .foregroundStyle(Theme.navy)
+                            .clipShape(RoundedRectangle(cornerRadius: 14))
+                    }
+                    .padding(.horizontal, 20)
 
-                // Disclaimer
-                Text("Dit is een indicatie. Controleer altijd de officiële regels van de maatschappij.")
-                    .font(.caption1).foregroundStyle(Theme.textSecondary)
-                    .multilineTextAlignment(.center)
-                    .padding(.horizontal, 24)
-
-                // Opnieuw
-                Button(action: onReset) {
-                    Label("Opnieuw controleren", systemImage: "arrow.clockwise")
-                        .font(.body1).fontWeight(.semibold)
-                        .foregroundStyle(Theme.sky)
+                    Text("Indicatie — controleer altijd de officiële regels.")
+                        .font(.caption1).foregroundStyle(Theme.textSecondary)
+                        .multilineTextAlignment(.center)
                 }
-                .padding(.bottom, 32)
+                .padding(.bottom, 36)
             }
-            .padding(.top, 8)
+            .padding(.top, topInset + 16)
         }
         .task { await loadBags() }
     }
 
-    // MARK: Verdict card
+    // MARK: Verdict hero
 
-    private var verdictCard: some View {
-        VStack(spacing: 16) {
+    private var verdictHero: some View {
+        VStack(spacing: 20) {
             ZStack {
                 Circle()
-                    .fill(Theme.verdictColor(result.verdict).opacity(0.12))
-                    .frame(width: 100, height: 100)
+                    .fill(Theme.verdictColor(result.verdict).opacity(0.10))
+                    .frame(width: 110, height: 110)
                 Image(systemName: verdictIcon)
-                    .font(.system(size: 48, weight: .semibold))
+                    .font(.system(size: 52, weight: .semibold))
                     .foregroundStyle(Theme.verdictColor(result.verdict))
             }
 
-            VStack(spacing: 6) {
+            VStack(spacing: 8) {
                 Text(result.verdictTitle)
-                    .font(.system(size: 28, weight: .bold, design: .rounded))
-                Text(isFit
-                     ? "Jouw tas voldoet aan de regels van \(airline.name)."
-                     : "Jouw tas past niet als handbagage bij \(airline.name).")
-                    .font(.body1)
-                    .foregroundStyle(Theme.textSecondary)
+                    .font(.system(size: 30, weight: .bold, design: .rounded))
                     .multilineTextAlignment(.center)
-                    .padding(.horizontal, 24)
-            }
 
-            // Dimensions summary
-            HStack(spacing: 8) {
-                DimPill(value: "\(Int(dimensions.0))×\(Int(dimensions.1))×\(Int(dimensions.2)) cm", icon: "ruler")
-                DimPill(value: String(format: "%.1f kg", dimensions.3), icon: "scalemass")
+                HStack(spacing: 6) {
+                    AirlineLogo(airline: airline, size: 20)
+                    Text(airline.name)
+                        .font(.system(size: 14, weight: .medium, design: .rounded))
+                        .foregroundStyle(Theme.textSecondary)
+                }
+
+                HStack(spacing: 8) {
+                    DimPill(value: "\(Int(dimensions.0))×\(Int(dimensions.1))×\(Int(dimensions.2)) cm", icon: "ruler")
+                    DimPill(value: String(format: "%.1f kg", dimensions.3), icon: "scalemass")
+                }
+                .padding(.top, 4)
             }
         }
-        .padding(.vertical, 28)
+        .padding(.top, 12)
         .frame(maxWidth: .infinity)
-        .background(Theme.surface)
-        .clipShape(RoundedRectangle(cornerRadius: 24))
-        .shadow(color: Theme.verdictColor(result.verdict).opacity(0.15), radius: 16, x: 0, y: 4)
-        .padding(.horizontal, 20)
     }
 
     private var verdictIcon: String {
@@ -586,61 +690,64 @@ struct ResultStepView: View {
         }
     }
 
-    // MARK: Variant card
+    // MARK: Variant rij (compact)
 
-    private func variantCard(_ variant: CheckVariant) -> some View {
-        Card {
-            VStack(alignment: .leading, spacing: 8) {
-                HStack(spacing: 8) {
-                    AirlineLogo(airline: airline, size: 32)
-                    Text(variant.name ?? airline.name)
-                        .font(.headline2).foregroundStyle(Theme.textPrimary)
-                }
-                if let w = variant.maxWeightKg {
-                    Label("Max \(Int(w)) kg toegestaan", systemImage: "scalemass")
-                        .font(.body1).foregroundStyle(Theme.textSecondary)
-                }
-                if let large = variant.includesLargeBag {
-                    Label(large ? "Grote tas inbegrepen in dit ticket" : "Alleen klein item toegestaan",
-                          systemImage: large ? "bag.fill" : "bag")
-                        .font(.body1)
-                        .foregroundStyle(large ? Theme.green : Theme.orange)
-                }
-                if let reasons = result.reasons, !reasons.isEmpty {
-                    VStack(alignment: .leading, spacing: 4) {
-                        ForEach(reasons, id: \.self) { r in
-                            Label(r, systemImage: "exclamationmark.circle.fill")
-                                .font(.caption1).foregroundStyle(Theme.red)
-                        }
-                    }
-                    .padding(.top, 4)
+    private func variantRow(_ variant: CheckVariant) -> some View {
+        VStack(alignment: .leading, spacing: 10) {
+            if let w = variant.maxWeightKg {
+                resultRow(icon: "scalemass", label: "Max gewicht", value: "\(Int(w)) kg")
+            }
+            if let large = variant.includesLargeBag {
+                resultRow(
+                    icon: large ? "bag.fill" : "bag",
+                    label: "Tickettype",
+                    value: large ? "Grote handbagage inbegrepen" : "Alleen klein persoonlijk item",
+                    color: large ? Theme.green : Theme.orange
+                )
+            }
+            if let reasons = result.reasons, !reasons.isEmpty {
+                ForEach(reasons, id: \.self) { r in
+                    resultRow(icon: "exclamationmark.circle", label: r, value: "", color: Theme.red)
                 }
             }
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(16)
         }
         .padding(.horizontal, 20)
+    }
+
+    private func resultRow(icon: String, label: String, value: String, color: Color = Theme.textSecondary) -> some View {
+        HStack(spacing: 12) {
+            Image(systemName: icon)
+                .font(.system(size: 15, weight: .medium))
+                .foregroundStyle(color)
+                .frame(width: 22)
+            Text(label)
+                .font(.system(size: 14, design: .rounded))
+                .foregroundStyle(Theme.textPrimary)
+            Spacer()
+            if !value.isEmpty {
+                Text(value)
+                    .font(.system(size: 14, weight: .semibold, design: .rounded))
+                    .foregroundStyle(Theme.textSecondary)
+            }
+        }
+        .padding(.vertical, 4)
     }
 
     // MARK: Bag recommendations
 
     private var bagRecommendations: some View {
-        VStack(alignment: .leading, spacing: 14) {
-            VStack(alignment: .leading, spacing: 4) {
+        VStack(alignment: .leading, spacing: 12) {
+            VStack(alignment: .leading, spacing: 3) {
                 Text("Tassen die wél passen")
-                    .font(.headline2)
-                Text("Speciaal geselecteerd voor \(airline.name).")
+                    .font(.system(size: 16, weight: .bold, design: .rounded))
+                Text("Geselecteerd voor \(airline.name).")
                     .font(.caption1).foregroundStyle(Theme.textSecondary)
             }
             .padding(.horizontal, 20)
 
             if loadingBags {
                 ProgressView().tint(Theme.sky).frame(maxWidth: .infinity).padding()
-            } else if bags.isEmpty {
-                Text("Geen aanbevelingen beschikbaar.")
-                    .font(.caption1).foregroundStyle(Theme.textSecondary)
-                    .padding(.horizontal, 20)
-            } else {
+            } else if !bags.isEmpty {
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 12) {
                         ForEach(bags.prefix(6)) { bag in

@@ -150,10 +150,10 @@ struct CheckResponse: Decodable, Equatable {
     var verdictTitle: String {
         switch status {
         case "fit":        return "Je tas past!"
-        case "too_large":  return "Te groot"
-        case "too_heavy":  return "Te zwaar"
-        case "no_match":   return "Geen match"
-        default:           return "Onbekend"
+        case "too_large":  return "Helaas, te groot"
+        case "too_heavy":  return "Helaas, te zwaar"
+        case "no_match":   return "Helaas, geen match"
+        default:           return "Helaas"
         }
     }
 

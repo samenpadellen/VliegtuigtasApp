@@ -20,6 +20,12 @@ enum SortOption: String, CaseIterable, Identifiable {
     }
 }
 
+private var shopStatusBarHeight: CGFloat {
+    UIApplication.shared.connectedScenes
+        .compactMap { $0 as? UIWindowScene }
+        .first?.windows.first?.safeAreaInsets.top ?? 50
+}
+
 struct BagsShopView: View {
     @State private var allBags: [Bag] = []
     @State private var airlines: [Airline] = []
@@ -108,34 +114,39 @@ struct BagsShopView: View {
     // MARK: - Shop header (navy hero style)
 
     private var shopHeader: some View {
-        Theme.navyGradient
-            .frame(maxWidth: .infinity)
-            .frame(height: 160)
-            .overlay {
-                // Decorative circles
-                Circle().fill(.white.opacity(0.04)).frame(width: 160).offset(x: 100, y: -40)
-                Circle().fill(.white.opacity(0.04)).frame(width: 100).offset(x: 140, y: 60)
-            }
-            .overlay(alignment: .bottomLeading) {
-                VStack(alignment: .leading, spacing: 6) {
-                    HStack(spacing: 8) {
-                        Image(systemName: "bag.fill")
-                            .font(.system(size: 14, weight: .semibold))
-                            .foregroundStyle(Theme.sky)
-                        Text("HANDBAGAGE SHOP")
-                            .font(.system(size: 11, weight: .bold, design: .rounded))
-                            .foregroundStyle(.white.opacity(0.7))
-                            .kerning(1.2)
-                    }
-                    Text("Tassen die altijd\npassen")
-                        .font(.system(size: 26, weight: .bold, design: .rounded))
-                        .foregroundStyle(.white)
-                        .lineSpacing(1)
+        ZStack(alignment: .bottomLeading) {
+            Image("PhotoTraveler")
+                .resizable()
+                .scaledToFill()
+                .frame(maxWidth: .infinity)
+                .frame(height: 160 + shopStatusBarHeight)
+                .clipped()
+
+            // Donker onderin + links zodat tekst leesbaar blijft, foto rechts uitkomt
+            LinearGradient(
+                colors: [Theme.navy.opacity(0.80), Theme.navy.opacity(0.10)],
+                startPoint: .bottom, endPoint: .topTrailing
+            )
+
+            VStack(alignment: .leading, spacing: 6) {
+                HStack(spacing: 8) {
+                    Image(systemName: "bag.fill")
+                        .font(.system(size: 14, weight: .semibold))
+                        .foregroundStyle(.white.opacity(0.80))
+                    Text("HANDBAGAGE SHOP")
+                        .font(.system(size: 11, weight: .bold, design: .rounded))
+                        .foregroundStyle(.white.opacity(0.75))
+                        .kerning(1.2)
                 }
-                .padding(.horizontal, 20)
-                .padding(.bottom, 22)
+                Text("Tassen die altijd\npassen")
+                    .font(.system(size: 26, weight: .bold, design: .rounded))
+                    .foregroundStyle(.white)
+                    .lineSpacing(1)
             }
-            .clipped()
+            .padding(.horizontal, 20)
+            .padding(.bottom, 22)
+        }
+        .clipped()
     }
 
     // MARK: - Search + filter row
@@ -390,22 +401,20 @@ private struct BagCard: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            // Product image
+            // Product image — witte achtergrond zodat foto's er professioneel uitzien
             ZStack {
-                LinearGradient(
-                    colors: [Color(.systemGray6), Color(.systemGray5)],
-                    startPoint: .topLeading, endPoint: .bottomTrailing
-                )
-                Image(systemName: "bag")
-                    .font(.system(size: 36, weight: .ultraLight))
-                    .foregroundStyle(Theme.navy.opacity(0.15))
+                Color.white
                 if bag.imageUrl != nil {
                     AuthorisedImage(urlString: bag.imageUrl)
-                        .padding(12)
+                        .padding(8)
+                } else {
+                    Image(systemName: "bag")
+                        .font(.system(size: 36, weight: .light))
+                        .foregroundStyle(Theme.navy.opacity(0.18))
                 }
             }
             .frame(maxWidth: .infinity)
-            .frame(height: 140)
+            .frame(height: 150)
             .clipShape(UnevenRoundedRectangle(topLeadingRadius: 18, bottomLeadingRadius: 0,
                                               bottomTrailingRadius: 0, topTrailingRadius: 18))
 
@@ -653,7 +662,7 @@ private struct SkeletonCard: View {
         VStack(alignment: .leading, spacing: 0) {
             RoundedRectangle(cornerRadius: 0)
                 .fill(Color(.systemFill))
-                .frame(height: 140)
+                .frame(height: 150)
                 .clipShape(UnevenRoundedRectangle(topLeadingRadius: 18, bottomLeadingRadius: 0,
                                                   bottomTrailingRadius: 0, topTrailingRadius: 18))
             VStack(alignment: .leading, spacing: 8) {

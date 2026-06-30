@@ -15,8 +15,11 @@ struct HomeView: View {
 
     @State private var flightNumber = ""
     @State private var selectedAirline: Airline?
-    @State private var showChecker  = false
-    @State private var showAirlines = false
+    @State private var showChecker   = false
+    @State private var showAirlines  = false
+    @State private var showShop      = false
+    @State private var shopBags: [Bag] = []
+    @State private var isLoadingBags  = true
 
     var body: some View {
         NavigationStack {
@@ -26,6 +29,7 @@ struct HomeView: View {
                     VStack(spacing: 20) {
                         flightLookupCard
                         airlineGridSection
+                        shopCarouselSection
                         howItWorksSection
                     }
                     .padding(.horizontal, 16)
@@ -37,7 +41,10 @@ struct HomeView: View {
             .ignoresSafeArea(edges: .top)
             .navigationBarHidden(true)
             .task {
-                await airlineStore.load()
+                async let loadAirlines: () = airlineStore.load()
+                async let loadBags: () = fetchShopBags()
+                await loadAirlines
+                await loadBags
                 APIClient.shared.sendEvent("page_view", path: "/home")
             }
             .navigationDestination(isPresented: $showChecker) {
@@ -45,6 +52,9 @@ struct HomeView: View {
             }
             .navigationDestination(isPresented: $showAirlines) {
                 AirlineListView()
+            }
+            .navigationDestination(isPresented: $showShop) {
+                BagsShopView()
             }
         }
     }
@@ -61,21 +71,20 @@ struct HomeView: View {
         .frame(maxWidth: .infinity)
         .frame(height: heroHeight)
         .overlay {
-            // Photo layer (won't affect layout bounds)
-            if UIImage(named: "HeroSuitcase") != nil {
-                Image("HeroSuitcase")
-                    .resizable()
-                    .scaledToFill()
-            } else {
-                Image(systemName: "suitcase.fill")
-                    .font(.system(size: 90, weight: .thin))
-                    .foregroundStyle(.white.opacity(0.15))
-                    .offset(x: 60, y: -20)
-            }
+            Image("PhotoWindowWing")
+                .resizable()
+                .scaledToFill()
         }
         .overlay {
-            // Dark gradient on top of photo
-            Theme.heroGradient
+            // KLM-stijl donker verloop over de foto
+            LinearGradient(
+                colors: [
+                    Theme.navy.opacity(0.72),
+                    Theme.navy.opacity(0.30),
+                    Theme.navy.opacity(0.60)
+                ],
+                startPoint: .topLeading, endPoint: .bottomTrailing
+            )
         }
         .clipped()
         // Branding bar pinned to top
@@ -264,20 +273,16 @@ struct HomeView: View {
         .shadow(color: .black.opacity(0.06), radius: 12, x: 0, y: 4)
     }
 
-    // MARK: - Airline grid
+    // MARK: - Airline grid (3 × 1, meestgebruikte maatschappijen)
 
     private var airlineGridSection: some View {
         VStack(spacing: 14) {
             HStack {
-                VStack(alignment: .leading, spacing: 2) {
-                    Text("Populaire maatschappijen")
-                        .font(.system(size: 18, weight: .bold, design: .rounded))
-                        .foregroundStyle(Theme.textPrimary)
-                }
+                Text("Populaire maatschappijen")
+                    .font(.system(size: 18, weight: .bold, design: .rounded))
+                    .foregroundStyle(Theme.textPrimary)
                 Spacer()
-                Button {
-                    showAirlines = true
-                } label: {
+                Button { showAirlines = true } label: {
                     HStack(spacing: 4) {
                         Text("Bekijk alle")
                             .font(.system(size: 13, weight: .semibold))
@@ -289,18 +294,18 @@ struct HomeView: View {
             }
 
             if airlineStore.isLoading {
-                HStack {
-                    Spacer()
-                    ProgressView().tint(Theme.navy)
-                    Spacer()
+                HStack(spacing: 10) {
+                    ForEach(0..<3, id: \.self) { _ in
+                        RoundedRectangle(cornerRadius: 18)
+                            .fill(Color(.systemBackground))
+                            .frame(maxWidth: .infinity)
+                            .frame(height: 90)
+                            .shadow(color: .black.opacity(0.05), radius: 6, x: 0, y: 2)
+                    }
                 }
-                .padding(.vertical, 24)
             } else {
-                LazyVGrid(
-                    columns: Array(repeating: GridItem(.flexible(), spacing: 10), count: 3),
-                    spacing: 10
-                ) {
-                    ForEach(airlineStore.airlines.prefix(9)) { airline in
+                HStack(spacing: 10) {
+                    ForEach(airlineStore.airlines.prefix(3)) { airline in
                         AirlineCard(airline: airline) {
                             selectedAirline = airline
                             UIImpactFeedbackGenerator(style: .light).impactOccurred()
@@ -312,27 +317,117 @@ struct HomeView: View {
         }
     }
 
+    // MARK: - Shop carousel
+
+    private var shopCarouselSection: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            // Foto-banner header
+            Button { showShop = true } label: {
+                ZStack(alignment: .bottomLeading) {
+                    Image("PhotoOverheadBlue")
+                        .resizable()
+                        .scaledToFill()
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 110)
+                        .clipped()
+                        .clipShape(RoundedRectangle(cornerRadius: 18))
+
+                    LinearGradient(
+                        colors: [.black.opacity(0.55), .black.opacity(0.0)],
+                        startPoint: .bottomLeading, endPoint: .topTrailing
+                    )
+                    .clipShape(RoundedRectangle(cornerRadius: 18))
+
+                    HStack {
+                        VStack(alignment: .leading, spacing: 3) {
+                            Text("Aanbevolen tassen")
+                                .font(.system(size: 17, weight: .bold, design: .rounded))
+                                .foregroundStyle(.white)
+                            HStack(spacing: 4) {
+                                Image(systemName: "checkmark.seal.fill")
+                                    .font(.system(size: 10, weight: .semibold))
+                                    .foregroundStyle(.white.opacity(0.85))
+                                Text("Gecontroleerd op maat")
+                                    .font(.system(size: 12, design: .rounded))
+                                    .foregroundStyle(.white.opacity(0.85))
+                            }
+                        }
+                        Spacer()
+                        HStack(spacing: 4) {
+                            Text("Bekijk alle")
+                                .font(.system(size: 13, weight: .semibold))
+                            Image(systemName: "arrow.right")
+                                .font(.system(size: 11, weight: .semibold))
+                        }
+                        .foregroundStyle(.white)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 7)
+                        .background(.white.opacity(0.20))
+                        .clipShape(Capsule())
+                    }
+                    .padding(.horizontal, 16)
+                    .padding(.bottom, 14)
+                }
+            }
+            .buttonStyle(.plain)
+
+            // Edge-to-edge scroll (compenseer de 16pt parent padding)
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(alignment: .top, spacing: 12) {
+                    if isLoadingBags {
+                        ForEach(0..<5, id: \.self) { _ in ShopCarouselSkeletonCard() }
+                    } else {
+                        ForEach(shopBags.prefix(8)) { bag in ShopCarouselCard(bag: bag) }
+                        if !shopBags.isEmpty {
+                            ViewAllShopCard { showShop = true }
+                        }
+                    }
+                }
+                .padding(.horizontal, 16)
+                .padding(.vertical, 4)
+            }
+            .padding(.horizontal, -16)
+        }
+    }
+
     // MARK: - How it works
 
     private var howItWorksSection: some View {
-        VStack(spacing: 14) {
-            HStack {
+        ZStack(alignment: .topLeading) {
+            // Foto achtergrond
+            Image("PhotoOverheadOpen")
+                .resizable()
+                .scaledToFill()
+                .frame(maxWidth: .infinity)
+                .frame(height: 260)
+                .clipped()
+                .clipShape(RoundedRectangle(cornerRadius: 22))
+
+            // Donkere overlay
+            LinearGradient(
+                colors: [Theme.navy.opacity(0.88), Theme.navy.opacity(0.55)],
+                startPoint: .bottom, endPoint: .top
+            )
+            .clipShape(RoundedRectangle(cornerRadius: 22))
+
+            VStack(alignment: .leading, spacing: 16) {
                 Text("Hoe werkt het?")
                     .font(.system(size: 18, weight: .bold, design: .rounded))
-                    .foregroundStyle(Theme.textPrimary)
-                Spacer()
+                    .foregroundStyle(.white)
+
+                VStack(spacing: 12) {
+                    PhotoStepRow(number: "1", icon: "airplane.departure",
+                                 title: "Kies je maatschappij",
+                                 description: "Of zoek via vluchtnummer.")
+                    PhotoStepRow(number: "2", icon: "ruler",
+                                 title: "Vul je tasmaten in",
+                                 description: "Lengte, breedte, hoogte en gewicht.")
+                    PhotoStepRow(number: "3", icon: "checkmark.shield.fill",
+                                 title: "Direct resultaat",
+                                 description: "Past het niet? We adviseren de juiste tas.")
+                }
             }
-            VStack(spacing: 10) {
-                StepRow(number: "1", icon: "airplane.departure", color: Theme.navy,
-                        title: "Kies je maatschappij",
-                        description: "Of zoek automatisch via vluchtnummer.")
-                StepRow(number: "2", icon: "ruler", color: Theme.sky,
-                        title: "Vul je tasmaten in",
-                        description: "Lengte, breedte, hoogte en gewicht.")
-                StepRow(number: "3", icon: "checkmark.shield.fill", color: Theme.green,
-                        title: "Direct resultaat",
-                        description: "Past het niet? We adviseren de juiste tas.")
-            }
+            .padding(20)
         }
     }
 
@@ -340,6 +435,13 @@ struct HomeView: View {
         let t = flightNumber.trimmingCharacters(in: .whitespaces)
         guard !t.isEmpty else { return }
         Task { await flightStore.lookup(t) }
+    }
+
+    @MainActor
+    private func fetchShopBags() async {
+        isLoadingBags = true
+        shopBags = (try? await APIClient.shared.bags()) ?? []
+        isLoadingBags = false
     }
 }
 
@@ -368,6 +470,196 @@ private struct AirlineCard: View {
             .shadow(color: .black.opacity(0.07), radius: 8, x: 0, y: 3)
         }
         .buttonStyle(.plain)
+        .accessibilityLabel("Controleer handbagage bij \(airline.name)")
+    }
+}
+
+// MARK: - Shop carousel card
+
+private struct ShopCarouselCard: View {
+    let bag: Bag
+
+    private var dimensionsText: String? {
+        let parts = [bag.length, bag.width, bag.depth].compactMap { $0.map { "\(Int($0))" } }
+        guard !parts.isEmpty else { return nil }
+        return parts.joined(separator: "×") + " cm"
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            // Productafbeelding — witte achtergrond, product centred met minimale padding
+            ZStack {
+                Color.white
+                if bag.imageUrl != nil {
+                    AuthorisedImage(urlString: bag.imageUrl)
+                        .padding(6)
+                } else {
+                    Image(systemName: "bag")
+                        .font(.system(size: 32, weight: .light))
+                        .foregroundStyle(Theme.navy.opacity(0.18))
+                }
+            }
+            .frame(width: 160, height: 120)
+            .clipShape(UnevenRoundedRectangle(
+                topLeadingRadius: 16, bottomLeadingRadius: 0,
+                bottomTrailingRadius: 0, topTrailingRadius: 16
+            ))
+
+            // Info
+            VStack(alignment: .leading, spacing: 5) {
+                if let brand = bag.brand {
+                    Text(brand.uppercased())
+                        .font(.system(size: 9, weight: .bold, design: .rounded))
+                        .foregroundStyle(Theme.navy.opacity(0.65))
+                        .kerning(0.7)
+                }
+                Text(bag.name)
+                    .font(.system(size: 12, weight: .semibold, design: .rounded))
+                    .foregroundStyle(Theme.textPrimary)
+                    .lineLimit(2)
+                    .fixedSize(horizontal: false, vertical: true)
+                if let dims = dimensionsText {
+                    Text(dims)
+                        .font(.system(size: 9, design: .rounded))
+                        .foregroundStyle(Theme.textSecondary)
+                }
+                Spacer(minLength: 6)
+                HStack(alignment: .center) {
+                    if let price = bag.price {
+                        Text("€\(Int(price))")
+                            .font(.system(size: 18, weight: .bold, design: .rounded))
+                            .foregroundStyle(Theme.textPrimary)
+                    }
+                    Spacer()
+                    if let url = bag.affiliateUrl.flatMap(URL.init) {
+                        Link(destination: url) {
+                            Image(systemName: "arrow.up.right")
+                                .font(.system(size: 11, weight: .bold))
+                                .foregroundStyle(.white)
+                                .frame(width: 30, height: 30)
+                                .background(Theme.navyGradient)
+                                .clipShape(Circle())
+                        }
+                    }
+                }
+            }
+            .padding(.horizontal, 12)
+            .padding(.top, 10)
+            .padding(.bottom, 12)
+        }
+        .frame(width: 160)
+        .background(Color(.systemBackground))
+        .clipShape(RoundedRectangle(cornerRadius: 16))
+        .shadow(color: .black.opacity(0.08), radius: 10, x: 0, y: 4)
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("\(bag.brand.map { $0 + " " } ?? "")\(bag.name)\(bag.price.map { ", €\(Int($0))" } ?? "")")
+    }
+}
+
+// MARK: - "Bekijk alle tassen" eindkaart
+
+private struct ViewAllShopCard: View {
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            VStack(spacing: 10) {
+                ZStack {
+                    Circle()
+                        .fill(Theme.navy.opacity(0.08))
+                        .frame(width: 52, height: 52)
+                    Image(systemName: "bag.fill")
+                        .font(.system(size: 22, weight: .medium))
+                        .foregroundStyle(Theme.navy)
+                }
+                VStack(spacing: 3) {
+                    Text("Bekijk alle")
+                        .font(.system(size: 13, weight: .bold, design: .rounded))
+                        .foregroundStyle(Theme.navy)
+                    Text("tassen")
+                        .font(.system(size: 12, design: .rounded))
+                        .foregroundStyle(Theme.textSecondary)
+                }
+                Image(systemName: "arrow.right")
+                    .font(.system(size: 13, weight: .semibold))
+                    .foregroundStyle(Theme.navy.opacity(0.45))
+            }
+            .frame(width: 100)
+            .frame(maxHeight: .infinity)
+            .padding(.vertical, 20)
+            .background(Theme.navy.opacity(0.04))
+            .clipShape(RoundedRectangle(cornerRadius: 16))
+            .overlay(
+                RoundedRectangle(cornerRadius: 16)
+                    .strokeBorder(Theme.navy.opacity(0.10), lineWidth: 1)
+            )
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel("Bekijk alle tassen in de shop")
+    }
+}
+
+// MARK: - Skeleton carousel card
+
+private struct ShopCarouselSkeletonCard: View {
+    @State private var opacity: Double = 1
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            Color(.systemFill)
+                .frame(width: 160, height: 120)
+                .clipShape(UnevenRoundedRectangle(
+                    topLeadingRadius: 16, bottomLeadingRadius: 0,
+                    bottomTrailingRadius: 0, topTrailingRadius: 16
+                ))
+            VStack(alignment: .leading, spacing: 8) {
+                RoundedRectangle(cornerRadius: 4).fill(Color(.systemFill)).frame(height: 8).frame(maxWidth: 45)
+                RoundedRectangle(cornerRadius: 4).fill(Color(.systemFill)).frame(height: 11).frame(maxWidth: 136)
+                RoundedRectangle(cornerRadius: 4).fill(Color(.systemFill)).frame(height: 11).frame(maxWidth: 100)
+                RoundedRectangle(cornerRadius: 4).fill(Color(.systemFill)).frame(height: 18).frame(maxWidth: 55)
+            }
+            .padding(12)
+        }
+        .frame(width: 160)
+        .background(Color(.systemBackground))
+        .clipShape(RoundedRectangle(cornerRadius: 16))
+        .shadow(color: .black.opacity(0.05), radius: 8, x: 0, y: 3)
+        .opacity(opacity)
+        .onAppear {
+            withAnimation(.easeInOut(duration: 0.9).repeatForever(autoreverses: true)) { opacity = 0.5 }
+        }
+    }
+}
+
+private struct PhotoStepRow: View {
+    let number: String
+    let icon: String
+    let title: String
+    let description: String
+
+    var body: some View {
+        HStack(alignment: .center, spacing: 14) {
+            ZStack {
+                Circle()
+                    .fill(.white.opacity(0.15))
+                    .frame(width: 40, height: 40)
+                Image(systemName: icon)
+                    .font(.system(size: 16, weight: .semibold))
+                    .foregroundStyle(.white)
+            }
+            VStack(alignment: .leading, spacing: 2) {
+                Text(title)
+                    .font(.system(size: 14, weight: .semibold, design: .rounded))
+                    .foregroundStyle(.white)
+                Text(description)
+                    .font(.system(size: 12, design: .rounded))
+                    .foregroundStyle(.white.opacity(0.75))
+            }
+            Spacer()
+            Text(number)
+                .font(.system(size: 20, weight: .bold, design: .rounded))
+                .foregroundStyle(.white.opacity(0.20))
+        }
     }
 }
 
