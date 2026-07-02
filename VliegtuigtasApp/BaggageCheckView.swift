@@ -3,8 +3,8 @@ import SwiftUI
 struct BaggageCheckView: View {
     var preselected: Airline?
 
-    @StateObject private var airlineStore = AirlineStore()
-    @StateObject private var checkStore   = CheckStore()
+    @EnvironmentObject private var airlineStore: AirlineStore
+    @StateObject private var checkStore = CheckStore()
 
     @State private var selectedAirline: Airline?
     @State private var selectedVariant: AirlineVariant?
@@ -260,7 +260,7 @@ struct ResultSheet: View {
                     if let variant = result.variant {
                         Card {
                             VStack(alignment: .leading, spacing: 8) {
-                                Text(variant.name ?? "Ticket type")
+                                Text(variant.variantName)
                                     .font(.headline2).foregroundStyle(Theme.sky)
                                 if let w = variant.maxWeightKg {
                                     Label("Max gewicht: \(Int(w)) kg", systemImage: "scalemass")

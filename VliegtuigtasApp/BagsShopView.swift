@@ -27,28 +27,69 @@ private var shopStatusBarHeight: CGFloat {
 }
 
 struct BagsShopView: View {
-    @State private var allBags: [Bag] = []
-    @State private var airlines: [Airline] = []
-    @State private var isLoading = false
+    // Gedeelde catalogus (zie AppNavigator/ContentView): zonder maatschappij-filter
+    // hergebruiken we gewoon wat Home al heeft ingeladen, in plaats van dezelfde
+    // data nog een keer op te vragen bij elke tabwissel.
+    @EnvironmentObject private var airlineStore: AirlineStore
+    @EnvironmentObject private var bagStore: BagStore
+
+    @State private var filteredBags: [Bag] = []
+    @State private var isLoadingFiltered = false
 
     @State private var searchText = ""
-    @State private var selectedCategory: String? = nil
+    @State private var selectedFitType: BagFitType? = nil
     @State private var selectedAirlineSlug: String? = nil
+    @State private var selectedBrand: String? = nil
     @State private var sortOption: SortOption = .default
     @State private var showFilters = false
+    @Namespace private var zoomNamespace
 
-    private var categories: [String] {
-        Array(Set(allBags.compactMap(\.category))).sorted()
+    /// Zonder maatschappij-filter tonen we de gedeelde catalogus; met filter
+    /// gebruiken we de eigen server-gefilterde resultaten (de API filtert op
+    /// maatschappij zelf, dat kan de gedeelde store niet generiek cachen).
+    private var allBags: [Bag] {
+        selectedAirlineSlug == nil ? bagStore.bags : filteredBags
+    }
+
+    private var isLoading: Bool {
+        selectedAirlineSlug == nil
+            ? (bagStore.isLoading && bagStore.bags.isEmpty)
+            : isLoadingFiltered
+    }
+
+    private var availableFitTypes: [BagFitType] {
+        BagFitType.allCases.filter { type in allBags.contains { $0.fitType == type } }
+    }
+
+    /// Meest voorkomende merken in de catalogus, voor de merken-chips (net als Apple's productgrid).
+    private var topBrands: [String] {
+        var counts: [String: Int] = [:]
+        for bag in allBags { if let brand = bag.brand { counts[brand, default: 0] += 1 } }
+        return counts.sorted { $0.value == $1.value ? $0.key < $1.key : $0.value > $1.value }
+            .prefix(8).map(\.key)
+    }
+
+    private var distinctBrandCount: Int {
+        Set(allBags.compactMap(\.brand)).count
+    }
+
+    /// Uitgelichte tassen voor de swipeable carousel bovenaan.
+    private var featuredBags: [Bag] {
+        let featured = allBags.filter { $0.featured == true }
+            .sorted { ($0.editorRank ?? .max) < ($1.editorRank ?? .max) }
+        if !featured.isEmpty { return Array(featured.prefix(5)) }
+        return Array(allBags.sorted { ($0.editorRank ?? .max) < ($1.editorRank ?? .max) }.prefix(3))
     }
 
     private var activeFilterCount: Int {
-        [selectedCategory != nil, selectedAirlineSlug != nil, sortOption != .default]
+        [selectedFitType != nil, selectedAirlineSlug != nil, selectedBrand != nil, sortOption != .default]
             .filter { $0 }.count
     }
 
     private var filtered: [Bag] {
         var result = allBags
-        if let cat = selectedCategory  { result = result.filter { $0.category == cat } }
+        if let fit = selectedFitType  { result = result.filter { $0.fitType == fit } }
+        if let brand = selectedBrand  { result = result.filter { $0.brand == brand } }
         if !searchText.isEmpty {
             result = result.filter {
                 $0.name.localizedCaseInsensitiveContains(searchText) ||
@@ -57,8 +98,8 @@ struct BagsShopView: View {
         }
         switch sortOption {
         case .default:   break
-        case .priceLow:  result.sort { ($0.price ?? 0) < ($1.price ?? 0) }
-        case .priceHigh: result.sort { ($0.price ?? 0) > ($1.price ?? 0) }
+        case .priceLow:  result.sort { ($0.priceEur ?? 0) < ($1.priceEur ?? 0) }
+        case .priceHigh: result.sort { ($0.priceEur ?? 0) > ($1.priceEur ?? 0) }
         case .sizeSmall: result.sort { volume($0) < volume($1) }
         case .sizeLarge: result.sort { volume($0) > volume($1) }
         }
@@ -74,18 +115,20 @@ struct BagsShopView: View {
                     searchAndFilter
                         .padding(.horizontal, 16)
                         .padding(.top, 20)
-                        .padding(.bottom, 16)
-
-                    promoBanner
-                        .padding(.horizontal, 16)
                         .padding(.bottom, 20)
 
-                    if !categories.isEmpty {
-                        categoryRow.padding(.bottom, 16)
+                    featuredCarousel
+                        .padding(.bottom, 24)
+
+                    if !topBrands.isEmpty {
+                        brandRow.padding(.bottom, 16)
+                    }
+
+                    if !availableFitTypes.isEmpty {
+                        fitTypeRow.padding(.bottom, 16)
                     }
 
                     activeFiltersBar
-                        .padding(.horizontal, 16)
 
                     productGrid
                         .padding(.horizontal, 16)
@@ -96,11 +139,12 @@ struct BagsShopView: View {
         .background(Color(.systemGroupedBackground))
         .ignoresSafeArea(edges: .top)
         .navigationBarHidden(true)
+        .refreshable { await refreshAll() }
         .sheet(isPresented: $showFilters) {
             FilterSheet(
-                airlines: airlines,
-                categories: categories,
-                selectedCategory: $selectedCategory,
+                airlines: airlineStore.airlines,
+                fitTypes: availableFitTypes,
+                selectedFitType: $selectedFitType,
                 selectedAirlineSlug: $selectedAirlineSlug,
                 sortOption: $sortOption
             )
@@ -142,6 +186,13 @@ struct BagsShopView: View {
                     .font(.system(size: 26, weight: .bold, design: .rounded))
                     .foregroundStyle(.white)
                     .lineSpacing(1)
+
+                if !allBags.isEmpty {
+                    Text("\(allBags.count) tassen · \(distinctBrandCount) merken")
+                        .font(.system(size: 12, weight: .medium, design: .rounded))
+                        .foregroundStyle(.white.opacity(0.65))
+                        .padding(.top, 2)
+                }
             }
             .padding(.horizontal, 20)
             .padding(.bottom, 22)
@@ -198,17 +249,17 @@ struct BagsShopView: View {
         }
     }
 
-    // MARK: - Category chips
+    // MARK: - Fit type chips (onder de stoel / bagagevak)
 
-    private var categoryRow: some View {
+    private var fitTypeRow: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 8) {
-                CategoryChip(label: "Alles", selected: selectedCategory == nil) {
-                    withAnimation(.spring(response: 0.3)) { selectedCategory = nil }
+                CategoryChip(label: "Alles", selected: selectedFitType == nil) {
+                    withAnimation(.spring(response: 0.3)) { selectedFitType = nil }
                 }
-                ForEach(categories, id: \.self) { cat in
-                    CategoryChip(label: cat.capitalized, selected: selectedCategory == cat) {
-                        withAnimation(.spring(response: 0.3)) { selectedCategory = cat }
+                ForEach(availableFitTypes) { fit in
+                    CategoryChip(label: fit.label, selected: selectedFitType == fit) {
+                        withAnimation(.spring(response: 0.3)) { selectedFitType = fit }
                     }
                 }
             }
@@ -227,71 +278,65 @@ struct BagsShopView: View {
                         ActiveFilterChip(label: sortOption.rawValue) { sortOption = .default }
                     }
                     if let slug = selectedAirlineSlug,
-                       let airline = airlines.first(where: { $0.slug == slug }) {
+                       let airline = airlineStore.airlines.first(where: { $0.slug == slug }) {
                         ActiveFilterChip(label: airline.name) { selectedAirlineSlug = nil }
                     }
+                    if let brand = selectedBrand {
+                        ActiveFilterChip(label: brand) { selectedBrand = nil }
+                    }
                     Button {
-                        sortOption = .default; selectedAirlineSlug = nil; selectedCategory = nil
+                        sortOption = .default; selectedAirlineSlug = nil
+                        selectedFitType = nil; selectedBrand = nil
                     } label: {
                         Text("Wis alles")
                             .font(.system(size: 12, weight: .semibold, design: .rounded))
                             .foregroundStyle(Theme.red)
                     }
                 }
+                .padding(.horizontal, 16)
             }
             .padding(.bottom, 14)
         }
     }
 
-    // MARK: - Promo banner
+    // MARK: - Featured carousel ("Uitgelicht", swipeable als in de App Store shop)
 
-    private var promoBanner: some View {
-        ZStack(alignment: .leading) {
-            Theme.navyGradient
-                .clipShape(RoundedRectangle(cornerRadius: 20))
+    @ViewBuilder
+    private var featuredCarousel: some View {
+        if isLoading {
+            SkeletonCard()
+                .frame(height: 220)
+                .padding(.horizontal, 16)
+        } else if featuredBags.isEmpty {
+            FeaturedBagCard(bag: nil)
+                .padding(.horizontal, 16)
+        } else {
+            FeaturedCarousel(bags: featuredBags)
+        }
+    }
 
-            // Decorative circles
-            Circle().fill(.white.opacity(0.06)).frame(width: 120).offset(x: 190, y: -30)
-            Circle().fill(.white.opacity(0.04)).frame(width: 80).offset(x: 240, y: 50)
+    // MARK: - Brand row ("Merken", vergelijkbaar met Apple's productcategorieën)
 
-            HStack(alignment: .center, spacing: 0) {
-                VStack(alignment: .leading, spacing: 10) {
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("ZOMERDEAL")
-                            .font(.system(size: 10, weight: .bold, design: .rounded))
-                            .foregroundStyle(Theme.sky)
-                            .kerning(1.5)
-                        Text("Altijd past\njouw tas!")
-                            .font(.system(size: 22, weight: .bold, design: .rounded))
-                            .foregroundStyle(.white)
-                            .lineSpacing(2)
-                        Text("Gecontroleerd op maat")
-                            .font(.system(size: 12, design: .rounded))
-                            .foregroundStyle(.white.opacity(0.70))
+    private var brandRow: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text("Merken")
+                .font(.system(size: 15, weight: .bold, design: .rounded))
+                .foregroundStyle(Theme.textPrimary)
+                .padding(.horizontal, 16)
+
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 8) {
+                    ForEach(topBrands, id: \.self) { brand in
+                        CategoryChip(label: brand, selected: selectedBrand == brand) {
+                            withAnimation(.spring(response: 0.3)) {
+                                selectedBrand = (selectedBrand == brand) ? nil : brand
+                            }
+                        }
                     }
-                    HStack(spacing: 6) {
-                        Text("Shop nu")
-                            .font(.system(size: 13, weight: .bold, design: .rounded))
-                        Image(systemName: "arrow.right")
-                            .font(.system(size: 11, weight: .bold))
-                    }
-                    .foregroundStyle(Theme.navy)
-                    .padding(.horizontal, 16).padding(.vertical, 10)
-                    .background(.white)
-                    .clipShape(Capsule())
                 }
-                .padding(22)
-
-                Spacer()
-
-                Text("🧳")
-                    .font(.system(size: 72))
-                    .rotationEffect(.degrees(10))
-                    .padding(.trailing, 22)
-                    .offset(y: 8)
+                .padding(.horizontal, 16)
             }
         }
-        .frame(height: 165)
     }
 
     // MARK: - Product grid
@@ -310,6 +355,8 @@ struct BagsShopView: View {
                     Text("\(filtered.count) tassen")
                         .font(.system(size: 13, design: .rounded))
                         .foregroundStyle(Theme.textSecondary)
+                        .contentTransition(.numericText(value: Double(filtered.count)))
+                        .animation(.snappy(duration: 0.25), value: filtered.count)
                     Spacer()
                     if sortOption != .default {
                         HStack(spacing: 4) {
@@ -326,8 +373,18 @@ struct BagsShopView: View {
                     columns: [GridItem(.flexible(), spacing: 12), GridItem(.flexible(), spacing: 12)],
                     spacing: 12
                 ) {
-                    ForEach(filtered) { bag in BagCard(bag: bag) }
+                    ForEach(filtered) { bag in
+                        NavigationLink(destination: BagDetailView(bagId: bag.id)
+                            .zoomDestination(id: bag.id, in: zoomNamespace)) {
+                            BagCard(bag: bag)
+                        }
+                        .buttonStyle(.pressableCard)
+                        .zoomSource(id: bag.id, in: zoomNamespace)
+                    }
                 }
+                // Laat kaarten vloeiend herschikken/verschijnen bij filteren,
+                // zoeken en sorteren in plaats van hard te verspringen.
+                .animation(.spring(response: 0.35, dampingFraction: 0.85), value: filtered.map(\.id))
             }
         }
     }
@@ -354,7 +411,7 @@ struct BagsShopView: View {
             if activeFilterCount > 0 {
                 Button {
                     sortOption = .default; selectedAirlineSlug = nil
-                    selectedCategory = nil; searchText = ""
+                    selectedFitType = nil; selectedBrand = nil; searchText = ""
                 } label: {
                     Text("Wis alle filters")
                         .font(.system(size: 14, weight: .semibold, design: .rounded))
@@ -378,19 +435,204 @@ struct BagsShopView: View {
 
     private func loadAll() async {
         async let bagsTask: () = loadBags()
-        async let airlinesTask = APIClient.shared.airlines()
+        async let airlinesTask: () = airlineStore.load()
         await bagsTask
-        airlines = (try? await airlinesTask) ?? []
+        await airlinesTask
+    }
+
+    /// Voor pull-to-refresh: in tegenstelling tot `loadAll()` haalt dit altijd
+    /// verse data op, ook als de gedeelde catalogus al gevuld was.
+    private func refreshAll() async {
+        async let airlinesTask: () = airlineStore.load()
+        if selectedAirlineSlug == nil {
+            async let bagsTask: () = bagStore.reload()
+            await bagsTask
+        } else {
+            async let bagsTask: () = loadBags()
+            await bagsTask
+        }
+        await airlinesTask
     }
 
     private func loadBags() async {
-        isLoading = true
-        allBags = (try? await APIClient.shared.bags(
-            airline: selectedAirlineSlug,
+        guard let slug = selectedAirlineSlug else {
+            // Geen filter: gebruik/laad de gedeelde catalogus, geen dubbele fetch.
+            await bagStore.loadIfNeeded()
+            return
+        }
+        isLoadingFiltered = true
+        filteredBags = (try? await APIClient.shared.bags(
+            airline: slug,
             type: nil,
             maxPrice: nil
         )) ?? []
-        isLoading = false
+        isLoadingFiltered = false
+    }
+}
+
+// MARK: - Featured carousel (swipeable, net als Apple's "Shop iPhone")
+
+private struct FeaturedCarousel: View {
+    let bags: [Bag]
+    @State private var page = 0
+
+    var body: some View {
+        VStack(spacing: 12) {
+            TabView(selection: $page) {
+                ForEach(Array(bags.enumerated()), id: \.element.id) { index, bag in
+                    FeaturedBagCard(bag: bag, badgeLabel: index == 0 ? "ONZE KEUS" : "AANBEVOLEN")
+                        .padding(.horizontal, 16)
+                        .tag(index)
+                }
+            }
+            .tabViewStyle(.page(indexDisplayMode: .never))
+            .frame(height: 232)
+
+            if bags.count > 1 {
+                HStack(spacing: 6) {
+                    ForEach(bags.indices, id: \.self) { index in
+                        Capsule()
+                            .fill(index == page ? Theme.navy : Theme.navy.opacity(0.18))
+                            .frame(width: index == page ? 16 : 6, height: 6)
+                            .animation(.spring(response: 0.3), value: page)
+                    }
+                }
+            }
+        }
+    }
+}
+
+// MARK: - Featured bag card ("Onze keus")
+
+private struct FeaturedBagCard: View {
+    let bag: Bag?
+    var badgeLabel: String = "ONZE KEUS"
+    @State private var isPressed = false
+
+    var body: some View {
+        cardContent
+            // Press-animatie via simultaneousGesture zodat de Link tap gewoon werkt
+            .simultaneousGesture(
+                DragGesture(minimumDistance: 0)
+                    .onChanged { _ in
+                        guard !isPressed else { return }
+                        isPressed = true
+                        UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+                    }
+                    .onEnded { _ in
+                        isPressed = false
+                    }
+            )
+    }
+
+    private var cardContent: some View {
+        Group {
+            if let url = bag?.affiliateUrl.flatMap(URL.init) {
+                Link(destination: url) { featured }
+            } else {
+                featured
+            }
+        }
+        .buttonStyle(.plain)
+    }
+
+    private var featured: some View {
+        HStack(spacing: 0) {
+
+            // — Links: navy gradient met tekst —
+            ZStack(alignment: .topLeading) {
+                LinearGradient(
+                    colors: [Theme.navy, Color(red: 0.04, green: 0.16, blue: 0.36)],
+                    startPoint: .topLeading, endPoint: .bottomTrailing
+                )
+                // subtiele decoratieve cirkel
+                Circle().fill(.white.opacity(0.06)).frame(width: 120).offset(x: -30, y: 80)
+
+                VStack(alignment: .leading, spacing: 14) {
+                    // Badge
+                    HStack(spacing: 5) {
+                        Image(systemName: "star.fill")
+                            .font(.system(size: 9, weight: .bold))
+                            .foregroundStyle(Theme.yellow)
+                        Text(badgeLabel)
+                            .font(.system(size: 10, weight: .bold, design: .rounded))
+                            .foregroundStyle(Theme.yellow)
+                            .kerning(1.2)
+                    }
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 6)
+                    .background(Theme.yellow.opacity(0.18))
+                    .clipShape(Capsule())
+
+                    // Naam & merk
+                    VStack(alignment: .leading, spacing: 3) {
+                        if let brand = bag?.brand {
+                            Text(brand.uppercased())
+                                .font(.system(size: 9, weight: .bold, design: .rounded))
+                                .foregroundStyle(.white.opacity(0.50))
+                                .kerning(0.7)
+                        }
+                        Text(bag?.name ?? "Aanbevolen tas")
+                            .font(.system(size: 17, weight: .bold, design: .rounded))
+                            .foregroundStyle(.white)
+                            .lineLimit(3)
+                            .lineSpacing(1)
+                    }
+
+                    Spacer()
+
+                    // Prijs + shop domain
+                    VStack(alignment: .leading, spacing: 4) {
+                        if let label = bag?.displayPrice {
+                            Text(label)
+                                .font(.system(size: 26, weight: .black, design: .rounded))
+                                .foregroundStyle(Theme.yellow)
+                        }
+                        if let domain = bag?.shopDomain {
+                            Text(domain)
+                                .font(.system(size: 10, design: .rounded))
+                                .foregroundStyle(.white.opacity(0.50))
+                        }
+                    }
+
+                    // CTA knop
+                    HStack(spacing: 5) {
+                        Text("Bekijk aanbieding")
+                            .font(.system(size: 13, weight: .bold, design: .rounded))
+                        Image(systemName: "arrow.up.right")
+                            .font(.system(size: 11, weight: .bold))
+                    }
+                    .foregroundStyle(Theme.navy)
+                    .padding(.horizontal, 14)
+                    .padding(.vertical, 10)
+                    .background(.white)
+                    .clipShape(Capsule())
+                    .shadow(color: .black.opacity(0.18), radius: 8, x: 0, y: 3)
+                }
+                .padding(18)
+            }
+            .frame(maxWidth: .infinity)
+
+            // — Rechts: productfoto vult het volledige paneel —
+            ZStack {
+                Color.white
+
+                if bag?.imageUrl != nil {
+                    AuthorisedImage(urlString: bag?.imageUrl, fill: true)
+                } else {
+                    Image(systemName: "bag.fill")
+                        .font(.system(size: 44, weight: .light))
+                        .foregroundStyle(Theme.navy.opacity(0.12))
+                }
+            }
+            .frame(width: 140)
+            .clipped()
+        }
+        .frame(height: 220)
+        .clipShape(RoundedRectangle(cornerRadius: 22))
+        .scaleEffect(isPressed ? 0.97 : 1.0)
+        .animation(.spring(response: 0.25, dampingFraction: 0.7), value: isPressed)
+        .shadow(color: Theme.navy.opacity(0.25), radius: 18, x: 0, y: 8)
     }
 }
 
@@ -401,30 +643,56 @@ private struct BagCard: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            // Product image — witte achtergrond zodat foto's er professioneel uitzien
-            ZStack {
-                Color.white
-                if bag.imageUrl != nil {
-                    AuthorisedImage(urlString: bag.imageUrl)
+
+            // — Productfoto —
+            ZStack(alignment: .topTrailing) {
+                ZStack {
+                    Color.white
+                    if bag.imageUrl != nil {
+                        AuthorisedImage(urlString: bag.imageUrl, fill: true)
+                    } else {
+                        Image(systemName: "bag")
+                            .font(.system(size: 36, weight: .light))
+                            .foregroundStyle(Theme.navy.opacity(0.12))
+                    }
+                }
+                .frame(maxWidth: .infinity)
+                .frame(height: 148)
+                .clipShape(UnevenRoundedRectangle(
+                    topLeadingRadius: 18, bottomLeadingRadius: 0,
+                    bottomTrailingRadius: 0, topTrailingRadius: 18))
+
+                // Afmetingen badge rechtsboven
+                if let dims = dimensionsBadge {
+                    Text(dims)
+                        .font(.system(size: 9, weight: .bold, design: .rounded))
+                        .foregroundStyle(.white)
+                        .padding(.horizontal, 7)
+                        .padding(.vertical, 4)
+                        .glassChrome(in: Capsule(), tint: Theme.navy, legacyFill: AnyShapeStyle(Theme.navy.opacity(0.80)))
                         .padding(8)
-                } else {
-                    Image(systemName: "bag")
-                        .font(.system(size: 36, weight: .light))
-                        .foregroundStyle(Theme.navy.opacity(0.18))
+                }
+
+                // Topkeuze badge linksboven (compact zodat het niet botst met de afmetingen-badge)
+                if bag.featured == true {
+                    Image(systemName: "star.fill")
+                        .font(.system(size: 10, weight: .bold))
+                        .foregroundStyle(Theme.navy)
+                        .frame(width: 22, height: 22)
+                        .background(Theme.yellow)
+                        .clipShape(Circle())
+                        .padding(8)
+                        .frame(maxWidth: .infinity, alignment: .leading)
                 }
             }
-            .frame(maxWidth: .infinity)
-            .frame(height: 150)
-            .clipShape(UnevenRoundedRectangle(topLeadingRadius: 18, bottomLeadingRadius: 0,
-                                              bottomTrailingRadius: 0, topTrailingRadius: 18))
 
-            // Info block
-            VStack(alignment: .leading, spacing: 6) {
+            // — Info —
+            VStack(alignment: .leading, spacing: 4) {
                 if let brand = bag.brand {
                     Text(brand.uppercased())
                         .font(.system(size: 9, weight: .bold, design: .rounded))
-                        .foregroundStyle(Theme.navy)
-                        .kerning(0.8)
+                        .foregroundStyle(Theme.navy.opacity(0.55))
+                        .kerning(0.7)
                 }
                 Text(bag.name)
                     .font(.system(size: 13, weight: .semibold, design: .rounded))
@@ -432,31 +700,33 @@ private struct BagCard: View {
                     .lineLimit(2)
                     .fixedSize(horizontal: false, vertical: true)
 
-                if let dims = dimensionsText {
-                    Text(dims)
-                        .font(.system(size: 10, design: .rounded))
-                        .foregroundStyle(Theme.textSecondary)
-                }
-
-                Spacer(minLength: 6)
-
-                HStack(alignment: .center) {
-                    if let price = bag.price {
-                        Text("€\(Int(price))")
-                            .font(.system(size: 20, weight: .bold, design: .rounded))
-                            .foregroundStyle(Theme.textPrimary)
-                    }
-                    Spacer()
-                    if let url = bag.affiliateUrl.flatMap(URL.init) {
-                        Link(destination: url) {
-                            Image(systemName: "arrow.up.right")
-                                .font(.system(size: 12, weight: .bold))
-                                .foregroundStyle(.white)
-                                .frame(width: 32, height: 32)
-                                .background(Theme.navyGradient)
-                                .clipShape(Circle())
+                if let colors = bag.colors, !colors.isEmpty {
+                    HStack(spacing: 4) {
+                        ForEach(colors.prefix(5), id: \.self) { name in
+                            Circle()
+                                .fill(BagColorMap.color(for: name))
+                                .frame(width: 10, height: 10)
+                                .overlay(Circle().strokeBorder(Color(.systemGray4), lineWidth: 0.6))
+                        }
+                        if colors.count > 5 {
+                            Text("+\(colors.count - 5)")
+                                .font(.system(size: 9, weight: .medium, design: .rounded))
+                                .foregroundStyle(Theme.textSecondary)
                         }
                     }
+                    .padding(.top, 2)
+                }
+
+                if let label = bag.displayPrice {
+                    Text(label)
+                        .font(.system(size: 18, weight: .black, design: .rounded))
+                        .foregroundStyle(Theme.navy)
+                        .padding(.top, 4)
+                }
+                if let domain = bag.shopDomain {
+                    Text(domain)
+                        .font(.system(size: 9, design: .rounded))
+                        .foregroundStyle(Theme.textSecondary)
                 }
             }
             .padding(12)
@@ -467,12 +737,11 @@ private struct BagCard: View {
         .shadow(color: .black.opacity(0.07), radius: 10, x: 0, y: 4)
     }
 
-    private var dimensionsText: String? {
+    private var dimensionsBadge: String? {
+        if let label = bag.dimensionsLabel { return label }
         let parts = [bag.length, bag.width, bag.depth].compactMap { $0.map { "\(Int($0))" } }
-        guard !parts.isEmpty else { return nil }
-        var s = parts.joined(separator: "×") + " cm"
-        if let w = bag.weight { s += " · \(Int(w))kg" }
-        return s
+        guard parts.count == 3 else { return nil }
+        return parts.joined(separator: "×") + " cm"
     }
 }
 
@@ -480,8 +749,8 @@ private struct BagCard: View {
 
 private struct FilterSheet: View {
     let airlines: [Airline]
-    let categories: [String]
-    @Binding var selectedCategory: String?
+    let fitTypes: [BagFitType]
+    @Binding var selectedFitType: BagFitType?
     @Binding var selectedAirlineSlug: String?
     @Binding var sortOption: SortOption
     @Environment(\.dismiss) private var dismiss
@@ -556,17 +825,17 @@ private struct FilterSheet: View {
                     }
                 }
 
-                if !categories.isEmpty {
+                if !fitTypes.isEmpty {
                     Section {
                         Button {
-                            selectedCategory = nil
+                            selectedFitType = nil
                         } label: {
                             HStack {
-                                Text("Alle categorieën")
+                                Text("Alle types")
                                     .font(.system(size: 15, design: .rounded))
                                     .foregroundStyle(Theme.textPrimary)
                                 Spacer()
-                                if selectedCategory == nil {
+                                if selectedFitType == nil {
                                     Image(systemName: "checkmark")
                                         .foregroundStyle(Theme.navy).fontWeight(.semibold)
                                 }
@@ -574,16 +843,19 @@ private struct FilterSheet: View {
                         }
                         .buttonStyle(.plain)
 
-                        ForEach(categories, id: \.self) { cat in
+                        ForEach(fitTypes) { fit in
                             Button {
-                                selectedCategory = cat
+                                selectedFitType = fit
                             } label: {
-                                HStack {
-                                    Text(cat.capitalized)
+                                HStack(spacing: 12) {
+                                    Image(systemName: fit.icon)
+                                        .frame(width: 20)
+                                        .foregroundStyle(Theme.navy)
+                                    Text(fit.label)
                                         .font(.system(size: 15, design: .rounded))
                                         .foregroundStyle(Theme.textPrimary)
                                     Spacer()
-                                    if selectedCategory == cat {
+                                    if selectedFitType == fit {
                                         Image(systemName: "checkmark")
                                             .foregroundStyle(Theme.navy).fontWeight(.semibold)
                                     }
@@ -592,7 +864,7 @@ private struct FilterSheet: View {
                             .buttonStyle(.plain)
                         }
                     } header: {
-                        Text("Categorie").font(.system(size: 12, weight: .semibold, design: .rounded))
+                        Text("Waar past de tas?").font(.system(size: 12, weight: .semibold, design: .rounded))
                     }
                 }
             }
@@ -611,7 +883,7 @@ private struct FilterSheet: View {
 
 // MARK: - Active filter chip
 
-private struct ActiveFilterChip: View {
+struct ActiveFilterChip: View {
     let label: String
     let onRemove: () -> Void
 

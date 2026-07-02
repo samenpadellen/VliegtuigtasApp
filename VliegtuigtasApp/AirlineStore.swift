@@ -47,6 +47,28 @@ final class CheckStore: ObservableObject {
     }
 }
 
+/// Gedeelde, ongefilterde tassencatalogus. Wordt als environment object één keer
+/// geladen en hergebruikt door Home én de Shop-tab, zodat tabwisselen instant
+/// aanvoelt in plaats van telkens opnieuw dezelfde data op te vragen.
+@MainActor
+final class BagStore: ObservableObject {
+    @Published var bags: [Bag] = []
+    @Published var isLoading = false
+
+    func loadIfNeeded() async {
+        guard bags.isEmpty else { return }
+        isLoading = true
+        bags = (try? await APIClient.shared.bags()) ?? []
+        isLoading = false
+    }
+
+    func reload() async {
+        isLoading = true
+        bags = (try? await APIClient.shared.bags()) ?? []
+        isLoading = false
+    }
+}
+
 @MainActor
 final class FlightStore: ObservableObject {
     @Published var result: FlightLookupResponse?

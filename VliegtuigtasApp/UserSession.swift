@@ -1,5 +1,36 @@
 import Foundation
 import Combine
+import WidgetKit
+
+/// Deelt de opgeslagen vlucht en voornaam met de widgets via de App Group,
+/// zodat de vlucht-aftelwidget buiten het app-proces bij deze data kan.
+enum SharedFlightStore {
+    static let suiteName = "group.com.vliegtuigtas.app"
+
+    private static var defaults: UserDefaults? { UserDefaults(suiteName: suiteName) }
+
+    private enum Key {
+        static let flightNumber = "vt_shared_flight_number"
+        static let airlineName  = "vt_shared_flight_airline"
+        static let airlineSlug  = "vt_shared_flight_slug"
+        static let departure    = "vt_shared_flight_departure"
+        static let firstName    = "vt_shared_first_name"
+    }
+
+    static func saveFlight(number: String, airlineName: String?, airlineSlug: String?, departure: Date) {
+        guard let d = defaults else { return }
+        d.set(number, forKey: Key.flightNumber)
+        d.set(airlineName, forKey: Key.airlineName)
+        d.set(airlineSlug, forKey: Key.airlineSlug)
+        d.set(departure.timeIntervalSince1970, forKey: Key.departure)
+        WidgetCenter.shared.reloadTimelines(ofKind: "VluchtCountdownWidget")
+    }
+
+    static func syncFirstName(_ name: String) {
+        defaults?.set(name, forKey: Key.firstName)
+        WidgetCenter.shared.reloadTimelines(ofKind: "VluchtCountdownWidget")
+    }
+}
 
 /// Persists user identity in UserDefaults (equivalent of a session cookie).
 final class UserSession: ObservableObject {
@@ -21,6 +52,7 @@ final class UserSession: ObservableObject {
         firstName   = defaults.string(forKey: Key.firstName) ?? ""
         email       = defaults.string(forKey: Key.email) ?? ""
         isOnboarded = defaults.bool(forKey: Key.isOnboarded)
+        SharedFlightStore.syncFirstName(firstName)
     }
 
     /// Called when the user completes onboarding.
@@ -32,6 +64,7 @@ final class UserSession: ObservableObject {
         defaults.set(firstName,  forKey: Key.firstName)
         defaults.set(email,      forKey: Key.email)
         defaults.set(true,       forKey: Key.isOnboarded)
+        SharedFlightStore.syncFirstName(firstName)
 
         // Sync to API
         APIClient.shared.saveLead(firstName: firstName, email: email)

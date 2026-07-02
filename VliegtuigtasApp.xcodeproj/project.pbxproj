@@ -7,6 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0E2EC02F1056B42AC59ECA95 /* popup.js in Resources */ = {isa = PBXBuildFile; fileRef = 8B284427ED128365BE8C3321 /* popup.js */; };
+		18D8B3FE6E1390DE7D09613D /* manifest.json in Resources */ = {isa = PBXBuildFile; fileRef = 34E24E52B02698D530FF2739 /* manifest.json */; };
+		18DA73838EF3EBE610CF3986 /* SafariWebExtensionHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52135C5BAE8E94DC433994F8 /* SafariWebExtensionHandler.swift */; };
+		6CF06350598D7E5D6A9B9DD4 /* popup.css in Resources */ = {isa = PBXBuildFile; fileRef = A8916FB229A565877D528BD1 /* popup.css */; };
+		720CB503C779908E8BE558CD /* background.js in Resources */ = {isa = PBXBuildFile; fileRef = 5CEAAFB156F178B5F137720C /* background.js */; };
+		A42E076F007410E892B63F3D /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 95FEEF1589C24BFB462E5C23 /* Foundation.framework */; };
 		AA000001 /* VliegtuigtasApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA100001 /* VliegtuigtasApp.swift */; };
 		AA000002 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA100002 /* ContentView.swift */; };
 		AA000003 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA100003 /* Theme.swift */; };
@@ -25,9 +31,57 @@
 		AA000016 /* UserSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA100016 /* UserSession.swift */; };
 		AA000017 /* AppStrings.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA100017 /* AppStrings.swift */; };
 		AA000018 /* airplane_beep.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = AA100018 /* airplane_beep.mp3 */; };
+		AA000019 /* SplashView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA100019 /* SplashView.swift */; };
+		AA000020 /* BagDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA100020 /* BagDetailView.swift */; };
+		AAW00001 /* VliegtuigtasWidgets.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAW10001 /* VliegtuigtasWidgets.swift */; };
+		AAW00002 /* Vliegtuigtas Widgets.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = AAW10003 /* Vliegtuigtas Widgets.appex */; settings = {ATTRIBUTES = (RemoveHeaderOnCopy, ); }; };
+		AB61B0FF462FD1FB680C4E54 /* content.js in Resources */ = {isa = PBXBuildFile; fileRef = D21544F7D8CDB9643A45CBB3 /* content.js */; };
+		BE744C57DCD58610FDB56695 /* Vliegtuigtas Extension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 1777E1FA4F444DC27257F0E8 /* Vliegtuigtas Extension.appex */; settings = {ATTRIBUTES = (RemoveHeaderOnCopy, ); }; };
+		C5E6B9AF86AF28274364CFE3 /* images in Resources */ = {isa = PBXBuildFile; fileRef = 44FDB403A24A66E3FB14354C /* images */; };
+		E8C2A7FEED5C23D12D8205F0 /* popup.html in Resources */ = {isa = PBXBuildFile; fileRef = CBC02DF0768DC8CAD9E90E6A /* popup.html */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		5E382108EDF2F9262B74C222 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = AAPROJECT1 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 1CA59C60E1B2ACA8433200B3;
+			remoteInfo = "Vliegtuigtas Extension";
+		};
+		AAWPRX01 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = AAPROJECT1 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = AAWTGT01;
+			remoteInfo = "Vliegtuigtas Widgets";
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		94A2A6104101983614E94051 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				BE744C57DCD58610FDB56695 /* Vliegtuigtas Extension.appex in Embed Foundation Extensions */,
+				AAW00002 /* Vliegtuigtas Widgets.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
+		1777E1FA4F444DC27257F0E8 /* Vliegtuigtas Extension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "Vliegtuigtas Extension.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
+		34E24E52B02698D530FF2739 /* manifest.json */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.json; name = manifest.json; path = Resources/manifest.json; sourceTree = "<group>"; };
+		44FDB403A24A66E3FB14354C /* images */ = {isa = PBXFileReference; explicitFileType = folder; name = images; path = Resources/images; sourceTree = "<group>"; };
+		52135C5BAE8E94DC433994F8 /* SafariWebExtensionHandler.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SafariWebExtensionHandler.swift; sourceTree = "<group>"; };
+		5CEAAFB156F178B5F137720C /* background.js */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.javascript; name = background.js; path = Resources/background.js; sourceTree = "<group>"; };
+		8B284427ED128365BE8C3321 /* popup.js */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.javascript; name = popup.js; path = Resources/popup.js; sourceTree = "<group>"; };
+		95FEEF1589C24BFB462E5C23 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS18.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
+		A8916FB229A565877D528BD1 /* popup.css */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.css; name = popup.css; path = Resources/popup.css; sourceTree = "<group>"; };
 		AA100001 /* VliegtuigtasApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VliegtuigtasApp.swift; sourceTree = "<group>"; };
 		AA100002 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		AA100003 /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
@@ -46,15 +100,79 @@
 		AA100016 /* UserSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserSession.swift; sourceTree = "<group>"; };
 		AA100017 /* AppStrings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppStrings.swift; sourceTree = "<group>"; };
 		AA100018 /* airplane_beep.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = airplane_beep.mp3; sourceTree = "<group>"; };
+		AA100019 /* SplashView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplashView.swift; sourceTree = "<group>"; };
+		AA100020 /* BagDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BagDetailView.swift; sourceTree = "<group>"; };
+		AA100021 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		AA100022 /* Vliegtuigtas.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Vliegtuigtas.entitlements; sourceTree = "<group>"; };
 		AAPROD001 /* Vliegtuigtas.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Vliegtuigtas.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		AAW10001 /* VliegtuigtasWidgets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VliegtuigtasWidgets.swift; sourceTree = "<group>"; };
+		AAW10002 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		AAW10003 /* Vliegtuigtas Widgets.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "Vliegtuigtas Widgets.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
+		AAW10004 /* VliegtuigtasWidgets.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = VliegtuigtasWidgets.entitlements; sourceTree = "<group>"; };
+		CBC02DF0768DC8CAD9E90E6A /* popup.html */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.html; name = popup.html; path = Resources/popup.html; sourceTree = "<group>"; };
+		D21544F7D8CDB9643A45CBB3 /* content.js */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.javascript; name = content.js; path = Resources/content.js; sourceTree = "<group>"; };
+		D4F2351D688C11BFA75D8756 /* Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
+/* Begin PBXFrameworksBuildPhase section */
+		7644D83FFF2C138CDF994E1B /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A42E076F007410E892B63F3D /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AAWPH002 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
 /* Begin PBXGroup section */
+		0FDF3B46CEF837A2E0680C07 /* VliegtuigtasExtension */ = {
+			isa = PBXGroup;
+			children = (
+				52135C5BAE8E94DC433994F8 /* SafariWebExtensionHandler.swift */,
+				D4F2351D688C11BFA75D8756 /* Info.plist */,
+				34E24E52B02698D530FF2739 /* manifest.json */,
+				D21544F7D8CDB9643A45CBB3 /* content.js */,
+				5CEAAFB156F178B5F137720C /* background.js */,
+				CBC02DF0768DC8CAD9E90E6A /* popup.html */,
+				A8916FB229A565877D528BD1 /* popup.css */,
+				8B284427ED128365BE8C3321 /* popup.js */,
+				44FDB403A24A66E3FB14354C /* images */,
+			);
+			path = VliegtuigtasExtension;
+			sourceTree = "<group>";
+		};
+		6EF4BC572587BBCF87A49128 /* iOS */ = {
+			isa = PBXGroup;
+			children = (
+				95FEEF1589C24BFB462E5C23 /* Foundation.framework */,
+			);
+			name = iOS;
+			sourceTree = "<group>";
+		};
+		A2A76474FA7E96403C8DE346 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				6EF4BC572587BBCF87A49128 /* iOS */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		AAGRP000 = {
 			isa = PBXGroup;
 			children = (
 				AAGRP001 /* VliegtuigtasApp */,
 				AAGRP002 /* Products */,
+				0FDF3B46CEF837A2E0680C07 /* VliegtuigtasExtension */,
+				AAWGRP01 /* VliegtuigtasWidgets */,
+				A2A76474FA7E96403C8DE346 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -79,6 +197,10 @@
 				AA100016 /* UserSession.swift */,
 				AA100017 /* AppStrings.swift */,
 				AA100018 /* airplane_beep.mp3 */,
+				AA100019 /* SplashView.swift */,
+				AA100020 /* BagDetailView.swift */,
+				AA100021 /* Info.plist */,
+				AA100022 /* Vliegtuigtas.entitlements */,
 			);
 			path = VliegtuigtasApp;
 			sourceTree = "<group>";
@@ -87,28 +209,77 @@
 			isa = PBXGroup;
 			children = (
 				AAPROD001 /* Vliegtuigtas.app */,
+				1777E1FA4F444DC27257F0E8 /* Vliegtuigtas Extension.appex */,
+				AAW10003 /* Vliegtuigtas Widgets.appex */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		AAWGRP01 /* VliegtuigtasWidgets */ = {
+			isa = PBXGroup;
+			children = (
+				AAW10001 /* VliegtuigtasWidgets.swift */,
+				AAW10002 /* Info.plist */,
+				AAW10004 /* VliegtuigtasWidgets.entitlements */,
+			);
+			path = VliegtuigtasWidgets;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		1CA59C60E1B2ACA8433200B3 /* Vliegtuigtas Extension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D7AB5204C111FDC18E345E5A /* Build configuration list for PBXNativeTarget "Vliegtuigtas Extension" */;
+			buildPhases = (
+				CBA7D25F3A1F9ACA13170059 /* Sources */,
+				7644D83FFF2C138CDF994E1B /* Frameworks */,
+				1C17C419419257FEF6779344 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "Vliegtuigtas Extension";
+			productName = "Vliegtuigtas Extension";
+			productReference = 1777E1FA4F444DC27257F0E8 /* Vliegtuigtas Extension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 		AATARGET1 /* Vliegtuigtas */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = AACFGLIST1 /* Build configuration list for PBXNativeTarget "Vliegtuigtas" */;
 			buildPhases = (
 				AAPHASE001 /* Sources */,
 				AAPHASE002 /* Resources */,
+				94A2A6104101983614E94051 /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				56539FABA16615F638E56135 /* PBXTargetDependency */,
+				AAWDEP01 /* PBXTargetDependency */,
 			);
 			name = Vliegtuigtas;
 			productName = Vliegtuigtas;
 			productReference = AAPROD001 /* Vliegtuigtas.app */;
 			productType = "com.apple.product-type.application";
+		};
+		AAWTGT01 /* Vliegtuigtas Widgets */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = AAWCFGL1 /* Build configuration list for PBXNativeTarget "Vliegtuigtas Widgets" */;
+			buildPhases = (
+				AAWPH001 /* Sources */,
+				AAWPH002 /* Frameworks */,
+				AAWPH003 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "Vliegtuigtas Widgets";
+			productName = "Vliegtuigtas Widgets";
+			productReference = AAW10003 /* Vliegtuigtas Widgets.appex */;
+			productType = "com.apple.product-type.app-extension";
 		};
 /* End PBXNativeTarget section */
 
@@ -140,17 +311,40 @@
 			projectRoot = "";
 			targets = (
 				AATARGET1 /* Vliegtuigtas */,
+				1CA59C60E1B2ACA8433200B3 /* Vliegtuigtas Extension */,
+				AAWTGT01 /* Vliegtuigtas Widgets */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		1C17C419419257FEF6779344 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				18D8B3FE6E1390DE7D09613D /* manifest.json in Resources */,
+				AB61B0FF462FD1FB680C4E54 /* content.js in Resources */,
+				720CB503C779908E8BE558CD /* background.js in Resources */,
+				E8C2A7FEED5C23D12D8205F0 /* popup.html in Resources */,
+				6CF06350598D7E5D6A9B9DD4 /* popup.css in Resources */,
+				0E2EC02F1056B42AC59ECA95 /* popup.js in Resources */,
+				C5E6B9AF86AF28274364CFE3 /* images in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		AAPHASE002 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 				AA000013 /* Assets.xcassets in Resources */,
 				AA000018 /* airplane_beep.mp3 in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AAWPH003 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -177,12 +371,69 @@
 				AA000015 /* OnboardingView.swift in Sources */,
 				AA000016 /* UserSession.swift in Sources */,
 				AA000017 /* AppStrings.swift in Sources */,
+				AA000019 /* SplashView.swift in Sources */,
+				AA000020 /* BagDetailView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AAWPH001 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				AAW00001 /* VliegtuigtasWidgets.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CBA7D25F3A1F9ACA13170059 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				18DA73838EF3EBE610CF3986 /* SafariWebExtensionHandler.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
+/* Begin PBXTargetDependency section */
+		56539FABA16615F638E56135 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = "Vliegtuigtas Extension";
+			target = 1CA59C60E1B2ACA8433200B3 /* Vliegtuigtas Extension */;
+			targetProxy = 5E382108EDF2F9262B74C222 /* PBXContainerItemProxy */;
+		};
+		AAWDEP01 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = "Vliegtuigtas Widgets";
+			target = AAWTGT01 /* Vliegtuigtas Widgets */;
+			targetProxy = AAWPRX01 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
 /* Begin XCBuildConfiguration section */
+		4975D71CF1A72AECD63E9547 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = FDH27DW6H2;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = VliegtuigtasExtension/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.vliegtuigtas.app.SafariExtension;
+				PRODUCT_NAME = "Vliegtuigtas Extension";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
 		AACFG001 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -235,7 +486,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 27.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -292,7 +543,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 27.0;
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
@@ -307,11 +558,13 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = VliegtuigtasApp/Vliegtuigtas.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = VliegtuigtasApp/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = Vliegtuigtas;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.travel";
 				INFOPLIST_KEY_NSAppTransportSecurity = "<dict><key>NSAllowsArbitraryLoads</key><false/></dict>";
@@ -320,6 +573,7 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				IPHONEOS_DEPLOYMENT_TARGET = 27.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -338,11 +592,13 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = VliegtuigtasApp/Vliegtuigtas.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = VliegtuigtasApp/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = Vliegtuigtas;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.travel";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -350,6 +606,7 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				IPHONEOS_DEPLOYMENT_TARGET = 27.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -362,6 +619,84 @@
 				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Release;
+		};
+		AAWCFG01 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = VliegtuigtasWidgets/VliegtuigtasWidgets.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = FDH27DW6H2;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = VliegtuigtasWidgets/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = Vliegtuigtas;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.vliegtuigtas.app.Widgets;
+				PRODUCT_NAME = "Vliegtuigtas Widgets";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		AAWCFG02 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = VliegtuigtasWidgets/VliegtuigtasWidgets.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = FDH27DW6H2;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = VliegtuigtasWidgets/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = Vliegtuigtas;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.vliegtuigtas.app.Widgets;
+				PRODUCT_NAME = "Vliegtuigtas Widgets";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		BD2AC1793D1A7FF13B70F458 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = FDH27DW6H2;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = VliegtuigtasExtension/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.vliegtuigtas.app.SafariExtension;
+				PRODUCT_NAME = "Vliegtuigtas Extension";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
 		};
 /* End XCBuildConfiguration section */
 
@@ -380,6 +715,24 @@
 			buildConfigurations = (
 				AACFG003 /* Debug */,
 				AACFG004 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		AAWCFGL1 /* Build configuration list for PBXNativeTarget "Vliegtuigtas Widgets" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				AAWCFG01 /* Debug */,
+				AAWCFG02 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		D7AB5204C111FDC18E345E5A /* Build configuration list for PBXNativeTarget "Vliegtuigtas Extension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4975D71CF1A72AECD63E9547 /* Release */,
+				BD2AC1793D1A7FF13B70F458 /* Debug */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

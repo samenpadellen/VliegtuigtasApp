@@ -10,16 +10,15 @@ private var statusBarHeight: CGFloat {
 
 struct HomeView: View {
     @EnvironmentObject private var session: UserSession
-    @StateObject private var airlineStore = AirlineStore()
-    @StateObject private var flightStore  = FlightStore()
+    @EnvironmentObject private var nav: AppNavigator
+    @EnvironmentObject private var airlineStore: AirlineStore
+    @EnvironmentObject private var bagStore: BagStore
+    @StateObject private var flightStore = FlightStore()
 
     @State private var flightNumber = ""
-    @State private var selectedAirline: Airline?
-    @State private var showChecker   = false
-    @State private var showAirlines  = false
-    @State private var showShop      = false
-    @State private var shopBags: [Bag] = []
-    @State private var isLoadingBags  = true
+    @State private var departureDate = Date()
+    @State private var flightSaved = false
+    @Namespace private var zoomNamespace
 
     var body: some View {
         NavigationStack {
@@ -31,6 +30,7 @@ struct HomeView: View {
                         airlineGridSection
                         shopCarouselSection
                         howItWorksSection
+                        safariExtensionTip
                     }
                     .padding(.horizontal, 16)
                     .padding(.top, 24)
@@ -42,19 +42,10 @@ struct HomeView: View {
             .navigationBarHidden(true)
             .task {
                 async let loadAirlines: () = airlineStore.load()
-                async let loadBags: () = fetchShopBags()
+                async let loadBags: () = bagStore.loadIfNeeded()
                 await loadAirlines
                 await loadBags
                 APIClient.shared.sendEvent("page_view", path: "/home")
-            }
-            .navigationDestination(isPresented: $showChecker) {
-                CheckFlowView(preselected: selectedAirline)
-            }
-            .navigationDestination(isPresented: $showAirlines) {
-                AirlineListView()
-            }
-            .navigationDestination(isPresented: $showShop) {
-                BagsShopView()
             }
         }
     }
@@ -105,8 +96,7 @@ struct HomeView: View {
                         .foregroundStyle(.white.opacity(0.9))
                         .padding(.horizontal, 12)
                         .padding(.vertical, 6)
-                        .background(.white.opacity(0.15))
-                        .clipShape(Capsule())
+                        .glassChrome(in: Capsule(), legacyFill: AnyShapeStyle(.white.opacity(0.15)))
                 }
             }
             .padding(.horizontal, 20)
@@ -128,9 +118,8 @@ struct HomeView: View {
                 }
 
                 Button {
-                    selectedAirline = nil
                     UIImpactFeedbackGenerator(style: .medium).impactOccurred()
-                    showChecker = true
+                    nav.openChecker(preselected: nil)
                 } label: {
                     HStack(spacing: 10) {
                         Image(systemName: "checkmark.shield.fill")
@@ -197,30 +186,73 @@ struct HomeView: View {
 
             if let result = flightStore.result {
                 if let airline = result.resolvedAirline {
-                    HStack(spacing: 10) {
-                        if airline.bestLogoUrl != nil {
-                            AuthorisedImage(urlString: airline.bestLogoUrl)
-                                .frame(width: 28, height: 20)
-                        } else {
-                            Image(systemName: "checkmark.circle.fill").foregroundStyle(Theme.green)
-                        }
-                        Text(airline.name)
-                            .font(.system(size: 14, weight: .semibold, design: .rounded))
-                        Spacer()
-                        Button {
-                            selectedAirline = airline
-                            showChecker = true
-                        } label: {
-                            HStack(spacing: 4) {
-                                Text("Check nu")
-                                    .font(.system(size: 13, weight: .semibold))
-                                Image(systemName: "arrow.right")
-                                    .font(.system(size: 11, weight: .semibold))
+                    VStack(spacing: 0) {
+                        HStack(spacing: 10) {
+                            if airline.bestLogoUrl != nil {
+                                AuthorisedImage(urlString: airline.bestLogoUrl)
+                                    .frame(width: 28, height: 20)
+                            } else {
+                                Image(systemName: "checkmark.circle.fill").foregroundStyle(Theme.green)
                             }
-                            .foregroundStyle(Theme.navy)
+                            Text(airline.name)
+                                .font(.system(size: 14, weight: .semibold, design: .rounded))
+                            Spacer()
+                            Button {
+                                nav.openChecker(preselected: airline)
+                            } label: {
+                                HStack(spacing: 4) {
+                                    Text("Check nu")
+                                        .font(.system(size: 13, weight: .semibold))
+                                    Image(systemName: "arrow.right")
+                                        .font(.system(size: 11, weight: .semibold))
+                                }
+                                .foregroundStyle(Theme.navy)
+                            }
                         }
+                        .padding(12)
+
+                        Divider().padding(.horizontal, 12)
+
+                        // Bewaar de vlucht voor de aftelwidget op home/lockscreen.
+                        HStack(spacing: 8) {
+                            Image(systemName: "calendar")
+                                .font(.system(size: 13))
+                                .foregroundStyle(Theme.navy)
+                            Text("Vertrek")
+                                .font(.system(size: 12, weight: .medium, design: .rounded))
+                                .foregroundStyle(Theme.textSecondary)
+                            DatePicker("", selection: $departureDate, in: Date()..., displayedComponents: .date)
+                                .labelsHidden()
+                            Spacer()
+                            Button {
+                                SharedFlightStore.saveFlight(
+                                    number: result.flightNumber ?? flightNumber.trimmingCharacters(in: .whitespaces).uppercased(),
+                                    airlineName: airline.name,
+                                    airlineSlug: airline.slug,
+                                    departure: departureDate
+                                )
+                                UINotificationFeedbackGenerator().notificationOccurred(.success)
+                                withAnimation(.spring(response: 0.3)) { flightSaved = true }
+                            } label: {
+                                HStack(spacing: 4) {
+                                    Image(systemName: flightSaved ? "checkmark" : "plus.square.on.square")
+                                        .font(.system(size: 11, weight: .bold))
+                                    Text(flightSaved ? "In widget" : "Zet in widget")
+                                        .font(.system(size: 12, weight: .semibold, design: .rounded))
+                                }
+                                .foregroundStyle(flightSaved ? Theme.green : .white)
+                                .padding(.horizontal, 10)
+                                .padding(.vertical, 7)
+                                .background(flightSaved
+                                    ? AnyShapeStyle(Theme.green.opacity(0.15))
+                                    : AnyShapeStyle(Theme.navyGradient))
+                                .clipShape(Capsule())
+                            }
+                            .buttonStyle(.plain)
+                        }
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 9)
                     }
-                    .padding(12)
                     .background(Theme.green.opacity(0.08))
                     .clipShape(RoundedRectangle(cornerRadius: 12))
                     .overlay(
@@ -239,8 +271,7 @@ struct HomeView: View {
                         }
                         Spacer()
                         Button {
-                            selectedAirline = nil
-                            showChecker = true
+                            nav.openChecker(preselected: nil)
                         } label: {
                             HStack(spacing: 4) {
                                 Text("Kies")
@@ -282,7 +313,7 @@ struct HomeView: View {
                     .font(.system(size: 18, weight: .bold, design: .rounded))
                     .foregroundStyle(Theme.textPrimary)
                 Spacer()
-                Button { showAirlines = true } label: {
+                Button { nav.openAirlines() } label: {
                     HStack(spacing: 4) {
                         Text("Bekijk alle")
                             .font(.system(size: 13, weight: .semibold))
@@ -307,9 +338,8 @@ struct HomeView: View {
                 HStack(spacing: 10) {
                     ForEach(airlineStore.airlines.prefix(3)) { airline in
                         AirlineCard(airline: airline) {
-                            selectedAirline = airline
                             UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                            showChecker = true
+                            nav.openChecker(preselected: airline)
                         }
                     }
                 }
@@ -321,38 +351,40 @@ struct HomeView: View {
 
     private var shopCarouselSection: some View {
         VStack(alignment: .leading, spacing: 14) {
-            // Foto-banner header
-            Button { showShop = true } label: {
-                ZStack(alignment: .bottomLeading) {
-                    Image("PhotoOverheadBlue")
-                        .resizable()
-                        .scaledToFill()
-                        .frame(maxWidth: .infinity)
-                        .frame(height: 110)
-                        .clipped()
-                        .clipShape(RoundedRectangle(cornerRadius: 18))
-
-                    LinearGradient(
-                        colors: [.black.opacity(0.55), .black.opacity(0.0)],
-                        startPoint: .bottomLeading, endPoint: .topTrailing
-                    )
+            // Foto-banner header — alleen de "Bekijk alle"-knop is tikbaar,
+            // niet de hele banner als sectie.
+            ZStack(alignment: .bottomLeading) {
+                Image("PhotoOverheadBlue")
+                    .resizable()
+                    .scaledToFill()
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 110)
+                    .clipped()
                     .clipShape(RoundedRectangle(cornerRadius: 18))
 
-                    HStack {
-                        VStack(alignment: .leading, spacing: 3) {
-                            Text("Aanbevolen tassen")
-                                .font(.system(size: 17, weight: .bold, design: .rounded))
-                                .foregroundStyle(.white)
-                            HStack(spacing: 4) {
-                                Image(systemName: "checkmark.seal.fill")
-                                    .font(.system(size: 10, weight: .semibold))
-                                    .foregroundStyle(.white.opacity(0.85))
-                                Text("Gecontroleerd op maat")
-                                    .font(.system(size: 12, design: .rounded))
-                                    .foregroundStyle(.white.opacity(0.85))
-                            }
+                LinearGradient(
+                    colors: [.black.opacity(0.55), .black.opacity(0.0)],
+                    startPoint: .bottomLeading, endPoint: .topTrailing
+                )
+                .clipShape(RoundedRectangle(cornerRadius: 18))
+                .allowsHitTesting(false)
+
+                HStack {
+                    VStack(alignment: .leading, spacing: 3) {
+                        Text("Aanbevolen tassen")
+                            .font(.system(size: 17, weight: .bold, design: .rounded))
+                            .foregroundStyle(.white)
+                        HStack(spacing: 4) {
+                            Image(systemName: "checkmark.seal.fill")
+                                .font(.system(size: 10, weight: .semibold))
+                                .foregroundStyle(.white.opacity(0.85))
+                            Text("Gecontroleerd op maat")
+                                .font(.system(size: 12, design: .rounded))
+                                .foregroundStyle(.white.opacity(0.85))
                         }
-                        Spacer()
+                    }
+                    Spacer()
+                    Button { nav.openShop() } label: {
                         HStack(spacing: 4) {
                             Text("Bekijk alle")
                                 .font(.system(size: 13, weight: .semibold))
@@ -362,24 +394,31 @@ struct HomeView: View {
                         .foregroundStyle(.white)
                         .padding(.horizontal, 12)
                         .padding(.vertical, 7)
-                        .background(.white.opacity(0.20))
-                        .clipShape(Capsule())
+                        .glassChrome(in: Capsule(), interactive: true, legacyFill: AnyShapeStyle(.white.opacity(0.20)))
                     }
-                    .padding(.horizontal, 16)
-                    .padding(.bottom, 14)
+                    .buttonStyle(.plain)
                 }
+                .padding(.horizontal, 16)
+                .padding(.bottom, 14)
             }
-            .buttonStyle(.plain)
 
             // Edge-to-edge scroll (compenseer de 16pt parent padding)
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(alignment: .top, spacing: 12) {
-                    if isLoadingBags {
+                    if bagStore.isLoading && bagStore.bags.isEmpty {
                         ForEach(0..<5, id: \.self) { _ in ShopCarouselSkeletonCard() }
                     } else {
-                        ForEach(shopBags.prefix(8)) { bag in ShopCarouselCard(bag: bag) }
-                        if !shopBags.isEmpty {
-                            ViewAllShopCard { showShop = true }
+                        ForEach(bagStore.bags.prefix(8)) { bag in
+                            NavigationLink(destination: BagDetailView(bagId: bag.id)
+                                .zoomDestination(id: bag.id, in: zoomNamespace)) {
+                                ShopCarouselCard(bag: bag)
+                            }
+                            .buttonStyle(.pressableCard)
+                            .zoomSource(id: bag.id, in: zoomNamespace)
+                            .carouselTransition()
+                        }
+                        if !bagStore.bags.isEmpty {
+                            ViewAllShopCard { nav.openShop() }
                         }
                     }
                 }
@@ -431,17 +470,47 @@ struct HomeView: View {
         }
     }
 
+    private var safariExtensionTip: some View {
+        Button {
+            if let url = URL(string: UIApplication.openSettingsURLString) {
+                UIApplication.shared.open(url)
+            }
+        } label: {
+            HStack(spacing: 14) {
+                ZStack {
+                    Circle().fill(Theme.skyLight).frame(width: 44, height: 44)
+                    Image(systemName: "safari.fill")
+                        .font(.system(size: 18, weight: .medium))
+                        .foregroundStyle(Theme.sky)
+                }
+
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Check tassen tijdens het shoppen")
+                        .font(.system(size: 14, weight: .semibold, design: .rounded))
+                        .foregroundStyle(Theme.textPrimary)
+                    Text("Zet de Vliegtuigtas-extensie aan in Instellingen > Safari > Extensies.")
+                        .font(.caption1)
+                        .foregroundStyle(Theme.textSecondary)
+                }
+
+                Spacer()
+                Image(systemName: "chevron.right")
+                    .font(.system(size: 13, weight: .semibold))
+                    .foregroundStyle(Theme.textSecondary)
+            }
+            .padding(14)
+            .background(Color(.systemBackground))
+            .clipShape(RoundedRectangle(cornerRadius: 18))
+            .shadow(color: .black.opacity(0.05), radius: 8, x: 0, y: 3)
+        }
+        .buttonStyle(.plain)
+    }
+
     private func lookupFlight() {
         let t = flightNumber.trimmingCharacters(in: .whitespaces)
         guard !t.isEmpty else { return }
+        flightSaved = false
         Task { await flightStore.lookup(t) }
-    }
-
-    @MainActor
-    private func fetchShopBags() async {
-        isLoadingBags = true
-        shopBags = (try? await APIClient.shared.bags()) ?? []
-        isLoadingBags = false
     }
 }
 
@@ -492,11 +561,11 @@ private struct ShopCarouselCard: View {
                 Color.white
                 if bag.imageUrl != nil {
                     AuthorisedImage(urlString: bag.imageUrl)
-                        .padding(6)
+                        .padding(10)
                 } else {
                     Image(systemName: "bag")
                         .font(.system(size: 32, weight: .light))
-                        .foregroundStyle(Theme.navy.opacity(0.18))
+                        .foregroundStyle(Theme.navy.opacity(0.15))
                 }
             }
             .frame(width: 160, height: 120)
@@ -525,22 +594,20 @@ private struct ShopCarouselCard: View {
                 }
                 Spacer(minLength: 6)
                 HStack(alignment: .center) {
-                    if let price = bag.price {
+                    if let price = bag.priceEur {
                         Text("€\(Int(price))")
                             .font(.system(size: 18, weight: .bold, design: .rounded))
                             .foregroundStyle(Theme.textPrimary)
                     }
                     Spacer()
-                    if let url = bag.affiliateUrl.flatMap(URL.init) {
-                        Link(destination: url) {
-                            Image(systemName: "arrow.up.right")
-                                .font(.system(size: 11, weight: .bold))
-                                .foregroundStyle(.white)
-                                .frame(width: 30, height: 30)
-                                .background(Theme.navyGradient)
-                                .clipShape(Circle())
-                        }
-                    }
+                    // Decoratief: de hele kaart opent de productpagina (NavigationLink),
+                    // dit is geen losse link meer naar de externe affiliate-URL.
+                    Image(systemName: "arrow.up.right")
+                        .font(.system(size: 11, weight: .bold))
+                        .foregroundStyle(.white)
+                        .frame(width: 30, height: 30)
+                        .background(Theme.navyGradient)
+                        .clipShape(Circle())
                 }
             }
             .padding(.horizontal, 12)
@@ -552,7 +619,7 @@ private struct ShopCarouselCard: View {
         .clipShape(RoundedRectangle(cornerRadius: 16))
         .shadow(color: .black.opacity(0.08), radius: 10, x: 0, y: 4)
         .accessibilityElement(children: .combine)
-        .accessibilityLabel("\(bag.brand.map { $0 + " " } ?? "")\(bag.name)\(bag.price.map { ", €\(Int($0))" } ?? "")")
+        .accessibilityLabel("\(bag.brand.map { $0 + " " } ?? "")\(bag.name)\(bag.priceEur.map { ", €\(Int($0))" } ?? "")")
     }
 }
 
@@ -639,14 +706,11 @@ private struct PhotoStepRow: View {
 
     var body: some View {
         HStack(alignment: .center, spacing: 14) {
-            ZStack {
-                Circle()
-                    .fill(.white.opacity(0.15))
-                    .frame(width: 40, height: 40)
-                Image(systemName: icon)
-                    .font(.system(size: 16, weight: .semibold))
-                    .foregroundStyle(.white)
-            }
+            Image(systemName: icon)
+                .font(.system(size: 16, weight: .semibold))
+                .foregroundStyle(.white)
+                .frame(width: 40, height: 40)
+                .glassChrome(in: Circle(), legacyFill: AnyShapeStyle(.white.opacity(0.15)))
             VStack(alignment: .leading, spacing: 2) {
                 Text(title)
                     .font(.system(size: 14, weight: .semibold, design: .rounded))

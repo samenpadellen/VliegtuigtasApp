@@ -7,8 +7,9 @@ private var airlineListStatusBarHeight: CGFloat {
 }
 
 struct AirlineListView: View {
-    @StateObject private var store = AirlineStore()
+    @EnvironmentObject private var store: AirlineStore
     @State private var search = ""
+    @Namespace private var zoomNamespace
 
     private var filtered: [Airline] {
         search.isEmpty
@@ -49,10 +50,12 @@ struct AirlineListView: View {
                         spacing: 12
                     ) {
                         ForEach(filtered) { airline in
-                            NavigationLink(destination: AirlineDetailView(airline: airline)) {
+                            NavigationLink(destination: AirlineDetailView(airline: airline)
+                                .zoomDestination(id: airline.id, in: zoomNamespace)) {
                                 AirlineListCard(airline: airline)
                             }
-                            .buttonStyle(.plain)
+                            .buttonStyle(.pressableCard)
+                            .zoomSource(id: airline.id, in: zoomNamespace)
                         }
                     }
                 }

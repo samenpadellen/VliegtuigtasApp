@@ -6,7 +6,7 @@ final class APIClient: ObservableObject {
     // Paste je iOS API key hier, of zet VT_API_KEY in een Config.xcconfig
     private let apiKey = "lFkEQW18oyMrdMsbfNK1DtnDnoCcqwNSBRfMCXmszUgbAoLf"
 
-    private let base = URL(string: "https://handbagage-held.lovable.app/api/public/v1")!
+    private let base = URL(string: "https://www.vliegtuigtas.com/api/public/v1")!
 
     private lazy var session: URLSession = {
         let cfg = URLSessionConfiguration.default
@@ -45,12 +45,23 @@ final class APIClient: ObservableObject {
         return try JSONDecoder().decode(T.self, from: data)
     }
 
+    // MARK: - In-memory response cache (avoids refetching unchanged catalog data on every navigation)
+
+    private var airlinesCache: (value: [Airline], at: Date)?
+    private var bagsCache: [String: (value: [Bag], at: Date)] = [:]
+    private let cacheTTL: TimeInterval = 5 * 60
+
     // MARK: - Endpoints
 
     /// GET /airlines
     func airlines() async throws -> [Airline] {
+        if let cached = airlinesCache, Date().timeIntervalSince(cached.at) < cacheTTL {
+            return cached.value
+        }
         let res: APIResponse<[Airline]> = try await get("airlines")
-        return res.data ?? []
+        let airlines = res.data ?? []
+        airlinesCache = (airlines, Date())
+        return airlines
     }
 
     /// GET /airlines/{slug}
@@ -66,8 +77,21 @@ final class APIClient: ObservableObject {
         if let a = airline  { query["airline"]   = a }
         if let t = type     { query["type"]      = t }
         if let p = maxPrice { query["max_price"] = "\(p)" }
+        let cacheKey = "\(airline ?? "")|\(type ?? "")|\(maxPrice.map(String.init) ?? "")"
+        if let cached = bagsCache[cacheKey], Date().timeIntervalSince(cached.at) < cacheTTL {
+            return cached.value
+        }
         let res: APIResponse<[Bag]> = try await get("bags", query: query)
-        return res.data ?? []
+        let bags = res.data ?? []
+        bagsCache[cacheKey] = (bags, Date())
+        return bags
+    }
+
+    /// GET /bags/{id}
+    func bag(id: String) async throws -> BagDetail {
+        let res: APIResponse<BagDetail> = try await get("bags/\(id)")
+        guard let data = res.data else { throw APIError.noData }
+        return data
     }
 
     /// POST /check

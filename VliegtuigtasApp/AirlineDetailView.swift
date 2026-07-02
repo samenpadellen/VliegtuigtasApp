@@ -92,11 +92,20 @@ struct AirlineDetailView: View {
             }
             .buttonStyle(.plain)
 
+            if hasBaggageOverview {
+                sectionHeader("De bagage van \(display.name) in één oogopslag")
+                baggageOverviewRow
+            }
+
             if let variants = display.variants, !variants.isEmpty {
                 sectionHeader("Bagageregels")
                 ForEach(variants) { variant in
                     VariantCard(variant: variant)
                 }
+            }
+
+            if hasCheckedBagExtras {
+                checkedBagExtrasSection
             }
 
             if let notes = display.extraNotes {
@@ -134,6 +143,116 @@ struct AirlineDetailView: View {
                 }
             }
         }
+        .pageEntrance()
+    }
+
+    // MARK: - Bagagesoorten in één oogopslag (zoals op vliegtuigtas.com)
+
+    private var kleinItemDims: String? {
+        dims(display.personalItemLCm, display.personalItemWCm, display.personalItemDCm)
+    }
+
+    /// De variant die het duidelijkst grote handbagage toont; anders de eerste beschikbare.
+    private var grootHandbagageVariant: AirlineVariant? {
+        display.variants?.first { $0.includesLargeBag == true } ?? display.variants?.first
+    }
+
+    private var ruimbagageDims: String? {
+        dims(display.checkedBagMaxLCm, display.checkedBagMaxWCm, display.checkedBagMaxDCm)
+    }
+
+    private var hasBaggageOverview: Bool {
+        kleinItemDims != nil || grootHandbagageVariant != nil || ruimbagageDims != nil || display.checkedBagMaxWeightKg != nil
+    }
+
+    private var baggageOverviewRow: some View {
+        HStack(spacing: 10) {
+            BaggageTypeCard(
+                icon: "backpack.fill",
+                color: Theme.sky,
+                title: "Klein item",
+                subtitle: "Aan boord meenemen",
+                detail: kleinItemDims ?? grootHandbagageVariant?.smallDimString,
+                priceLabel: "Meestal gratis"
+            )
+            BaggageTypeCard(
+                icon: "bag.fill",
+                color: Theme.green,
+                title: "Grote handbagage",
+                subtitle: "In het bagagevak boven je hoofd",
+                detail: grootHandbagageVariant?.largeDimString,
+                priceLabel: grootHandbagageVariant?.priceIndicationEur.map(euroLabel).map { "Vanaf \($0)" }
+                    ?? "Afhankelijk van tarief"
+            )
+            BaggageTypeCard(
+                icon: "suitcase.rolling.fill",
+                color: Theme.orange,
+                title: "Ruimbagage",
+                subtitle: "Inchecken bij de balie",
+                detail: ruimbagageDims,
+                priceLabel: display.checkedBagPriceFromEur.map(euroLabel).map { "Vanaf \($0)" }
+                    ?? (display.checkedBagIncluded == true ? "Vaak inbegrepen" : nil)
+            )
+        }
+    }
+
+    // MARK: - Ruimbagage & extra's
+
+    private var hasCheckedBagExtras: Bool {
+        display.checkedBagIncluded != nil
+            || display.checkedBagPriceFromEur != nil
+            || display.overweightFeePerKgEur != nil
+            || display.oversizeFeeEur != nil
+            || display.priorityBoardingPriceEur != nil
+    }
+
+    private var checkedBagExtrasSection: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            sectionHeader("Ruimbagage & extra's")
+            VStack(spacing: 0) {
+                if let included = display.checkedBagIncluded {
+                    SpecRow(icon: "checkmark.seal", label: "Standaard inbegrepen",
+                            value: included ? "Ja" : "Nee")
+                    Divider()
+                }
+                if let weight = display.checkedBagMaxWeightKg {
+                    SpecRow(icon: "scalemass", label: "Max. gewicht",
+                            value: "\(Int(weight)) kg")
+                    Divider()
+                }
+                if let price = display.checkedBagPriceFromEur.map(euroLabel) {
+                    SpecRow(icon: "eurosign.circle", label: "Vanaf-prijs", value: price)
+                    Divider()
+                }
+                if let fee = display.overweightFeePerKgEur.map(euroLabel) {
+                    SpecRow(icon: "scalemass.fill", label: "Overgewicht", value: "\(fee) / kg")
+                    Divider()
+                }
+                if let fee = display.oversizeFeeEur.map(euroLabel) {
+                    SpecRow(icon: "arrow.up.left.and.arrow.down.right", label: "Te grote tas", value: fee)
+                    Divider()
+                }
+                if let fee = display.priorityBoardingPriceEur.map(euroLabel) {
+                    SpecRow(icon: "star.fill", label: "Priority boarding", value: fee)
+                }
+            }
+            .padding(.horizontal, 16)
+            .background(Color(.systemBackground))
+            .clipShape(RoundedRectangle(cornerRadius: 16))
+            .shadow(color: .black.opacity(0.04), radius: 6, x: 0, y: 2)
+        }
+    }
+
+    private func dims(_ l: Double?, _ w: Double?, _ d: Double?) -> String? {
+        guard let l, let w, let d else { return nil }
+        return "\(Int(l)) × \(Int(w)) × \(Int(d)) cm"
+    }
+
+    private func euroLabel(_ value: Double) -> String {
+        let symbol = (display.currency ?? "EUR") == "EUR" ? "€" : (display.currency ?? "") + " "
+        return value.truncatingRemainder(dividingBy: 1) == 0
+            ? "\(symbol)\(Int(value))"
+            : String(format: "\(symbol)%.2f", value)
     }
 
     private func sectionHeader(_ title: String) -> some View {
@@ -158,6 +277,88 @@ struct AirlineDetailView: View {
         isLoading = true
         detail = try? await APIClient.shared.airline(slug: airline.slug)
         isLoading = false
+    }
+}
+
+// MARK: - Baggage type card ("in één oogopslag", zoals op vliegtuigtas.com)
+
+private struct BaggageTypeCard: View {
+    let icon: String
+    let color: Color
+    let title: String
+    let subtitle: String
+    let detail: String?
+    let priceLabel: String?
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            ZStack {
+                RoundedRectangle(cornerRadius: 14)
+                    .fill(color.opacity(0.12))
+                    .frame(width: 44, height: 44)
+                Image(systemName: icon)
+                    .font(.system(size: 19, weight: .medium))
+                    .foregroundStyle(color)
+            }
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text(title)
+                    .font(.system(size: 13, weight: .bold, design: .rounded))
+                    .foregroundStyle(Theme.textPrimary)
+                Text(subtitle)
+                    .font(.system(size: 10, design: .rounded))
+                    .foregroundStyle(Theme.textSecondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+
+            if let detail {
+                Text(detail)
+                    .font(.system(size: 11, weight: .semibold, design: .rounded))
+                    .foregroundStyle(Theme.textPrimary)
+            }
+
+            Spacer(minLength: 0)
+
+            if let priceLabel {
+                Text(priceLabel)
+                    .font(.system(size: 10, weight: .semibold, design: .rounded))
+                    .foregroundStyle(color)
+                    .padding(.horizontal, 9)
+                    .padding(.vertical, 5)
+                    .background(color.opacity(0.12))
+                    .clipShape(Capsule())
+            }
+        }
+        .padding(13)
+        .frame(maxWidth: .infinity, minHeight: 148, alignment: .leading)
+        .background(Color(.systemBackground))
+        .clipShape(RoundedRectangle(cornerRadius: 16))
+        .shadow(color: .black.opacity(0.05), radius: 6, x: 0, y: 3)
+    }
+}
+
+// MARK: - Spec row (Ruimbagage & extra's)
+
+private struct SpecRow: View {
+    let icon: String
+    let label: String
+    let value: String
+
+    var body: some View {
+        HStack(spacing: 12) {
+            Image(systemName: icon)
+                .font(.system(size: 13))
+                .foregroundStyle(Theme.navy)
+                .frame(width: 20)
+            Text(label)
+                .font(.system(size: 13, design: .rounded))
+                .foregroundStyle(Theme.textSecondary)
+            Spacer()
+            Text(value)
+                .font(.system(size: 13, weight: .semibold, design: .rounded))
+                .foregroundStyle(Theme.textPrimary)
+        }
+        .padding(.vertical, 11)
     }
 }
 

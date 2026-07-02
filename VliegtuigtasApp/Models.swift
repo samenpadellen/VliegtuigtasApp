@@ -17,21 +17,59 @@ struct Airline: Identifiable, Codable, Hashable {
     let personalItemWCm: Double?
     let personalItemDCm: Double?
     let variants: [AirlineVariant]?
+    let countryCode: String?
+    let flagEmoji: String?
+    let flagImageUrl: String?
+    // v1.2 verrijkte velden
+    let continent: String?
+    let alliance: String?
+    let airlineType: String?
+    let headquarters: String?
+    let websiteUrl: String?
+    let bookingUrl: String?
+    let customerServiceUrl: String?
+    let baggagePolicyUrl: String?
+    let checkedBagIncluded: Bool?
+    let checkedBagMaxWeightKg: Double?
+    let checkedBagMaxLCm: Double?
+    let checkedBagMaxWCm: Double?
+    let checkedBagMaxDCm: Double?
+    let checkedBagPriceFromEur: Double?
+    let overweightFeePerKgEur: Double?
+    let oversizeFeeEur: Double?
+    let priorityBoardingPriceEur: Double?
+    let currency: String?
 
     enum CodingKeys: String, CodingKey {
-        case id, slug, name, variants, domain
-        case logoUrl          = "logo_url"
-        case logoUrlSmall     = "logo_url_small"
-        case extraNotes       = "extra_notes"
-        case sourceUrl        = "source_url"
-        case lastVerifiedDate = "last_verified_date"
-        case sortOrder        = "sort_order"
-        case personalItemLCm  = "personal_item_l_cm"
-        case personalItemWCm  = "personal_item_w_cm"
-        case personalItemDCm  = "personal_item_d_cm"
+        case id, slug, name, variants, domain, continent, alliance, headquarters, currency
+        case logoUrl                  = "logo_url"
+        case logoUrlSmall             = "logo_url_small"
+        case extraNotes               = "extra_notes"
+        case sourceUrl                = "source_url"
+        case lastVerifiedDate         = "last_verified_date"
+        case sortOrder                = "sort_order"
+        case personalItemLCm          = "personal_item_l_cm"
+        case personalItemWCm          = "personal_item_w_cm"
+        case personalItemDCm          = "personal_item_d_cm"
+        case countryCode              = "country_code"
+        case flagEmoji                = "flag_emoji"
+        case flagImageUrl             = "flag_image_url"
+        case airlineType              = "airline_type"
+        case websiteUrl               = "website_url"
+        case bookingUrl               = "booking_url"
+        case customerServiceUrl       = "customer_service_url"
+        case baggagePolicyUrl         = "baggage_policy_url"
+        case checkedBagIncluded       = "checked_bag_included"
+        case checkedBagMaxWeightKg    = "checked_bag_max_weight_kg"
+        case checkedBagMaxLCm         = "checked_bag_max_l_cm"
+        case checkedBagMaxWCm         = "checked_bag_max_w_cm"
+        case checkedBagMaxDCm         = "checked_bag_max_d_cm"
+        case checkedBagPriceFromEur   = "checked_bag_price_from_eur"
+        case overweightFeePerKgEur    = "overweight_fee_per_kg_eur"
+        case oversizeFeeEur           = "oversize_fee_eur"
+        case priorityBoardingPriceEur = "priority_boarding_price_eur"
     }
 
-    /// Best logo URL: prefer small (list views), fall back to full
     var bestLogoUrl: String? { logoUrlSmall ?? logoUrl }
 }
 
@@ -39,6 +77,7 @@ struct Airline: Identifiable, Codable, Hashable {
 
 struct AirlineVariant: Identifiable, Codable, Hashable {
     let id: String
+    let airlineId: String?
     let variantName: String
     let includesLargeBag: Bool?
     let smallLCm: Double?
@@ -51,20 +90,40 @@ struct AirlineVariant: Identifiable, Codable, Hashable {
     let weightRule: String?
     let wheelMarginCm: Double?
     let notes: String?
+    // v1.2 verrijkte velden
+    let priceIndicationEur: Double?
+    let includesCheckedBag: Bool?
+    let checkedBagCount: Int?
+    let checkedBagWeightKg: Double?
+    let checkedBagPriceEur: Double?
+    let seatSelectionIncluded: Bool?
+    let priorityBoarding: Bool?
+    let changesAllowed: Bool?
+    let refundable: Bool?
+    let perks: String?
 
     enum CodingKeys: String, CodingKey {
-        case id, notes
-        case variantName      = "variant_name"
-        case includesLargeBag = "includes_large_bag"
-        case smallLCm         = "small_l_cm"
-        case smallWCm         = "small_w_cm"
-        case smallDCm         = "small_d_cm"
-        case largeLCm         = "large_l_cm"
-        case largeWCm         = "large_w_cm"
-        case largeDCm         = "large_d_cm"
-        case maxWeightKg      = "max_weight_kg"
-        case weightRule       = "weight_rule"
-        case wheelMarginCm    = "wheel_margin_cm"
+        case id, notes, perks, refundable
+        case airlineId             = "airline_id"
+        case variantName           = "variant_name"
+        case includesLargeBag      = "includes_large_bag"
+        case smallLCm              = "small_l_cm"
+        case smallWCm              = "small_w_cm"
+        case smallDCm              = "small_d_cm"
+        case largeLCm              = "large_l_cm"
+        case largeWCm              = "large_w_cm"
+        case largeDCm              = "large_d_cm"
+        case maxWeightKg           = "max_weight_kg"
+        case weightRule            = "weight_rule"
+        case wheelMarginCm         = "wheel_margin_cm"
+        case priceIndicationEur    = "price_indication_eur"
+        case includesCheckedBag    = "includes_checked_bag"
+        case checkedBagCount       = "checked_bag_count"
+        case checkedBagWeightKg    = "checked_bag_weight_kg"
+        case checkedBagPriceEur    = "checked_bag_price_eur"
+        case seatSelectionIncluded = "seat_selection_included"
+        case priorityBoarding      = "priority_boarding"
+        case changesAllowed        = "changes_allowed"
     }
 
     var smallDimString: String {
@@ -83,30 +142,235 @@ struct AirlineVariant: Identifiable, Codable, Hashable {
 
 // MARK: - Bag (affiliate product)
 
-struct Bag: Identifiable, Codable {
+struct Bag: Identifiable, Decodable {
     let id: String
     let name: String
     let brand: String?
     let imageUrl: String?
-    let price: Double?
-    let currency: String?
     let affiliateUrl: String?
     let category: String?
+    let type: String?
     let length: Double?
     let width: Double?
     let depth: Double?
     let weight: Double?
+    let colors: [String]?
+    let airlineSlugs: [String]?
+    let shopName: String?
     let shopLogoUrl: String?
     let shopDomain: String?
+    let featured: Bool?
+    let editorRank: Int?
+    let editorNote: String?
+    // Afgeleide velden
+    let dimensionsLabel: String?
+    let volumeLiters: Double?
+    let totalDimensionsCm: Double?
+    let detailUrl: String?
+    let apiDetailUrl: String?
+    let priceEur: Double?
+    let priceCurrency: String?
+    let priceLabel: String?
+    let matchedAirlines: [Airline]?
 
     enum CodingKeys: String, CodingKey {
-        case id, name, brand, price, currency, category, length, width, depth, weight
-        case imageUrl     = "image_url"
-        case affiliateUrl = "affiliate_url"
-        case shopLogoUrl  = "shop_logo_url"
-        case shopDomain   = "shop_domain"
+        case id, name, brand, category, type, colors, featured
+        case imageUrl          = "image_url"
+        case affiliateUrl      = "affiliate_url"
+        case lengthCm          = "length_cm"
+        case widthCm           = "width_cm"
+        case depthCm           = "depth_cm"
+        case weightKg          = "weight_kg"
+        case airlineSlugs      = "airline_slugs"
+        case shopName          = "shop_name"
+        case shopLogoUrl       = "shop_logo_url"
+        case shopDomain        = "shop_domain"
+        case editorRank        = "editor_rank"
+        case editorNote        = "editor_note"
+        case dimensionsLabel   = "dimensions_label"
+        case volumeLiters      = "volume_liters"
+        case totalDimensionsCm = "total_dimensions_cm"
+        case detailUrl         = "detail_url"
+        case apiDetailUrl      = "api_detail_url"
+        case priceEur          = "price_eur"
+        case priceCurrency     = "price_currency"
+        case priceLabel        = "price_label"
+        case matchedAirlines   = "matched_airlines"
+    }
+
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        id = try c.decode(String.self, forKey: .id)
+        name = try c.decode(String.self, forKey: .name)
+        brand = try c.decodeIfPresent(String.self, forKey: .brand)
+        imageUrl = try c.decodeIfPresent(String.self, forKey: .imageUrl)
+        affiliateUrl = try c.decodeIfPresent(String.self, forKey: .affiliateUrl)
+        category = try c.decodeIfPresent(String.self, forKey: .category)
+        type = try c.decodeIfPresent(String.self, forKey: .type)
+        length = try c.decodeIfPresent(Double.self, forKey: .lengthCm)
+        width = try c.decodeIfPresent(Double.self, forKey: .widthCm)
+        depth = try c.decodeIfPresent(Double.self, forKey: .depthCm)
+        weight = try c.decodeIfPresent(Double.self, forKey: .weightKg)
+        colors = try c.decodeIfPresent([String].self, forKey: .colors)
+        airlineSlugs = try c.decodeIfPresent([String].self, forKey: .airlineSlugs)
+        shopName = try c.decodeIfPresent(String.self, forKey: .shopName)
+        shopLogoUrl = try c.decodeIfPresent(String.self, forKey: .shopLogoUrl)
+        shopDomain = try c.decodeIfPresent(String.self, forKey: .shopDomain)
+        featured = try c.decodeIfPresent(Bool.self, forKey: .featured)
+        editorRank = try c.decodeIfPresent(Int.self, forKey: .editorRank)
+        editorNote = try c.decodeIfPresent(String.self, forKey: .editorNote)
+        dimensionsLabel = try c.decodeIfPresent(String.self, forKey: .dimensionsLabel)
+        volumeLiters = try c.decodeIfPresent(Double.self, forKey: .volumeLiters)
+        totalDimensionsCm = try c.decodeIfPresent(Double.self, forKey: .totalDimensionsCm)
+        detailUrl = try c.decodeIfPresent(String.self, forKey: .detailUrl)
+        apiDetailUrl = try c.decodeIfPresent(String.self, forKey: .apiDetailUrl)
+        priceEur = try c.decodeIfPresent(Double.self, forKey: .priceEur)
+        priceCurrency = try c.decodeIfPresent(String.self, forKey: .priceCurrency)
+        priceLabel = try c.decodeIfPresent(String.self, forKey: .priceLabel)
+        matchedAirlines = try c.decodeIfPresent([Airline].self, forKey: .matchedAirlines)
+    }
+
+    var displayPrice: String? { priceLabel ?? priceEur.map { "€\(Int($0)),-" } }
+}
+
+// MARK: - Bag Detail
+
+struct BagDetail: Identifiable, Decodable {
+    let id: String
+    let name: String
+    let brand: String?
+    let imageUrl: String?
+    let affiliateUrl: String?
+    let category: String?
+    let type: String?
+    let length: Double?
+    let width: Double?
+    let depth: Double?
+    let weight: Double?
+    let airlineSlugs: [String]?
+    let shopName: String?
+    let shopLogoUrl: String?
+    let shopDomain: String?
+    let featured: Bool?
+    let editorRank: Int?
+    let editorNote: String?
+    // Afgeleide velden
+    let dimensionsLabel: String?
+    let volumeLiters: Double?
+    let totalDimensionsCm: Double?
+    let detailUrl: String?
+    let apiDetailUrl: String?
+    let priceEur: Double?
+    let priceCurrency: String?
+    let priceLabel: String?
+    // Detail-only velden
+    let colors: [String]?
+    let matchedAirlines: [Airline]?
+    let similarBags: [Bag]?
+
+    enum CodingKeys: String, CodingKey {
+        case id, name, brand, category, type, colors, featured
+        case imageUrl          = "image_url"
+        case affiliateUrl      = "affiliate_url"
+        case lengthCm          = "length_cm"
+        case widthCm           = "width_cm"
+        case depthCm           = "depth_cm"
+        case weightKg          = "weight_kg"
+        case airlineSlugs      = "airline_slugs"
+        case shopName          = "shop_name"
+        case shopLogoUrl       = "shop_logo_url"
+        case shopDomain        = "shop_domain"
+        case editorRank        = "editor_rank"
+        case editorNote        = "editor_note"
+        case dimensionsLabel   = "dimensions_label"
+        case volumeLiters      = "volume_liters"
+        case totalDimensionsCm = "total_dimensions_cm"
+        case detailUrl         = "detail_url"
+        case apiDetailUrl      = "api_detail_url"
+        case priceEur          = "price_eur"
+        case priceCurrency     = "price_currency"
+        case priceLabel        = "price_label"
+        case matchedAirlines   = "matched_airlines"
+        case similarBags       = "similar_bags"
+    }
+
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        id = try c.decode(String.self, forKey: .id)
+        name = try c.decode(String.self, forKey: .name)
+        brand = try c.decodeIfPresent(String.self, forKey: .brand)
+        imageUrl = try c.decodeIfPresent(String.self, forKey: .imageUrl)
+        affiliateUrl = try c.decodeIfPresent(String.self, forKey: .affiliateUrl)
+        category = try c.decodeIfPresent(String.self, forKey: .category)
+        type = try c.decodeIfPresent(String.self, forKey: .type)
+        length = try c.decodeIfPresent(Double.self, forKey: .lengthCm)
+        width = try c.decodeIfPresent(Double.self, forKey: .widthCm)
+        depth = try c.decodeIfPresent(Double.self, forKey: .depthCm)
+        weight = try c.decodeIfPresent(Double.self, forKey: .weightKg)
+        airlineSlugs = try c.decodeIfPresent([String].self, forKey: .airlineSlugs)
+        shopName = try c.decodeIfPresent(String.self, forKey: .shopName)
+        shopLogoUrl = try c.decodeIfPresent(String.self, forKey: .shopLogoUrl)
+        shopDomain = try c.decodeIfPresent(String.self, forKey: .shopDomain)
+        featured = try c.decodeIfPresent(Bool.self, forKey: .featured)
+        editorRank = try c.decodeIfPresent(Int.self, forKey: .editorRank)
+        editorNote = try c.decodeIfPresent(String.self, forKey: .editorNote)
+        dimensionsLabel = try c.decodeIfPresent(String.self, forKey: .dimensionsLabel)
+        volumeLiters = try c.decodeIfPresent(Double.self, forKey: .volumeLiters)
+        totalDimensionsCm = try c.decodeIfPresent(Double.self, forKey: .totalDimensionsCm)
+        detailUrl = try c.decodeIfPresent(String.self, forKey: .detailUrl)
+        apiDetailUrl = try c.decodeIfPresent(String.self, forKey: .apiDetailUrl)
+        priceEur = try c.decodeIfPresent(Double.self, forKey: .priceEur)
+        priceCurrency = try c.decodeIfPresent(String.self, forKey: .priceCurrency)
+        priceLabel = try c.decodeIfPresent(String.self, forKey: .priceLabel)
+        colors = try c.decodeIfPresent([String].self, forKey: .colors)
+        matchedAirlines = try c.decodeIfPresent([Airline].self, forKey: .matchedAirlines)
+        similarBags = try c.decodeIfPresent([Bag].self, forKey: .similarBags)
+    }
+
+    var displayPrice: String? { priceLabel ?? priceEur.map { "€\(Int($0)),-" } }
+}
+
+// MARK: - Bag fit type (onder de stoel vs. bagagevak)
+
+enum BagFitType: String, CaseIterable, Identifiable {
+    case underSeat, overhead
+
+    var id: String { rawValue }
+
+    var label: String {
+        switch self {
+        case .underSeat: return "Onder de stoel"
+        case .overhead:  return "In het bagagevak"
+        }
+    }
+
+    var icon: String {
+        switch self {
+        case .underSeat: return "figure.seated.side"
+        case .overhead:  return "bag.fill"
+        }
     }
 }
+
+protocol BagDimensioned {
+    var length: Double? { get }
+    var width: Double? { get }
+    var depth: Double? { get }
+}
+
+extension BagDimensioned {
+    /// Grove classificatie op basis van afmetingen: een klein persoonlijk item
+    /// past onder de stoel, een grotere cabin bag hoort in het bagagevak.
+    var fitType: BagFitType? {
+        guard let l = length, let w = width, let d = depth else { return nil }
+        let sorted = [l, w, d].sorted(by: >)
+        let fitsUnderSeat = sorted[0] <= 45 && sorted[1] <= 35 && sorted[2] <= 20
+        return fitsUnderSeat ? .underSeat : .overhead
+    }
+}
+
+extension Bag: BagDimensioned {}
+extension BagDetail: BagDimensioned {}
 
 // MARK: - Check
 
@@ -136,8 +400,8 @@ struct CheckResponse: Decodable, Equatable {
     let status: String      // "fit" | "too_large" | "too_heavy" | "no_match"
     let target: String?     // "large" | "small" | nil
     let reasons: [String]?
-    let variant: CheckVariant?
-    let airline: CheckAirline?
+    let variant: AirlineVariant?
+    let airline: Airline?
 
     var verdict: Verdict {
         switch status {
@@ -171,29 +435,6 @@ struct CheckResponse: Decodable, Equatable {
     }
 }
 
-struct CheckVariant: Decodable, Equatable {
-    let id: String?
-    let name: String?
-    let includesLargeBag: Bool?
-    let maxWeightKg: Double?
-
-    enum CodingKeys: String, CodingKey {
-        case id, name
-        case includesLargeBag = "includes_large_bag"
-        case maxWeightKg      = "max_weight_kg"
-    }
-}
-
-struct CheckAirline: Decodable, Equatable {
-    let slug: String?
-    let name: String?
-    let logoUrl: String?
-
-    enum CodingKeys: String, CodingKey {
-        case slug, name
-        case logoUrl = "logo_url"
-    }
-}
 
 // MARK: - Flight lookup
 
