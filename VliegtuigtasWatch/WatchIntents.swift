@@ -54,7 +54,7 @@ struct WatchAirlineQuery: EntityStringQuery {
 struct WatchBagageRegelsIntent: AppIntent {
     static var title: LocalizedStringResource = "Bagageregels opzoeken"
     static var description = IntentDescription(
-        "Vertelt de handbagageregels van een vliegmaatschappij, direct op je Apple Watch.",
+        "Vertelt de handbagageregels van een vliegmaatschappij, direct op je pols.",
         categoryName: "Bagagecheck"
     )
 
@@ -95,7 +95,7 @@ struct WatchBagageRegelsIntent: AppIntent {
 struct WatchMijnVluchtIntent: AppIntent {
     static var title: LocalizedStringResource = "Wanneer vertrekt mijn vlucht?"
     static var description = IntentDescription(
-        "Vertelt wanneer je opgeslagen vlucht vertrekt, direct op je Apple Watch.",
+        "Vertelt wanneer je opgeslagen vlucht vertrekt, direct op je pols.",
         categoryName: "Vlucht"
     )
 

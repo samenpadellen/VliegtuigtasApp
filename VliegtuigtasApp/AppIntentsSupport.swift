@@ -338,7 +338,7 @@ struct CheckSavedBagIntent: AppIntent {
 struct VluchtToevoegenIntent: AppIntent {
     static var title: LocalizedStringResource = "Vlucht toevoegen"
     static var description = IntentDescription(
-        "Slaat een vlucht op in Vliegtuigtas: de aftelling verschijnt op je widget, Apple Watch en lockscreen.",
+        "Slaat een vlucht op in Vliegtuigtas: de aftelling verschijnt op je widget, smartwatch en lockscreen.",
         categoryName: "Vlucht"
     )
 
@@ -354,7 +354,7 @@ struct VluchtToevoegenIntent: AppIntent {
 
     func perform() async throws -> some IntentResult & ProvidesDialog {
         guard UserSession.shared.hasAccount else {
-            return .result(dialog: "Vluchten opslaan werkt met een profiel. Maak er gratis één aan in de app, dan sync je vlucht ook naar je widget en Apple Watch.")
+            return .result(dialog: "Vluchten opslaan werkt met een profiel. Maak er gratis één aan in de app, dan sync je vlucht ook naar je widget en smartwatch.")
         }
 
         let number = vluchtnummer.trimmingCharacters(in: .whitespaces).uppercased()

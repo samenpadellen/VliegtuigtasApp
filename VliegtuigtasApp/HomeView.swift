@@ -654,7 +654,7 @@ struct HomeView: View {
                     nav.openChecker(preselected: nil)
                 }
                 QuickActionCard(
-                    icon: "airport.fill",
+                    icon: "airplane.circle.fill",
                     color: Theme.sky,
                     title: "Luchthavens",
                     subtitle: "Info per vliegveld"

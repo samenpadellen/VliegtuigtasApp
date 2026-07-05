@@ -99,7 +99,7 @@ struct AirportDetailView: View {
                     }
 
                     // Recommendations
-                    if let minutes = airport.recommendedArrivalMinutes {
+                    if airport.recommendedArrivalMinutes != nil {
                         recommendationsSection
                     }
 

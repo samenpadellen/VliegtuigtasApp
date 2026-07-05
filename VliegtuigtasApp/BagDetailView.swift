@@ -13,9 +13,14 @@ struct BagDetailView: View {
     let bagId: String
 
     @EnvironmentObject private var airlineStore: AirlineStore
+    @ObservedObject private var flightsStore = FlightsStore.shared
     @State private var detail: BagDetail?
     @State private var isLoading = true
     @State private var selectedImage = 0
+    // Beide airline-lijsten starten ingeklapt: de detailpagina blijft rustig
+    // en de gebruiker vouwt open wat hij wil zien.
+    @State private var acceptedExpanded = false
+    @State private var rejectedExpanded = false
     @Environment(\.dismiss) private var dismiss
 
     // Airlines die de tas NIET accepteren
@@ -23,6 +28,20 @@ struct BagDetailView: View {
         guard let matched = detail?.matchedAirlines else { return airlineStore.airlines }
         let matchedIds = Set(matched.map(\.id))
         return airlineStore.airlines.filter { !matchedIds.contains($0.id) }
+    }
+
+    /// Slugs van maatschappijen die de gebruiker al kent uit zijn opgeslagen
+    /// vluchten — daar stemmen we de detailpagina op af.
+    private var knownAirlineSlugs: Set<String> {
+        Set(flightsStore.flights.compactMap(\.airlineSlug))
+    }
+
+    /// De bekende maatschappij(en) van de gebruiker die deze tas accepteren.
+    /// Die zetten we bovenaan met een vinkje + koop-CTA — precies de tassen
+    /// die relevant zijn voor de vlucht die de gebruiker al heeft ingepland.
+    private func knownAccepted(_ d: BagDetail) -> [Airline] {
+        guard !knownAirlineSlugs.isEmpty else { return [] }
+        return (d.matchedAirlines ?? []).filter { knownAirlineSlugs.contains($0.slug) }
     }
 
     var body: some View {
@@ -84,23 +103,32 @@ struct BagDetailView: View {
                             colorsSection(colors)
                         }
 
-                        // 4. Niet geaccepteerd (bovenaan airlines blok)
-                        if !notAccepted.isEmpty {
-                            airlineBlock(
-                                title: "Niet geaccepteerd",
-                                subtitle: "\(notAccepted.count) maatschappij\(notAccepted.count == 1 ? "" : "en") accepteren deze tas niet",
-                                airlines: notAccepted,
-                                style: .rejected
+                        // 4. Bekende maatschappij van de gebruiker die deze
+                        //    tas accepteert — prominent met vinkje + koop-CTA.
+                        let known = knownAccepted(d)
+                        if !known.isEmpty {
+                            knownAirlineHighlight(known, bag: d)
+                        }
+
+                        // 5. Geaccepteerd (ingeklapt)
+                        if let matched = d.matchedAirlines, !matched.isEmpty {
+                            collapsibleAirlineBlock(
+                                title: "Geaccepteerd bij deze airlines",
+                                subtitle: "\(matched.count) maatschappij\(matched.count == 1 ? "" : "en") accepteren deze tas",
+                                airlines: matched,
+                                style: .accepted,
+                                isExpanded: $acceptedExpanded
                             )
                         }
 
-                        // 5. Geaccepteerd
-                        if let matched = d.matchedAirlines, !matched.isEmpty {
-                            airlineBlock(
-                                title: "Geaccepteerd door",
-                                subtitle: "\(matched.count) maatschappij\(matched.count == 1 ? "" : "en") accepteren deze tas",
-                                airlines: matched,
-                                style: .accepted
+                        // 6. Niet geaccepteerd (ingeklapt, onderaan)
+                        if !notAccepted.isEmpty {
+                            collapsibleAirlineBlock(
+                                title: "Niet geaccepteerd bij deze airlines",
+                                subtitle: "\(notAccepted.count) maatschappij\(notAccepted.count == 1 ? "" : "en") accepteren deze tas niet",
+                                airlines: notAccepted,
+                                style: .rejected,
+                                isExpanded: $rejectedExpanded
                             )
                         }
                     }
@@ -353,66 +381,160 @@ struct BagDetailView: View {
         .frame(maxWidth: .infinity, alignment: .leading)
     }
 
-    // MARK: - Airline blokken
+    // MARK: - Bekende maatschappij van de gebruiker (vinkje + koop-CTA)
 
-    private enum AirlineStyle { case accepted, rejected }
-
-    private func airlineBlock(
-        title: String,
-        subtitle: String,
-        airlines: [Airline],
-        style: AirlineStyle
-    ) -> some View {
-        VStack(alignment: .leading, spacing: 14) {
-            VStack(alignment: .leading, spacing: 3) {
-                HStack(spacing: 8) {
-                    Image(systemName: style == .accepted ? "checkmark.circle.fill" : "xmark.circle.fill")
-                        .font(.system(size: 16, weight: .semibold))
-                        .foregroundStyle(style == .accepted ? Color.green : Color.red)
-                    sectionHeader(title)
-                }
-                Text(subtitle)
-                    .font(.system(size: 13, design: .rounded))
-                    .foregroundStyle(Theme.textSecondary)
+    /// Toont de maatschappij die de gebruiker al kent (uit een opgeslagen
+    /// vlucht) en die deze tas accepteert — met een groen vinkje en een
+    /// directe koop-CTA, want dit is precies de tas die bij zijn vlucht past.
+    private func knownAirlineHighlight(_ airlines: [Airline], bag d: BagDetail) -> some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack(spacing: 8) {
+                Image(systemName: "checkmark.seal.fill")
+                    .font(.system(size: 16, weight: .semibold))
+                    .foregroundStyle(Theme.green)
+                sectionHeader("Past bij jouw vlucht")
             }
 
-            VStack(spacing: 8) {
-                ForEach(airlines) { ma in
+            ForEach(airlines) { ma in
+                VStack(spacing: 12) {
                     NavigationLink(destination: AirlineDetailView(airline: ma)) {
                         HStack(spacing: 14) {
                             AirlineLogo(airline: ma, size: 42)
-                            Text(ma.name)
-                                .font(.system(size: 15, weight: .semibold, design: .rounded))
-                                .foregroundStyle(Theme.textPrimary)
-                            Spacer()
-                            if style == .rejected {
-                                Image(systemName: "xmark")
-                                    .font(.system(size: 11, weight: .bold))
-                                    .foregroundStyle(.red.opacity(0.60))
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text(ma.name)
+                                    .font(.system(size: 15, weight: .semibold, design: .rounded))
+                                    .foregroundStyle(Theme.textPrimary)
+                                Label("Deze tas is toegestaan", systemImage: "checkmark.circle.fill")
+                                    .font(.system(size: 12, weight: .medium, design: .rounded))
+                                    .foregroundStyle(Theme.green)
                             }
+                            Spacer()
                             Image(systemName: "chevron.right")
                                 .font(.system(size: 12, weight: .semibold))
                                 .foregroundStyle(Theme.textSecondary.opacity(0.4))
                         }
-                        .padding(.horizontal, 14)
-                        .padding(.vertical, 12)
-                        .background(
-                            style == .rejected
-                                ? Color.red.opacity(0.04)
-                                : Color(.systemBackground)
-                        )
-                        .clipShape(RoundedRectangle(cornerRadius: 14))
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 14)
-                                .strokeBorder(
-                                    style == .rejected ? Color.red.opacity(0.12) : Color.clear,
-                                    lineWidth: 1
-                                )
-                        )
-                        .shadow(color: .black.opacity(0.04), radius: 6, x: 0, y: 2)
                     }
                     .buttonStyle(.pressableCard)
+
+                    if let url = d.affiliateUrl.flatMap(URL.init) {
+                        Link(destination: url) {
+                            HStack(spacing: 6) {
+                                Image(systemName: "bag.fill")
+                                    .font(.system(size: 13, weight: .semibold))
+                                Text("Koop deze tas")
+                                    .font(.system(size: 14, weight: .bold, design: .rounded))
+                                Image(systemName: "arrow.up.right")
+                                    .font(.system(size: 11, weight: .bold))
+                            }
+                            .foregroundStyle(.white)
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 13)
+                            .background(Theme.navyGradient)
+                            .clipShape(RoundedRectangle(cornerRadius: 14))
+                            .shadow(color: Theme.navy.opacity(0.25), radius: 8, x: 0, y: 3)
+                        }
+                        .simultaneousGesture(TapGesture().onEnded {
+                            APIClient.shared.sendEvent("bag_buy_known_airline", path: "/bag/\(d.id)")
+                        })
+                    }
                 }
+                .padding(14)
+                .background(Theme.green.opacity(0.07))
+                .clipShape(RoundedRectangle(cornerRadius: 16))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 16)
+                        .strokeBorder(Theme.green.opacity(0.25), lineWidth: 1.2)
+                )
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    // MARK: - Airline blokken (inklapbaar)
+
+    private enum AirlineStyle { case accepted, rejected }
+
+    /// Inklapbaar blok: standaard alleen een kop met aantal + chevron; tikken
+    /// vouwt de volledige lijst uit. Houdt de detailpagina compact.
+    private func collapsibleAirlineBlock(
+        title: String,
+        subtitle: String,
+        airlines: [Airline],
+        style: AirlineStyle,
+        isExpanded: Binding<Bool>
+    ) -> some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Button {
+                UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                withAnimation(.spring(response: 0.35, dampingFraction: 0.85)) {
+                    isExpanded.wrappedValue.toggle()
+                }
+            } label: {
+                HStack(spacing: 10) {
+                    Image(systemName: style == .accepted ? "checkmark.circle.fill" : "xmark.circle.fill")
+                        .font(.system(size: 16, weight: .semibold))
+                        .foregroundStyle(style == .accepted ? Color.green : Color.red)
+                    VStack(alignment: .leading, spacing: 2) {
+                        sectionHeader(title)
+                        Text(subtitle)
+                            .font(.system(size: 12, design: .rounded))
+                            .foregroundStyle(Theme.textSecondary)
+                            .multilineTextAlignment(.leading)
+                    }
+                    Spacer()
+                    Image(systemName: "chevron.down")
+                        .font(.system(size: 13, weight: .bold))
+                        .foregroundStyle(Theme.textSecondary)
+                        .rotationEffect(.degrees(isExpanded.wrappedValue ? 180 : 0))
+                }
+                .padding(14)
+                .background(Color(.systemBackground))
+                .clipShape(RoundedRectangle(cornerRadius: 16))
+                .shadow(color: .black.opacity(0.04), radius: 6, x: 0, y: 2)
+                .contentShape(RoundedRectangle(cornerRadius: 16))
+            }
+            .buttonStyle(.plain)
+
+            if isExpanded.wrappedValue {
+                VStack(spacing: 8) {
+                    ForEach(airlines) { ma in
+                        NavigationLink(destination: AirlineDetailView(airline: ma)) {
+                            HStack(spacing: 14) {
+                                AirlineLogo(airline: ma, size: 42)
+                                Text(ma.name)
+                                    .font(.system(size: 15, weight: .semibold, design: .rounded))
+                                    .foregroundStyle(Theme.textPrimary)
+                                Spacer()
+                                if style == .rejected {
+                                    Image(systemName: "xmark")
+                                        .font(.system(size: 11, weight: .bold))
+                                        .foregroundStyle(.red.opacity(0.60))
+                                }
+                                Image(systemName: "chevron.right")
+                                    .font(.system(size: 12, weight: .semibold))
+                                    .foregroundStyle(Theme.textSecondary.opacity(0.4))
+                            }
+                            .padding(.horizontal, 14)
+                            .padding(.vertical, 12)
+                            .background(
+                                style == .rejected
+                                    ? Color.red.opacity(0.04)
+                                    : Color(.systemBackground)
+                            )
+                            .clipShape(RoundedRectangle(cornerRadius: 14))
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 14)
+                                    .strokeBorder(
+                                        style == .rejected ? Color.red.opacity(0.12) : Color.clear,
+                                        lineWidth: 1
+                                    )
+                            )
+                            .shadow(color: .black.opacity(0.04), radius: 6, x: 0, y: 2)
+                        }
+                        .buttonStyle(.pressableCard)
+                    }
+                }
+                .transition(.opacity.combined(with: .move(edge: .top)))
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
