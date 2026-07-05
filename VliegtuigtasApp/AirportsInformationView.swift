@@ -397,6 +397,13 @@ struct EURulesView: View {
                         }
                         .padding(.horizontal, 20)
 
+                        SaveToRemindersButton(
+                            titles: reminderTitles(for: rules),
+                            notes: "EU-handbagageregels · Vliegtuigtas",
+                            label: "Bewaar regels in Herinneringen"
+                        )
+                        .padding(.horizontal, 20)
+
                         Spacer(minLength: 32)
                     }
                 }
@@ -447,6 +454,18 @@ struct EURulesView: View {
             .padding(16)
         }
         .padding(.horizontal, 20)
+    }
+
+    /// Beknopte, actiegerichte samenvatting van de EU-regels als losse
+    /// herinneringen — geen lappen tekst, maar precies wat je moet onthouden
+    /// terwijl je inpakt.
+    private func reminderTitles(for rules: EULuggageRules) -> [String] {
+        [
+            "Vloeistoffen: max. \(rules.fluidRule.maxMlPerBottle) ml per verpakking, samen in één zakje van \(rules.fluidRule.maxTotalLiters == 1 ? "1" : "\(rules.fluidRule.maxTotalLiters)") liter",
+            "Powerbanks & losse batterijen in handbagage (niet in ruimbagage)",
+            "E-sigaretten/vapes alleen in handbagage",
+            "Scherpe voorwerpen (lemmet > 6 cm) niet in handbagage"
+        ]
     }
 }
 

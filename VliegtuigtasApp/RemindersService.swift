@@ -10,6 +10,10 @@ final class RemindersService: ObservableObject {
 
     private let store = EKEventStore()
 
+    /// Naam van de eigen Herinneringen-lijst waarin alles uit de app terechtkomt,
+    /// zodat reistips niet verdwijnen tussen de boodschappenlijstjes.
+    private let listTitle = "Vliegtuigtas"
+
     private init() {}
 
     /// Vraagt (indien nodig) toegang tot Herinneringen. Gebruikt op iOS 17+ de
@@ -43,7 +47,7 @@ final class RemindersService: ObservableObject {
         let reminder = EKReminder(eventStore: store)
         reminder.title = title
         reminder.notes = notes
-        reminder.calendar = store.defaultCalendarForNewReminders()
+        reminder.calendar = targetCalendar()
 
         if let dueDate {
             reminder.dueDateComponents = Calendar.current.dateComponents(
@@ -68,12 +72,13 @@ final class RemindersService: ObservableObject {
     func saveReminders(titles: [String], notes: String? = nil) async -> Int {
         guard await ensureAccess() else { return 0 }
 
+        let calendar = targetCalendar()
         var saved = 0
         for title in titles {
             let reminder = EKReminder(eventStore: store)
             reminder.title = title
             reminder.notes = notes
-            reminder.calendar = store.defaultCalendarForNewReminders()
+            reminder.calendar = calendar
             // Per item committen zou traag zijn; we committen één keer na de lus.
             if (try? store.save(reminder, commit: false)) != nil {
                 saved += 1
@@ -81,6 +86,45 @@ final class RemindersService: ObservableObject {
         }
         try? store.commit()
         return saved
+    }
+
+    // MARK: - Eigen "Vliegtuigtas"-lijst
+
+    /// De lijst waarin nieuwe herinneringen komen: de eigen "Vliegtuigtas"-lijst
+    /// als die te maken/vinden is, anders de standaardlijst van de gebruiker.
+    private func targetCalendar() -> EKCalendar? {
+        if let existing = store.calendars(for: .reminder).first(where: { $0.title == listTitle }) {
+            return existing
+        }
+        // Nog niet aanwezig: aanmaken in een geschikte bron.
+        guard let source = preferredSource() else {
+            return store.defaultCalendarForNewReminders()
+        }
+        let calendar = EKCalendar(for: .reminder, eventStore: store)
+        calendar.title = listTitle
+        calendar.source = source
+        do {
+            try store.saveCalendar(calendar, commit: true)
+            return calendar
+        } catch {
+            // Sommige accounts staan geen nieuwe lijsten toe — val netjes terug.
+            return store.defaultCalendarForNewReminders()
+        }
+    }
+
+    /// Beste bron voor een nieuwe lijst: dezelfde als de standaardlijst (meestal
+    /// iCloud), anders een iCloud/CalDAV-bron, anders lokaal.
+    private func preferredSource() -> EKSource? {
+        if let defaultSource = store.defaultCalendarForNewReminders()?.source {
+            return defaultSource
+        }
+        let sources = store.sources
+        if let cloud = sources.first(where: {
+            $0.sourceType == .calDAV && $0.title.lowercased().contains("icloud")
+        }) {
+            return cloud
+        }
+        return sources.first(where: { $0.sourceType == .local }) ?? sources.first
     }
 
     /// Vraagt toegang op als die nog niet bepaald is; geeft terug of we
