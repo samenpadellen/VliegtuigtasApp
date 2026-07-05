@@ -565,6 +565,25 @@ struct Airport: Identifiable, Codable, Hashable {
 
     // Links
     let officialUrl: String?
+
+    /// Domein afgeleid uit de officiële luchthaven-URL (bijv. "schiphol.nl"),
+    /// als sleutel voor logo.dev.
+    var domain: String? {
+        guard let officialUrl,
+              let host = URLComponents(string: officialUrl)?.host else { return nil }
+        return host.replacingOccurrences(of: "www.", with: "")
+    }
+
+    /// Logo van de luchthaven via logo.dev, op basis van het domein.
+    var logoUrl: String? {
+        guard let domain else { return nil }
+        return "https://img.logo.dev/\(domain)?token=\(LogoDev.publishableKey)&size=120&format=png"
+    }
+}
+
+/// Publieke sleutel voor logo.dev (mag client-side gebruikt worden).
+enum LogoDev {
+    static let publishableKey = "pk_B_tNBKCOSX-QVBpxITF-yg"
 }
 
 // MARK: - EU Rules

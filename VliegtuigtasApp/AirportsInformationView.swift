@@ -25,10 +25,12 @@ struct AirportSelectionView: View {
                             NavigationLink(destination: AirportDetailView(airport: airport)) {
                                 VStack(alignment: .leading, spacing: 8) {
                                     HStack(spacing: 12) {
+                                        AirportLogo(airport: airport, size: 44)
                                         VStack(alignment: .leading, spacing: 4) {
                                             Text(airport.name)
                                                 .font(.system(size: 16, weight: .semibold, design: .rounded))
                                                 .foregroundStyle(Theme.textPrimary)
+                                                .multilineTextAlignment(.leading)
                                             HStack(spacing: 8) {
                                                 Text(airport.iata)
                                                     .font(.system(size: 11, weight: .bold, design: .rounded))
@@ -69,16 +71,18 @@ struct AirportSelectionView: View {
 
 struct AirportDetailView: View {
     let airport: Airport
-    @Environment(\.dismiss) var dismiss
 
     var body: some View {
-        NavigationStack {
-            ScrollView {
+        ScrollView {
                 VStack(alignment: .leading, spacing: 16) {
                     // Header
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text(airport.name)
-                            .font(.system(size: 28, weight: .bold, design: .rounded))
+                    VStack(alignment: .leading, spacing: 12) {
+                        HStack(spacing: 14) {
+                            AirportLogo(airport: airport, size: 56)
+                            Text(airport.name)
+                                .font(.system(size: 26, weight: .bold, design: .rounded))
+                                .fixedSize(horizontal: false, vertical: true)
+                        }
                         HStack(spacing: 12) {
                             Badge(text: airport.iata, color: Theme.navy)
                             Badge(text: airport.type, color: Theme.sky)
@@ -130,23 +134,10 @@ struct AirportDetailView: View {
 
                     Spacer(minLength: 32)
                 }
-            }
-            .navigationBarTitleDisplayMode(.inline)
-            .navigationBarBackButtonHidden(false)
-            .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
-                    Button(action: { dismiss() }) {
-                        HStack(spacing: 6) {
-                            Image(systemName: "chevron.left")
-                                .font(.system(size: 14, weight: .semibold))
-                            Text("Terug")
-                                .font(.system(size: 14, weight: .semibold, design: .rounded))
-                        }
-                        .foregroundStyle(Theme.navy)
-                    }
-                }
-            }
         }
+        .background(Color(.systemGroupedBackground))
+        .navigationTitle(airport.iata)
+        .navigationBarTitleDisplayMode(.inline)
     }
 
     @ViewBuilder
@@ -801,5 +792,55 @@ private struct Badge: View {
             .padding(.vertical, 5)
             .background(color)
             .clipShape(Capsule())
+    }
+}
+
+// MARK: - Airport Logo
+
+/// Logo van de luchthaven via logo.dev (op basis van het domein). Valt terug
+/// op een vliegtuig-icoon als er geen domein/logo beschikbaar is.
+///
+/// Bewust `AsyncImage` i.p.v. de gedeelde `AuthorisedImage`: die stuurt onze
+/// eigen API-bearer-token mee op élke request, en dat token hoort niet naar
+/// een externe host als logo.dev te lekken. logo.dev authenticeert via de
+/// `?token=`-querystring (publishable key), niet via een Authorization-header.
+struct AirportLogo: View {
+    let airport: Airport
+    var size: CGFloat = 44
+
+    var body: some View {
+        ZStack {
+            RoundedRectangle(cornerRadius: size * 0.24)
+                .fill(Theme.skyLight)
+
+            if let logo = airport.logoUrl.flatMap(URL.init) {
+                AsyncImage(url: logo) { phase in
+                    switch phase {
+                    case .success(let image):
+                        image.resizable().scaledToFit().padding(size * 0.16)
+                    case .empty:
+                        ProgressView().tint(Theme.sky).scaleEffect(0.6)
+                    case .failure:
+                        fallbackIcon
+                    @unknown default:
+                        fallbackIcon
+                    }
+                }
+            } else {
+                fallbackIcon
+            }
+        }
+        .frame(width: size, height: size)
+        .clipShape(RoundedRectangle(cornerRadius: size * 0.24))
+        .overlay(
+            RoundedRectangle(cornerRadius: size * 0.24)
+                .strokeBorder(Color(.systemGray5), lineWidth: 1)
+        )
+    }
+
+    private var fallbackIcon: some View {
+        Image(systemName: "airplane.departure")
+            .font(.system(size: size * 0.42, weight: .semibold))
+            .foregroundStyle(Theme.navy)
     }
 }
