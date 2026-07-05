@@ -570,7 +570,7 @@ struct Airport: Identifiable, Codable, Hashable {
 // MARK: - EU Rules
 
 struct EULuggageRules: Identifiable, Codable {
-    let id: String = "eu-rules"
+    var id: String { "eu-rules" }
 
     struct FluidRule: Codable {
         let title: String
@@ -598,13 +598,12 @@ struct EULuggageRules: Identifiable, Codable {
     let ecigaretteRule: String
     let sharpObjectsRule: String
     let prohibitedItems: [ProhibitedItem]
-    let checkedBaggageLiquids: String
 }
 
 // MARK: - Customs
 
 struct CustomsInfo: Identifiable, Codable {
-    let id: String = "customs"
+    var id: String { "customs" }
 
     struct TobaccoLimits: Codable {
         let cigarettes: Int
@@ -631,7 +630,7 @@ struct CustomsInfo: Identifiable, Codable {
 // MARK: - Baggage Issues
 
 struct BaggageIssueInfo: Identifiable, Codable {
-    let id: String = "baggage-issues"
+    var id: String { "baggage-issues" }
 
     struct Claim: Codable {
         let condition: String // "Damaged", "Delayed", "Lost"
