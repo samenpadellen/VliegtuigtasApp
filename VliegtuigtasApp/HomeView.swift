@@ -679,15 +679,19 @@ struct HomeView: View {
         }
         .sheet(isPresented: $showEURules) {
             EURulesView()
+                .presentationDragIndicator(.visible)
         }
         .sheet(isPresented: $showCustomsInfo) {
             CustomsInfoView()
+                .presentationDragIndicator(.visible)
         }
         .sheet(isPresented: $showBaggageIssues) {
             BaggageIssuesView()
+                .presentationDragIndicator(.visible)
         }
         .sheet(isPresented: $showAirportSelection) {
             AirportSelectionView()
+                .presentationDragIndicator(.visible)
         }
     }
 

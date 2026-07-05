@@ -635,6 +635,23 @@ struct Airport: Identifiable, Codable, Hashable {
         guard let domain else { return nil }
         return "https://img.logo.dev/\(domain)?token=\(LogoDev.publishableKey)&size=120&format=png"
     }
+
+    /// Nederlandstalig label voor het type luchthaven — de ruwe data is Engels,
+    /// maar de app is Nederlands, dus tonen we het netjes vertaald.
+    var displayType: String {
+        switch type {
+        case "Hub":                return "Hub · alle maatschappijen"
+        case "Low-cost hub":       return "Lowcost-hub"
+        case "Regional":           return "Regionaal"
+        case "Small - Charters":   return "Klein · vakantiecharters"
+        case "Not yet commercial": return "Nog niet in gebruik"
+        default:                   return type
+        }
+    }
+
+    /// Is de luchthaven al open voor commerciële passagiersvluchten?
+    /// Lelystad is fysiek klaar maar nog niet operationeel.
+    var isOperational: Bool { type != "Not yet commercial" }
 }
 
 /// Publieke sleutel voor logo.dev (mag client-side gebruikt worden).

@@ -4,6 +4,7 @@ import SwiftUI
 
 struct AirportSelectionView: View {
     @StateObject private var airportsStore = AirportsStore.shared
+    @Environment(\.dismiss) private var dismiss
     let onSelect: (Airport) -> Void = { _ in }
 
     var body: some View {
@@ -11,59 +12,94 @@ struct AirportSelectionView: View {
             ScrollView {
                 VStack(alignment: .leading, spacing: 12) {
                     VStack(alignment: .leading, spacing: 8) {
-                        Text("Nederlandse Luchthavens")
+                        Text("Nederlandse luchthavens")
                             .font(.system(size: 24, weight: .bold, design: .rounded))
-                        Text("Selecteer een luchthaven voor specifieke informatie")
+                        Text("Kies een luchthaven voor security-info, tips en aankomsttijden.")
                             .font(.system(size: 13, design: .rounded))
                             .foregroundStyle(Theme.textSecondary)
+                            .fixedSize(horizontal: false, vertical: true)
                     }
                     .padding(.horizontal, 20)
-                    .padding(.top, 16)
+                    .padding(.top, 8)
 
                     VStack(spacing: 10) {
                         ForEach(airportsStore.airports) { airport in
                             NavigationLink(destination: AirportDetailView(airport: airport)) {
-                                VStack(alignment: .leading, spacing: 8) {
-                                    HStack(spacing: 12) {
-                                        AirportLogo(airport: airport, size: 44)
-                                        VStack(alignment: .leading, spacing: 4) {
-                                            Text(airport.name)
-                                                .font(.system(size: 16, weight: .semibold, design: .rounded))
-                                                .foregroundStyle(Theme.textPrimary)
-                                                .multilineTextAlignment(.leading)
-                                            HStack(spacing: 8) {
-                                                Text(airport.iata)
-                                                    .font(.system(size: 11, weight: .bold, design: .rounded))
-                                                    .foregroundStyle(.white)
-                                                    .padding(.horizontal, 8)
-                                                    .padding(.vertical, 4)
-                                                    .background(Theme.navy)
-                                                    .clipShape(Capsule())
-                                                Text(airport.type)
-                                                    .font(.system(size: 11, design: .rounded))
-                                                    .foregroundStyle(Theme.textSecondary)
-                                            }
-                                        }
-                                        Spacer()
-                                        Image(systemName: "chevron.right")
-                                            .foregroundStyle(Theme.textSecondary)
-                                            .font(.system(size: 13, weight: .semibold))
-                                    }
-                                }
-                                .padding(14)
-                                .background(Theme.surface)
-                                .clipShape(RoundedRectangle(cornerRadius: 16))
-                                .shadow(color: .black.opacity(0.05), radius: 6, x: 0, y: 2)
+                                airportRow(airport)
                             }
                         }
                     }
                     .padding(.horizontal, 20)
+
+                    // Vertrouwensnoot: eerlijk over hoe actueel de info is.
+                    Label(
+                        "Regels en tijden wijzigen regelmatig — controleer vlak voor vertrek altijd de officiële luchthavensite.",
+                        systemImage: "info.circle"
+                    )
+                    .font(.system(size: 11, design: .rounded))
+                    .foregroundStyle(Theme.textSecondary)
+                    .padding(.horizontal, 20)
+                    .padding(.top, 6)
                     .padding(.bottom, 40)
                 }
             }
             .background(Color(.systemGroupedBackground))
+            .navigationTitle("Luchthavens")
             .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("Gereed") { dismiss() }
+                        .fontWeight(.semibold)
+                        .foregroundStyle(Theme.navy)
+                }
+            }
         }
+    }
+
+    @ViewBuilder
+    private func airportRow(_ airport: Airport) -> some View {
+        HStack(spacing: 12) {
+            AirportLogo(airport: airport, size: 44)
+                .opacity(airport.isOperational ? 1 : 0.5)
+            VStack(alignment: .leading, spacing: 4) {
+                Text(airport.name)
+                    .font(.system(size: 16, weight: .semibold, design: .rounded))
+                    .foregroundStyle(Theme.textPrimary)
+                    .multilineTextAlignment(.leading)
+                HStack(spacing: 8) {
+                    Text(airport.iata)
+                        .font(.system(size: 11, weight: .bold, design: .rounded))
+                        .foregroundStyle(.white)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 4)
+                        .background(airport.isOperational ? Theme.navy : Color(.systemGray))
+                        .clipShape(Capsule())
+                    Text(airport.displayType)
+                        .font(.system(size: 11, design: .rounded))
+                        .foregroundStyle(Theme.textSecondary)
+                        .lineLimit(1)
+                }
+            }
+            Spacer()
+            if airport.isOperational {
+                Image(systemName: "chevron.right")
+                    .foregroundStyle(Theme.textSecondary)
+                    .font(.system(size: 13, weight: .semibold))
+            } else {
+                Text("Binnenkort")
+                    .font(.system(size: 10, weight: .bold, design: .rounded))
+                    .foregroundStyle(Theme.orange)
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 4)
+                    .background(Theme.orange.opacity(0.12))
+                    .clipShape(Capsule())
+            }
+        }
+        .padding(14)
+        .background(Theme.surface)
+        .clipShape(RoundedRectangle(cornerRadius: 16))
+        .shadow(color: .black.opacity(0.05), radius: 6, x: 0, y: 2)
+        .opacity(airport.isOperational ? 1 : 0.7)
     }
 }
 
@@ -79,19 +115,35 @@ struct AirportDetailView: View {
                     VStack(alignment: .leading, spacing: 12) {
                         HStack(spacing: 14) {
                             AirportLogo(airport: airport, size: 56)
-                            Text(airport.name)
-                                .font(.system(size: 26, weight: .bold, design: .rounded))
-                                .fixedSize(horizontal: false, vertical: true)
+                            VStack(alignment: .leading, spacing: 3) {
+                                Text(airport.name)
+                                    .font(.system(size: 24, weight: .bold, design: .rounded))
+                                    .fixedSize(horizontal: false, vertical: true)
+                                Text(airport.city)
+                                    .font(.system(size: 13, weight: .medium, design: .rounded))
+                                    .foregroundStyle(Theme.textSecondary)
+                            }
                         }
-                        HStack(spacing: 12) {
+                        HStack(spacing: 8) {
                             Badge(text: airport.iata, color: Theme.navy)
-                            Badge(text: airport.type, color: Theme.sky)
+                            Badge(text: airport.displayType, color: Theme.sky)
                         }
+                        websiteLink
                     }
                     .padding(.horizontal, 20)
                     .padding(.top, 16)
 
                     Divider().padding(.horizontal, 20)
+
+                    // Nog niet operationeel (Lelystad): eerlijk en duidelijk.
+                    if !airport.isOperational {
+                        notYetOpenBanner
+                    }
+
+                    // Maatschappijen die hier vliegen
+                    if let airlines = airport.airlineExamples, !airlines.isEmpty {
+                        airlinesSection(airlines)
+                    }
 
                     // Security features
                     if hasSecurityInfo(airport) {
@@ -138,6 +190,71 @@ struct AirportDetailView: View {
         .background(Color(.systemGroupedBackground))
         .navigationTitle(airport.iata)
         .navigationBarTitleDisplayMode(.inline)
+    }
+
+    // MARK: - Header-onderdelen
+
+    @ViewBuilder
+    private var websiteLink: some View {
+        if let urlString = airport.officialUrl, let url = URL(string: urlString) {
+            Link(destination: url) {
+                HStack(spacing: 6) {
+                    Image(systemName: "safari.fill")
+                        .font(.system(size: 12, weight: .semibold))
+                    Text("Officiële website")
+                        .font(.system(size: 13, weight: .semibold, design: .rounded))
+                    Image(systemName: "arrow.up.right")
+                        .font(.system(size: 10, weight: .bold))
+                }
+                .foregroundStyle(Theme.navy)
+                .padding(.horizontal, 12)
+                .padding(.vertical, 8)
+                .background(Theme.navy.opacity(0.08))
+                .clipShape(Capsule())
+            }
+            .padding(.top, 2)
+        }
+    }
+
+    private var notYetOpenBanner: some View {
+        HStack(alignment: .top, spacing: 12) {
+            Image(systemName: "clock.badge.exclamationmark.fill")
+                .font(.system(size: 20, weight: .semibold))
+                .foregroundStyle(Theme.orange)
+            VStack(alignment: .leading, spacing: 3) {
+                Text("Nog niet open voor passagiers")
+                    .font(.system(size: 14, weight: .semibold, design: .rounded))
+                    .foregroundStyle(Theme.textPrimary)
+                Text("Deze luchthaven verwerkt nog geen commerciële vluchten. We houden de status in de gaten.")
+                    .font(.system(size: 12, design: .rounded))
+                    .foregroundStyle(Theme.textSecondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
+        .padding(14)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Theme.orange.opacity(0.10))
+        .clipShape(RoundedRectangle(cornerRadius: 16))
+        .padding(.horizontal, 20)
+    }
+
+    private func airlinesSection(_ airlines: [String]) -> some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack(spacing: 10) {
+                Image(systemName: "airplane")
+                    .foregroundStyle(Theme.sky)
+                Text("Maatschappijen die hier vliegen")
+                    .font(.system(size: 14, weight: .semibold, design: .rounded))
+            }
+
+            // Flexibele chip-wrap zodat het bij elk aantal netjes oogt.
+            FlowChips(items: airlines)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(16)
+        .background(Theme.surface)
+        .clipShape(RoundedRectangle(cornerRadius: 16))
+        .padding(.horizontal, 20)
     }
 
     @ViewBuilder
@@ -190,20 +307,32 @@ struct AirportDetailView: View {
                 HStack(spacing: 10) {
                     Image(systemName: "clock.fill")
                         .foregroundStyle(Theme.sky)
-                    Text("Aankomst aanbevelingen")
+                    Text("Goed om te weten")
                         .font(.system(size: 14, weight: .semibold, design: .rounded))
                 }
 
                 if let minutes = airport.recommendedArrivalMinutes {
-                    recommendationRow(icon: "calendar", label: "Normaal seizoen", value: "\(minutes) minuten voor vertrek")
+                    recommendationRow(icon: "calendar", label: "Op tijd zijn (normaal)", value: "\(minutes) min voor vertrek")
                 }
 
                 if let minutesHigh = airport.recommendedArrivalMinutesHighSeason {
-                    recommendationRow(icon: "calendar", label: "Piekseizoen", value: "\(minutesHigh) minuten voor vertrek")
+                    recommendationRow(icon: "calendar.badge.exclamationmark", label: "Op tijd zijn (piek)", value: "\(minutesHigh) min voor vertrek")
+                }
+
+                if let opensAt = airport.airportOpensAt {
+                    recommendationRow(icon: "sunrise.fill", label: "Luchthaven open vanaf", value: "\(opensAt) uur")
+                }
+
+                if let lockers = airport.hasBaggageLockers {
+                    recommendationRow(
+                        icon: "lock.square.fill",
+                        label: "Bagagekluizen",
+                        value: lockers ? "Aanwezig" : "Niet aanwezig"
+                    )
                 }
 
                 if let fastTrack = airport.fastTrackPrice {
-                    recommendationRow(icon: "bolt.fill", label: "Fast-track", value: "€\(String(format: "%.2f", fastTrack))")
+                    recommendationRow(icon: "bolt.fill", label: "Fast-track", value: "vanaf €\(String(format: "%.2f", fastTrack))")
                 }
             }
             .padding(16)
@@ -410,16 +539,10 @@ struct EURulesView: View {
             }
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
-                    Button(action: { dismiss() }) {
-                        HStack(spacing: 6) {
-                            Image(systemName: "chevron.left")
-                                .font(.system(size: 14, weight: .semibold))
-                            Text("Terug")
-                                .font(.system(size: 14, weight: .semibold, design: .rounded))
-                        }
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("Gereed") { dismiss() }
+                        .fontWeight(.semibold)
                         .foregroundStyle(Theme.navy)
-                    }
                 }
             }
         }
@@ -603,16 +726,10 @@ struct CustomsInfoView: View {
             }
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
-                    Button(action: { dismiss() }) {
-                        HStack(spacing: 6) {
-                            Image(systemName: "chevron.left")
-                                .font(.system(size: 14, weight: .semibold))
-                            Text("Terug")
-                                .font(.system(size: 14, weight: .semibold, design: .rounded))
-                        }
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("Gereed") { dismiss() }
+                        .fontWeight(.semibold)
                         .foregroundStyle(Theme.navy)
-                    }
                 }
             }
         }
@@ -759,16 +876,10 @@ struct BaggageIssuesView: View {
             }
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
-                    Button(action: { dismiss() }) {
-                        HStack(spacing: 6) {
-                            Image(systemName: "chevron.left")
-                                .font(.system(size: 14, weight: .semibold))
-                            Text("Terug")
-                                .font(.system(size: 14, weight: .semibold, design: .rounded))
-                        }
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("Gereed") { dismiss() }
+                        .fontWeight(.semibold)
                         .foregroundStyle(Theme.navy)
-                    }
                 }
             }
         }
@@ -829,6 +940,77 @@ private struct Badge: View {
             .padding(.vertical, 5)
             .background(color)
             .clipShape(Capsule())
+    }
+}
+
+// MARK: - Flow chips (regelbrekende chips)
+
+/// Toont korte labels als chips die vanzelf naar een nieuwe regel wrappen —
+/// netjes bij één maatschappij én bij vijf. Gebruikt de native Layout-API.
+struct FlowChips: View {
+    let items: [String]
+
+    var body: some View {
+        FlowLayout(spacing: 8, lineSpacing: 8) {
+            ForEach(items, id: \.self) { item in
+                Text(item)
+                    .font(.system(size: 12, weight: .semibold, design: .rounded))
+                    .foregroundStyle(Theme.navy)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 7)
+                    .background(Theme.skyLight)
+                    .clipShape(Capsule())
+            }
+        }
+    }
+}
+
+/// Eenvoudige wrap-layout: plaatst subviews op een rij en breekt af zodra de
+/// beschikbare breedte op is.
+private struct FlowLayout: Layout {
+    var spacing: CGFloat = 8
+    var lineSpacing: CGFloat = 8
+
+    func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) -> CGSize {
+        let maxWidth = proposal.width ?? .infinity
+        var rowWidth: CGFloat = 0
+        var rowHeight: CGFloat = 0
+        var totalHeight: CGFloat = 0
+        var totalWidth: CGFloat = 0
+
+        for subview in subviews {
+            let size = subview.sizeThatFits(.unspecified)
+            if rowWidth > 0, rowWidth + spacing + size.width > maxWidth {
+                totalHeight += rowHeight + lineSpacing
+                totalWidth = max(totalWidth, rowWidth)
+                rowWidth = size.width
+                rowHeight = size.height
+            } else {
+                rowWidth += (rowWidth > 0 ? spacing : 0) + size.width
+                rowHeight = max(rowHeight, size.height)
+            }
+        }
+        totalHeight += rowHeight
+        totalWidth = max(totalWidth, rowWidth)
+        return CGSize(width: totalWidth, height: totalHeight)
+    }
+
+    func placeSubviews(in bounds: CGRect, proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) {
+        var x = bounds.minX
+        var y = bounds.minY
+        var rowHeight: CGFloat = 0
+
+        for subview in subviews {
+            let size = subview.sizeThatFits(.unspecified)
+            if x > bounds.minX, x + size.width > bounds.maxX {
+                x = bounds.minX
+                y += rowHeight + lineSpacing
+                rowHeight = 0
+            }
+            subview.place(at: CGPoint(x: x, y: y), anchor: .topLeading, proposal: ProposedViewSize(size))
+            x += size.width + spacing
+            rowHeight = max(rowHeight, size.height)
+        }
     }
 }
 
