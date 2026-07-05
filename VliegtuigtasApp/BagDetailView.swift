@@ -14,6 +14,7 @@ struct BagDetailView: View {
 
     @EnvironmentObject private var airlineStore: AirlineStore
     @ObservedObject private var flightsStore = FlightsStore.shared
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var detail: BagDetail?
     @State private var isLoading = true
     @State private var selectedImage = 0
@@ -211,8 +212,9 @@ struct BagDetailView: View {
         // Automatisch doorbladeren: de task herstart bij élke wijziging van
         // selectedImage — dus ook na een handmatige veeg begint de teller
         // opnieuw, zodat een foto na interactie niet meteen doorspringt.
+        // Respecteert "Verminder beweging": dan bladert er niets vanzelf.
         .task(id: selectedImage) {
-            guard images.count > 1 else { return }
+            guard images.count > 1, !reduceMotion else { return }
             try? await Task.sleep(for: .seconds(autoScrollInterval))
             guard !Task.isCancelled else { return }
             withAnimation(.spring(response: 0.5, dampingFraction: 0.85)) {

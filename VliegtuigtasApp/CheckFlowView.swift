@@ -508,6 +508,8 @@ private struct AirlineStepView: View {
             }
         }
         .buttonStyle(.plain)
+        .accessibilityLabel("Filteren")
+        .accessibilityValue(activeFilterCount > 0 ? "\(activeFilterCount) filters actief" : "Geen filters")
     }
 
     private var activeFiltersBar: some View {
@@ -592,6 +594,7 @@ private struct AirlineStepView: View {
                     Image(systemName: "xmark.circle.fill")
                         .foregroundStyle(Theme.textSecondary)
                 }
+                .accessibilityLabel("Zoekopdracht wissen")
             }
         }
         .padding(.horizontal, 14)
@@ -1010,6 +1013,7 @@ private struct DimensionsStepView: View {
                                 Image(systemName: "minus.circle.fill")
                                     .font(.system(size: 28)).foregroundStyle(Theme.navy)
                             }
+                            .accessibilityLabel("Gewicht verlagen")
                             Spacer()
                             VStack(spacing: 2) {
                                 Text(String(format: "%.1f", weight))
@@ -1021,6 +1025,9 @@ private struct DimensionsStepView: View {
                                     .animation(.snappy(duration: 0.25), value: weight)
                                 Text("kilogram").font(.caption1).foregroundStyle(Theme.textSecondary)
                             }
+                            .accessibilityElement(children: .ignore)
+                            .accessibilityLabel("Gewicht")
+                            .accessibilityValue(String(format: "%.1f kilogram", weight))
                             Spacer()
                             Button {
                                 if weight < 40 { weight += 0.5 }
@@ -1029,6 +1036,7 @@ private struct DimensionsStepView: View {
                                 Image(systemName: "plus.circle.fill")
                                     .font(.system(size: 28)).foregroundStyle(Theme.navy)
                             }
+                            .accessibilityLabel("Gewicht verhogen")
                         }
                     }
                     .padding(16)
