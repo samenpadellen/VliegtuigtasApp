@@ -58,6 +58,7 @@
 		AI000002 /* AIAssistantView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AI100002 /* AIAssistantView.swift */; };
 		APRT0001 /* AirportsInformationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = APRT1001 /* AirportsInformationView.swift */; };
 		APST0001 /* AirportsStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = APST1001 /* AirportsStore.swift */; };
+		REMS0001 /* RemindersService.swift in Sources */ = {isa = PBXBuildFile; fileRef = REMS1001 /* RemindersService.swift */; };
 		AL000001 /* FlightActivityAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = AL100001 /* FlightActivityAttributes.swift */; };
 		AL000002 /* FlightLiveActivityManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = AL100002 /* FlightLiveActivityManager.swift */; };
 		AL000003 /* FlightActivityAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = AL100001 /* FlightActivityAttributes.swift */; };
@@ -230,6 +231,7 @@
 		AI100002 /* AIAssistantView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIAssistantView.swift; sourceTree = "<group>"; };
 		APRT1001 /* AirportsInformationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AirportsInformationView.swift; sourceTree = "<group>"; };
 		APST1001 /* AirportsStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AirportsStore.swift; sourceTree = "<group>"; };
+		REMS1001 /* RemindersService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemindersService.swift; sourceTree = "<group>"; };
 		AL100001 /* FlightActivityAttributes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlightActivityAttributes.swift; sourceTree = "<group>"; };
 		AL100002 /* FlightLiveActivityManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlightLiveActivityManager.swift; sourceTree = "<group>"; };
 		AL100003 /* FlightLiveActivity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlightLiveActivity.swift; sourceTree = "<group>"; };
@@ -385,6 +387,7 @@
 				AI100002 /* AIAssistantView.swift */,
 				APRT1001 /* AirportsInformationView.swift */,
 				APST1001 /* AirportsStore.swift */,
+				REMS1001 /* RemindersService.swift */,
 				AP100001 /* AppIntentsSupport.swift */,
 				AS100001 /* SplitFlapBoard.swift */,
 				AC100001 /* BagScannerView.swift */,
@@ -739,6 +742,7 @@
 				AI000002 /* AIAssistantView.swift in Sources */,
 				APRT0001 /* AirportsInformationView.swift in Sources */,
 				APST0001 /* AirportsStore.swift in Sources */,
+				REMS0001 /* RemindersService.swift in Sources */,
 				AP000001 /* AppIntentsSupport.swift in Sources */,
 				AS000001 /* SplitFlapBoard.swift in Sources */,
 				AC000001 /* BagScannerView.swift in Sources */,

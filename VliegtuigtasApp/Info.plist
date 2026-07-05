@@ -25,6 +25,10 @@
 	</dict>
 	<key>NSCameraUsageDescription</key>
 	<string>De camera wordt gebruikt om je tas op te meten met AR, zodat je direct kunt checken of hij als handbagage past.</string>
+	<key>NSRemindersFullAccessUsageDescription</key>
+	<string>Zo kun je reistips en checklist-items uit Vliegtuigtas bewaren in je Herinneringen, zodat je niets vergeet voor je vertrekt.</string>
+	<key>NSRemindersUsageDescription</key>
+	<string>Zo kun je reistips en checklist-items uit Vliegtuigtas bewaren in je Herinneringen, zodat je niets vergeet voor je vertrekt.</string>
 	<key>NSSupportsLiveActivities</key>
 	<true/>
 	<key>CFBundleURLTypes</key>

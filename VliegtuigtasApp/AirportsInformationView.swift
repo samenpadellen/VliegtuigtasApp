@@ -222,7 +222,7 @@ struct AirportDetailView: View {
             }
             .padding(.horizontal, 20)
 
-            VStack(spacing: 8) {
+            VStack(spacing: 12) {
                 ForEach(airport.tips ?? [], id: \.self) { tip in
                     HStack(alignment: .top, spacing: 12) {
                         Circle()
@@ -232,7 +232,17 @@ struct AirportDetailView: View {
                         Text(tip)
                             .font(.system(size: 13, design: .rounded))
                             .foregroundStyle(Theme.textSecondary)
+                            .frame(maxWidth: .infinity, alignment: .leading)
                     }
+                }
+
+                if let tips = airport.tips, !tips.isEmpty {
+                    Divider()
+                    SaveToRemindersButton(
+                        titles: tips,
+                        notes: "Reistip · \(airport.name)",
+                        label: "Bewaar tips in Herinneringen"
+                    )
                 }
             }
             .padding(16)
@@ -698,7 +708,7 @@ struct BaggageIssuesView: View {
                                         .font(.system(size: 14, weight: .semibold, design: .rounded))
                                 }
 
-                                VStack(spacing: 8) {
+                                VStack(spacing: 12) {
                                     ForEach(issues.tips, id: \.self) { tip in
                                         HStack(alignment: .top, spacing: 10) {
                                             Circle()
@@ -708,8 +718,16 @@ struct BaggageIssuesView: View {
                                             Text(tip)
                                                 .font(.system(size: 12, design: .rounded))
                                                 .foregroundStyle(Theme.textSecondary)
+                                                .frame(maxWidth: .infinity, alignment: .leading)
                                         }
                                     }
+
+                                    Divider()
+                                    SaveToRemindersButton(
+                                        titles: issues.tips,
+                                        notes: "Bagage kwijt of beschadigd — checklist",
+                                        label: "Bewaar checklist in Herinneringen"
+                                    )
                                 }
                             }
                             .padding(16)

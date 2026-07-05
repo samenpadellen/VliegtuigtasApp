@@ -515,3 +515,82 @@ struct LoadingOverlay: View {
         }
     }
 }
+
+// MARK: - Bewaar in Herinneringen
+
+/// Knop die één of meer tips/checklist-items in de Herinneringen-app opslaat.
+/// Regelt zelf de toestemmingsvraag en toont feedback (opgeslagen / geen
+/// toegang). Herbruikbaar op de luchthaven-tips, EU-regels, bagage-hulp, enz.
+struct SaveToRemindersButton: View {
+    /// De items die als aparte herinneringen worden opgeslagen.
+    let titles: [String]
+    /// Optionele context die bij elke herinnering als notitie meegaat.
+    var notes: String? = nil
+    var label: String = "Bewaar in Herinneringen"
+    /// Compacte variant (klein, voor naast een enkele tip) vs. volle breedte.
+    var compact: Bool = false
+
+    @State private var state: SaveState = .idle
+    @State private var showDeniedAlert = false
+
+    private enum SaveState { case idle, saving, saved }
+
+    var body: some View {
+        Button {
+            Task { await save() }
+        } label: {
+            HStack(spacing: 7) {
+                Group {
+                    if state == .saving {
+                        ProgressView().tint(Theme.navy).scaleEffect(0.7)
+                    } else {
+                        Image(systemName: state == .saved ? "checkmark.circle.fill" : "checklist")
+                            .font(.system(size: compact ? 12 : 14, weight: .semibold))
+                    }
+                }
+                Text(state == .saved ? "Opgeslagen" : label)
+                    .font(.system(size: compact ? 12 : 14, weight: .semibold, design: .rounded))
+            }
+            .foregroundStyle(state == .saved ? Theme.green : Theme.navy)
+            .padding(.horizontal, compact ? 12 : 16)
+            .padding(.vertical, compact ? 8 : 12)
+            .frame(maxWidth: compact ? nil : .infinity)
+            .background((state == .saved ? Theme.green : Theme.navy).opacity(0.10))
+            .clipShape(RoundedRectangle(cornerRadius: compact ? 10 : 14))
+        }
+        .buttonStyle(.plain)
+        .disabled(state != .idle)
+        .alert("Geen toegang tot Herinneringen", isPresented: $showDeniedAlert) {
+            Button("Naar Instellingen") {
+                if let url = URL(string: UIApplication.openSettingsURLString) {
+                    UIApplication.shared.open(url)
+                }
+            }
+            Button("Annuleer", role: .cancel) {}
+        } message: {
+            Text("Geef Vliegtuigtas toegang tot Herinneringen in Instellingen om tips te bewaren.")
+        }
+    }
+
+    private func save() async {
+        guard !titles.isEmpty else { return }
+        state = .saving
+        let ok: Bool
+        if titles.count == 1 {
+            ok = await RemindersService.shared.saveReminder(title: titles[0], notes: notes)
+        } else {
+            ok = await RemindersService.shared.saveReminders(titles: titles, notes: notes) > 0
+        }
+        if ok {
+            UINotificationFeedbackGenerator().notificationOccurred(.success)
+            withAnimation(.spring(response: 0.3)) { state = .saved }
+        } else {
+            state = .idle
+            // Alleen de instellingen-alert tonen als toegang echt geweigerd is.
+            let status = RemindersService.shared.authorizationStatus
+            if status == .denied || status == .restricted {
+                showDeniedAlert = true
+            }
+        }
+    }
+}
