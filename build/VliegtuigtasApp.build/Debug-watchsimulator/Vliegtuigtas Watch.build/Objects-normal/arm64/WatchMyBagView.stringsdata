@@ -1,0 +1,48 @@
+{
+  "source": "/Users/wouterschut/Documents/VliegtuigtasApp/VliegtuigtasWatch/WatchMyBagView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "Mijn tas",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 28
+        }
+      },
+      {
+        "comment": "",
+        "key": "Afmetingen",
+        "location": {
+          "startingColumn": 21,
+          "startingLine": 9
+        }
+      },
+      {
+        "comment": "",
+        "key": "Gewicht",
+        "location": {
+          "startingColumn": 21,
+          "startingLine": 14
+        }
+      },
+      {
+        "comment": "",
+        "key": "Maten worden gebruikt voor de pas-indicatie per maatschappij.",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 19
+        }
+      },
+      {
+        "comment": "",
+        "key": "%@ %@",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 45
+        }
+      }
+    ]
+  },
+  "version": 1
+}

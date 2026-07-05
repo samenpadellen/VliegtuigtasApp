@@ -119,13 +119,7 @@ struct BagDetailView: View {
 
             // Zwevende terugknop
             HStack {
-                Button { dismiss() } label: {
-                    Image(systemName: "chevron.left")
-                        .font(.system(size: 16, weight: .semibold))
-                        .foregroundStyle(.white)
-                        .frame(width: 38, height: 38)
-                        .glassChrome(in: Circle(), interactive: true, legacyFill: AnyShapeStyle(.black.opacity(0.28)))
-                }
+                FloatingBackButton { dismiss() }
                 Spacer()
             }
             .padding(.horizontal, 20)

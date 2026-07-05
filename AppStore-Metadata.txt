@@ -1,0 +1,335 @@
+================================================================
+VLIEGTUIGTAS — APP STORE CONNECT METADATA (versie 1.5)
+Taal: Nederlands (primair). Alle teksten passen binnen de
+tekenlimieten van App Store Connect.
+================================================================
+
+----------------------------------------------------------------
+1. APP-NAAM (max 30 tekens)
+----------------------------------------------------------------
+Vliegtuigtas: Handbagage Check
+
+----------------------------------------------------------------
+2. ONDERTITEL (max 30 tekens)
+----------------------------------------------------------------
+Past je tas in het vliegtuig?
+
+----------------------------------------------------------------
+3. PROMOTIETEKST (max 170 tekens, altijd aanpasbaar)
+----------------------------------------------------------------
+Nieuw: scan je tas met de camera (LiDAR), vraag Purser Pim alles
+over handbagage en zie live je vluchtroute. Nu ook op Apple Watch
+en Mac!
+
+----------------------------------------------------------------
+4. BESCHRIJVING (max 4000 tekens)
+----------------------------------------------------------------
+Past jouw tas in het vliegtuig? Vliegtuigtas geeft direct antwoord.
+Check in een paar tikken of je handbagage voldoet aan de regels van
+Ryanair, KLM, easyJet, Transavia, TUI fly en veel meer maatschappijen
+— voordat je bij de gate voor verrassingen staat.
+
+DE BAGAGECHECK
+• Kies je maatschappij of zoek op vluchtnummer
+• Vul de maten in met sliders, of scan je tas met de camera:
+  met AR (en LiDAR op Pro-modellen) meet de app je tas in seconden
+• Direct resultaat per tickettype: past hij als klein persoonlijk
+  item, als grote handbagage, of niet?
+
+ALTIJD ACTUELE REGELS
+• Bagageregels per maatschappij: maten, gewicht, prijzen en
+  tickettypes, regelmatig geverifieerd
+• Complete gids "Wat mag mee?": vloeistoffen (100 ml-regel),
+  powerbanks, medicijnen, scherpe voorwerpen en meer, volgens de
+  actuele EU-securityregels
+• Vluchtinfo met route en status, live opgezocht
+
+PURSER PIM — JOUW PERSOONLIJKE BAGAGE-ASSISTENT
+Stel je vraag gewoon in het Nederlands: "Past 55×40×20 bij
+Ryanair?" of "Mag mijn powerbank mee?". Pim antwoordt met Apple
+Intelligence, volledig op je iPhone — privé, zonder dat je vraag
+je toestel verlaat. (Vereist iPhone met Apple Intelligence, iOS 26.)
+
+NOOIT MEER IETS VERGETEN
+• Vertrek-aftelling als widget op je home- en toegangsscherm
+• Live Activity met aftelling en tas-reminder in het Dynamic Island
+• Vertrek-reminder zonder vluchtnummer, met slimme notificaties
+  24 uur en 3 uur voor vertrek
+• Siri en Kortere weg: "Check mijn tas met Vliegtuigtas"
+
+DE JUISTE TAS OF KOFFER VINDEN
+Zoek je een nieuwe tas, koffer of rugzak? In de Travel Shop vind je
+bagage die gegarandeerd past: elk artikel is gecheckt op de maten
+van de maatschappijen, met een zegel dat toont bij hoeveel
+maatschappijen hij past. Filter op soort, merk en maatschappij.
+
+OOK OP JE POLS EN JE MAC
+• Apple Watch-app: bagageregels en jouw tasmaten, altijd binnen
+  handbereik
+• Volwaardige Mac-app met hetzelfde overzicht op groot scherm
+
+Vliegtuigtas is gemaakt voor reizigers die zonder stress het
+vliegtuig in willen. Download gratis en check je tas vóór je boekt,
+pakt of vertrekt.
+
+----------------------------------------------------------------
+5. ZOEKWOORDEN / KEYWORDS (max 100 tekens, kommagescheiden)
+----------------------------------------------------------------
+handbagage,koffer,ryanair,klm,easyjet,transavia,bagage,vliegen,cabin,tas,vlucht,reizen,maten
+
+(97 tekens. "Vliegtuigtas" zelf niet nodig — appnaam telt al mee.)
+
+----------------------------------------------------------------
+6. CATEGORIEËN
+----------------------------------------------------------------
+Primair:   Reizen (Travel)
+Secundair: Hulpprogramma's (Utilities)
+
+----------------------------------------------------------------
+7. LEEFTIJDSCLASSIFICATIE
+----------------------------------------------------------------
+4+ (geen aanstootgevende inhoud; de bagagegids benoemt verboden
+voorwerpen puur informatief — geen reden voor hogere rating)
+
+----------------------------------------------------------------
+8. URLS
+----------------------------------------------------------------
+Support-URL:    https://www.vliegtuigtas.com
+Marketing-URL:  https://www.vliegtuigtas.com
+Privacybeleid:  https://www.vliegtuigtas.com/privacy
+                (⚠ controleer dat deze pagina bestaat en de
+                onderstaande privacyverklaringen dekt)
+
+----------------------------------------------------------------
+9. COPYRIGHT
+----------------------------------------------------------------
+© 2026 Vliegtuigtas.com
+
+----------------------------------------------------------------
+10. WAT IS ER NIEUW (versienotities 1.2)
+----------------------------------------------------------------
+Grote update! Dit is er nieuw:
+
+• App Clip: check je tas direct via QR-code of link, zonder de
+  app te installeren
+• iCloud-sync: je naam, tasmaten en opgeslagen vlucht reizen
+  automatisch mee naar je andere Apple-apparaten — zonder account
+• Scan je tas met de camera: AR-meting (met LiDAR op Pro-modellen)
+  vult je tasmaten automatisch in
+• Purser Pim: stel al je bagagevragen aan onze AI-assistent —
+  draait privé op je iPhone met Apple Intelligence (iOS 26)
+• Apple Watch-app: regels en je tasmaten op je pols
+• Mac-app: Vliegtuigtas op groot scherm
+• Vluchtinfo met route (AMS ✈ LHR) en live status
+• Gids "Wat mag mee?": vloeistoffen, powerbanks, medicijnen e.d.
+• Vertrek-reminder zonder vluchtnummer + slimme notificaties
+• Siri & Kortere weg: "Check mijn tas met Vliegtuigtas"
+• Vernieuwde Travel Shop en soepelere bediening
+• Lockscreen-widgets gerepareerd en strakker vormgegeven
+
+----------------------------------------------------------------
+11. APP-PRIVACY (vragenlijst App Store Connect)
+----------------------------------------------------------------
+Verzamelt de app gegevens? JA — declareer:
+
+a) Contactgegevens (naam, e-mailadres)
+   - Bron: onboarding en bagagecheck (optioneel veld)
+   - Doel: appfunctionaliteit (resultaat mailen/leads)
+   - Gekoppeld aan identiteit: JA
+   - Tracking: NEE
+
+b) Identificatoren (sessie-ID per installatie)
+   - Doel: analytics (gebruiksstatistieken)
+   - Gekoppeld aan identiteit: NEE
+   - Tracking: NEE
+
+c) Gebruiksgegevens (events zoals page views en checks)
+   - Doel: analytics
+   - Gekoppeld aan identiteit: NEE
+   - Tracking: NEE
+
+Let op iCloud: profiel, tasmaten en opgeslagen vlucht worden
+gesynct via iCloud Key-Value Storage in de eigen iCloud van de
+gebruiker — dit is geen dataverzameling door de ontwikkelaar en
+hoeft niet extra gedeclareerd te worden.
+
+NIET verzameld (wel gebruikt, alleen lokaal op het toestel):
+   - Camera/AR-beelden (tasmeting gebeurt on-device, niets wordt
+     opgeslagen of verstuurd)
+   - AI-chatgesprekken met Purser Pim (Apple Intelligence,
+     on-device)
+   - Locatie: wordt nooit gevraagd
+
+"Data Used to Track You": geen. Geen advertentie-SDK's.
+Let op: de shop bevat affiliate-links naar externe webshops;
+buiten de app gelden de voorwaarden van die shops.
+
+----------------------------------------------------------------
+12. NOTITIES VOOR APP REVIEW (Review Notes)
+----------------------------------------------------------------
+FIXES N.A.V. REJECTIE (Submission efdf92ef, 2 juli 2026):
+- 5.1.1(v) verplichte e-mail: onboarding heeft nu rechtsboven een
+  "Sla over"-knop; de volledige app werkt zonder naam of e-mail.
+- 5.1.1(v) accountverwijdering: Home → profiel-chip (rechtsboven)
+  → "Account & gegevens verwijderen" → bevestiging. Verwijdert
+  lokaal, iCloud én stuurt een verwijderverzoek naar de server.
+  ⚠ Backend: implementeer POST /leads/delete (body: {email}).
+  Screen recording van deze flow toevoegen aan de Notes.
+- 2.1(a) onklikbare knoppen (iPad): oorzaak gevonden — een
+  DragGesture(minimumDistance: 0) op de uitgelichte shopkaart ving
+  pointer-clicks af op iPadOS. Verwijderd; alle knoppen hebben nu
+  volledige contentShape-raakvlakken. Getest op iPad.
+- 4.2.1 AR minimaal: de scanner meet nu niet alleen, maar toont in
+  AR ook een limiet-kooi van de gekozen maatschappij om de tas
+  (groen = past, rood = te groot) met direct oordeel — een
+  geïntegreerde AR-ervaring gekoppeld aan de kernfunctie.
+
+- Er is geen account of login nodig voor de kernfunctie; onboarding
+  heeft een "Sla over"-knop.
+
+ACCOUNTGEBONDEN FEATURES (toegestaan onder 5.1.1):
+De bagagecheck, bagageregels, gids en shop zijn volledig vrij
+toegankelijk. Drie features vereisen een gratis profiel, met een
+functionele reden (de data is profielgebonden):
+1. Vlucht opslaan — wordt aan het profiel gekoppeld en via iCloud
+   gesynct naar widget, Apple Watch en andere apparaten.
+2. Vertrek-reminder — persoonlijke notificaties (met naam) en
+   dezelfde aftelling op alle apparaten via iCloud.
+3. Purser Pim (AI) — persoonlijk advies op basis van profiel
+   (naam, opgeslagen tasmaten, opgeslagen vlucht); het gesprek
+   zelf draait on-device.
+Elke gate legt dit in de app uit en biedt directe registratie;
+accountverwijdering wist al deze data (lokaal, iCloud, server).
+- Vluchtzoeker testen kan met een echt vluchtnummer, bijv. KL1001.
+- "Purser Pim" en "Pakadvies" gebruiken Apple's FoundationModels
+  (on-device Apple Intelligence). Deze features zijn alleen
+  zichtbaar op toestellen met Apple Intelligence (iPhone 15 Pro of
+  nieuwer, iOS 26, Apple Intelligence ingeschakeld). Op andere
+  toestellen verschijnen ze niet — dit is bedoeld gedrag.
+- De camerascan (AR/LiDAR) vereist een fysiek toestel; op de
+  simulator toont de app een nette melding.
+- De Live Activity start automatisch binnen 8 uur voor vertrek van
+  een opgeslagen vlucht.
+- De shop bevat affiliate-links die openen in de browser/webshop;
+  er zijn geen in-app aankopen.
+- De Safari-extensie (handbagage-check tijdens webshoppen) wordt
+  geactiveerd via Instellingen > Safari > Extensies.
+
+----------------------------------------------------------------
+13. TECHNISCHE GEGEVENS
+----------------------------------------------------------------
+Bundle ID:            com.vliegtuigtas.app
+App Clip bundle ID:   com.vliegtuigtas.app.Clip
+Versie:               1.5 (MARKETING_VERSION staat al op 1.5
+                      voor alle targets)
+Platforms:            iOS/iPadOS 17.6+, watchOS 10+ (companion),
+                      macOS (Mac Catalyst)
+In-app aankopen:      geen
+Abonnementen:         geen
+Advertenties:         geen
+Vereiste rechten:     camera (AR-tasmeting), notificaties
+                      (vertrek-reminders) — beide met Nederlandse
+                      omschrijving in de app
+
+----------------------------------------------------------------
+14. SCREENSHOTS — AANBEVOLEN SET (zelf maken)
+----------------------------------------------------------------
+Vereist: 6,9" (iPhone 17 Pro Max) en 6,5"; optioneel iPad 13",
+Apple Watch en Mac.
+
+Voorgestelde volgorde (met korte overlay-tekst):
+1. Home met hero + split-flap headline    — "Past jouw tas in het vliegtuig?"
+2. Checkresultaat (groen vinkje)          — "Direct zekerheid per tickettype"
+3. AR-camerascan met meetbox              — "Scan je tas met LiDAR"
+4. Purser Pim chat                        — "Vraag het Purser Pim"
+5. Maatschappij-detail (bagageregels)     — "Alle regels per maatschappij"
+6. Travel Shop                            — "Tassen die gegarandeerd passen"
+7. Widgets + Live Activity                — "Aftellen naar vertrek"
+8. Apple Watch                            — "Ook op je pols"
+
+----------------------------------------------------------------
+15. APP CLIP (App Store Connect → App Clip-ervaring)
+----------------------------------------------------------------
+Wat de clip doet: de bagagecheck in één scherm — maatschappij
+kiezen, maten instellen, direct resultaat. Na het resultaat
+verschijnt de systeembanner om de volledige app te installeren.
+
+In te vullen bij "App Clip Experience":
+- Kop (subtitle, max 43):   Check direct of je tas past
+- Actieknop:                Open (of "Bekijk")
+- Header-afbeelding:        3000×2000 px, zelf aanleveren
+                            (bijv. hero-foto met koffer)
+
+Invocaties (Advanced App Clip Experiences):
+- URL:        https://www.vliegtuigtas.com/check
+              (optioneel met ?airline=<slug>, bijv.
+              https://www.vliegtuigtas.com/check?airline=ryanair —
+              de clip preselecteert die maatschappij)
+- Vereist: Associated Domains op de website
+  (apple-app-site-association met "appclips"-sectie voor
+  com.vliegtuigtas.app.Clip) — server-kant, zelf toevoegen.
+- QR-/App Clip-codes genereer je daarna in App Store Connect.
+
+Technisch: het App Clip-target "Vliegtuigtas Clip" zit in het
+project en wordt automatisch mee-gearchiveerd met de app.
+⚠ Nog doen: eigen AppIcon voor de clip toevoegen (App Store-eis)
+en de clip onder de 10 MB houden (nu ruim daaronder).
+
+----------------------------------------------------------------
+16. RICHTLIJNEN-AUDIT (stand na fixes, juli 2026)
+----------------------------------------------------------------
+COMPLIANT:
+[✓] 5.1.1(v) registratiedwang — onboarding overslaanbaar; alleen
+    account-based features (vlucht, reminder, Pim) vereisen een
+    profiel, met functionele uitleg in de app
+[✓] 5.1.1(v) accountverwijdering — in-app flow, wist lokaal +
+    iCloud + serververzoek
+[✓] 2.1(a) iPad-bug — oorzaak (DragGesture ving pointer-clicks)
+    verwijderd; raakvlakken overal ≥44pt met contentShape
+[✓] 4.2.1 AR — meting + limietkooi per maatschappij + oordeel:
+    geïntegreerde AR-ervaring
+[✓] 4.8 Sign in with Apple — niet vereist: geen third-party/social
+    login, alleen first-party e-mail zonder wachtwoord
+[✓] 3.1.5(a) — shop verkoopt fysieke producten via externe links;
+    geen IAP vereist
+[✓] 2.3.10/3.1.1 referral — Amex-aanbod is extern, met zichtbare
+    vergoedings-disclosure
+[✓] ATT/5.1.2 — geen tracking, geen advertentie-SDK's
+[✓] Privacy-strings — camera aanwezig; notificaties vereisen geen
+    string; locatie wordt nooit gebruikt
+[✓] Export compliance — ITSAppUsesNonExemptEncryption=NO op alle
+    targets (alleen HTTPS): geen encryptievraag meer per upload
+[✓] Widgets/Live Activity — containerBackground overal; geen ads
+[✓] Versienummers — alle targets identiek (1.5)
+
+OPENSTAAND (zelf doen vóór indienen):
+[x] App Clip AppIcon (1024-icoon geregistreerd in het project)
+[x] Amex referral: echte link staat erin, live gecheckt (200)
+[x] Server: /leads/delete live op beide paden, auth afgedwongen
+    (401 zonder key) — geverifieerd met echte calls op 3 juli 2026
+[x] AASA live: application/json met juiste App IDs (team FDH27DW6H2),
+    appclips-sectie voor /check — geverifieerd 3 juli 2026
+[x] Privacybeleid live op vliegtuigtas.com/privacy (status 200;
+    inhoud even visueel nalopen)
+[ ] Screen recording van de accountverwijderflow (fysiek toestel)
+    in de Review Notes
+[ ] Volledige regressietest op fysieke iPad (rejectie was op iPad)
+[ ] Archive maken in Xcode (Any iOS Device) en via Organizer
+    valideren: dat draait Apple's eigen pre-checks nog een keer
+[ ] Aandachtspunt (geen blocker): de API-key zit in de app-bundle;
+    overweeg server-side rate limiting per key
+
+----------------------------------------------------------------
+17. CHECKLIST VÓÓR INDIENEN
+----------------------------------------------------------------
+[x] MARKETING_VERSION staat op 1.5 (alle targets)
+[x] App Clip: icoon toevoegen + apple-app-site-association op
+    vliegtuigtas.com publiceren
+[] Privacybeleid-pagina live op vliegtuigtas.com/privacy
+[x] Watch-appicoon 1024×1024 zit erin (gedaan)
+[x] Mac Catalyst: schermafbeeldingen maken of Mac-release
+    uitstellen (Mac kan later apart aangevinkt worden)
+[x] App Privacy-vragenlijst invullen zoals hierboven
+[x] Testen op fysiek toestel: camerascan, notificaties,
+    Live Activity, widgets, Siri-shortcuts
+================================================================

@@ -1,0 +1,48 @@
+{
+  "source": "/Users/wouterschut/Documents/VliegtuigtasApp/VliegtuigtasWatch/WatchAirlineDetailView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "Persoonlijk item",
+        "location": {
+          "startingColumn": 25,
+          "startingLine": 22
+        }
+      },
+      {
+        "comment": "",
+        "key": "Let op",
+        "location": {
+          "startingColumn": 25,
+          "startingLine": 65
+        }
+      },
+      {
+        "comment": "",
+        "key": "Grote handbagage niet inbegrepen bij dit ticket.",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 57
+        }
+      },
+      {
+        "comment": "",
+        "key": "Jouw tas: %@",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 73
+        }
+      },
+      {
+        "comment": "",
+        "key": "Pas-indicatie is een benadering; de app op je iPhone doet de officiële check.",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 76
+        }
+      }
+    ]
+  },
+  "version": 1
+}

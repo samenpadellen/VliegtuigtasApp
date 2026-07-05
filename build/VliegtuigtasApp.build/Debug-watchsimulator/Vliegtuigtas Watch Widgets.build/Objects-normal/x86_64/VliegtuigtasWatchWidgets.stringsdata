@@ -1,0 +1,80 @@
+{
+  "source": "/Users/wouterschut/Documents/VliegtuigtasApp/VliegtuigtasWatchWidgets/VliegtuigtasWatchWidgets.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "%lld",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 127
+        }
+      },
+      {
+        "comment": "",
+        "key": "dag",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 131
+        }
+      },
+      {
+        "comment": "",
+        "key": "dgn",
+        "location": {
+          "startingColumn": 46,
+          "startingLine": 131
+        }
+      },
+      {
+        "comment": "",
+        "key": "%@ · %@",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 150
+        }
+      },
+      {
+        "comment": "",
+        "key": "Vliegtuigtas",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 153
+        }
+      },
+      {
+        "comment": "",
+        "key": "✈︎ %@ · %@",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 162
+        }
+      },
+      {
+        "comment": "",
+        "key": "✈︎ Geen vlucht gepland",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 165
+        }
+      },
+      {
+        "comment": "",
+        "key": "Vluchtaftelling",
+        "location": {
+          "startingColumn": 35,
+          "startingLine": 206
+        }
+      },
+      {
+        "comment": "",
+        "key": "Telt op je wijzerplaat af naar je opgeslagen vlucht.",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 207
+        }
+      }
+    ]
+  },
+  "version": 1
+}

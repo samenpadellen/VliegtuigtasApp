@@ -14,6 +14,7 @@ struct CheckFlowView: View {
     var request: CheckerRequest?
 
     @EnvironmentObject private var airlineStore: AirlineStore
+    @EnvironmentObject private var nav: AppNavigator
     @StateObject private var checkStore = CheckStore()
 
     @State private var step: CheckStep = .airline
@@ -36,7 +37,9 @@ struct CheckFlowView: View {
                         airlines: airlineStore.airlines,
                         isLoading: airlineStore.isLoading,
                         selected: selectedAirline,
-                        onDismiss: { dismiss() }
+                        // De checker is een tab-root: dismiss() deed hier
+                        // niets. "Terug" betekent: naar de Home-tab.
+                        onDismiss: { nav.selectedTab = .home }
                     ) { airline in
                         let g = UIImpactFeedbackGenerator(style: .rigid)
                         g.impactOccurred(intensity: 0.85)
@@ -120,6 +123,14 @@ struct CheckFlowView: View {
         }
         .onAppear {
             applyRequest(request)
+            // Laatst gebruikte tasmaten terugzetten — via iCloud ook de maten
+            // die je op een ander apparaat invoerde.
+            if let saved = CloudSync.shared.savedBagDims() {
+                length = min(max(saved.length, 20), 90)
+                width  = min(max(saved.width, 10), 60)
+                depth  = min(max(saved.depth, 5), 50)
+                weight = min(max(saved.weight, 1), 40)
+            }
         }
         .onChange(of: request) { _, new in
             // Reageert op élk nieuw verzoek vanuit Home — ook een herhaalde tik
@@ -155,7 +166,7 @@ struct CheckFlowView: View {
                 Button {
                     withAnimation(.spring(response: 0.4, dampingFraction: 0.85)) {
                         switch step {
-                        case .airline:    dismiss()
+                        case .airline:    nav.selectedTab = .home
                         case .dimensions: step = .airline; selectedAirline = nil
                         case .result:
                             checkStore.result = nil
@@ -188,6 +199,8 @@ struct CheckFlowView: View {
 
     private func runCheck() {
         guard let airline = selectedAirline else { return }
+        // Maten bewaren (lokaal + iCloud) zodra ze echt gebruikt worden.
+        CloudSync.shared.pushBagDims(length: length, width: width, depth: depth, weight: weight)
         Task {
             await checkStore.check(
                 airlineSlug: airline.slug,
@@ -198,6 +211,114 @@ struct CheckFlowView: View {
 }
 
 extension CheckStep: Hashable {}
+
+// MARK: - Vlucht in de widget (mini-sheet vanaf het checkresultaat)
+
+/// Slaat de vlucht direct op vanaf het resultaatscherm — de maatschappij is
+/// al bekend, dus alleen vluchtnummer (optioneel) en vertrekmoment.
+private struct FlightWidgetSheet: View {
+    let airline: Airline
+
+    @Environment(\.dismiss) private var dismiss
+    @ObservedObject private var session = UserSession.shared
+    @State private var flightNumber = ""
+    @State private var departure = Calendar.current.date(byAdding: .day, value: 1, to: .now) ?? .now
+    @State private var saved = false
+
+    var body: some View {
+        NavigationStack {
+            if session.hasAccount {
+                content
+            } else {
+                ScrollView {
+                    AccountRequiredView(
+                        icon: "airplane.departure",
+                        title: "Vlucht opslaan werkt met een profiel",
+                        reason: "Je vlucht hoort bij je profiel: zo telt dezelfde vlucht af op je widget, je Apple Watch en al je andere apparaten."
+                    )
+                    .padding(16)
+                }
+                .background(Color(.systemGroupedBackground))
+                .navigationTitle("Vlucht opslaan")
+                .navigationBarTitleDisplayMode(.inline)
+                .toolbar {
+                    ToolbarItem(placement: .topBarTrailing) {
+                        Button("Sluit") { dismiss() }
+                    }
+                }
+            }
+        }
+    }
+
+    private var content: some View {
+        VStack(alignment: .leading, spacing: 18) {
+            HStack(spacing: 10) {
+                AirlineLogo(airline: airline, size: 34)
+                Text("Vlucht met \(airline.name)")
+                    .font(.system(size: 15, weight: .semibold, design: .rounded))
+            }
+
+            VStack(alignment: .leading, spacing: 6) {
+                Text("Vluchtnummer (optioneel)")
+                    .font(.system(size: 12, weight: .semibold, design: .rounded))
+                    .foregroundStyle(Theme.textSecondary)
+                TextField("bijv. KL1234", text: $flightNumber)
+                    .autocorrectionDisabled()
+                    .textInputAutocapitalization(.characters)
+                    .font(.system(size: 15, design: .rounded))
+                    .padding(12)
+                    .background(Color(.secondarySystemGroupedBackground))
+                    .clipShape(RoundedRectangle(cornerRadius: 12))
+            }
+
+            VStack(alignment: .leading, spacing: 6) {
+                Text("Vertrek")
+                    .font(.system(size: 12, weight: .semibold, design: .rounded))
+                    .foregroundStyle(Theme.textSecondary)
+                DatePicker("", selection: $departure, in: Date()..., displayedComponents: [.date, .hourAndMinute])
+                    .labelsHidden()
+            }
+
+            Spacer()
+
+            Button {
+                let number = flightNumber.trimmingCharacters(in: .whitespaces).uppercased()
+                FlightsStore.shared.upsert(SavedFlightRecord(
+                    number: number.isEmpty ? "Mijn vlucht" : number,
+                    airlineName: airline.name,
+                    airlineSlug: airline.slug,
+                    airlineLogoUrl: airline.bestLogoUrl,
+                    departure: departure
+                ))
+                UINotificationFeedbackGenerator().notificationOccurred(.success)
+                withAnimation(.spring(response: 0.3)) { saved = true }
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.9) { dismiss() }
+            } label: {
+                HStack(spacing: 8) {
+                    Image(systemName: saved ? "checkmark" : "plus.square.on.square")
+                    Text(saved ? "Vlucht opgeslagen" : "Vlucht opslaan")
+                        .font(.system(size: 16, weight: .semibold, design: .rounded))
+                }
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 15)
+                .background(saved ? AnyShapeStyle(Theme.green) : AnyShapeStyle(Theme.navyGradient))
+                .foregroundStyle(.white)
+                .clipShape(RoundedRectangle(cornerRadius: 16))
+            }
+            .buttonStyle(.plain)
+            .disabled(saved)
+        }
+        .padding(20)
+        .background(Color(.systemGroupedBackground))
+        .navigationTitle("Vlucht opslaan")
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                Button("Sluit") { dismiss() }
+            }
+        }
+    }
+}
 
 // MARK: - Flow stepper (maakt de 3-staps checker-flow expliciet zichtbaar,
 // in plaats van kleine losse puntjes die op elke pagina anders leken)
@@ -423,6 +544,9 @@ private struct AirlineStepView: View {
                 .frame(maxWidth: .infinity)
                 .frame(height: checkerStatusBarHeight + 230)
                 .clipped()
+                // .clipped() knipt alleen het tekenen, niet de hit-test:
+                // zonder dit vangt de foto op iPad tikken in het grid af.
+                .allowsHitTesting(false)
 
             LinearGradient(
                 colors: [
@@ -433,6 +557,7 @@ private struct AirlineStepView: View {
                 startPoint: .bottom,
                 endPoint: .topTrailing
             )
+            .allowsHitTesting(false)
 
             VStack(alignment: .leading, spacing: 8) {
                 Text("STAP 1 VAN 3 · HANDBAGAGE CHECKER")
@@ -550,13 +675,7 @@ private struct AirlineStepView: View {
     private var headerOverlay: some View {
         VStack {
             HStack {
-                Button(action: onDismiss) {
-                    Image(systemName: "chevron.left")
-                        .font(.system(size: 16, weight: .semibold))
-                        .foregroundStyle(.white)
-                        .frame(width: 38, height: 38)
-                        .glassChrome(in: Circle(), interactive: true, legacyFill: AnyShapeStyle(.white.opacity(0.18)))
-                }
+                FloatingBackButton(action: onDismiss)
                 Spacer()
             }
             .padding(.horizontal, 20)
@@ -742,6 +861,50 @@ private struct DimensionsStepView: View {
     var topInset: CGFloat = 0
     let onCheck: () -> Void
 
+    @State private var showScanner = false
+
+    /// Grootste toegestane handbagagemaat van de gekozen maatschappij,
+    /// als AR-limietkooi in de scanner.
+    private var scannerLimits: (h: Double, w: Double, d: Double)? {
+        let variant = airline?.variants?.first { $0.includesLargeBag == true }
+            ?? airline?.variants?.first
+        if let l = variant?.largeLCm, let w = variant?.largeWCm, let d = variant?.largeDCm {
+            return (l, w, d)
+        }
+        if let l = variant?.smallLCm, let w = variant?.smallWCm, let d = variant?.smallDCm {
+            return (l, w, d)
+        }
+        return nil
+    }
+
+    /// Tariefvariant waarvan we de toegestane maat als referentie tonen.
+    private var referenceVariant: AirlineVariant? {
+        airline?.variants?.first { $0.includesLargeBag == true } ?? airline?.variants?.first
+    }
+
+    /// Toont wat de maatschappij toestaat, puur als richtlijn terwijl je
+    /// meet — het echte oordeel volgt na "Controleer nu" (met wielmarge en
+    /// eventuele uitzonderingen die hier niet meegewogen zijn).
+    private func limitReference(_ variant: AirlineVariant) -> some View {
+        let dims = variant.includesLargeBag == true ? variant.largeDimString : variant.smallDimString
+        return HStack(spacing: 10) {
+            Image(systemName: "ruler.fill")
+                .font(.system(size: 13, weight: .semibold))
+                .foregroundStyle(Theme.sky)
+            Text("Toegestaan bij \(variant.variantName): max. \(dims)"
+                 + (variant.maxWeightKg.map { " · \(Int($0)) kg" } ?? ""))
+                .font(.system(size: 13, weight: .medium, design: .rounded))
+                .foregroundStyle(Theme.textSecondary)
+                .fixedSize(horizontal: false, vertical: true)
+            Spacer(minLength: 0)
+        }
+        .padding(.horizontal, 14)
+        .padding(.vertical, 10)
+        .background(Theme.skyLight)
+        .clipShape(RoundedRectangle(cornerRadius: 12))
+        .padding(.horizontal, 20)
+    }
+
     var body: some View {
         ScrollView {
             VStack(spacing: 20) {
@@ -765,9 +928,59 @@ private struct DimensionsStepView: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.horizontal, 20)
 
+                // Referentie: de toegestane maat, zodat je weet waar je
+                // naartoe meet vóórdat je op "Controleer" tikt.
+                if let variant = referenceVariant {
+                    limitReference(variant)
+                }
+
                 // Visual bag diagram
                 BagDiagram(length: length, width: width, depth: depth)
                     .padding(.horizontal, 20)
+
+                #if !targetEnvironment(macCatalyst)
+                // AR-meting: alleen op toestellen met LiDAR — zonder die
+                // sensor is de meting niet betrouwbaar genoeg.
+                if LiDARSupport.isAvailable {
+                Button {
+                    UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                    showScanner = true
+                } label: {
+                    HStack(spacing: 8) {
+                        Image(systemName: "camera.viewfinder")
+                            .font(.system(size: 15, weight: .semibold))
+                        Text("Scan je tas met de camera")
+                            .font(.system(size: 15, weight: .semibold, design: .rounded))
+                        Spacer()
+                        Text("LiDAR")
+                            .font(.system(size: 10, weight: .black, design: .rounded))
+                            .foregroundStyle(Theme.navy)
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 4)
+                            .background(Theme.yellow)
+                            .clipShape(Capsule())
+                    }
+                    .foregroundStyle(.white)
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 14)
+                    .background(Theme.skyGradient)
+                    .clipShape(RoundedRectangle(cornerRadius: 16))
+                }
+                .buttonStyle(.plain)
+                .padding(.horizontal, 20)
+                .fullScreenCover(isPresented: $showScanner) {
+                    BagScannerView(
+                        airlineName: airline?.name,
+                        limitsCm: scannerLimits
+                    ) { h, b, d in
+                        // Clamp binnen de sliderbereiken van de checker.
+                        length = min(max(h, 20), 90)
+                        width  = min(max(b, 10), 60)
+                        depth  = min(max(d, 5), 50)
+                    }
+                }
+                }
+                #endif
 
                 // Dimension inputs
                 Card {
@@ -904,6 +1117,47 @@ private struct BagSideFace: Shape {
     }
 }
 
+/// Het volledige silhouet van de koffer (voorvlak + extrusie) als één vorm
+/// met afgeronde hoeken. De facetten worden hierbinnen geclipt, zodat boven-,
+/// zij- en voorvlak altijd naadloos op elkaar aansluiten — ook tijdens animatie.
+private struct BagSilhouette: Shape {
+    var skew: CGFloat
+    var radius: CGFloat = 8
+    var animatableData: CGFloat {
+        get { skew }
+        set { skew = newValue }
+    }
+
+    func path(in rect: CGRect) -> Path {
+        let frontW = rect.width - skew
+        let frontB = rect.height          // onderkant voorvlak
+        let sideB  = rect.height - skew   // onderkant zijvlak (rechts)
+
+        // Zeshoek, met de klok mee vanaf de linkerbovenhoek van het voorvlak.
+        let corners = [
+            CGPoint(x: rect.minX,         y: rect.minY + skew), // voor · linksboven
+            CGPoint(x: rect.minX + skew,  y: rect.minY),        // boven · linksachter
+            CGPoint(x: rect.maxX,         y: rect.minY),        // boven · rechtsachter
+            CGPoint(x: rect.maxX,         y: sideB),            // zij · rechtsonder
+            CGPoint(x: frontW,            y: frontB),           // voor · rechtsonder
+            CGPoint(x: rect.minX,         y: frontB)            // voor · linksonder
+        ]
+
+        var p = Path()
+        let r = min(radius, skew / 2 + 2)
+        // Start midden op de onderrand (veilig recht stuk) en rond elke hoek
+        // af met een tangent-boog, met de klok mee.
+        p.move(to: CGPoint(x: (corners[4].x + corners[5].x) / 2, y: frontB))
+        for i in corners.indices {
+            let corner = corners[(i + 5) % corners.count]
+            let next   = corners[(i + 6) % corners.count]
+            p.addArc(tangent1End: corner, tangent2End: next, radius: r)
+        }
+        p.closeSubpath()
+        return p
+    }
+}
+
 private struct BagDiagram: View {
     let length: Double   // hoogte (cm)
     let width:  Double   // breedte (cm)
@@ -913,6 +1167,13 @@ private struct BagDiagram: View {
     private var w: CGFloat { 28 + CGFloat((width  - 10) / 50) * 62 }  // 10–60 cm → 28–90 pt
     private var h: CGFloat { 34 + CGFloat((length - 20) / 70) * 62 }  // 20–90 cm → 34–96 pt
     private var d: CGFloat { 6  + CGFloat((depth  -  5) / 45) * 20 }  //  5–50 cm →  6–26 pt
+
+    // Hoeveel de greepbuizen in het bovenvlak "verzinken" — verbergt de naad
+    // tussen greep en koffer, zodat de greep er echt uit lijkt te komen in
+    // plaats van los erboven te zweven.
+    private var handleOverlap: CGFloat { d * 0.45 }
+    // Hoeveel de wielophanging in de onderrand verzinkt, om dezelfde reden.
+    private let wheelOverlap: CGFloat = 6
 
     var body: some View {
         ZStack {
@@ -933,60 +1194,242 @@ private struct BagDiagram: View {
 
     private var suitcase: some View {
         VStack(spacing: 0) {
-            // Telescopische trolleygreep
-            ZStack(alignment: .top) {
-                HStack(spacing: max(w * 0.36, 12)) {
-                    Capsule().fill(Theme.yellow.opacity(0.75)).frame(width: 4, height: 16)
-                    Capsule().fill(Theme.yellow.opacity(0.75)).frame(width: 4, height: 16)
-                }
-                Capsule().fill(Theme.yellow).frame(width: max(w * 0.36, 12) + 18, height: 6)
-            }
-            .offset(x: d / 2)
-            .zIndex(1)
+            trolleyHandle
+                .offset(x: d / 2)
+                // Buizen zakken een stukje weg áchter het bovenvlak (dat
+                // hierna getekend wordt) i.p.v. er los bovenop te eindigen.
+                .padding(.bottom, -handleOverlap)
 
-            // Koffer met dieptevlakken (isometrische extrusie naar rechtsboven)
-            ZStack(alignment: .topLeading) {
-                // Bovenvlak
-                BagTopFace(skew: d)
-                    .fill(Theme.yellowSoft)
-                    .frame(width: w + d, height: d)
+            // Koffer met dieptevlakken (isometrische extrusie naar rechtsboven).
+            // Alle vlakken worden binnen één afgerond silhouet geclipt, zodat
+            // ze bij elke maat en tijdens animaties naadloos aansluiten.
+            bagBody
 
-                // Zijvlak
-                BagSideFace(skew: d)
-                    .fill(Theme.yellow)
-                    .overlay(BagSideFace(skew: d).fill(.black.opacity(0.18)))
-                    .frame(width: d, height: h + d)
-                    .offset(x: w)
+            wheels
+                // Wielophanging zakt weg ín de onderrand i.p.v. eronder te bungelen.
+                .padding(.top, -wheelOverlap)
+        }
+        .background(alignment: .bottom) {
+            // Contactschaduw op de "vloer" — zet de koffer neer i.p.v. zweven.
+            Ellipse()
+                .fill(Theme.navy.opacity(0.14))
+                .frame(width: w + d * 0.6, height: 12)
+                .blur(radius: 5)
+                .offset(x: -d / 4, y: 8)
+        }
+    }
 
-                // Voorvlak
-                ZStack {
-                    RoundedRectangle(cornerRadius: 10)
-                        .fill(LinearGradient(
-                            colors: [Theme.yellow, Theme.yellow.opacity(0.82)],
-                            startPoint: .topLeading, endPoint: .bottomTrailing
-                        ))
-
-                    VStack(spacing: h / 5) {
-                        ForEach(0..<3, id: \.self) { _ in
-                            Capsule()
-                                .fill(Color.white.opacity(0.25))
-                                .frame(width: w * 0.7, height: 3)
-                        }
+    // Tweetraps telescoopgreep met handvat-grip. Het bagagelabel hangt er
+    // letterlijk aan (i.p.v. los op een hoek van de koffer te zweven).
+    private var trolleyHandle: some View {
+        ZStack(alignment: .top) {
+            // Buizen: buitenbuis donkerder, binnenbuis lichter (uitgeschoven)
+            HStack(spacing: max(w * 0.36, 12)) {
+                ForEach(0..<2, id: \.self) { _ in
+                    VStack(spacing: 0) {
+                        Capsule().fill(Theme.yellow).frame(width: 3, height: 9)
+                        Capsule().fill(Theme.yellow.opacity(0.65)).frame(width: 4.5, height: 9)
                     }
                 }
+            }
+            // Handvat met donkere grip
+            Capsule()
+                .fill(Theme.yellow)
+                .frame(width: max(w * 0.36, 12) + 20, height: 7)
+                .overlay(
+                    Capsule()
+                        .fill(Theme.navyDark.opacity(0.35))
+                        .frame(width: max(w * 0.36, 12) + 4, height: 3)
+                )
+        }
+        .overlay(alignment: .top) {
+            // Vlak náást de rechterbuis, niet aan de volle breedte van het
+            // handvat — anders drijft het label bij een brede koffer los
+            // de kaart uit.
+            luggageTag
+                .offset(x: max(w * 0.36, 12) / 2 + 8, y: 6)
+        }
+    }
+
+    private var bagBody: some View {
+        ZStack(alignment: .topLeading) {
+            // Basis: hele silhouet in het voorvlak-geel
+            BagSilhouette(skew: d)
+                .fill(LinearGradient(
+                    colors: [Theme.yellow, Theme.yellow.opacity(0.82)],
+                    startPoint: .topLeading, endPoint: .bottomTrailing
+                ))
+
+            // Bovenvlak (lichter) + montageplaatjes van de greep
+            BagTopFace(skew: d)
+                .fill(Theme.yellowSoft)
+                .frame(width: w + d, height: d)
+            HStack(spacing: max(w * 0.36, 12)) {
+                ForEach(0..<2, id: \.self) { _ in
+                    RoundedRectangle(cornerRadius: 1.5)
+                        .fill(Theme.navyDark.opacity(0.30))
+                        .frame(width: 7, height: 3.5)
+                }
+            }
+            .frame(width: w + d)
+            .offset(x: d / 2, y: d * 0.35)
+
+            // Lichtrand op de achterste bovenrand: vangt het licht en bindt
+            // boven- en zijvlak visueel samen tot één gevouwen vorm i.p.v.
+            // los aanééngeplakte facetten.
+            Rectangle()
+                .fill(Color.white.opacity(0.40))
+                .frame(width: w, height: 1)
+                .offset(x: d, y: 0)
+
+            // Zijvlak (donkerder) + draaggreep op de zijkant
+            BagSideFace(skew: d)
+                .fill(.black.opacity(0.16))
+                .frame(width: d, height: h + d)
+                .offset(x: w)
+            if d > 12 {
+                RoundedRectangle(cornerRadius: 3)
+                    .strokeBorder(Theme.navyDark.opacity(0.35), lineWidth: 2)
+                    .frame(width: max(d * 0.45, 6), height: h * 0.16)
+                    .offset(x: w + d * 0.28, y: d + h * 0.18)
+            }
+
+            frontFaceDetails
                 .frame(width: w, height: h)
                 .offset(y: d)
-            }
-            .frame(width: w + d, height: h + d)
-            .shadow(color: Theme.navy.opacity(0.16), radius: 10, x: 0, y: 7)
-
-            // Wielen
-            HStack(spacing: max(w * 0.4, 14)) {
-                Circle().fill(Color(.systemGray)).frame(width: 7, height: 7)
-                Circle().fill(Color(.systemGray)).frame(width: 7, height: 7)
-            }
-            .offset(x: -d / 2, y: -2)
         }
+        .frame(width: w + d, height: h + d)
+        .clipShape(BagSilhouette(skew: d))
+        .overlay(
+            // Dunne contourlijn om het hele silhouet: bindt de vlakken samen
+            // tot één ogende vorm, ook precies tijdens het schuiven.
+            BagSilhouette(skew: d)
+                .stroke(Theme.navyDark.opacity(0.18), lineWidth: 1)
+        )
+        .overlay(alignment: .topLeading) {
+            // Achterwiel: piept net onder de zijkant uit. Zonder dit leek de
+            // koffer maar op twee wielen te staan in plaats van de
+            // gebruikelijke vier.
+            ZStack {
+                RoundedRectangle(cornerRadius: 1.5)
+                    .fill(Theme.navyDark.opacity(0.5))
+                    .frame(width: 5, height: 4)
+                    .offset(y: -3)
+                Circle()
+                    .fill(Color(red: 0.22, green: 0.24, blue: 0.29))
+                    .frame(width: 7, height: 7)
+                Circle()
+                    .fill(Color(.systemGray3))
+                    .frame(width: 3, height: 3)
+            }
+            .offset(x: w + d * 0.5 - 3.5, y: h - 5)
+        }
+        .shadow(color: Theme.navy.opacity(0.16), radius: 10, x: 0, y: 7)
+    }
+
+    /// Voorvlak: hardshell-ribbels, rits met trekker, merkplaatje en een
+    /// diagonale glans — vast aantal elementen zodat alles vloeiend meeschaalt.
+    private var frontFaceDetails: some View {
+        ZStack {
+            // Verticale hardshell-ribbels (vast aantal, flexibele breedte)
+            HStack(spacing: 0) {
+                ForEach(0..<6, id: \.self) { _ in
+                    HStack(spacing: 0) {
+                        LinearGradient(
+                            colors: [.white.opacity(0.14), .clear],
+                            startPoint: .leading, endPoint: .trailing
+                        )
+                        LinearGradient(
+                            colors: [.clear, .black.opacity(0.07)],
+                            startPoint: .leading, endPoint: .trailing
+                        )
+                    }
+                }
+            }
+            .padding(.vertical, h * 0.06)
+
+            // Rits rondom het voorvlak, met trekker rechtsboven
+            RoundedRectangle(cornerRadius: 8)
+                .strokeBorder(style: StrokeStyle(lineWidth: 1.4, dash: [2.5, 2.5]))
+                .foregroundStyle(Theme.navyDark.opacity(0.30))
+                .padding(6)
+            Circle()
+                .strokeBorder(Theme.navyDark.opacity(0.45), lineWidth: 1.6)
+                .frame(width: 6, height: 6)
+                .offset(x: w / 2 - 9, y: -h / 2 + 12)
+
+            // Merkplaatje
+            RoundedRectangle(cornerRadius: 2.5)
+                .fill(Theme.navyDark.opacity(0.85))
+                .frame(width: min(w * 0.3, 26), height: 8)
+                .overlay(
+                    Text("VT")
+                        .font(.system(size: 5.5, weight: .black, design: .rounded))
+                        .foregroundStyle(Theme.yellow)
+                )
+                .offset(y: -h * 0.30)
+
+            // Diagonale glans linksboven
+            LinearGradient(
+                stops: [
+                    .init(color: .white.opacity(0.28), location: 0),
+                    .init(color: .clear, location: 0.45)
+                ],
+                startPoint: .topLeading, endPoint: .bottomTrailing
+            )
+            .allowsHitTesting(false)
+        }
+    }
+
+    // Spinnerwielen met naaf en een steviger ophanging die echt in de
+    // onderrand van de koffer verzinkt, i.p.v. er los onder te bungelen.
+    private var wheels: some View {
+        HStack(spacing: max(w * 0.4, 14)) {
+            ForEach(0..<2, id: \.self) { _ in
+                ZStack {
+                    RoundedRectangle(cornerRadius: 2)
+                        .fill(Theme.navyDark.opacity(0.55))
+                        .frame(width: 8, height: 7)
+                        .offset(y: -5)
+                    Circle()
+                        .fill(Color(red: 0.22, green: 0.24, blue: 0.29))
+                        .frame(width: 10, height: 10)
+                    Circle()
+                        .fill(Color(.systemGray3))
+                        .frame(width: 4, height: 4)
+                }
+            }
+        }
+        .offset(x: -d / 2)
+    }
+
+    /// Bagagelabel aan de greep — knipoog naar het merk. Compact en dicht
+    /// tegen de buis aan, zodat het duidelijk ergens aan hangt i.p.v. los
+    /// te zweven.
+    private var luggageTag: some View {
+        VStack(spacing: 0) {
+            Capsule()
+                .fill(Theme.navyDark.opacity(0.4))
+                .frame(width: 1.5, height: 6)
+            RoundedRectangle(cornerRadius: 2.5)
+                .fill(.white)
+                .frame(width: 13, height: 18)
+                .overlay(
+                    VStack(spacing: 1.5) {
+                        Circle()
+                            .strokeBorder(Theme.navyDark.opacity(0.4), lineWidth: 1)
+                            .frame(width: 3, height: 3)
+                        Image(systemName: "airplane")
+                            .font(.system(size: 5, weight: .bold))
+                            .foregroundStyle(Theme.navy)
+                        RoundedRectangle(cornerRadius: 0.5)
+                            .fill(Theme.navyDark.opacity(0.25))
+                            .frame(width: 7, height: 1.5)
+                    }
+                )
+                .shadow(color: .black.opacity(0.12), radius: 2, x: 0, y: 1)
+        }
+        .rotationEffect(.degrees(8), anchor: .top)
     }
 
     private var overlayLabels: some View {
@@ -1066,11 +1509,17 @@ struct ResultStepView: View {
     var topInset: CGFloat = 0
     let onReset: () -> Void
 
+    @EnvironmentObject private var nav: AppNavigator
+    @ObservedObject private var session = UserSession.shared
+    // Sluit de resultaat-sheet (BaggageCheckView-variant) vóór het wisselen
+    // van tab; in de tab-checker is dit een onschuldige no-op.
+    @Environment(\.dismiss) private var dismissContainer
     @State private var bags: [Bag] = []
     @State private var loadingBags = false
     @State private var firstName = ""
     @State private var email = ""
     @State private var leadSent = false
+    @State private var showFlightSheet = false
 
     private var isFit: Bool { result.status == "fit" }
 
@@ -1085,9 +1534,23 @@ struct ResultStepView: View {
                     variantRow(variant)
                 }
 
-                // Tas-aanbevelingen
+                // Tas-aanbevelingen + route naar de shop: het moment van
+                // "past niet" is precies het moment van koopintentie.
                 if !isFit {
                     bagRecommendations
+                    shopCTA
+                } else {
+                    fitNextSteps
+                }
+
+                // Lead: alleen voor gebruikers zonder profiel — de al
+                // gebouwde leadCard stond hier voorheen ongebruikt in de file.
+                if !session.hasAccount {
+                    if leadSent {
+                        leadThanks
+                    } else {
+                        leadCard
+                    }
                 }
 
                 // Opnieuw + disclaimer
@@ -1103,7 +1566,7 @@ struct ResultStepView: View {
                     }
                     .padding(.horizontal, 20)
 
-                    Text("Indicatie — controleer altijd de officiële regels.")
+                    Text("Indicatie: controleer altijd de officiële regels.")
                         .font(.caption1).foregroundStyle(Theme.textSecondary)
                         .multilineTextAlignment(.center)
                 }
@@ -1112,6 +1575,11 @@ struct ResultStepView: View {
             .padding(.top, topInset + 16)
         }
         .task { await loadBags() }
+        .sheet(isPresented: $showFlightSheet) {
+            FlightWidgetSheet(airline: airline)
+                .presentationDetents([.medium])
+                .presentationDragIndicator(.visible)
+        }
     }
 
     // MARK: Verdict hero
@@ -1211,7 +1679,7 @@ struct ResultStepView: View {
     private var bagRecommendations: some View {
         VStack(alignment: .leading, spacing: 12) {
             VStack(alignment: .leading, spacing: 3) {
-                Text("Tassen die wél passen")
+                Text("Tassen & koffers die wél passen")
                     .font(.system(size: 16, weight: .bold, design: .rounded))
                 Text("Geselecteerd voor \(airline.name).")
                     .font(.caption1).foregroundStyle(Theme.textSecondary)
@@ -1234,6 +1702,110 @@ struct ResultStepView: View {
         }
     }
 
+    // MARK: Vervolgacties
+
+    /// Fail: één duidelijke route naar de volledige, voorgefilterde shop.
+    private var shopCTA: some View {
+        Button {
+            UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+            APIClient.shared.sendEvent("shop_cta_result_fail", path: "/check/result")
+            dismissContainer()
+            nav.openShop(airlineSlug: airline.slug)
+        } label: {
+            HStack(spacing: 8) {
+                Image(systemName: "bag.fill")
+                Text("Bekijk alles wat past bij \(airline.name)")
+                    .font(.system(size: 15, weight: .semibold, design: .rounded))
+                Image(systemName: "arrow.right")
+                    .font(.system(size: 12, weight: .semibold))
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 15)
+            .background(Theme.navyGradient)
+            .foregroundStyle(.white)
+            .clipShape(RoundedRectangle(cornerRadius: 14))
+        }
+        .buttonStyle(.plain)
+        .padding(.horizontal, 20)
+    }
+
+    /// Fit: houd het momentum vast met logische volgende stappen.
+    private var fitNextSteps: some View {
+        VStack(spacing: 10) {
+            nextStepRow(
+                icon: "airplane.departure", color: Theme.sky,
+                title: "Zet je vlucht in de aftelwidget",
+                subtitle: "Aftelling + tasreminder op je beginscherm"
+            ) {
+                // Geen tabwissel (die was onzichtbaar als je al via Home
+                // binnenkwam): sla de vlucht hier direct op via een mini-sheet.
+                APIClient.shared.sendEvent("widget_cta_result_fit", path: "/check/result")
+                showFlightSheet = true
+            }
+            nextStepRow(
+                icon: "bag.fill", color: Theme.green,
+                title: "Toch een nieuwe tas of koffer?",
+                subtitle: "Alles cabin-proof voor \(airline.name)"
+            ) {
+                APIClient.shared.sendEvent("shop_cta_result_fit", path: "/check/result")
+                dismissContainer()
+                nav.openShop(airlineSlug: airline.slug)
+            }
+        }
+        .padding(.horizontal, 20)
+    }
+
+    private func nextStepRow(
+        icon: String, color: Color, title: String, subtitle: String,
+        action: @escaping () -> Void
+    ) -> some View {
+        Button {
+            UIImpactFeedbackGenerator(style: .light).impactOccurred()
+            action()
+        } label: {
+            HStack(spacing: 12) {
+                Image(systemName: icon)
+                    .font(.system(size: 16, weight: .semibold))
+                    .foregroundStyle(color)
+                    .frame(width: 40, height: 40)
+                    .background(color.opacity(0.12))
+                    .clipShape(RoundedRectangle(cornerRadius: 12))
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(title)
+                        .font(.system(size: 14, weight: .semibold, design: .rounded))
+                        .foregroundStyle(Theme.textPrimary)
+                    Text(subtitle)
+                        .font(.system(size: 12, design: .rounded))
+                        .foregroundStyle(Theme.textSecondary)
+                }
+                Spacer()
+                Image(systemName: "chevron.right")
+                    .font(.system(size: 12, weight: .semibold))
+                    .foregroundStyle(Theme.textSecondary)
+            }
+            .padding(14)
+            .background(Color(.systemBackground))
+            .clipShape(RoundedRectangle(cornerRadius: 16))
+            .shadow(color: .black.opacity(0.05), radius: 8, x: 0, y: 3)
+            .contentShape(RoundedRectangle(cornerRadius: 16))
+        }
+        .buttonStyle(.plain)
+    }
+
+    private var leadThanks: some View {
+        HStack(spacing: 10) {
+            Image(systemName: "checkmark.seal.fill")
+                .foregroundStyle(Theme.green)
+            Text("Gelukt! We houden je op de hoogte.")
+                .font(.system(size: 14, weight: .semibold, design: .rounded))
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 16)
+        .background(Theme.green.opacity(0.10))
+        .clipShape(RoundedRectangle(cornerRadius: 14))
+        .padding(.horizontal, 20)
+    }
+
     // MARK: Lead card
 
     private var leadCard: some View {
@@ -1246,7 +1818,7 @@ struct ResultStepView: View {
                         .font(.headline2)
                 }
 
-                Text("We sturen je een overzicht van tassen die altijd passen bij \(airline.name).")
+                Text("We sturen je een overzicht van tassen en koffers die altijd passen bij \(airline.name).")
                     .font(.caption1).foregroundStyle(Theme.textSecondary)
 
                 HStack(spacing: 10) {

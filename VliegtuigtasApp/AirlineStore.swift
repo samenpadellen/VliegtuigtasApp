@@ -8,12 +8,23 @@ final class AirlineStore: ObservableObject {
 
     func load() async {
         guard airlines.isEmpty else { return }
-        isLoading = true
+        // Instant: laatste catalogus van schijf zodat de UI direct vult
+        // (ook offline); het netwerk ververst er stil achteraan.
+        if let cached = APIClient.shared.airlinesFromDisk(), !cached.isEmpty {
+            airlines = cached
+        }
+        isLoading = airlines.isEmpty
         error = nil
         do {
             airlines = try await APIClient.shared.airlines()
+            // Niet in de App Clip: die bevat geen App Intents-laag.
+            #if os(iOS) && !APPCLIP
+            // Spotlight-index + Siri-zinnen met maatschappijnamen bijwerken.
+            IntentDonations.airlinesLoaded(airlines)
+            #endif
         } catch {
-            self.error = error.localizedDescription
+            // Met een gevulde cache is een mislukte refresh geen fout voor de UI.
+            if airlines.isEmpty { self.error = error.localizedDescription }
         }
         isLoading = false
     }
@@ -40,6 +51,11 @@ final class CheckStore: ObservableObject {
                 email: email, firstName: firstName
             )
             APIClient.shared.sendEvent("bag_check", path: "/check")
+            #if os(iOS) && !APPCLIP
+            if result?.status == "fit" {
+                FlightLiveActivityManager.shared.markBagChecked()
+            }
+            #endif
         } catch {
             self.error = error.localizedDescription
         }
@@ -57,8 +73,14 @@ final class BagStore: ObservableObject {
 
     func loadIfNeeded() async {
         guard bags.isEmpty else { return }
-        isLoading = true
-        bags = (try? await APIClient.shared.bags()) ?? []
+        // Instant van schijf; netwerk ververst erna.
+        if let cached = APIClient.shared.bagsFromDisk(), !cached.isEmpty {
+            bags = cached
+        }
+        isLoading = bags.isEmpty
+        if let fresh = try? await APIClient.shared.bags() {
+            bags = fresh
+        }
         isLoading = false
     }
 

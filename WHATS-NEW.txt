@@ -1,0 +1,31 @@
+Grote update! Dit is er nieuw:
+
+✈️ MEERDERE VLUCHTEN
+Voeg al je reizen toe, niet meer maar één. Elke vlucht heeft nu een
+eigen detailpagina met route, status en aftelling — je eerstvolgende
+vlucht verschijnt automatisch op je widget en Apple Watch.
+
+⚡️ VLUCHT TOEVOEGEN ZONDER GEZOEK
+Typ je vluchtnummer en de rest wordt automatisch opgehaald: geen
+zoekknop meer nodig, en de vertrekdatum vult zichzelf in.
+
+📷 AR-TASMETING OP EEN HEEL ANDER NIVEAU
+Scan je tas nu écht met LiDAR: loop er een keer omheen en zie live
+een boundingbox om je tas verschijnen, in plaats van losse punten
+aan te tikken. Preciezer én leuker om te gebruiken.
+
+🧢 PURSER PIM OP JE HOMESCREEN
+Nieuwe widget met elke dag een pak-tip van Purser Pim — persoonlijk
+zodra je in de app pakadvies hebt gevraagd.
+
+🎨 KIES JE EIGEN APP-ICOON
+Naast het standaardicoon nu ook de pet van Purser Pim en een
+vertrekbord-icoon, instelbaar in je profiel.
+
+🗣️ MEER SIRI EN KORTCOMMANDO'S — OOK OP APPLE WATCH
+Vraag Siri of je eigen tas mee mag, voeg een vlucht toe of zet een
+inpak-alarm, met je stem. Werkt nu ook rechtstreeks vanaf je pols.
+
+Daarnaast: een verbeterde proefversie (App Clip) waarin je nu
+gewoon een maatschappij kunt kiezen, en verschillende kleine
+verbeteringen en oplossingen onder de motorkap.

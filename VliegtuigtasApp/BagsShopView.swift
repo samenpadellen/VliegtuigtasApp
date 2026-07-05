@@ -1,4 +1,5 @@
 import SwiftUI
+import Combine
 
 enum SortOption: String, CaseIterable, Identifiable {
     case `default`   = "Aanbevolen"
@@ -32,12 +33,14 @@ struct BagsShopView: View {
     // data nog een keer op te vragen bij elke tabwissel.
     @EnvironmentObject private var airlineStore: AirlineStore
     @EnvironmentObject private var bagStore: BagStore
+    @EnvironmentObject private var airlineNav: AppNavigator
 
     @State private var filteredBags: [Bag] = []
     @State private var isLoadingFiltered = false
 
     @State private var searchText = ""
     @State private var selectedFitType: BagFitType? = nil
+    @State private var selectedType: String? = nil
     @State private var selectedAirlineSlug: String? = nil
     @State private var selectedBrand: String? = nil
     @State private var sortOption: SortOption = .default
@@ -61,16 +64,22 @@ struct BagsShopView: View {
         BagFitType.allCases.filter { type in allBags.contains { $0.fitType == type } }
     }
 
-    /// Meest voorkomende merken in de catalogus, voor de merken-chips (net als Apple's productgrid).
-    private var topBrands: [String] {
-        var counts: [String: Int] = [:]
-        for bag in allBags { if let brand = bag.brand { counts[brand, default: 0] += 1 } }
-        return counts.sorted { $0.value == $1.value ? $0.key < $1.key : $0.value > $1.value }
-            .prefix(8).map(\.key)
+    /// Unieke webshops (aanbieders) in de catalogus.
+    private var distinctShopCount: Int {
+        Set(allBags.compactMap { $0.shopDomain ?? $0.shopName }).count
     }
 
-    private var distinctBrandCount: Int {
-        Set(allBags.compactMap(\.brand)).count
+    /// Productsoorten in de catalogus (koffer, rugzak, …), op volgorde van
+    /// aantal — maakt zichtbaar dat er méér dan alleen tassen zijn.
+    private var availableTypes: [String] {
+        var counts: [String: Int] = [:]
+        for bag in allBags {
+            if let type = bag.type?.trimmingCharacters(in: .whitespaces).lowercased(), !type.isEmpty {
+                counts[type, default: 0] += 1
+            }
+        }
+        return counts.sorted { $0.value == $1.value ? $0.key < $1.key : $0.value > $1.value }
+            .map { $0.key.capitalized }
     }
 
     /// Uitgelichte tassen voor de swipeable carousel bovenaan.
@@ -82,13 +91,17 @@ struct BagsShopView: View {
     }
 
     private var activeFilterCount: Int {
-        [selectedFitType != nil, selectedAirlineSlug != nil, selectedBrand != nil, sortOption != .default]
+        [selectedFitType != nil, selectedAirlineSlug != nil, selectedBrand != nil,
+         selectedType != nil, sortOption != .default]
             .filter { $0 }.count
     }
 
     private var filtered: [Bag] {
         var result = allBags
         if let fit = selectedFitType  { result = result.filter { $0.fitType == fit } }
+        if let type = selectedType {
+            result = result.filter { $0.type?.caseInsensitiveCompare(type) == .orderedSame }
+        }
         if let brand = selectedBrand  { result = result.filter { $0.brand == brand } }
         if !searchText.isEmpty {
             result = result.filter {
@@ -120,8 +133,12 @@ struct BagsShopView: View {
                     featuredCarousel
                         .padding(.bottom, 24)
 
-                    if !topBrands.isEmpty {
-                        brandRow.padding(.bottom, 16)
+                    loyaltySection
+                        .padding(.horizontal, 16)
+                        .padding(.bottom, 20)
+
+                    if availableTypes.count > 1 {
+                        typeRow.padding(.bottom, 16)
                     }
 
                     if !availableFitTypes.isEmpty {
@@ -134,11 +151,16 @@ struct BagsShopView: View {
                         .padding(.horizontal, 16)
                         .padding(.bottom, 48)
                 }
+                .frame(maxWidth: Theme.contentMaxWidth)
+                .frame(maxWidth: .infinity)
             }
         }
         .background(Color(.systemGroupedBackground))
         .ignoresSafeArea(edges: .top)
         .navigationBarHidden(true)
+        // Toetsenbord schuift interactief mee weg bij scrollen — geen
+        // zoekbalk-toetsenbord dat het halve scherm blijft blokkeren.
+        .scrollDismissesKeyboard(.interactively)
         .refreshable { await refreshAll() }
         .sheet(isPresented: $showFilters) {
             FilterSheet(
@@ -153,51 +175,93 @@ struct BagsShopView: View {
         }
         .task { await loadAll() }
         .onChange(of: selectedAirlineSlug) { Task { await loadBags() } }
+        // "Tassen die passen bij X" vanuit resultaat/detailpagina: zet het
+        // maatschappij-filter zodra er een verzoek binnenkomt.
+        .onChange(of: airlineNav.shopRequest) { _, request in
+            if let request {
+                withAnimation(.spring(response: 0.3)) {
+                    selectedAirlineSlug = request.airlineSlug
+                }
+            }
+        }
+        .onAppear {
+            if let request = airlineNav.shopRequest, selectedAirlineSlug != request.airlineSlug {
+                selectedAirlineSlug = request.airlineSlug
+            }
+        }
     }
 
     // MARK: - Shop header (navy hero style)
 
     private var shopHeader: some View {
-        ZStack(alignment: .bottomLeading) {
-            Image("PhotoTraveler")
-                .resizable()
-                .scaledToFill()
-                .frame(maxWidth: .infinity)
-                .frame(height: 160 + shopStatusBarHeight)
-                .clipped()
+        VStack(spacing: 0) {
+            ZStack(alignment: .bottomLeading) {
+                Image("PhotoTraveler")
+                    .resizable()
+                    .scaledToFill()
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 196 + shopStatusBarHeight)
+                    .clipped()
+                    // .clipped() knipt alleen het tekenen, niet de hit-test:
+                    // zonder dit vangt de foto op iPad tikken onder de header af.
+                    .allowsHitTesting(false)
 
-            // Donker onderin + links zodat tekst leesbaar blijft, foto rechts uitkomt
-            LinearGradient(
-                colors: [Theme.navy.opacity(0.80), Theme.navy.opacity(0.10)],
-                startPoint: .bottom, endPoint: .topTrailing
-            )
+                // Donker onderin + links zodat tekst leesbaar blijft, foto rechts uitkomt
+                LinearGradient(
+                    colors: [Theme.navyDark.opacity(0.92), Theme.navy.opacity(0.15)],
+                    startPoint: .bottom, endPoint: .topTrailing
+                )
+                .allowsHitTesting(false)
 
-            VStack(alignment: .leading, spacing: 6) {
-                HStack(spacing: 8) {
-                    Image(systemName: "bag.fill")
-                        .font(.system(size: 14, weight: .semibold))
-                        .foregroundStyle(.white.opacity(0.80))
-                    Text("HANDBAGAGE SHOP")
-                        .font(.system(size: 11, weight: .bold, design: .rounded))
-                        .foregroundStyle(.white.opacity(0.75))
-                        .kerning(1.2)
-                }
-                Text("Tassen die altijd\npassen")
-                    .font(.system(size: 26, weight: .bold, design: .rounded))
-                    .foregroundStyle(.white)
-                    .lineSpacing(1)
+                VStack(alignment: .leading, spacing: 10) {
+                    // Vertrekhal-regel, zoals de bewegwijzering op Schiphol
+                    HStack(spacing: 8) {
+                        Image(systemName: "airplane")
+                            .font(.system(size: 11, weight: .bold))
+                            .foregroundStyle(Theme.yellow)
+                        Text("VERTREKHAL · HANDBAGAGE")
+                            .font(.system(size: 10, weight: .bold, design: .rounded))
+                            .foregroundStyle(.white.opacity(0.75))
+                            .kerning(1.8)
+                    }
 
-                if !allBags.isEmpty {
-                    Text("\(allBags.count) tassen · \(distinctBrandCount) merken")
-                        .font(.system(size: 12, weight: .medium, design: .rounded))
-                        .foregroundStyle(.white.opacity(0.65))
+                    // Vertrekbord: klappert binnen als een Solari-bord
+                    SplitFlapText("TRAVEL SHOP", size: 24)
+
+                    Text("Elke tas én koffer hier is gecheckt op de maten van de maatschappijen.")
+                        .font(.system(size: 13, design: .rounded))
+                        .foregroundStyle(.white.opacity(0.85))
+                        .lineSpacing(1)
+
+                    if !allBags.isEmpty {
+                        HStack(spacing: 14) {
+                            headerStat(icon: "bag.fill", label: "\(allBags.count) tassen & koffers")
+                            headerStat(icon: "storefront.fill", label: "\(distinctShopCount) aanbieders")
+                            headerStat(icon: "checkmark.seal.fill", label: "cabin checked")
+                        }
                         .padding(.top, 2)
+                    }
                 }
+                .padding(.horizontal, 20)
+                .padding(.bottom, 24)
             }
-            .padding(.horizontal, 20)
-            .padding(.bottom, 22)
+            .clipped()
+
+            // Perforatierand: de header scheurt af als een boarding pass
+            BoardingPassDivider()
         }
-        .clipped()
+    }
+
+    private func headerStat(icon: String, label: String) -> some View {
+        HStack(spacing: 5) {
+            Image(systemName: icon)
+                .font(.system(size: 9, weight: .semibold))
+                .foregroundStyle(Theme.yellow)
+            Text(label.uppercased())
+                .font(.system(size: 9, weight: .bold, design: .rounded))
+                .foregroundStyle(.white.opacity(0.80))
+                .kerning(0.8)
+        }
     }
 
     // MARK: - Search + filter row
@@ -249,6 +313,26 @@ struct BagsShopView: View {
         }
     }
 
+    // MARK: - Soort-chips (koffer / rugzak / tas …)
+
+    private var typeRow: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 8) {
+                CategoryChip(label: "Alle soorten", selected: selectedType == nil) {
+                    withAnimation(.spring(response: 0.3)) { selectedType = nil }
+                }
+                ForEach(availableTypes, id: \.self) { type in
+                    CategoryChip(label: type, selected: selectedType == type) {
+                        withAnimation(.spring(response: 0.3)) {
+                            selectedType = (selectedType == type) ? nil : type
+                        }
+                    }
+                }
+            }
+            .padding(.horizontal, 16)
+        }
+    }
+
     // MARK: - Fit type chips (onder de stoel / bagagevak)
 
     private var fitTypeRow: some View {
@@ -284,9 +368,12 @@ struct BagsShopView: View {
                     if let brand = selectedBrand {
                         ActiveFilterChip(label: brand) { selectedBrand = nil }
                     }
+                    if let type = selectedType {
+                        ActiveFilterChip(label: type) { selectedType = nil }
+                    }
                     Button {
                         sortOption = .default; selectedAirlineSlug = nil
-                        selectedFitType = nil; selectedBrand = nil
+                        selectedFitType = nil; selectedBrand = nil; selectedType = nil
                     } label: {
                         Text("Wis alles")
                             .font(.system(size: 12, weight: .semibold, design: .rounded))
@@ -315,27 +402,27 @@ struct BagsShopView: View {
         }
     }
 
-    // MARK: - Brand row ("Merken", vergelijkbaar met Apple's productcategorieën)
+    // MARK: - Loyalty (miles & referrals)
 
-    private var brandRow: some View {
+    private var loyaltySection: some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text("Merken")
-                .font(.system(size: 15, weight: .bold, design: .rounded))
-                .foregroundStyle(Theme.textPrimary)
-                .padding(.horizontal, 16)
-
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 8) {
-                    ForEach(topBrands, id: \.self) { brand in
-                        CategoryChip(label: brand, selected: selectedBrand == brand) {
-                            withAnimation(.spring(response: 0.3)) {
-                                selectedBrand = (selectedBrand == brand) ? nil : brand
-                            }
-                        }
-                    }
-                }
-                .padding(.horizontal, 16)
+            HStack(spacing: 6) {
+                Image(systemName: "creditcard.fill")
+                    .font(.system(size: 10, weight: .semibold))
+                    .foregroundStyle(Theme.navy.opacity(0.6))
+                Text("LOYALTY LOUNGE")
+                    .font(.system(size: 11, weight: .bold, design: .rounded))
+                    .foregroundStyle(Theme.textSecondary)
+                    .kerning(1.4)
             }
+
+            LoyaltyCard(
+                brand: "AMERICAN EXPRESS",
+                title: "American Express Platinum Card",
+                benefit: "Welkomstbonus aan Membership Rewards punten via onze referral. Punten wissel je in voor onder andere Flying Blue miles.",
+                disclosure: "Referral-aanbieding · wij kunnen een vergoeding ontvangen",
+                url: LoyaltyLinks.amexReferral
+            )
         }
     }
 
@@ -344,7 +431,7 @@ struct BagsShopView: View {
     @ViewBuilder
     private var productGrid: some View {
         if isLoading {
-            LazyVGrid(columns: [GridItem(.flexible(), spacing: 12), GridItem(.flexible(), spacing: 12)], spacing: 12) {
+            LazyVGrid(columns: [GridItem(.adaptive(minimum: 160), spacing: 12)], spacing: 12) {
                 ForEach(0..<6, id: \.self) { _ in SkeletonCard() }
             }
         } else if filtered.isEmpty {
@@ -352,9 +439,11 @@ struct BagsShopView: View {
         } else {
             VStack(spacing: 0) {
                 HStack {
-                    Text("\(filtered.count) tassen")
-                        .font(.system(size: 13, design: .rounded))
+                    Text("\(filtered.count) TASSEN & KOFFERS · CABIN CHECKED")
+                        .font(.system(size: 11, weight: .bold, design: .rounded))
                         .foregroundStyle(Theme.textSecondary)
+                        .kerning(1.2)
+                        .monospacedDigit()
                         .contentTransition(.numericText(value: Double(filtered.count)))
                         .animation(.snappy(duration: 0.25), value: filtered.count)
                     Spacer()
@@ -370,7 +459,7 @@ struct BagsShopView: View {
                 .padding(.bottom, 14)
 
                 LazyVGrid(
-                    columns: [GridItem(.flexible(), spacing: 12), GridItem(.flexible(), spacing: 12)],
+                    columns: [GridItem(.adaptive(minimum: 160), spacing: 12)],
                     spacing: 12
                 ) {
                     ForEach(filtered) { bag in
@@ -400,7 +489,7 @@ struct BagsShopView: View {
                     .foregroundStyle(Theme.navy.opacity(0.4))
             }
             VStack(spacing: 6) {
-                Text("Geen tassen gevonden")
+                Text("Niets gevonden")
                     .font(.system(size: 16, weight: .bold, design: .rounded))
                     .foregroundStyle(Theme.textPrimary)
                 Text("Pas je filters aan of zoek op een ander merk.")
@@ -411,7 +500,8 @@ struct BagsShopView: View {
             if activeFilterCount > 0 {
                 Button {
                     sortOption = .default; selectedAirlineSlug = nil
-                    selectedFitType = nil; selectedBrand = nil; searchText = ""
+                    selectedFitType = nil; selectedBrand = nil
+                    selectedType = nil; searchText = ""
                 } label: {
                     Text("Wis alle filters")
                         .font(.system(size: 14, weight: .semibold, design: .rounded))
@@ -461,12 +551,161 @@ struct BagsShopView: View {
             return
         }
         isLoadingFiltered = true
-        filteredBags = (try? await APIClient.shared.bags(
+        let result = (try? await APIClient.shared.bags(
             airline: slug,
             type: nil,
             maxPrice: nil
         )) ?? []
+        // Stale-response guard: is het filter intussen gewijzigd (snel tikken),
+        // dan mag dit oude antwoord de nieuwe selectie niet overschrijven.
+        guard slug == selectedAirlineSlug else { return }
+        filteredBags = result
         isLoadingFiltered = false
+    }
+}
+
+// MARK: - Loyalty
+
+/// Referral-links op één plek. Vervang de placeholder door jouw eigen
+/// persoonlijke AMEX-referral-URL (Amex-app → Vrienden doorverwijzen).
+enum LoyaltyLinks {
+    static let amexReferral = URL(string: "https://americanexpress.com/nl-nl/referral/platinum?ref=wOUTESWPob&XL=MIANS")!
+}
+
+/// Loyaltykaart: ingetogen en volwassen — donker vlak, gedempt goud als
+/// accent, typografie doet het werk. Duidelijke referral-disclosure
+/// (App Store-eis voor affiliate/referral-aanbiedingen).
+private struct LoyaltyCard: View {
+    let brand: String
+    let title: String
+    let benefit: String
+    let disclosure: String
+    let url: URL
+
+    /// Gedempt goud: chic accent in plaats van felgeel.
+    private let gold = Color(red: 0.80, green: 0.68, blue: 0.42)
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            VStack(alignment: .leading, spacing: 10) {
+                HStack(alignment: .center) {
+                    Text(brand)
+                        .font(.system(size: 10, weight: .semibold))
+                        .foregroundStyle(.white.opacity(0.55))
+                        .kerning(2.2)
+                    Spacer()
+                    Image(systemName: "creditcard")
+                        .font(.system(size: 13, weight: .light))
+                        .foregroundStyle(gold.opacity(0.8))
+                }
+
+                Text(title)
+                    .font(.system(size: 18, weight: .semibold, design: .rounded))
+                    .foregroundStyle(.white)
+
+                Text(benefit)
+                    .font(.system(size: 12.5, design: .rounded))
+                    .foregroundStyle(.white.opacity(0.65))
+                    .lineSpacing(2.5)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            .padding(18)
+
+            Rectangle()
+                .fill(.white.opacity(0.08))
+                .frame(height: 1)
+
+            HStack {
+                Link(destination: url) {
+                    HStack(spacing: 6) {
+                        Text("Bekijk het aanbod")
+                            .font(.system(size: 13, weight: .semibold, design: .rounded))
+                        Image(systemName: "arrow.right")
+                            .font(.system(size: 10, weight: .semibold))
+                    }
+                    .foregroundStyle(gold)
+                    .contentShape(Rectangle())
+                }
+
+                Spacer()
+
+                ShareLink(item: url, message: Text("Tip: via deze link krijg je een welkomstbonus op de \(title).")) {
+                    Image(systemName: "square.and.arrow.up")
+                        .font(.system(size: 14, weight: .medium))
+                        .foregroundStyle(.white.opacity(0.55))
+                        .frame(width: 36, height: 36)
+                        .contentShape(Rectangle())
+                }
+            }
+            .padding(.horizontal, 18)
+            .padding(.vertical, 8)
+
+            Text(disclosure)
+                .font(.system(size: 8.5, design: .rounded))
+                .foregroundStyle(.white.opacity(0.35))
+                .padding(.horizontal, 18)
+                .padding(.bottom, 10)
+        }
+        .background(Color(red: 0.07, green: 0.09, blue: 0.14))
+        .clipShape(RoundedRectangle(cornerRadius: 18))
+        .overlay(
+            RoundedRectangle(cornerRadius: 18)
+                .strokeBorder(.white.opacity(0.09), lineWidth: 1)
+        )
+        .overlay(alignment: .top) {
+            // Dun gouden keyline bovenlangs: het enige sieraad.
+            RoundedRectangle(cornerRadius: 18)
+                .strokeBorder(gold.opacity(0.35), lineWidth: 1)
+                .mask(
+                    LinearGradient(
+                        colors: [.white, .clear],
+                        startPoint: .top, endPoint: .center
+                    )
+                )
+        }
+        .shadow(color: .black.opacity(0.18), radius: 14, x: 0, y: 6)
+    }
+}
+
+// MARK: - Boarding-pass perforatie
+
+/// Scheurrand zoals tussen de stroken van een boarding pass: gestippelde
+/// lijn met een inkeping links en rechts.
+private struct BoardingPassDivider: View {
+    var body: some View {
+        ZStack {
+            Rectangle()
+                .fill(Color(.systemBackground))
+
+            DashLine()
+                .stroke(style: StrokeStyle(lineWidth: 1.5, dash: [6, 5]))
+                .foregroundStyle(Color(.systemGray4))
+                .frame(height: 1.5)
+                .padding(.horizontal, 24)
+
+            HStack {
+                Circle()
+                    .fill(Color(.systemGroupedBackground))
+                    .frame(width: 22, height: 22)
+                    .offset(x: -11)
+                Spacer()
+                Circle()
+                    .fill(Color(.systemGroupedBackground))
+                    .frame(width: 22, height: 22)
+                    .offset(x: 11)
+            }
+        }
+        .frame(height: 24)
+        .clipped()
+    }
+}
+
+private struct DashLine: Shape {
+    func path(in rect: CGRect) -> Path {
+        var p = Path()
+        p.move(to: CGPoint(x: rect.minX, y: rect.midY))
+        p.addLine(to: CGPoint(x: rect.maxX, y: rect.midY))
+        return p
     }
 }
 
@@ -475,18 +714,40 @@ struct BagsShopView: View {
 private struct FeaturedCarousel: View {
     let bags: [Bag]
     @State private var page = 0
+    // Etalage-gedrag: rustig doorbladeren zoals reclameschermen op de
+    // luchthaven; stopt zodra de gebruiker zelf swipet.
+    @State private var autoAdvance = true
+    @Environment(\.scenePhase) private var scenePhase
+    private let timer = Timer.publish(every: 6, on: .main, in: .common).autoconnect()
 
     var body: some View {
         VStack(spacing: 12) {
             TabView(selection: $page) {
                 ForEach(Array(bags.enumerated()), id: \.element.id) { index, bag in
-                    FeaturedBagCard(bag: bag, badgeLabel: index == 0 ? "ONZE KEUS" : "AANBEVOLEN")
+                    FeaturedBagCard(bag: bag, badgeLabel: index == 0 ? "KEUZE VAN DE CREW" : "AANBEVOLEN")
                         .padding(.horizontal, 16)
                         .tag(index)
                 }
             }
             .tabViewStyle(.page(indexDisplayMode: .never))
             .frame(height: 232)
+            .onReceive(timer) { _ in
+                // Niet animeren als de app niet actief is — bespaart werk
+                // (en batterij) terwijl niemand kijkt.
+                guard scenePhase == .active, autoAdvance, bags.count > 1 else { return }
+                withAnimation(.easeInOut(duration: 0.45)) {
+                    page = (page + 1) % bags.count
+                }
+            }
+            .simultaneousGesture(
+                // Handmatige swipe = gebruiker heeft de regie; stop met
+                // automatisch doordraaien. Alleen schrijven bij de éérste
+                // drag-tick — elke tick opnieuw schrijven forceerde een
+                // re-render per frame (AttributeGraph/glassEffect-warnings).
+                DragGesture().onChanged { _ in
+                    if autoAdvance { autoAdvance = false }
+                }
+            )
 
             if bags.count > 1 {
                 HStack(spacing: 6) {
@@ -506,34 +767,21 @@ private struct FeaturedCarousel: View {
 
 private struct FeaturedBagCard: View {
     let bag: Bag?
-    var badgeLabel: String = "ONZE KEUS"
-    @State private var isPressed = false
+    var badgeLabel: String = "KEUZE VAN DE CREW"
 
     var body: some View {
-        cardContent
-            // Press-animatie via simultaneousGesture zodat de Link tap gewoon werkt
-            .simultaneousGesture(
-                DragGesture(minimumDistance: 0)
-                    .onChanged { _ in
-                        guard !isPressed else { return }
-                        isPressed = true
-                        UIImpactFeedbackGenerator(style: .medium).impactOccurred()
-                    }
-                    .onEnded { _ in
-                        isPressed = false
-                    }
-            )
-    }
-
-    private var cardContent: some View {
+        // Geen DragGesture(minimumDistance: 0) meer voor het press-effect:
+        // die ving op iPad (trackpad/pointer) de clicks af waardoor de Link
+        // niet meer reageerde — App Review 2.1(a). De pressableCard-stijl
+        // geeft hetzelfde effect via het normale knop-mechanisme.
         Group {
             if let url = bag?.affiliateUrl.flatMap(URL.init) {
                 Link(destination: url) { featured }
+                    .buttonStyle(.pressableCard)
             } else {
                 featured
             }
         }
-        .buttonStyle(.plain)
     }
 
     private var featured: some View {
@@ -630,8 +878,6 @@ private struct FeaturedBagCard: View {
         }
         .frame(height: 220)
         .clipShape(RoundedRectangle(cornerRadius: 22))
-        .scaleEffect(isPressed ? 0.97 : 1.0)
-        .animation(.spring(response: 0.25, dampingFraction: 0.7), value: isPressed)
         .shadow(color: Theme.navy.opacity(0.25), radius: 18, x: 0, y: 8)
     }
 }
@@ -720,6 +966,7 @@ private struct BagCard: View {
                 if let label = bag.displayPrice {
                     Text(label)
                         .font(.system(size: 18, weight: .black, design: .rounded))
+                        .monospacedDigit()
                         .foregroundStyle(Theme.navy)
                         .padding(.top, 4)
                 }
@@ -728,13 +975,29 @@ private struct BagCard: View {
                         .font(.system(size: 9, design: .rounded))
                         .foregroundStyle(Theme.textSecondary)
                 }
+
+                // Duty-free-waardig zegel: bij hoeveel maatschappijen past hij?
+                if let count = bag.airlineSlugs?.count, count > 0 {
+                    HStack(spacing: 4) {
+                        Image(systemName: "checkmark.seal.fill")
+                            .font(.system(size: 8, weight: .bold))
+                        Text(count == 1 ? "Past bij 1 maatschappij" : "Past bij \(count) maatschappijen")
+                            .font(.system(size: 9, weight: .semibold, design: .rounded))
+                    }
+                    .foregroundStyle(Theme.green)
+                    .padding(.top, 3)
+                }
             }
             .padding(12)
             .frame(maxWidth: .infinity, alignment: .leading)
         }
         .background(Color(.systemBackground))
         .clipShape(RoundedRectangle(cornerRadius: 18))
-        .shadow(color: .black.opacity(0.07), radius: 10, x: 0, y: 4)
+        .overlay(
+            RoundedRectangle(cornerRadius: 18)
+                .strokeBorder(Theme.navy.opacity(0.08), lineWidth: 1)
+        )
+        .shadow(color: Theme.navy.opacity(0.10), radius: 12, x: 0, y: 5)
     }
 
     private var dimensionsBadge: String? {

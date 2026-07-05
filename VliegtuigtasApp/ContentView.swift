@@ -17,6 +17,13 @@ struct CheckerRequest: Equatable {
     let token: UUID
 }
 
+/// Verzoek om de Shop-tab met een maatschappij-filter te openen ("tassen
+/// die passen bij X"), vanuit het checkresultaat of de detailpagina.
+struct ShopRequest: Equatable {
+    let airlineSlug: String
+    let token: UUID
+}
+
 @MainActor
 final class AppNavigator: ObservableObject {
     enum Tab: Hashable {
@@ -25,6 +32,10 @@ final class AppNavigator: ObservableObject {
 
     @Published var selectedTab: Tab = .home
     @Published var checkerRequest: CheckerRequest?
+    @Published var shopRequest: ShopRequest?
+    /// Token in plaats van Bool: verandert bij élke aanroep, ook als Home
+    /// al vooraan stond, zodat de widget-deeplink altijd het gesprek opent.
+    @Published var openPimChatToken: UUID?
 
     func openChecker(preselected airline: Airline?) {
         checkerRequest = CheckerRequest(airline: airline, token: UUID())
@@ -35,8 +46,17 @@ final class AppNavigator: ObservableObject {
         selectedTab = .airlines
     }
 
-    func openShop() {
+    func openShop(airlineSlug: String? = nil) {
+        if let airlineSlug {
+            shopRequest = ShopRequest(airlineSlug: airlineSlug, token: UUID())
+        }
         selectedTab = .shop
+    }
+
+    /// Vanuit de Purser Pim-widget: naar Home en het gesprek openen.
+    func openPimChat() {
+        selectedTab = .home
+        openPimChatToken = UUID()
     }
 }
 
@@ -61,10 +81,15 @@ struct ContentView: View {
             .onChange(of: nav.selectedTab) { _, _ in
                 UISelectionFeedbackGenerator().selectionChanged()
             }
-            // Deeplink vanuit de widgets: vliegtuigtas://check?airline=<slug>
-            // opent direct de checker met de maatschappij van de widget.
+            // Deeplinks vanuit de widgets:
+            // - vliegtuigtas://check?airline=<slug> → checker met maatschappij
+            // - vliegtuigtas://pim                  → Purser Pim-gesprek
             .onOpenURL { url in
                 guard url.scheme == "vliegtuigtas" else { return }
+                if url.host == "pim" {
+                    nav.openPimChat()
+                    return
+                }
                 let slug = URLComponents(url: url, resolvingAgainstBaseURL: false)?
                     .queryItems?.first(where: { $0.name == "airline" })?.value
                 Task { @MainActor in

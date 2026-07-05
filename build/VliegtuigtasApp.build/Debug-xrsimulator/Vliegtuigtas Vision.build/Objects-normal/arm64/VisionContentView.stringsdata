@@ -1,0 +1,128 @@
+{
+  "source": "/Users/wouterschut/Documents/VliegtuigtasApp/VliegtuigtasVision/VisionContentView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "Vliegtuigtas",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 20
+        }
+      },
+      {
+        "comment": "",
+        "key": "Zoek maatschappij",
+        "location": {
+          "startingColumn": 52,
+          "startingLine": 21
+        }
+      },
+      {
+        "comment": "",
+        "key": "Laden…",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 24
+        }
+      },
+      {
+        "comment": "",
+        "key": "Bekijk de bagageregels en check of jouw koffer past, op ware grootte in je kamer.",
+        "location": {
+          "startingColumn": 39,
+          "startingLine": 35
+        }
+      },
+      {
+        "comment": "",
+        "key": "Kies een maatschappij",
+        "location": {
+          "startingColumn": 21,
+          "startingLine": 33
+        }
+      },
+      {
+        "comment": "",
+        "key": "Handbagageregels",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 87
+        }
+      },
+      {
+        "comment": "",
+        "key": "Geverifieerd op %@",
+        "location": {
+          "startingColumn": 23,
+          "startingLine": 90
+        }
+      },
+      {
+        "comment": "",
+        "key": "max. %lld kg",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 106
+        }
+      },
+      {
+        "comment": "",
+        "key": "Klein: %@",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 114
+        }
+      },
+      {
+        "comment": "",
+        "key": "Groot: %@",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 117
+        }
+      },
+      {
+        "comment": "",
+        "key": "Check je koffer",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 132
+        }
+      },
+      {
+        "comment": "",
+        "key": "Checken…",
+        "location": {
+          "startingColumn": 49,
+          "startingLine": 150
+        }
+      },
+      {
+        "comment": "",
+        "key": "Controleer",
+        "location": {
+          "startingColumn": 64,
+          "startingLine": 150
+        }
+      },
+      {
+        "comment": "",
+        "key": "Toon op ware grootte",
+        "location": {
+          "startingColumn": 27,
+          "startingLine": 164
+        }
+      },
+      {
+        "comment": "",
+        "key": "%@ %@",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 194
+        }
+      }
+    ]
+  },
+  "version": 1
+}

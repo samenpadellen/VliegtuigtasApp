@@ -1,6 +1,8 @@
 import SwiftUI
+import UserNotifications
 
 private let heroHeight: CGFloat = 380
+private let contentMaxWidth = Theme.contentMaxWidth
 
 private var statusBarHeight: CGFloat {
     UIApplication.shared.connectedScenes
@@ -18,7 +20,25 @@ struct HomeView: View {
     @State private var flightNumber = ""
     @State private var departureDate = Date()
     @State private var flightSaved = false
+    @State private var flightSearchTask: Task<Void, Never>?
+    @State private var showProfile = false
+    @State private var showAccountForFlight = false
+    // Programmatische navigatie voor de carrousels: gewone Buttons + een
+    // navigationDestination. NavigationLinks met custom ButtonStyle in
+    // geneste ScrollViews waren op iPadOS onbetrouwbaar (dode tikken).
+    @State private var selectedAirline: Airline?
+    @State private var selectedBagId: String?
     @Namespace private var zoomNamespace
+
+    // Airport & rules information
+    @State private var showEURules = false
+    @State private var showCustomsInfo = false
+    @State private var showBaggageIssues = false
+    @State private var showAirportSelection = false
+    @State private var showBaggageGuide = false
+    @State private var showBagsOverview = false
+    @State private var showPackingAlarms = false
+    @State private var showReminderSheet = false
 
     var body: some View {
         NavigationStack {
@@ -27,11 +47,19 @@ struct HomeView: View {
                     heroSection
                     VStack(spacing: 20) {
                         flightLookupCard
+                        if #available(iOS 26.0, *) {
+                            AIAssistentHomeCard()
+                        }
                         airlineGridSection
                         shopCarouselSection
                         howItWorksSection
+                        quickActionsSection
+                        #if !targetEnvironment(macCatalyst)
+                        // Instellingen > Safari > Extensies bestaat niet op de Mac.
                         safariExtensionTip
+                        #endif
                     }
+                    .frame(maxWidth: contentMaxWidth)
                     .padding(.horizontal, 16)
                     .padding(.top, 24)
                     .padding(.bottom, 48)
@@ -40,6 +68,34 @@ struct HomeView: View {
             .background(Color(.systemGroupedBackground))
             .ignoresSafeArea(edges: .top)
             .navigationBarHidden(true)
+            .navigationDestination(item: $selectedAirline) { airline in
+                AirlineDetailView(airline: airline)
+            }
+            .navigationDestination(item: $selectedBagId) { bagId in
+                BagDetailView(bagId: bagId)
+            }
+            .sheet(isPresented: $showProfile) {
+                ProfileView()
+            }
+            .sheet(isPresented: $showAccountForFlight) {
+                ScrollView {
+                    AccountRequiredView(
+                        icon: "airplane.departure",
+                        title: "Vlucht opslaan werkt met een profiel",
+                        reason: "Je vlucht hoort bij je profiel: zo telt dezelfde vlucht af op je widget, je Apple Watch en al je andere apparaten.",
+                        onCompleted: {
+                            // Sheet dicht en de vlucht die je wilde bewaren
+                            // meteen opslaan: geen tweede tik nodig.
+                            showAccountForFlight = false
+                            savePendingFlight()
+                        }
+                    )
+                    .padding(16)
+                }
+                .background(Color(.systemGroupedBackground))
+                .presentationDetents([.medium, .large])
+                .presentationDragIndicator(.visible)
+            }
             .task {
                 async let loadAirlines: () = airlineStore.load()
                 async let loadBags: () = bagStore.loadIfNeeded()
@@ -62,9 +118,14 @@ struct HomeView: View {
         .frame(maxWidth: .infinity)
         .frame(height: heroHeight)
         .overlay {
+            // allowsHitTesting(false) is essentieel: .clipped() knipt alleen
+            // het tekenen, niet de hit-test. Op iPad werd deze fill-foto
+            // honderden punten hoger dan de hero en ving hij onzichtbaar
+            // alle tikken onder de hero af (o.a. de maatschappijen-carrousel).
             Image("PhotoWindowWing")
                 .resizable()
                 .scaledToFill()
+                .allowsHitTesting(false)
         }
         .overlay {
             // KLM-stijl donker verloop over de foto
@@ -76,10 +137,11 @@ struct HomeView: View {
                 ],
                 startPoint: .topLeading, endPoint: .bottomTrailing
             )
+            .allowsHitTesting(false)
         }
         .clipped()
-        // Branding bar pinned to top
-        .overlay(alignment: .topLeading) {
+        // Branding bar pinned to top (gecentreerde kolom op brede schermen)
+        .overlay(alignment: .top) {
             HStack {
                 HStack(spacing: 8) {
                     Image(systemName: "suitcase.rolling.fill")
@@ -90,26 +152,47 @@ struct HomeView: View {
                         .foregroundStyle(.white)
                 }
                 Spacer()
-                if !session.firstName.isEmpty {
-                    Text("Hey \(session.firstName) 👋")
-                        .font(.system(size: 13, weight: .semibold, design: .rounded))
-                        .foregroundStyle(.white.opacity(0.9))
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 6)
-                        .glassChrome(in: Capsule(), legacyFill: AnyShapeStyle(.white.opacity(0.15)))
+                // Tik op je naam → profiel (gegevens, eigen tas & vlucht,
+                // uitloggen, account verwijderen). Ook zichtbaar zonder naam.
+                Button {
+                    UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                    showProfile = true
+                } label: {
+                    HStack(spacing: 5) {
+                        if session.firstName.isEmpty {
+                            Image(systemName: "person.circle")
+                                .font(.system(size: 13, weight: .semibold))
+                            Text("Profiel")
+                                .font(.system(size: 13, weight: .semibold, design: .rounded))
+                        } else {
+                            Text("Hey \(session.firstName) 👋")
+                                .font(.system(size: 13, weight: .semibold, design: .rounded))
+                        }
+                        Image(systemName: "chevron.right")
+                            .font(.system(size: 9, weight: .bold))
+                            .opacity(0.7)
+                    }
+                    .foregroundStyle(.white.opacity(0.9))
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 8)
+                    .glassChrome(in: Capsule(), interactive: true, legacyFill: AnyShapeStyle(.white.opacity(0.15)))
+                    .contentShape(Capsule())
                 }
+                .buttonStyle(.plain)
+                .accessibilityLabel("Open mijn profiel")
             }
+            .frame(maxWidth: contentMaxWidth)
             .padding(.horizontal, 20)
             .padding(.top, statusBarHeight + 8)
         }
-        // Headline + CTA pinned to bottom
+        // Headline + CTA pinned to bottom (gecentreerde kolom op brede schermen)
         .overlay(alignment: .bottom) {
             VStack(alignment: .leading, spacing: 16) {
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("Past jouw tas\nin het vliegtuig?")
-                        .font(.system(size: 34, weight: .bold, design: .rounded))
-                        .foregroundStyle(.white)
-                        .lineSpacing(2)
+                VStack(alignment: .leading, spacing: 10) {
+                    // Vertrekbord-animatie: klappert naar de headline zoals
+                    // een Solari-bord op het vliegveld. Eén instantie = één
+                    // klok = één state-write per tick.
+                    SplitFlapText("PAST JOUW TAS\nIN HET VLIEGTUIG?", size: 21)
 
                     Text("Check direct de regels van Ryanair,\nKLM, easyJet en meer.")
                         .font(.system(size: 15, design: .rounded))
@@ -135,6 +218,7 @@ struct HomeView: View {
                 }
                 .buttonStyle(.plain)
             }
+            .frame(maxWidth: contentMaxWidth)
             .padding(.horizontal, 20)
             .padding(.bottom, 28)
         }
@@ -167,22 +251,18 @@ struct HomeView: View {
 
                 if flightStore.isLoading {
                     ProgressView().tint(Theme.sky).scaleEffect(0.8)
-                } else if !flightNumber.isEmpty {
-                    Button { lookupFlight() } label: {
-                        Text("Zoek")
-                            .font(.system(size: 13, weight: .semibold))
-                            .foregroundStyle(.white)
-                            .padding(.horizontal, 14)
-                            .padding(.vertical, 7)
-                            .background(Theme.navyGradient)
-                            .clipShape(Capsule())
-                    }
                 }
             }
             .padding(.horizontal, 14)
             .padding(.vertical, 13)
             .background(Color(.secondarySystemGroupedBackground))
             .clipShape(RoundedRectangle(cornerRadius: 14))
+            .onChange(of: flightNumber) { _, newValue in
+                scheduleFlightAutoLookup(for: newValue)
+            }
+            .onChange(of: flightStore.result?.flightDate) { _, newDate in
+                applyLookedUpDepartureDate(newDate)
+            }
 
             if let result = flightStore.result {
                 if let airline = result.resolvedAirline {
@@ -196,6 +276,9 @@ struct HomeView: View {
                             }
                             Text(airline.name)
                                 .font(.system(size: 14, weight: .semibold, design: .rounded))
+                            if let status = result.statusLabel {
+                                FlightStatusChip(status: status, rawStatus: result.status)
+                            }
                             Spacer()
                             Button {
                                 nav.openChecker(preselected: airline)
@@ -211,47 +294,64 @@ struct HomeView: View {
                         }
                         .padding(12)
 
+                        if result.hasRoute {
+                            Divider().padding(.horizontal, 12)
+                            FlightRouteRow(result: result)
+                                .padding(.horizontal, 12)
+                                .padding(.vertical, 10)
+                        }
+
                         Divider().padding(.horizontal, 12)
 
-                        // Bewaar de vlucht voor de aftelwidget op home/lockscreen.
-                        HStack(spacing: 8) {
-                            Image(systemName: "calendar")
-                                .font(.system(size: 13))
-                                .foregroundStyle(Theme.navy)
-                            Text("Vertrek")
-                                .font(.system(size: 12, weight: .medium, design: .rounded))
-                                .foregroundStyle(Theme.textSecondary)
-                            DatePicker("", selection: $departureDate, in: Date()..., displayedComponents: .date)
-                                .labelsHidden()
-                            Spacer()
-                            Button {
-                                SharedFlightStore.saveFlight(
-                                    number: result.flightNumber ?? flightNumber.trimmingCharacters(in: .whitespaces).uppercased(),
-                                    airlineName: airline.name,
-                                    airlineSlug: airline.slug,
-                                    departure: departureDate
-                                )
-                                UINotificationFeedbackGenerator().notificationOccurred(.success)
-                                withAnimation(.spring(response: 0.3)) { flightSaved = true }
-                            } label: {
-                                HStack(spacing: 4) {
-                                    Image(systemName: flightSaved ? "checkmark" : "plus.square.on.square")
-                                        .font(.system(size: 11, weight: .bold))
-                                    Text(flightSaved ? "In widget" : "Zet in widget")
-                                        .font(.system(size: 12, weight: .semibold, design: .rounded))
+                        // Bewaar de vlucht in je vluchtenlijst (zie profiel).
+                        // Twee rijen: de datum+tijd-picker en de knop passen
+                        // niet comfortabel samen op één regel.
+                        VStack(spacing: 10) {
+                            HStack(spacing: 8) {
+                                Image(systemName: "calendar")
+                                    .font(.system(size: 13))
+                                    .foregroundStyle(Theme.navy)
+                                Text("Vertrek")
+                                    .font(.system(size: 12, weight: .medium, design: .rounded))
+                                    .foregroundStyle(Theme.textSecondary)
+                                if flightStore.result?.flightDate != nil {
+                                    Label("Automatisch ingevuld", systemImage: "wand.and.stars")
+                                        .font(.system(size: 9, weight: .semibold, design: .rounded))
+                                        .foregroundStyle(Theme.green)
                                 }
+                                Spacer()
+                                DatePicker("", selection: $departureDate, in: Date()..., displayedComponents: [.date, .hourAndMinute])
+                                    .labelsHidden()
+                            }
+
+                            Button {
+                                // Accountgebonden: de vlucht wordt aan je
+                                // profiel gekoppeld en via iCloud gesynct
+                                // naar widget, Watch en andere apparaten.
+                                guard session.hasAccount else {
+                                    showAccountForFlight = true
+                                    return
+                                }
+                                savePendingFlight()
+                            } label: {
+                                HStack(spacing: 6) {
+                                    Image(systemName: flightSaved ? "checkmark" : "plus.square.on.square")
+                                        .font(.system(size: 12, weight: .bold))
+                                    Text(flightSaved ? "Vlucht opgeslagen" : "Vlucht opslaan")
+                                        .font(.system(size: 13, weight: .semibold, design: .rounded))
+                                }
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 11)
                                 .foregroundStyle(flightSaved ? Theme.green : .white)
-                                .padding(.horizontal, 10)
-                                .padding(.vertical, 7)
                                 .background(flightSaved
                                     ? AnyShapeStyle(Theme.green.opacity(0.15))
                                     : AnyShapeStyle(Theme.navyGradient))
-                                .clipShape(Capsule())
+                                .clipShape(RoundedRectangle(cornerRadius: 12))
                             }
                             .buttonStyle(.plain)
                         }
                         .padding(.horizontal, 12)
-                        .padding(.vertical, 9)
+                        .padding(.vertical, 10)
                     }
                     .background(Theme.green.opacity(0.08))
                     .clipShape(RoundedRectangle(cornerRadius: 12))
@@ -260,29 +360,41 @@ struct HomeView: View {
                             .strokeBorder(Theme.green.opacity(0.2), lineWidth: 1)
                     )
                 } else if let name = result.rawAirlineName {
-                    HStack(spacing: 10) {
-                        Image(systemName: "info.circle.fill").foregroundStyle(Theme.yellow)
-                        VStack(alignment: .leading, spacing: 1) {
-                            Text(name)
-                                .font(.system(size: 14, weight: .semibold, design: .rounded))
-                            Text("Niet in onze database — kies handmatig")
-                                .font(.system(size: 11))
-                                .foregroundStyle(Theme.textSecondary)
-                        }
-                        Spacer()
-                        Button {
-                            nav.openChecker(preselected: nil)
-                        } label: {
-                            HStack(spacing: 4) {
-                                Text("Kies")
-                                    .font(.system(size: 13, weight: .semibold))
-                                Image(systemName: "arrow.right")
-                                    .font(.system(size: 11, weight: .semibold))
+                    VStack(spacing: 0) {
+                        HStack(spacing: 10) {
+                            Image(systemName: "info.circle.fill").foregroundStyle(Theme.yellow)
+                            VStack(alignment: .leading, spacing: 1) {
+                                Text(name)
+                                    .font(.system(size: 14, weight: .semibold, design: .rounded))
+                                Text("Niet in onze database, kies handmatig")
+                                    .font(.system(size: 11))
+                                    .foregroundStyle(Theme.textSecondary)
                             }
-                            .foregroundStyle(Theme.navy)
+                            if let status = result.statusLabel {
+                                FlightStatusChip(status: status, rawStatus: result.status)
+                            }
+                            Spacer()
+                            Button {
+                                nav.openChecker(preselected: nil)
+                            } label: {
+                                HStack(spacing: 4) {
+                                    Text("Kies")
+                                        .font(.system(size: 13, weight: .semibold))
+                                    Image(systemName: "arrow.right")
+                                        .font(.system(size: 11, weight: .semibold))
+                                }
+                                .foregroundStyle(Theme.navy)
+                            }
+                        }
+                        .padding(12)
+
+                        if result.hasRoute {
+                            Divider().padding(.horizontal, 12)
+                            FlightRouteRow(result: result)
+                                .padding(.horizontal, 12)
+                                .padding(.vertical, 10)
                         }
                     }
-                    .padding(12)
                     .background(Theme.yellow.opacity(0.08))
                     .clipShape(RoundedRectangle(cornerRadius: 12))
                     .overlay(
@@ -321,28 +433,44 @@ struct HomeView: View {
                             .font(.system(size: 11, weight: .semibold))
                     }
                     .foregroundStyle(Theme.navy)
+                    // Ruimer raakvlak dan alleen de tekst zelf
+                    .padding(.vertical, 8)
+                    .padding(.leading, 12)
+                    .contentShape(Rectangle())
                 }
+                .buttonStyle(.plain)
             }
 
-            if airlineStore.isLoading {
+            if airlineStore.isLoading && airlineStore.airlines.isEmpty {
                 HStack(spacing: 10) {
                     ForEach(0..<3, id: \.self) { _ in
                         RoundedRectangle(cornerRadius: 18)
                             .fill(Color(.systemBackground))
-                            .frame(maxWidth: .infinity)
-                            .frame(height: 90)
+                            .frame(width: 118, height: 106)
                             .shadow(color: .black.opacity(0.05), radius: 6, x: 0, y: 2)
                     }
+                    Spacer()
                 }
             } else {
-                HStack(spacing: 10) {
-                    ForEach(airlineStore.airlines.prefix(3)) { airline in
-                        AirlineCard(airline: airline) {
-                            UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                            nav.openChecker(preselected: airline)
+                // Carrousel die direct naar de detailpagina pusht, met dezelfde
+                // zoom-overgang als de maatschappijenpagina. Geen cross-tab
+                // handoff meer: dat was de bron van de haperende tikken.
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 10) {
+                        ForEach(airlineStore.airlines.prefix(10)) { airline in
+                            Button {
+                                UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                selectedAirline = airline
+                            } label: {
+                                AirlineCard(airline: airline)
+                            }
+                            .buttonStyle(.plain)
                         }
                     }
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 4)
                 }
+                .padding(.horizontal, -16)
             }
         }
     }
@@ -361,6 +489,7 @@ struct HomeView: View {
                     .frame(height: 110)
                     .clipped()
                     .clipShape(RoundedRectangle(cornerRadius: 18))
+                    .allowsHitTesting(false)
 
                 LinearGradient(
                     colors: [.black.opacity(0.55), .black.opacity(0.0)],
@@ -371,7 +500,7 @@ struct HomeView: View {
 
                 HStack {
                     VStack(alignment: .leading, spacing: 3) {
-                        Text("Aanbevolen tassen")
+                        Text("Aanbevolen tassen & koffers")
                             .font(.system(size: 17, weight: .bold, design: .rounded))
                             .foregroundStyle(.white)
                         HStack(spacing: 4) {
@@ -409,13 +538,13 @@ struct HomeView: View {
                         ForEach(0..<5, id: \.self) { _ in ShopCarouselSkeletonCard() }
                     } else {
                         ForEach(bagStore.bags.prefix(8)) { bag in
-                            NavigationLink(destination: BagDetailView(bagId: bag.id)
-                                .zoomDestination(id: bag.id, in: zoomNamespace)) {
+                            Button {
+                                UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                selectedBagId = bag.id
+                            } label: {
                                 ShopCarouselCard(bag: bag)
                             }
-                            .buttonStyle(.pressableCard)
-                            .zoomSource(id: bag.id, in: zoomNamespace)
-                            .carouselTransition()
+                            .buttonStyle(.plain)
                         }
                         if !bagStore.bags.isEmpty {
                             ViewAllShopCard { nav.openShop() }
@@ -441,6 +570,7 @@ struct HomeView: View {
                 .frame(height: 260)
                 .clipped()
                 .clipShape(RoundedRectangle(cornerRadius: 22))
+                .allowsHitTesting(false)
 
             // Donkere overlay
             LinearGradient(
@@ -448,6 +578,7 @@ struct HomeView: View {
                 startPoint: .bottom, endPoint: .top
             )
             .clipShape(RoundedRectangle(cornerRadius: 22))
+            .allowsHitTesting(false)
 
             VStack(alignment: .leading, spacing: 16) {
                 Text("Hoe werkt het?")
@@ -467,6 +598,101 @@ struct HomeView: View {
                 }
             }
             .padding(20)
+        }
+    }
+
+    // MARK: - Handige acties (onderaan Home)
+
+    @State private var showReminderSheet = false
+    @State private var showBaggageGuide = false
+    @State private var showBagsOverview = false
+    @State private var showPackingAlarms = false
+
+    private var quickActionsSection: some View {
+        VStack(spacing: 14) {
+            HStack {
+                Text("Handige acties")
+                    .font(.system(size: 18, weight: .bold, design: .rounded))
+                    .foregroundStyle(Theme.textPrimary)
+                Spacer()
+            }
+
+            LazyVGrid(columns: [GridItem(.flexible(), spacing: 10), GridItem(.flexible(), spacing: 10)], spacing: 10) {
+                QuickActionCard(
+                    icon: "suitcase.rolling.fill",
+                    color: Theme.yellow,
+                    title: "Passen mijn tassen?",
+                    subtitle: "Al je tassen langs de regels"
+                ) {
+                    showBagsOverview = true
+                }
+                QuickActionCard(
+                    icon: "checkmark.seal.fill",
+                    color: Theme.navy,
+                    title: "Wat mag mee?",
+                    subtitle: "Vloeistoffen, powerbanks & meer"
+                ) {
+                    showEURules = true
+                }
+                QuickActionCard(
+                    icon: "alarm.fill",
+                    color: Theme.red,
+                    title: "Douane info",
+                    subtitle: "Belastingvrij importeren"
+                ) {
+                    showCustomsInfo = true
+                }
+                QuickActionCard(
+                    icon: "bell.badge.fill",
+                    color: Theme.orange,
+                    title: "Bagage kwijt?",
+                    subtitle: "Je rechten & procedure"
+                ) {
+                    showBaggageIssues = true
+                }
+                QuickActionCard(
+                    icon: "checkmark.shield.fill",
+                    color: Theme.green,
+                    title: "Check je tas",
+                    subtitle: "Past hij in de cabine?"
+                ) {
+                    nav.openChecker(preselected: nil)
+                }
+                QuickActionCard(
+                    icon: "airport.fill",
+                    color: Theme.sky,
+                    title: "Luchthavens",
+                    subtitle: "Info per vliegveld"
+                ) {
+                    showAirportSelection = true
+                }
+            }
+        }
+        .sheet(isPresented: $showBaggageGuide) {
+            BaggageGuideView()
+        }
+        .sheet(isPresented: $showBagsOverview) {
+            MyBagsOverviewView()
+        }
+        .sheet(isPresented: $showPackingAlarms) {
+            PackingAlarmsSheet()
+        }
+        .sheet(isPresented: $showReminderSheet) {
+            DepartureReminderSheet()
+                .presentationDetents([.medium])
+                .presentationDragIndicator(.visible)
+        }
+        .sheet(isPresented: $showEURules) {
+            EURulesView()
+        }
+        .sheet(isPresented: $showCustomsInfo) {
+            CustomsInfoView()
+        }
+        .sheet(isPresented: $showBaggageIssues) {
+            BaggageIssuesView()
+        }
+        .sheet(isPresented: $showAirportSelection) {
+            AirportSelectionView()
         }
     }
 
@@ -506,11 +732,297 @@ struct HomeView: View {
         .buttonStyle(.plain)
     }
 
+    /// Slaat de opgezochte vlucht op — inclusief alle route-info uit de
+    /// lookup — als een nieuwe vlucht in je vluchtenlijst. De eerstvolgende
+    /// vertrekkende vlucht verschijnt automatisch op widget/Live Activity/watch.
+    private func savePendingFlight() {
+        guard let result = flightStore.result,
+              let airline = result.resolvedAirline else { return }
+        FlightsStore.shared.upsert(SavedFlightRecord(
+            number: result.flightNumber ?? flightNumber.trimmingCharacters(in: .whitespaces).uppercased(),
+            airlineName: airline.name,
+            airlineSlug: airline.slug,
+            airlineLogoUrl: airline.bestLogoUrl ?? result.airlineLogoUrl,
+            flightIcao: result.flightIcao,
+            departure: departureDate,
+            departureIata: result.departureIata,
+            departureAirport: result.departureAirport,
+            arrivalIata: result.arrivalIata,
+            arrivalAirport: result.arrivalAirport,
+            flightDate: result.flightDate,
+            status: result.status
+        ))
+        UINotificationFeedbackGenerator().notificationOccurred(.success)
+        withAnimation(.spring(response: 0.3)) { flightSaved = true }
+    }
+
     private func lookupFlight() {
+        flightSearchTask?.cancel()
         let t = flightNumber.trimmingCharacters(in: .whitespaces)
         guard !t.isEmpty else { return }
         flightSaved = false
         Task { await flightStore.lookup(t) }
+    }
+
+    /// Zoekt vanzelf, kort na het typen — geen tik op "Zoek" meer nodig.
+    private func scheduleFlightAutoLookup(for value: String) {
+        flightSearchTask?.cancel()
+        flightSaved = false
+        let trimmed = value.trimmingCharacters(in: .whitespaces)
+        guard trimmed.count >= 4 else {
+            flightStore.result = nil
+            flightStore.error = nil
+            return
+        }
+        flightSearchTask = Task {
+            try? await Task.sleep(nanoseconds: 450_000_000)
+            guard !Task.isCancelled else { return }
+            await flightStore.lookup(trimmed)
+        }
+    }
+
+    /// Vult de vertrekdatum aan uit de match; het tijdstip (niet in de API)
+    /// blijft staan wat er al stond. Een datum in het verleden negeren we.
+    private func applyLookedUpDepartureDate(_ raw: String?) {
+        guard let raw else { return }
+        let iso = ISO8601DateFormatter()
+        iso.formatOptions = [.withFullDate]
+        guard let parsed = iso.date(from: raw) else { return }
+        let cal = Calendar.current
+        var comps = cal.dateComponents([.year, .month, .day], from: parsed)
+        let time = cal.dateComponents([.hour, .minute], from: departureDate)
+        comps.hour = time.hour
+        comps.minute = time.minute
+        if let combined = cal.date(from: comps), combined > .now {
+            withAnimation(.spring(response: 0.3)) { departureDate = combined }
+        }
+    }
+}
+
+// MARK: - Vluchtroute & status
+
+/// Boardingpass-achtige routeregel: IATA-codes groot, luchthavens klein,
+/// vliegtuigje ertussen. Alle info komt live uit de flight-lookup.
+private struct FlightRouteRow: View {
+    let result: FlightLookupResponse
+
+    var body: some View {
+        HStack(alignment: .center, spacing: 12) {
+            endpoint(code: result.departureIata, airport: result.departureAirport, alignment: .leading)
+
+            VStack(spacing: 2) {
+                Image(systemName: "airplane")
+                    .font(.system(size: 13, weight: .semibold))
+                    .foregroundStyle(Theme.sky)
+                if let date = formattedDate {
+                    Text(date)
+                        .font(.system(size: 9, weight: .medium, design: .rounded))
+                        .foregroundStyle(Theme.textSecondary)
+                }
+            }
+            .frame(maxWidth: .infinity)
+
+            endpoint(code: result.arrivalIata, airport: result.arrivalAirport, alignment: .trailing)
+        }
+    }
+
+    private func endpoint(code: String?, airport: String?, alignment: HorizontalAlignment) -> some View {
+        VStack(alignment: alignment, spacing: 1) {
+            Text(code ?? "—")
+                .font(.system(size: 22, weight: .black, design: .rounded))
+                .foregroundStyle(Theme.navy)
+                .kerning(1)
+            if let airport {
+                Text(airport)
+                    .font(.system(size: 10, weight: .medium, design: .rounded))
+                    .foregroundStyle(Theme.textSecondary)
+                    .lineLimit(1)
+            }
+        }
+    }
+
+    private var formattedDate: String? {
+        guard let raw = result.flightDate else { return nil }
+        let iso = ISO8601DateFormatter()
+        iso.formatOptions = [.withFullDate]
+        guard let date = iso.date(from: raw) else { return raw }
+        let fmt = DateFormatter()
+        fmt.locale = Locale(identifier: "nl_NL")
+        fmt.dateFormat = "d MMM"
+        return fmt.string(from: date)
+    }
+}
+
+private struct FlightStatusChip: View {
+    let status: String
+    let rawStatus: String?
+
+    private var color: Color {
+        switch rawStatus {
+        case "active":                                       return Theme.green
+        case "landed":                                       return Theme.textSecondary
+        case "cancelled", "incident", "diverted", "delayed": return Theme.red
+        default:                                             return Theme.sky
+        }
+    }
+
+    var body: some View {
+        Text(status)
+            .font(.system(size: 10, weight: .bold, design: .rounded))
+            .foregroundStyle(color)
+            .padding(.horizontal, 8)
+            .padding(.vertical, 4)
+            .background(color.opacity(0.12))
+            .clipShape(Capsule())
+    }
+}
+
+// MARK: - Handige actie-kaart
+
+private struct QuickActionCard: View {
+    let icon: String
+    let color: Color
+    let title: String
+    let subtitle: String
+    let action: () -> Void
+
+    var body: some View {
+        Button {
+            UIImpactFeedbackGenerator(style: .light).impactOccurred()
+            action()
+        } label: {
+            VStack(alignment: .leading, spacing: 8) {
+                ZStack {
+                    RoundedRectangle(cornerRadius: 12)
+                        .fill(color.opacity(0.12))
+                        .frame(width: 38, height: 38)
+                    Image(systemName: icon)
+                        .font(.system(size: 16, weight: .semibold))
+                        .foregroundStyle(color)
+                }
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(title)
+                        .font(.system(size: 12, weight: .bold, design: .rounded))
+                        .foregroundStyle(Theme.textPrimary)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.8)
+                    Text(subtitle)
+                        .font(.system(size: 10, design: .rounded))
+                        .foregroundStyle(Theme.textSecondary)
+                        .lineLimit(2)
+                }
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(12)
+            .background(Color(.systemBackground))
+            .clipShape(RoundedRectangle(cornerRadius: 16))
+            .shadow(color: .black.opacity(0.06), radius: 8, x: 0, y: 3)
+        }
+        .buttonStyle(.plain)
+    }
+}
+
+// MARK: - Vertrek-reminder zonder vluchtnummer
+
+/// Zet een aftelling + notificaties zonder dat er een vluchtnummer nodig is.
+/// Slaat op via dezelfde SharedFlightStore als de vluchtzoeker, dus widget,
+/// Live Activity en Siri-intent werken er automatisch mee.
+private struct DepartureReminderSheet: View {
+    @Environment(\.dismiss) private var dismiss
+    @ObservedObject private var session = UserSession.shared
+    @State private var label = ""
+    @State private var departure = Calendar.current.date(byAdding: .day, value: 1, to: .now) ?? .now
+    @State private var saved = false
+
+    var body: some View {
+        NavigationStack {
+            if session.hasAccount {
+                reminderContent
+            } else {
+                // Accountgebonden: reminders zijn persoonlijk (naam in de
+                // notificatie) en syncen via iCloud naar al je apparaten.
+                ScrollView {
+                    AccountRequiredView(
+                        icon: "bell.badge.fill",
+                        title: "Reminders werken met een profiel",
+                        reason: "Je vertrekreminder hoort bij je profiel: de notificaties zijn persoonlijk en dezelfde aftelling verschijnt op je widget, je Apple Watch en al je andere apparaten."
+                    )
+                    .padding(16)
+                }
+                .background(Color(.systemGroupedBackground))
+                .navigationTitle("Vertrekreminder")
+                .navigationBarTitleDisplayMode(.inline)
+                .toolbar {
+                    ToolbarItem(placement: .topBarTrailing) {
+                        Button("Sluit") { dismiss() }
+                    }
+                }
+            }
+        }
+    }
+
+    private var reminderContent: some View {
+        Group {
+            VStack(alignment: .leading, spacing: 18) {
+                Text("Geen vluchtnummer? Geen probleem: kies je vertrekmoment en we herinneren je op tijd aan je handbagage.")
+                    .font(.system(size: 13, design: .rounded))
+                    .foregroundStyle(Theme.textSecondary)
+
+                VStack(alignment: .leading, spacing: 6) {
+                    Text("Naam (optioneel)")
+                        .font(.system(size: 12, weight: .semibold, design: .rounded))
+                        .foregroundStyle(Theme.textSecondary)
+                    TextField("Bijv. Vakantie Ibiza", text: $label)
+                        .font(.system(size: 15, design: .rounded))
+                        .padding(12)
+                        .background(Color(.secondarySystemGroupedBackground))
+                        .clipShape(RoundedRectangle(cornerRadius: 12))
+                }
+
+                VStack(alignment: .leading, spacing: 6) {
+                    Text("Vertrek")
+                        .font(.system(size: 12, weight: .semibold, design: .rounded))
+                        .foregroundStyle(Theme.textSecondary)
+                    DatePicker("", selection: $departure, in: Date()..., displayedComponents: [.date, .hourAndMinute])
+                        .labelsHidden()
+                }
+
+                Spacer()
+
+                Button {
+                    let name = label.trimmingCharacters(in: .whitespaces)
+                    FlightsStore.shared.upsert(SavedFlightRecord(
+                        number: name.isEmpty ? "Mijn vlucht" : name,
+                        departure: departure
+                    ))
+                    UINotificationFeedbackGenerator().notificationOccurred(.success)
+                    withAnimation(.spring(response: 0.3)) { saved = true }
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.9) { dismiss() }
+                } label: {
+                    HStack(spacing: 8) {
+                        Image(systemName: saved ? "checkmark" : "bell.badge.fill")
+                        Text(saved ? "Reminder staat aan" : "Zet reminder")
+                            .font(.system(size: 16, weight: .semibold, design: .rounded))
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 15)
+                    .background(saved ? AnyShapeStyle(Theme.green) : AnyShapeStyle(Theme.navyGradient))
+                    .foregroundStyle(.white)
+                    .clipShape(RoundedRectangle(cornerRadius: 16))
+                }
+                .buttonStyle(.plain)
+                .disabled(saved)
+            }
+            .padding(20)
+            .background(Color(.systemGroupedBackground))
+            .navigationTitle("Vertrekreminder")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("Sluit") { dismiss() }
+                }
+            }
+        }
     }
 }
 
@@ -518,28 +1030,23 @@ struct HomeView: View {
 
 private struct AirlineCard: View {
     let airline: Airline
-    let onTap: () -> Void
 
     var body: some View {
-        Button(action: onTap) {
-            VStack(spacing: 8) {
-                AirlineLogo(airline: airline, size: 50)
-                Text(airline.name)
-                    .font(.system(size: 11, weight: .medium, design: .rounded))
-                    .foregroundStyle(Theme.textPrimary)
-                    .multilineTextAlignment(.center)
-                    .lineLimit(2)
-                    .minimumScaleFactor(0.8)
-            }
-            .frame(maxWidth: .infinity)
-            .padding(.vertical, 16)
-            .padding(.horizontal, 6)
-            .background(Color(.systemBackground))
-            .clipShape(RoundedRectangle(cornerRadius: 18))
-            .shadow(color: .black.opacity(0.07), radius: 8, x: 0, y: 3)
+        VStack(spacing: 8) {
+            AirlineLogo(airline: airline, size: 50)
+            Text(airline.name)
+                .font(.system(size: 11, weight: .medium, design: .rounded))
+                .foregroundStyle(Theme.textPrimary)
+                .multilineTextAlignment(.center)
+                .lineLimit(2)
+                .minimumScaleFactor(0.8)
         }
-        .buttonStyle(.plain)
-        .accessibilityLabel("Controleer handbagage bij \(airline.name)")
+        .frame(width: 118, height: 106)
+        .background(Color(.systemBackground))
+        .clipShape(RoundedRectangle(cornerRadius: 18))
+        .shadow(color: .black.opacity(0.07), radius: 8, x: 0, y: 3)
+        .contentShape(RoundedRectangle(cornerRadius: 18))
+        .accessibilityLabel("Bekijk bagageregels van \(airline.name)")
     }
 }
 
@@ -640,10 +1147,10 @@ private struct ViewAllShopCard: View {
                         .foregroundStyle(Theme.navy)
                 }
                 VStack(spacing: 3) {
-                    Text("Bekijk alle")
+                    Text("Bekijk alles")
                         .font(.system(size: 13, weight: .bold, design: .rounded))
                         .foregroundStyle(Theme.navy)
-                    Text("tassen")
+                    Text("in de shop")
                         .font(.system(size: 12, design: .rounded))
                         .foregroundStyle(Theme.textSecondary)
                 }
@@ -662,7 +1169,7 @@ private struct ViewAllShopCard: View {
             )
         }
         .buttonStyle(.plain)
-        .accessibilityLabel("Bekijk alle tassen in de shop")
+        .accessibilityLabel("Bekijk alle tassen en koffers in de shop")
     }
 }
 

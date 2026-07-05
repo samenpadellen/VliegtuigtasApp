@@ -6,5 +6,9 @@
 	<array>
 		<string>group.com.vliegtuigtas.app</string>
 	</array>
+	<!-- Expliciete id (niet $(CFBundleIdentifier)): de watch-app deelt
+	     dezelfde iCloud key-value store en heeft een andere bundle-id. -->
+	<key>com.apple.developer.ubiquity-kvstore-identifier</key>
+	<string>$(TeamIdentifierPrefix)com.vliegtuigtas.app</string>
 </dict>
 </plist>

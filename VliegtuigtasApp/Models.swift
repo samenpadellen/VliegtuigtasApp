@@ -439,36 +439,59 @@ struct CheckResponse: Decodable, Equatable {
 // MARK: - Flight lookup
 
 struct FlightLookupResponse: Decodable {
-    /// Raw Aviationstack airline info — may lack id/slug
-    let rawAirline: RawFlightAirline?
-    let flightNumber: String?
+    let flightIata: String?
+    let flightIcao: String?
+    let airlineName: String?
+    let airlineIata: String?
+    let departureAirport: String?
+    let departureIata: String?
+    let arrivalAirport: String?
+    let arrivalIata: String?
+    let flightDate: String?      // "2026-07-02"
+    let status: String?          // scheduled | active | landed | cancelled | ...
     let airlineLogoUrl: String?
     /// Full matched Airline from our database (has id, slug, variants)
     let matchedAirline: Airline?
 
     enum CodingKeys: String, CodingKey {
-        case rawAirline     = "airline"
-        case flightNumber   = "flight_number"
-        case airlineLogoUrl = "airline_logo_url"
-        case matchedAirline = "matched_airline"
+        case flightIata       = "flight_iata"
+        case flightIcao       = "flight_icao"
+        case airlineName      = "airline_name"
+        case airlineIata      = "airline_iata"
+        case departureAirport = "departure_airport"
+        case departureIata    = "departure_iata"
+        case arrivalAirport   = "arrival_airport"
+        case arrivalIata      = "arrival_iata"
+        case flightDate       = "flight_date"
+        case status
+        case airlineLogoUrl   = "airline_logo_url"
+        case matchedAirline   = "matched_airline"
     }
 
     /// Best resolved airline — matched_airline has full data incl. variants
     var resolvedAirline: Airline? { matchedAirline }
 
     /// Display name when matched_airline is nil
-    var rawAirlineName: String? { rawAirline?.name }
-}
+    var rawAirlineName: String? { airlineName }
 
-/// Lightweight airline from Aviationstack — only name is guaranteed
-struct RawFlightAirline: Decodable {
-    let name: String?
-    let iataCode: String?
+    var flightNumber: String? { flightIata }
 
-    enum CodingKeys: String, CodingKey {
-        case name
-        case iataCode = "iata_code"
+    var hasRoute: Bool { departureIata != nil && arrivalIata != nil }
+
+    /// Nederlands label voor de vluchtstatus van Aviationstack.
+    var statusLabel: String? {
+        switch status {
+        case "scheduled": return "Gepland"
+        case "active":    return "In de lucht"
+        case "landed":    return "Geland"
+        case "cancelled": return "Geannuleerd"
+        case "incident":  return "Incident"
+        case "diverted":  return "Omgeleid"
+        case "delayed":   return "Vertraagd"
+        default:          return nil
+        }
     }
+
 }
 
 // MARK: - Lead
@@ -511,3 +534,127 @@ struct APIResponse<T: Decodable>: Decodable {
 // MARK: - Verdict
 
 enum Verdict { case ok, warning, fail }
+
+// MARK: - Airport
+
+struct Airport: Identifiable, Codable, Hashable {
+    let id: String
+    let iata: String
+    let name: String
+    let city: String
+    let type: String // "Hub", "Low-cost hub", "Regional", etc.
+    let airlineExamples: [String]? // Array of airline names that fly there
+
+    // Security features
+    let has3DCtScan: Bool?
+    let fluidsMustBeRemoved: Bool?
+    let electronicsOutOfBag: Bool?
+    let jewelryMustBeRemoved: Bool?
+
+    // Facilities
+    let hasBaggageLockers: Bool?
+    let fastTrackPrice: Double? // in EUR
+    let recommendedArrivalMinutes: Int? // minutes before departure
+    let recommendedArrivalMinutesHighSeason: Int?
+    let airportOpensAt: String? // time like "04:30"
+
+    // Special notes
+    let specialNotes: String?
+    let tips: [String]?
+    let warningMessages: [String]?
+
+    // Links
+    let officialUrl: String?
+}
+
+// MARK: - EU Rules
+
+struct EULuggageRules: Identifiable, Codable {
+    let id: String = "eu-rules"
+
+    struct FluidRule: Codable {
+        let title: String
+        let description: String
+        let maxMlPerBottle: Int
+        let maxTotalLiters: Double
+        let examples: [String]
+    }
+
+    struct PowerBankRule: Codable {
+        let title: String
+        let maxWhWithoutPermission: Int
+        let maxWhWithPermission: Int
+        let maxUnitsWithPermission: Int
+        let details: String
+    }
+
+    struct ProhibitedItem: Codable {
+        let name: String
+        let category: String // "always", "handbagage-only", "checked-only"
+    }
+
+    let fluidRule: FluidRule
+    let powerBankRule: PowerBankRule
+    let ecigaretteRule: String
+    let sharpObjectsRule: String
+    let prohibitedItems: [ProhibitedItem]
+    let checkedBaggageLiquids: String
+}
+
+// MARK: - Customs
+
+struct CustomsInfo: Identifiable, Codable {
+    let id: String = "customs"
+
+    struct TobaccoLimits: Codable {
+        let cigarettes: Int
+        let shaggingTobacco: Int
+        let cigarillos: Int
+        let cigars: Int
+    }
+
+    struct AlcoholLimits: Codable {
+        let strongSpirits: String // "1 liter"
+        let sparklingWine: String // "2 liters"
+        let notes: String?
+    }
+
+    let dutyfreeImportLimit: Double // EUR 430
+    let landImportLimit: Double // EUR 300
+    let tobacco: TobaccoLimits
+    let alcohol: AlcoholLimits
+    let btw: String? // "21%" for NL, etc
+    let cashDeclarationThreshold: Double // EUR 10000
+    let restrictedItems: [String]
+}
+
+// MARK: - Baggage Issues
+
+struct BaggageIssueInfo: Identifiable, Codable {
+    let id: String = "baggage-issues"
+
+    struct Claim: Codable {
+        let condition: String // "Damaged", "Delayed", "Lost"
+        let daysToReport: Int
+        let daysToClaimAfterLoss: Int? // days until can claim as lost
+        let maxCompensationEur: Double
+        let description: String
+    }
+
+    let immediateReporting: String
+    let pirForm: String
+    let claims: [Claim]
+    let baggageRedelivery: String
+    let tips: [String]
+}
+
+// MARK: - Alert
+
+struct AlertMessage: Identifiable, Codable, Hashable {
+    let id: String
+    let title: String
+    let description: String
+    let type: String // "info", "warning", "alert"
+    let airport: String? // nil = applies to all
+    let expiryDate: String? // ISO date string
+}

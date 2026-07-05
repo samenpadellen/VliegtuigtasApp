@@ -1,29 +1,69 @@
 import SwiftUI
 
+private var airlineDetailStatusBarHeight: CGFloat {
+    UIApplication.shared.connectedScenes
+        .compactMap { $0 as? UIWindowScene }
+        .first?.windows.first?.safeAreaInsets.top ?? 50
+}
+
 struct AirlineDetailView: View {
     let airline: Airline
+    @EnvironmentObject private var nav: AppNavigator
     @State private var detail: Airline?
+    @State private var matchingBags: [Bag] = []
+    @State private var selectedBagId: String?
     @State private var isLoading = false
     @State private var navigateToCheck = false
+    // Merkkleur uit het logo: kleurt de hero en accenten subtiel mee met de
+    // maatschappij (KLM-blauw, Ryanair-navy, Transavia-groen …).
+    @State private var brandTint: Color?
+    @StateObject private var logoLoader = ImageLoader()
+    @Environment(\.dismiss) private var dismiss
+
+    private var accent: Color { brandTint ?? Theme.sky }
 
     var display: Airline { detail ?? airline }
 
     var body: some View {
-        ScrollView(showsIndicators: false) {
-            VStack(spacing: 0) {
-                heroHeader
-                content
-                    .padding(.horizontal, 16)
-                    .padding(.bottom, 40)
+        ZStack(alignment: .top) {
+            ScrollView(showsIndicators: false) {
+                VStack(spacing: 0) {
+                    heroHeader
+                    content
+                        .padding(.horizontal, 16)
+                        .padding(.bottom, 40)
+                }
+            }
+            .ignoresSafeArea(edges: .top)
+            .background(Color(.systemGroupedBackground))
+
+            // Zwevende terugknop: de merkkleur-gradient loopt nu helemaal
+            // door tot boven, dus de knop zweeft los over de hero heen in
+            // plaats van in een systeem-navigatiebalk te zitten.
+            HStack {
+                FloatingBackButton { dismiss() }
+                Spacer()
+            }
+            .padding(.horizontal, 20)
+            .padding(.top, airlineDetailStatusBarHeight + 10)
+        }
+        .navigationBarHidden(true)
+        .task { await loadDetail() }
+        .onAppear {
+            if let url = display.bestLogoUrl { logoLoader.load(url) }
+        }
+        .onReceive(logoLoader.$image) { image in
+            guard let color = image?.brandColor else { return }
+            withAnimation(.easeInOut(duration: 0.5)) {
+                brandTint = Color(uiColor: color)
             }
         }
-        .background(Color(.systemGroupedBackground))
-        .navigationBarTitleDisplayMode(.inline)
-        .navigationTitle("")
-        .task { await loadDetail() }
         .overlay { if isLoading && detail == nil { LoadingOverlay() } }
         .navigationDestination(isPresented: $navigateToCheck) {
             BaggageCheckView(preselected: display)
+        }
+        .navigationDestination(item: $selectedBagId) { bagId in
+            BagDetailView(bagId: bagId)
         }
     }
 
@@ -31,21 +71,37 @@ struct AirlineDetailView: View {
 
     private var heroHeader: some View {
         ZStack(alignment: .bottom) {
-            // Background gradient
+            // Achtergrondverloop in de merkkleur van de maatschappij, tot
+            // helemaal boven de statusbalk door (geen kale naad meer).
             LinearGradient(
-                colors: [Theme.sky.opacity(0.15), Color(.systemGroupedBackground)],
+                colors: [accent.opacity(0.16), Color(.systemGroupedBackground)],
                 startPoint: .top, endPoint: .bottom
             )
-            .frame(height: 200)
+            .frame(height: 200 + airlineDetailStatusBarHeight)
 
             VStack(spacing: 12) {
-                // Logo
+                // Logo als app-icoon-tegel: vierkante logo's (met eigen
+                // achtergrondvlak, zoals TUI) krijgen ronde hoeken en vullen
+                // de tegel netjes; brede wordmarks passen er ook gewoon in.
                 ZStack {
-                    Circle()
+                    RoundedRectangle(cornerRadius: 24)
                         .fill(Color(.systemBackground))
-                        .frame(width: 88, height: 88)
+                        .frame(width: 96, height: 96)
                         .shadow(color: .black.opacity(0.08), radius: 12, x: 0, y: 4)
-                    AirlineLogo(airline: display, size: 64)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 24)
+                                .strokeBorder(accent.opacity(0.22), lineWidth: 1)
+                        )
+
+                    if display.bestLogoUrl != nil {
+                        AuthorisedImage(urlString: display.bestLogoUrl)
+                            .frame(width: 66, height: 66)
+                            .clipShape(RoundedRectangle(cornerRadius: 14))
+                    } else {
+                        Text(display.name.prefix(2).uppercased())
+                            .font(.system(size: 26, weight: .bold, design: .rounded))
+                            .foregroundStyle(Theme.sky)
+                    }
                 }
 
                 VStack(spacing: 4) {
@@ -92,6 +148,10 @@ struct AirlineDetailView: View {
             }
             .buttonStyle(.plain)
 
+            if #available(iOS 26.0, *) {
+                PakAdviesButton(airline: display)
+            }
+
             if hasBaggageOverview {
                 sectionHeader("De bagage van \(display.name) in één oogopslag")
                 baggageOverviewRow
@@ -124,6 +184,48 @@ struct AirlineDetailView: View {
                 .background(Color(.systemBackground))
                 .clipShape(RoundedRectangle(cornerRadius: 16))
                 .shadow(color: .black.opacity(0.04), radius: 6, x: 0, y: 2)
+            }
+
+            // Tassen die gegarandeerd passen: het logische koopmoment als je
+            // je toch al in de regels van deze maatschappij verdiept.
+            if !matchingBags.isEmpty {
+                sectionHeader("Tassen & koffers die passen bij \(display.name)")
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 10) {
+                        ForEach(matchingBags.prefix(6)) { bag in
+                            Button {
+                                UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                APIClient.shared.sendEvent("bag_open_airline_detail", path: "/airline/\(display.slug)")
+                                selectedBagId = bag.id
+                            } label: {
+                                MatchingBagCard(bag: bag)
+                            }
+                            .buttonStyle(.plain)
+                        }
+                    }
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 4)
+                }
+                .padding(.horizontal, -16)
+
+                Button {
+                    UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                    APIClient.shared.sendEvent("shop_cta_airline_detail", path: "/airline/\(display.slug)")
+                    nav.openShop(airlineSlug: display.slug)
+                } label: {
+                    HStack(spacing: 6) {
+                        Text("Bekijk alles wat past in de shop")
+                            .font(.system(size: 14, weight: .semibold, design: .rounded))
+                        Image(systemName: "arrow.right")
+                            .font(.system(size: 11, weight: .semibold))
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 13)
+                    .background(Theme.navy.opacity(0.07))
+                    .foregroundStyle(Theme.navy)
+                    .clipShape(RoundedRectangle(cornerRadius: 14))
+                }
+                .buttonStyle(.plain)
             }
 
             if let sourceUrl = display.sourceUrl, let url = URL(string: sourceUrl) {
@@ -275,7 +377,10 @@ struct AirlineDetailView: View {
 
     private func loadDetail() async {
         isLoading = true
-        detail = try? await APIClient.shared.airline(slug: airline.slug)
+        async let detailTask = APIClient.shared.airline(slug: airline.slug)
+        async let bagsTask = APIClient.shared.bags(airline: airline.slug)
+        detail = try? await detailTask
+        matchingBags = (try? await bagsTask) ?? []
         isLoading = false
     }
 }
@@ -334,6 +439,56 @@ private struct BaggageTypeCard: View {
         .background(Color(.systemBackground))
         .clipShape(RoundedRectangle(cornerRadius: 16))
         .shadow(color: .black.opacity(0.05), radius: 6, x: 0, y: 3)
+    }
+}
+
+// MARK: - Passende-tas kaart (carrousel op de detailpagina)
+
+private struct MatchingBagCard: View {
+    let bag: Bag
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            ZStack {
+                Color.white
+                if bag.imageUrl != nil {
+                    AuthorisedImage(urlString: bag.imageUrl)
+                        .padding(8)
+                } else {
+                    Image(systemName: "bag")
+                        .font(.system(size: 26, weight: .light))
+                        .foregroundStyle(Theme.navy.opacity(0.15))
+                }
+            }
+            .frame(width: 128, height: 96)
+            .clipShape(RoundedRectangle(cornerRadius: 12))
+
+            Text(bag.name)
+                .font(.system(size: 11, weight: .semibold, design: .rounded))
+                .foregroundStyle(Theme.textPrimary)
+                .lineLimit(2)
+                .multilineTextAlignment(.leading)
+                .frame(height: 28, alignment: .top)
+
+            HStack(spacing: 4) {
+                if let price = bag.displayPrice {
+                    Text(price)
+                        .font(.system(size: 13, weight: .bold, design: .rounded))
+                        .monospacedDigit()
+                        .foregroundStyle(Theme.navy)
+                }
+                Spacer()
+                Image(systemName: "checkmark.seal.fill")
+                    .font(.system(size: 10))
+                    .foregroundStyle(Theme.green)
+            }
+        }
+        .padding(8)
+        .frame(width: 144)
+        .background(Color(.systemBackground))
+        .clipShape(RoundedRectangle(cornerRadius: 14))
+        .shadow(color: .black.opacity(0.05), radius: 6, x: 0, y: 2)
+        .contentShape(RoundedRectangle(cornerRadius: 14))
     }
 }
 

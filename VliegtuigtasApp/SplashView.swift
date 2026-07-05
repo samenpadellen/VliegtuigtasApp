@@ -2,6 +2,9 @@ import SwiftUI
 import UIKit
 
 struct SplashView: View {
+    /// Vuurt zodra het app-icoon volledig in beeld staat (na de fade-in) —
+    /// hét moment voor het vliegtuiggeluid, samen met de haptic.
+    var onIconVisible: () -> Void = {}
     let onFinished: () -> Void
 
     // Achtergrond
@@ -82,6 +85,8 @@ struct SplashView: View {
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.55) {
             UIImpactFeedbackGenerator(style: .light).impactOccurred(intensity: 0.4)
+            // Geluid exact op het moment dat het icoon "landt".
+            onIconVisible()
         }
 
         withAnimation(.easeInOut(duration: 0.4).delay(1.55)) {

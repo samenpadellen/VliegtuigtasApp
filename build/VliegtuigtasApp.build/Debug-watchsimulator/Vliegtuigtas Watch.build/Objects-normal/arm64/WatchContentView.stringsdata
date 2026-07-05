@@ -1,0 +1,64 @@
+{
+  "source": "/Users/wouterschut/Documents/VliegtuigtasApp/VliegtuigtasWatch/WatchContentView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "Vliegtuigtas",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 66
+        }
+      },
+      {
+        "comment": "",
+        "key": "Zoek maatschappij",
+        "location": {
+          "startingColumn": 52,
+          "startingLine": 67
+        }
+      },
+      {
+        "comment": "",
+        "key": "Maatschappijen",
+        "location": {
+          "startingColumn": 25,
+          "startingLine": 31
+        }
+      },
+      {
+        "comment": "",
+        "key": "Mijn tas",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 21
+        }
+      },
+      {
+        "comment": "",
+        "key": "Laden…",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 35
+        }
+      },
+      {
+        "comment": "",
+        "key": "Laden mislukt",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 41
+        }
+      },
+      {
+        "comment": "",
+        "key": "Opnieuw",
+        "location": {
+          "startingColumn": 36,
+          "startingLine": 46
+        }
+      }
+    ]
+  },
+  "version": 1
+}

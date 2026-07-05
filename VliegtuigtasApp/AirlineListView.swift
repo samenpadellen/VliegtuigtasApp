@@ -44,9 +44,9 @@ struct AirlineListView: View {
                     .clipShape(RoundedRectangle(cornerRadius: 16))
                     .shadow(color: .black.opacity(0.07), radius: 8, x: 0, y: 2)
 
-                    // Grid
+                    // Grid — adaptief: 2 kolommen op iPhone, meer op brede schermen
                     LazyVGrid(
-                        columns: Array(repeating: GridItem(.flexible(), spacing: 12), count: 2),
+                        columns: [GridItem(.adaptive(minimum: 160), spacing: 12)],
                         spacing: 12
                     ) {
                         ForEach(filtered) { airline in
@@ -59,6 +59,7 @@ struct AirlineListView: View {
                         }
                     }
                 }
+                .frame(maxWidth: Theme.contentMaxWidth)
                 .padding(16)
                 .padding(.bottom, 32)
             }
@@ -66,6 +67,7 @@ struct AirlineListView: View {
         .background(Color(.systemGroupedBackground))
         .ignoresSafeArea(edges: .top)
         .navigationBarHidden(true)
+        .scrollDismissesKeyboard(.interactively)
         .task { await store.load() }
         .overlay {
             if store.isLoading { LoadingOverlay() }
@@ -82,12 +84,16 @@ struct AirlineListView: View {
                 .frame(maxWidth: .infinity)
                 .frame(height: 140 + airlineListStatusBarHeight)
                 .clipped()
+                // .clipped() knipt alleen het tekenen, niet de hit-test:
+                // zonder dit vangt de foto op iPad tikken in het grid af.
+                .allowsHitTesting(false)
 
             // Donker verloop van onderaf + links voor leesbaarheid tekst
             LinearGradient(
                 colors: [Theme.navy.opacity(0.88), Theme.navy.opacity(0.30)],
                 startPoint: .bottom, endPoint: .topTrailing
             )
+            .allowsHitTesting(false)
 
             VStack(alignment: .leading, spacing: 6) {
                 HStack(spacing: 8) {

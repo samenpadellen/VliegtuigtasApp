@@ -1,6 +1,10 @@
 import SwiftUI
 
 enum Theme {
+    /// Maximale kolombreedte voor content op grote schermen (Mac Catalyst,
+    /// iPad). iPhone-schermen zijn smaller, dus daar heeft dit geen effect.
+    static let contentMaxWidth: CGFloat = 760
+
     // Brand colours
     static let navy      = Color(red: 0.00, green: 0.19, blue: 0.53)   // deep KLM-blue
     static let navyDark  = Color(red: 0.00, green: 0.12, blue: 0.38)

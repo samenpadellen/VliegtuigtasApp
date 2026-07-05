@@ -6,17 +6,29 @@ final class APIClient: ObservableObject {
     // Paste je iOS API key hier, of zet VT_API_KEY in een Config.xcconfig
     private let apiKey = "lFkEQW18oyMrdMsbfNK1DtnDnoCcqwNSBRfMCXmszUgbAoLf"
 
-    private let base = URL(string: "https://www.vliegtuigtas.com/api/public/v1")!
+    // Apex-host: www redirect (302) naar apex en URLSession laat de
+    // Authorization-header vallen bij cross-host redirects.
+    private let base = URL(string: "https://vliegtuigtas.com/api/public/v1")!
 
     private lazy var session: URLSession = {
         let cfg = URLSessionConfiguration.default
         cfg.timeoutIntervalForRequest = 15
+        // HTTP-cache voor alle API-verkeer: herhaalde requests binnen de
+        // server-cacheheaders komen van schijf i.p.v. het netwerk.
+        cfg.urlCache = URLCache(memoryCapacity: 8 * 1024 * 1024, diskCapacity: 50 * 1024 * 1024)
         return URLSession(configuration: cfg)
     }()
 
     // MARK: - Generic helpers
 
     private func get<T: Decodable>(_ path: String, query: [String: String] = [:]) async throws -> T {
+        let data = try await getRaw(path, query: query)
+        return try JSONDecoder().decode(T.self, from: data)
+    }
+
+    /// Zelfde als `get`, maar geeft ook de ruwe bytes terug — die schrijven
+    /// we voor de catalogi naar schijf zodat een koude start instant data heeft.
+    private func getRaw(_ path: String, query: [String: String] = [:]) async throws -> Data {
         var comps = URLComponents(url: base.appendingPathComponent(path), resolvingAgainstBaseURL: false)!
         if !query.isEmpty {
             comps.queryItems = query.map { URLQueryItem(name: $0.key, value: $0.value) }
@@ -24,7 +36,11 @@ final class APIClient: ObservableObject {
         var req = URLRequest(url: comps.url!)
         req.setValue("Bearer \(apiKey)", forHTTPHeaderField: "Authorization")
         req.setValue("application/json", forHTTPHeaderField: "Accept")
-        return try await perform(req)
+        let (data, response) = try await session.data(for: req)
+        if let http = response as? HTTPURLResponse, !(200..<300).contains(http.statusCode) {
+            throw APIError.http(http.statusCode)
+        }
+        return data
     }
 
     private func post<Body: Encodable, T: Decodable>(_ path: String, body: Body) async throws -> T {
@@ -51,6 +67,30 @@ final class APIClient: ObservableObject {
     private var bagsCache: [String: (value: [Bag], at: Date)] = [:]
     private let cacheTTL: TimeInterval = 5 * 60
 
+    // MARK: - Disk-catalogus (instant cold start & offline)
+
+    private static let catalogDir: URL = {
+        let dir = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)[0]
+            .appendingPathComponent("VTCatalogCache", isDirectory: true)
+        try? FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+        return dir
+    }()
+
+    private func persistCatalog(_ data: Data, name: String) {
+        try? data.write(to: Self.catalogDir.appendingPathComponent(name), options: .atomic)
+    }
+
+    private func catalog<T: Decodable>(_ type: T.Type, name: String) -> T? {
+        guard let data = try? Data(contentsOf: Self.catalogDir.appendingPathComponent(name)),
+              let res = try? JSONDecoder().decode(APIResponse<T>.self, from: data) else { return nil }
+        return res.data
+    }
+
+    /// Laatste succesvol opgehaalde catalogus — voor een direct gevulde UI
+    /// bij koude start of zonder verbinding, terwijl de refresh loopt.
+    func airlinesFromDisk() -> [Airline]? { catalog([Airline].self, name: "airlines.json") }
+    func bagsFromDisk() -> [Bag]? { catalog([Bag].self, name: "bags.json") }
+
     // MARK: - Endpoints
 
     /// GET /airlines
@@ -58,9 +98,11 @@ final class APIClient: ObservableObject {
         if let cached = airlinesCache, Date().timeIntervalSince(cached.at) < cacheTTL {
             return cached.value
         }
-        let res: APIResponse<[Airline]> = try await get("airlines")
+        let data = try await getRaw("airlines")
+        let res = try JSONDecoder().decode(APIResponse<[Airline]>.self, from: data)
         let airlines = res.data ?? []
         airlinesCache = (airlines, Date())
+        persistCatalog(data, name: "airlines.json")
         return airlines
     }
 
@@ -81,9 +123,14 @@ final class APIClient: ObservableObject {
         if let cached = bagsCache[cacheKey], Date().timeIntervalSince(cached.at) < cacheTTL {
             return cached.value
         }
-        let res: APIResponse<[Bag]> = try await get("bags", query: query)
+        let data = try await getRaw("bags", query: query)
+        let res = try JSONDecoder().decode(APIResponse<[Bag]>.self, from: data)
         let bags = res.data ?? []
         bagsCache[cacheKey] = (bags, Date())
+        if airline == nil, type == nil, maxPrice == nil {
+            // Alleen de ongefilterde catalogus bewaren (de basis van Home/Shop).
+            persistCatalog(data, name: "bags.json")
+        }
         return bags
     }
 
@@ -122,6 +169,25 @@ final class APIClient: ObservableObject {
         Task {
             let body = LeadRequest(firstName: firstName, email: email, airlineSlug: airlineSlug)
             let _: APIResponse<String?> = (try? await post("leads", body: body)) ?? .init(data: nil, error: nil)
+        }
+    }
+
+    /// POST https://www.vliegtuigtas.com/leads/delete — verwijdert alle
+    /// servergegevens (check_leads + bag_checks) van dit e-mailadres
+    /// (App Review 5.1.1(v): accountverwijdering). Let op: dit endpoint
+    /// leeft op de site-root, niet onder /api/public/v1.
+    func requestAccountDeletion(email: String) {
+        struct DeleteRequest: Encodable {
+            let email: String
+        }
+        Task {
+            guard let url = URL(string: "https://vliegtuigtas.com/leads/delete") else { return }
+            var req = URLRequest(url: url)
+            req.httpMethod = "POST"
+            req.setValue("Bearer \(apiKey)", forHTTPHeaderField: "Authorization")
+            req.setValue("application/json", forHTTPHeaderField: "Content-Type")
+            req.httpBody = try? JSONEncoder().encode(DeleteRequest(email: email))
+            _ = try? await session.data(for: req)
         }
     }
 

@@ -1,0 +1,79 @@
+{
+  "" : {
+    "diagnostics" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-xrsimulator/Vliegtuigtas Vision.build/Objects-normal/arm64/Vliegtuigtas Vision-primary.dia",
+    "emit-module-dependencies" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-xrsimulator/Vliegtuigtas Vision.build/Objects-normal/arm64/Vliegtuigtas Vision-primary-emit-module.d",
+    "emit-module-diagnostics" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-xrsimulator/Vliegtuigtas Vision.build/Objects-normal/arm64/Vliegtuigtas Vision-primary-emit-module.dia",
+    "pch" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-xrsimulator/Vliegtuigtas Vision.build/Objects-normal/arm64/Vliegtuigtas Vision-primary-Bridging-header.pch",
+    "swift-dependencies" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-xrsimulator/Vliegtuigtas Vision.build/Objects-normal/arm64/Vliegtuigtas Vision-primary.swiftdeps"
+  },
+  "/Users/wouterschut/Documents/VliegtuigtasApp/VliegtuigtasApp/APIClient.swift" : {
+    "const-values" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-xrsimulator/Vliegtuigtas Vision.build/Objects-normal/arm64/APIClient.swiftconstvalues",
+    "dependencies" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-xrsimulator/Vliegtuigtas Vision.build/Objects-normal/arm64/APIClient.d",
+    "diagnostics" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-xrsimulator/Vliegtuigtas Vision.build/Objects-normal/arm64/APIClient.dia",
+    "index-unit-output-path" : "/VliegtuigtasApp.build/Debug-xrsimulator/Vliegtuigtas Vision.build/Objects-normal/arm64/APIClient.o",
+    "llvm-bc" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-xrsimulator/Vliegtuigtas Vision.build/Objects-normal/arm64/APIClient.bc",
+    "object" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-xrsimulator/Vliegtuigtas Vision.build/Objects-normal/arm64/APIClient.o",
+    "swift-dependencies" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-xrsimulator/Vliegtuigtas Vision.build/Objects-normal/arm64/APIClient.swiftdeps",
+    "swiftmodule" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-xrsimulator/Vliegtuigtas Vision.build/Objects-normal/arm64/APIClient~partial.swiftmodule"
+  },
+  "/Users/wouterschut/Documents/VliegtuigtasApp/VliegtuigtasApp/AirlineStore.swift" : {
+    "const-values" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-xrsimulator/Vliegtuigtas Vision.build/Objects-normal/arm64/AirlineStore.swiftconstvalues",
+    "dependencies" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-xrsimulator/Vliegtuigtas Vision.build/Objects-normal/arm64/AirlineStore.d",
+    "diagnostics" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-xrsimulator/Vliegtuigtas Vision.build/Objects-normal/arm64/AirlineStore.dia",
+    "index-unit-output-path" : "/VliegtuigtasApp.build/Debug-xrsimulator/Vliegtuigtas Vision.build/Objects-normal/arm64/AirlineStore.o",
+    "llvm-bc" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-xrsimulator/Vliegtuigtas Vision.build/Objects-normal/arm64/AirlineStore.bc",
+    "object" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-xrsimulator/Vliegtuigtas Vision.build/Objects-normal/arm64/AirlineStore.o",
+    "swift-dependencies" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-xrsimulator/Vliegtuigtas Vision.build/Objects-normal/arm64/AirlineStore.swiftdeps",
+    "swiftmodule" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-xrsimulator/Vliegtuigtas Vision.build/Objects-normal/arm64/AirlineStore~partial.swiftmodule"
+  },
+  "/Users/wouterschut/Documents/VliegtuigtasApp/VliegtuigtasApp/Models.swift" : {
+    "const-values" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-xrsimulator/Vliegtuigtas Vision.build/Objects-normal/arm64/Models.swiftconstvalues",
+    "dependencies" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-xrsimulator/Vliegtuigtas Vision.build/Objects-normal/arm64/Models.d",
+    "diagnostics" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-xrsimulator/Vliegtuigtas Vision.build/Objects-normal/arm64/Models.dia",
+    "index-unit-output-path" : "/VliegtuigtasApp.build/Debug-xrsimulator/Vliegtuigtas Vision.build/Objects-normal/arm64/Models.o",
+    "llvm-bc" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-xrsimulator/Vliegtuigtas Vision.build/Objects-normal/arm64/Models.bc",
+    "object" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-xrsimulator/Vliegtuigtas Vision.build/Objects-normal/arm64/Models.o",
+    "swift-dependencies" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-xrsimulator/Vliegtuigtas Vision.build/Objects-normal/arm64/Models.swiftdeps",
+    "swiftmodule" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-xrsimulator/Vliegtuigtas Vision.build/Objects-normal/arm64/Models~partial.swiftmodule"
+  },
+  "/Users/wouterschut/Documents/VliegtuigtasApp/VliegtuigtasVision/BagVolumeView.swift" : {
+    "const-values" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-xrsimulator/Vliegtuigtas Vision.build/Objects-normal/arm64/BagVolumeView.swiftconstvalues",
+    "dependencies" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-xrsimulator/Vliegtuigtas Vision.build/Objects-normal/arm64/BagVolumeView.d",
+    "diagnostics" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-xrsimulator/Vliegtuigtas Vision.build/Objects-normal/arm64/BagVolumeView.dia",
+    "index-unit-output-path" : "/VliegtuigtasApp.build/Debug-xrsimulator/Vliegtuigtas Vision.build/Objects-normal/arm64/BagVolumeView.o",
+    "llvm-bc" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-xrsimulator/Vliegtuigtas Vision.build/Objects-normal/arm64/BagVolumeView.bc",
+    "object" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-xrsimulator/Vliegtuigtas Vision.build/Objects-normal/arm64/BagVolumeView.o",
+    "swift-dependencies" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-xrsimulator/Vliegtuigtas Vision.build/Objects-normal/arm64/BagVolumeView.swiftdeps",
+    "swiftmodule" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-xrsimulator/Vliegtuigtas Vision.build/Objects-normal/arm64/BagVolumeView~partial.swiftmodule"
+  },
+  "/Users/wouterschut/Documents/VliegtuigtasApp/VliegtuigtasVision/VisionContentView.swift" : {
+    "const-values" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-xrsimulator/Vliegtuigtas Vision.build/Objects-normal/arm64/VisionContentView.swiftconstvalues",
+    "dependencies" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-xrsimulator/Vliegtuigtas Vision.build/Objects-normal/arm64/VisionContentView.d",
+    "diagnostics" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-xrsimulator/Vliegtuigtas Vision.build/Objects-normal/arm64/VisionContentView.dia",
+    "index-unit-output-path" : "/VliegtuigtasApp.build/Debug-xrsimulator/Vliegtuigtas Vision.build/Objects-normal/arm64/VisionContentView.o",
+    "llvm-bc" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-xrsimulator/Vliegtuigtas Vision.build/Objects-normal/arm64/VisionContentView.bc",
+    "object" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-xrsimulator/Vliegtuigtas Vision.build/Objects-normal/arm64/VisionContentView.o",
+    "swift-dependencies" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-xrsimulator/Vliegtuigtas Vision.build/Objects-normal/arm64/VisionContentView.swiftdeps",
+    "swiftmodule" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-xrsimulator/Vliegtuigtas Vision.build/Objects-normal/arm64/VisionContentView~partial.swiftmodule"
+  },
+  "/Users/wouterschut/Documents/VliegtuigtasApp/VliegtuigtasVision/VliegtuigtasVisionApp.swift" : {
+    "const-values" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-xrsimulator/Vliegtuigtas Vision.build/Objects-normal/arm64/VliegtuigtasVisionApp.swiftconstvalues",
+    "dependencies" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-xrsimulator/Vliegtuigtas Vision.build/Objects-normal/arm64/VliegtuigtasVisionApp.d",
+    "diagnostics" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-xrsimulator/Vliegtuigtas Vision.build/Objects-normal/arm64/VliegtuigtasVisionApp.dia",
+    "index-unit-output-path" : "/VliegtuigtasApp.build/Debug-xrsimulator/Vliegtuigtas Vision.build/Objects-normal/arm64/VliegtuigtasVisionApp.o",
+    "llvm-bc" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-xrsimulator/Vliegtuigtas Vision.build/Objects-normal/arm64/VliegtuigtasVisionApp.bc",
+    "object" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-xrsimulator/Vliegtuigtas Vision.build/Objects-normal/arm64/VliegtuigtasVisionApp.o",
+    "swift-dependencies" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-xrsimulator/Vliegtuigtas Vision.build/Objects-normal/arm64/VliegtuigtasVisionApp.swiftdeps",
+    "swiftmodule" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-xrsimulator/Vliegtuigtas Vision.build/Objects-normal/arm64/VliegtuigtasVisionApp~partial.swiftmodule"
+  },
+  "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-xrsimulator/Vliegtuigtas Vision.build/DerivedSources/GeneratedAssetSymbols.swift" : {
+    "const-values" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-xrsimulator/Vliegtuigtas Vision.build/Objects-normal/arm64/GeneratedAssetSymbols.swiftconstvalues",
+    "dependencies" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-xrsimulator/Vliegtuigtas Vision.build/Objects-normal/arm64/GeneratedAssetSymbols.d",
+    "diagnostics" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-xrsimulator/Vliegtuigtas Vision.build/Objects-normal/arm64/GeneratedAssetSymbols.dia",
+    "index-unit-output-path" : "/VliegtuigtasApp.build/Debug-xrsimulator/Vliegtuigtas Vision.build/Objects-normal/arm64/GeneratedAssetSymbols.o",
+    "llvm-bc" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-xrsimulator/Vliegtuigtas Vision.build/Objects-normal/arm64/GeneratedAssetSymbols.bc",
+    "object" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-xrsimulator/Vliegtuigtas Vision.build/Objects-normal/arm64/GeneratedAssetSymbols.o",
+    "swift-dependencies" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-xrsimulator/Vliegtuigtas Vision.build/Objects-normal/arm64/GeneratedAssetSymbols.swiftdeps",
+    "swiftmodule" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-xrsimulator/Vliegtuigtas Vision.build/Objects-normal/arm64/GeneratedAssetSymbols~partial.swiftmodule"
+  }
+}

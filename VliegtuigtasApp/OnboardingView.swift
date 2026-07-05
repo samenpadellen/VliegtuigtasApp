@@ -52,19 +52,41 @@ struct OnboardingView: View {
             progressDots
                 .padding(.top, 60)
         }
+        // App Review 5.1.1(v): naam/e-mail zijn optioneel — de app werkt
+        // volledig zonder. Overslaan is daarom altijd één tik.
+        .overlay(alignment: .topTrailing) {
+            Button {
+                UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                session.completeWithoutAccount()
+            } label: {
+                Text("Sla over")
+                    .font(.system(size: 13, weight: .semibold, design: .rounded))
+                    .foregroundStyle(.white)
+                    .padding(.horizontal, 14)
+                    .padding(.vertical, 8)
+                    .background(.black.opacity(0.30))
+                    .clipShape(Capsule())
+                    .contentShape(Capsule())
+            }
+            .buttonStyle(.plain)
+            .padding(.top, 54)
+            .padding(.trailing, 16)
+        }
     }
 
     // MARK: - Progress dots
 
     private var progressDots: some View {
+        // Witte dots: alle drie de pagina's hebben bovenin een foto/hero.
         HStack(spacing: 6) {
             ForEach(0..<3) { i in
                 Capsule()
-                    .fill(i == page ? Theme.navy : Color(.systemFill))
+                    .fill(i == page ? .white : .white.opacity(0.35))
                     .frame(width: i == page ? 20 : 6, height: 6)
                     .animation(.spring(response: 0.4), value: page)
             }
         }
+        .shadow(color: .black.opacity(0.2), radius: 3)
     }
 
     // MARK: - Logic
@@ -106,41 +128,102 @@ private struct WelcomePage: View {
     let onNext: () -> Void
 
     var body: some View {
-        ScrollView(showsIndicators: false) {
-            VStack(spacing: 0) {
-                // Hero image
-                heroImage(height: 320)
-
-                // Card
-                VStack(spacing: 24) {
-                    VStack(spacing: 10) {
-                        Text("Nooit meer\nverrast bij de gate.")
-                            .font(.system(size: 28, weight: .bold, design: .rounded))
-                            .multilineTextAlignment(.center)
-                            .foregroundStyle(Theme.textPrimary)
-                        Text("Controleer in seconden of jouw handbagage past bij Ryanair, KLM, easyJet en meer.")
-                            .font(.system(size: 15, design: .rounded))
-                            .foregroundStyle(Theme.textSecondary)
-                            .multilineTextAlignment(.center)
-                    }
-
-                    VStack(spacing: 12) {
-                        FeatureRow(icon: "checkmark.shield.fill", color: Theme.green,
-                                   text: "Direct weten of jouw tas past")
-                        FeatureRow(icon: "bag.fill", color: Theme.sky,
-                                   text: "Tassen aanbevolen die altijd passen")
-                        FeatureRow(icon: "airplane", color: Theme.yellow,
-                                   text: "Alle grote Europese maatschappijen")
-                    }
-
-                    OnboardButton(title: "Aan de slag", icon: "arrow.right", action: onNext)
-                }
-                .padding(28)
-                .background(Color(.systemBackground))
+        // Full-bleed hero over het hele scherm; alle content onderin verankerd
+        // op een navy scrim — geen loze witruimte, edge-to-edge zoals moderne
+        // reis-apps.
+        ZStack(alignment: .bottom) {
+            GeometryReader { geo in
+                heroImage(height: geo.size.height + geo.safeAreaInsets.top + geo.safeAreaInsets.bottom)
+                    .offset(y: -geo.safeAreaInsets.top)
             }
+
+            // Scrim: foto loopt bovenin vrij, onderin diep navy voor leesbaarheid
+            LinearGradient(
+                stops: [
+                    .init(color: .clear, location: 0),
+                    .init(color: Theme.navyDark.opacity(0.55), location: 0.45),
+                    .init(color: Theme.navyDark.opacity(0.96), location: 1)
+                ],
+                startPoint: .top, endPoint: .bottom
+            )
+            .ignoresSafeArea()
+            .allowsHitTesting(false)
+
+            VStack(alignment: .leading, spacing: 18) {
+                HStack(spacing: 8) {
+                    Image(systemName: "suitcase.rolling.fill")
+                        .font(.system(size: 13, weight: .semibold))
+                        .foregroundStyle(Theme.yellow)
+                    Text("VLIEGTUIGTAS")
+                        .font(.system(size: 11, weight: .black, design: .rounded))
+                        .foregroundStyle(.white.opacity(0.8))
+                        .kerning(2)
+                }
+
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Nooit meer verrast\nbij de gate.")
+                        .font(.system(size: 34, weight: .bold, design: .rounded))
+                        .foregroundStyle(.white)
+                        .lineSpacing(2)
+                    Text("Controleer in seconden of jouw handbagage past bij Ryanair, KLM, easyJet en meer.")
+                        .font(.system(size: 15, design: .rounded))
+                        .foregroundStyle(.white.opacity(0.8))
+                        .lineSpacing(2)
+                }
+
+                VStack(spacing: 8) {
+                    WelcomeFeatureRow(icon: "checkmark.shield.fill", tint: Theme.green,
+                                      text: "Direct weten of jouw tas past")
+                    WelcomeFeatureRow(icon: "camera.viewfinder", tint: Theme.sky,
+                                      text: "Scan je tas met de camera (LiDAR)")
+                    WelcomeFeatureRow(icon: "airplane", tint: Theme.yellow,
+                                      text: "Alle grote Europese maatschappijen")
+                }
+
+                Button(action: onNext) {
+                    HStack(spacing: 8) {
+                        Text("Aan de slag")
+                            .font(.system(size: 17, weight: .semibold, design: .rounded))
+                        Image(systemName: "arrow.right")
+                            .font(.system(size: 15, weight: .semibold))
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 17)
+                    .background(.white)
+                    .foregroundStyle(Theme.navy)
+                    .clipShape(RoundedRectangle(cornerRadius: 16))
+                }
+                .buttonStyle(.plain)
+                .padding(.top, 6)
+            }
+            .frame(maxWidth: Theme.contentMaxWidth)
+            .padding(.horizontal, 24)
+            .padding(.bottom, 24)
         }
-        .background(Color(.systemBackground))
+        .background(Theme.navyDark)
         .ignoresSafeArea(edges: .top)
+    }
+}
+
+/// Featureregel op de donkere welkomstpagina: glazen chip-stijl.
+private struct WelcomeFeatureRow: View {
+    let icon: String
+    let tint: Color
+    let text: String
+
+    var body: some View {
+        HStack(spacing: 12) {
+            Image(systemName: icon)
+                .font(.system(size: 14, weight: .semibold))
+                .foregroundStyle(tint)
+                .frame(width: 34, height: 34)
+                .background(.white.opacity(0.12))
+                .clipShape(RoundedRectangle(cornerRadius: 10))
+            Text(text)
+                .font(.system(size: 14, weight: .medium, design: .rounded))
+                .foregroundStyle(.white.opacity(0.92))
+            Spacer(minLength: 0)
+        }
     }
 }
 
@@ -154,81 +237,44 @@ private struct NamePage: View {
     let onBack: () -> Void
 
     var body: some View {
-        ScrollView(showsIndicators: false) {
-            VStack(spacing: 0) {
-                heroImage(height: 220)
-                    .overlay(alignment: .bottomLeading) {
-                        Text("✋ Even\nvoorstellen")
-                            .font(.system(size: 28, weight: .bold, design: .rounded))
-                            .foregroundStyle(.white)
-                            .shadow(color: .black.opacity(0.25), radius: 8)
-                            .padding(24)
-                    }
+        OnboardFormScaffold {
+            VStack(alignment: .leading, spacing: 16) {
+                OnboardKicker(text: "STAP 1 VAN 2 · JOUW PROFIEL")
 
-                VStack(spacing: 24) {
-                    VStack(spacing: 6) {
-                        Text("Hoe mogen we je noemen?")
-                            .font(.system(size: 22, weight: .bold, design: .rounded))
-                            .multilineTextAlignment(.center)
-                        Text("Zodat we je persoonlijk kunnen helpen.")
-                            .font(.system(size: 15, design: .rounded))
-                            .foregroundStyle(Theme.textSecondary)
-                            .multilineTextAlignment(.center)
-                    }
-
-                    VStack(alignment: .leading, spacing: 6) {
-                        Text("Voornaam")
-                            .font(.system(size: 13, weight: .semibold, design: .rounded))
-                            .foregroundStyle(Theme.textSecondary)
-
-                        HStack(spacing: 12) {
-                            Image(systemName: "person.fill")
-                                .foregroundStyle(error ? Theme.red : (isFocused ? Theme.sky : Theme.textSecondary))
-                                .frame(width: 20)
-                            TextField("bijv. Emma of Luca", text: $firstName)
-                                .textContentType(.givenName)
-                                .autocorrectionDisabled()
-                                .focused($isFocused)
-                                .submitLabel(.next)
-                                .onSubmit { onNext() }
-                                .font(.system(size: 16, design: .rounded))
-                        }
-                        .padding(16)
-                        .background(error ? Theme.red.opacity(0.06) : Color(.secondarySystemBackground))
-                        .clipShape(RoundedRectangle(cornerRadius: 14))
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 14)
-                                .strokeBorder(
-                                    error ? Theme.red : (isFocused ? Theme.sky : .clear),
-                                    lineWidth: 2
-                                )
-                        )
-                        .animation(.easeInOut(duration: 0.2), value: error)
-                        .animation(.easeInOut(duration: 0.2), value: isFocused)
-
-                        if error {
-                            Label("Vul je voornaam in", systemImage: "exclamationmark.circle.fill")
-                                .font(.system(size: 13))
-                                .foregroundStyle(Theme.red)
-                                .transition(.opacity.combined(with: .move(edge: .top)))
-                        }
-                    }
-                    .animation(.easeInOut(duration: 0.2), value: error)
-
-                    OnboardButton(title: "Volgende", icon: "arrow.right", action: onNext)
-
-                    Button(action: onBack) {
-                        Label("Terug", systemImage: "chevron.left")
-                            .font(.system(size: 14, weight: .medium, design: .rounded))
-                            .foregroundStyle(Theme.textSecondary)
-                    }
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Hoe mogen we\nje noemen?")
+                        .font(.system(size: 32, weight: .bold, design: .rounded))
+                        .foregroundStyle(.white)
+                        .lineSpacing(2)
+                    Text("Zodat we je persoonlijk kunnen helpen.")
+                        .font(.system(size: 15, design: .rounded))
+                        .foregroundStyle(.white.opacity(0.75))
                 }
-                .padding(28)
-                .background(Color(.systemBackground))
+
+                DarkInputField(
+                    icon: "person.fill",
+                    placeholder: "bijv. Emma of Luca",
+                    text: $firstName,
+                    error: error,
+                    isFocused: $isFocused,
+                    contentType: .givenName,
+                    submitLabel: .next,
+                    onSubmit: onNext
+                )
+
+                if error {
+                    Label("Vul je voornaam in", systemImage: "exclamationmark.circle.fill")
+                        .font(.system(size: 13))
+                        .foregroundStyle(Theme.red)
+                        .transition(.opacity.combined(with: .move(edge: .top)))
+                }
+
+                OnboardPrimaryButton(title: "Volgende", icon: "arrow.right", action: onNext)
+
+                OnboardBackButton(action: onBack)
             }
+            .animation(.easeInOut(duration: 0.2), value: error)
         }
-        .background(Color(.systemBackground))
-        .ignoresSafeArea(edges: .top)
         .onAppear {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { isFocused = true }
         }
@@ -247,96 +293,201 @@ private struct EmailPage: View {
     let onBack: () -> Void
 
     var body: some View {
-        ScrollView(showsIndicators: false) {
-            VStack(spacing: 0) {
-                heroImage(height: 200)
-                    .overlay(alignment: .bottomLeading) {
-                        Text("Hoi \(firstName.isEmpty ? "daar" : firstName)! 👋")
-                            .font(.system(size: 30, weight: .bold, design: .rounded))
-                            .foregroundStyle(.white)
-                            .shadow(color: .black.opacity(0.3), radius: 8)
-                            .padding(24)
-                    }
+        OnboardFormScaffold {
+            VStack(alignment: .leading, spacing: 16) {
+                OnboardKicker(text: "STAP 2 VAN 2 · BIJNA KLAAR")
 
-                VStack(spacing: 24) {
-                    VStack(spacing: 6) {
-                        Text("Wat is je e-mailadres?")
-                            .font(.system(size: 22, weight: .bold, design: .rounded))
-                            .multilineTextAlignment(.center)
-                        Text("We sturen je handige reistips en alerts als regels veranderen.")
-                            .font(.system(size: 15, design: .rounded))
-                            .foregroundStyle(Theme.textSecondary)
-                            .multilineTextAlignment(.center)
-                    }
-
-                    VStack(alignment: .leading, spacing: 6) {
-                        Text("E-mailadres")
-                            .font(.system(size: 13, weight: .semibold, design: .rounded))
-                            .foregroundStyle(Theme.textSecondary)
-
-                        HStack(spacing: 12) {
-                            Image(systemName: "envelope.fill")
-                                .foregroundStyle(error ? Theme.red : (isFocused ? Theme.sky : Theme.textSecondary))
-                                .frame(width: 20)
-                            TextField("jouw@email.nl", text: $email)
-                                .textContentType(.emailAddress)
-                                .keyboardType(.emailAddress)
-                                .autocorrectionDisabled()
-                                .textInputAutocapitalization(.never)
-                                .focused($isFocused)
-                                .submitLabel(.done)
-                                .onSubmit { onNext() }
-                                .font(.system(size: 16, design: .rounded))
-                        }
-                        .padding(16)
-                        .background(error ? Theme.red.opacity(0.06) : Color(.secondarySystemBackground))
-                        .clipShape(RoundedRectangle(cornerRadius: 14))
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 14)
-                                .strokeBorder(
-                                    error ? Theme.red : (isFocused ? Theme.sky : .clear),
-                                    lineWidth: 2
-                                )
-                        )
-                        .animation(.easeInOut(duration: 0.2), value: error)
-                        .animation(.easeInOut(duration: 0.2), value: isFocused)
-
-                        if error {
-                            Label("Vul een geldig e-mailadres in", systemImage: "exclamationmark.circle.fill")
-                                .font(.system(size: 13))
-                                .foregroundStyle(Theme.red)
-                                .transition(.opacity.combined(with: .move(edge: .top)))
-                        }
-                    }
-                    .animation(.easeInOut(duration: 0.2), value: error)
-
-                    OnboardButton(
-                        title: isSending ? "Opslaan…" : "Start de app",
-                        icon: isSending ? nil : "checkmark",
-                        loading: isSending,
-                        action: onNext
-                    )
-                    .disabled(isSending)
-
-                    Button(action: onBack) {
-                        Label("Terug", systemImage: "chevron.left")
-                            .font(.system(size: 14, weight: .medium, design: .rounded))
-                            .foregroundStyle(Theme.textSecondary)
-                    }
-
-                    Text("We delen je gegevens nooit met derden.")
-                        .font(.system(size: 12))
-                        .foregroundStyle(Theme.textSecondary.opacity(0.5))
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Hoi \(firstName.isEmpty ? "daar" : firstName)! 👋")
+                        .font(.system(size: 32, weight: .bold, design: .rounded))
+                        .foregroundStyle(.white)
+                    Text("Waar mogen we reistips en alerts naartoe sturen als regels veranderen?")
+                        .font(.system(size: 15, design: .rounded))
+                        .foregroundStyle(.white.opacity(0.75))
+                        .lineSpacing(2)
                 }
-                .padding(28)
-                .background(Color(.systemBackground))
+
+                DarkInputField(
+                    icon: "envelope.fill",
+                    placeholder: "jouw@email.nl",
+                    text: $email,
+                    error: error,
+                    isFocused: $isFocused,
+                    keyboard: .emailAddress,
+                    contentType: .emailAddress,
+                    capitalization: .never,
+                    submitLabel: .done,
+                    onSubmit: onNext
+                )
+
+                if error {
+                    Label("Vul een geldig e-mailadres in", systemImage: "exclamationmark.circle.fill")
+                        .font(.system(size: 13))
+                        .foregroundStyle(Theme.red)
+                        .transition(.opacity.combined(with: .move(edge: .top)))
+                }
+
+                OnboardPrimaryButton(
+                    title: isSending ? "Opslaan…" : "Start de app",
+                    icon: isSending ? nil : "checkmark",
+                    loading: isSending,
+                    action: onNext
+                )
+                .disabled(isSending)
+
+                OnboardBackButton(action: onBack)
+
+                Text("We delen je gegevens nooit met derden.")
+                    .font(.system(size: 11, design: .rounded))
+                    .foregroundStyle(.white.opacity(0.45))
+                    .frame(maxWidth: .infinity)
             }
+            .animation(.easeInOut(duration: 0.2), value: error)
         }
-        .background(Color(.systemBackground))
-        .ignoresSafeArea(edges: .top)
         .onAppear {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { isFocused = true }
         }
+    }
+}
+
+// MARK: - Donkere formulier-bouwstenen (stijl van de welkomstpagina)
+
+/// Full-bleed hero + navy scrim met onderin verankerde content — zelfde
+/// edge-to-edge opbouw als de welkomstpagina, dus geen loze witruimte.
+private struct OnboardFormScaffold<Content: View>: View {
+    @ViewBuilder let content: Content
+
+    var body: some View {
+        ZStack(alignment: .bottom) {
+            GeometryReader { geo in
+                heroImage(height: geo.size.height + geo.safeAreaInsets.top + geo.safeAreaInsets.bottom)
+                    .offset(y: -geo.safeAreaInsets.top)
+            }
+
+            LinearGradient(
+                stops: [
+                    .init(color: .clear, location: 0),
+                    .init(color: Theme.navyDark.opacity(0.55), location: 0.40),
+                    .init(color: Theme.navyDark.opacity(0.96), location: 1)
+                ],
+                startPoint: .top, endPoint: .bottom
+            )
+            .ignoresSafeArea()
+            .allowsHitTesting(false)
+
+            content
+                .frame(maxWidth: Theme.contentMaxWidth)
+                .padding(.horizontal, 24)
+                .padding(.bottom, 24)
+        }
+        .background(Theme.navyDark)
+        .ignoresSafeArea(edges: .top)
+    }
+}
+
+private struct OnboardKicker: View {
+    let text: String
+
+    var body: some View {
+        HStack(spacing: 8) {
+            Image(systemName: "suitcase.rolling.fill")
+                .font(.system(size: 12, weight: .semibold))
+                .foregroundStyle(Theme.yellow)
+            Text(text)
+                .font(.system(size: 10, weight: .black, design: .rounded))
+                .foregroundStyle(.white.opacity(0.75))
+                .kerning(1.8)
+        }
+    }
+}
+
+/// Invoerveld op donkere ondergrond: glazen vlak, gele focusrand.
+private struct DarkInputField: View {
+    let icon: String
+    let placeholder: String
+    @Binding var text: String
+    var error: Bool
+    @FocusState.Binding var isFocused: Bool
+    var keyboard: UIKeyboardType = .default
+    var contentType: UITextContentType? = nil
+    var capitalization: TextInputAutocapitalization = .words
+    var submitLabel: SubmitLabel = .next
+    let onSubmit: () -> Void
+
+    var body: some View {
+        HStack(spacing: 12) {
+            Image(systemName: icon)
+                .foregroundStyle(error ? Theme.red : (isFocused ? Theme.yellow : .white.opacity(0.5)))
+                .frame(width: 20)
+            TextField("", text: $text, prompt: Text(placeholder).foregroundStyle(.white.opacity(0.35)))
+                .font(.system(size: 16, design: .rounded))
+                .foregroundStyle(.white)
+                .tint(Theme.yellow)
+                .keyboardType(keyboard)
+                .textContentType(contentType)
+                .textInputAutocapitalization(capitalization)
+                .autocorrectionDisabled()
+                .focused($isFocused)
+                .submitLabel(submitLabel)
+                .onSubmit(onSubmit)
+        }
+        .padding(16)
+        .background(.white.opacity(0.12))
+        .clipShape(RoundedRectangle(cornerRadius: 14))
+        .overlay(
+            RoundedRectangle(cornerRadius: 14)
+                .strokeBorder(
+                    error ? Theme.red : (isFocused ? Theme.yellow : .white.opacity(0.15)),
+                    lineWidth: 1.5
+                )
+        )
+        .animation(.easeInOut(duration: 0.2), value: error)
+        .animation(.easeInOut(duration: 0.2), value: isFocused)
+    }
+}
+
+private struct OnboardPrimaryButton: View {
+    let title: String
+    var icon: String?
+    var loading: Bool = false
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            HStack(spacing: 8) {
+                if loading {
+                    ProgressView().tint(Theme.navy)
+                }
+                Text(title)
+                    .font(.system(size: 17, weight: .semibold, design: .rounded))
+                if let icon, !loading {
+                    Image(systemName: icon)
+                        .font(.system(size: 15, weight: .semibold))
+                }
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 17)
+            .background(.white)
+            .foregroundStyle(Theme.navy)
+            .clipShape(RoundedRectangle(cornerRadius: 16))
+        }
+        .buttonStyle(.plain)
+        .padding(.top, 6)
+    }
+}
+
+private struct OnboardBackButton: View {
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            Label("Terug", systemImage: "chevron.left")
+                .font(.system(size: 14, weight: .medium, design: .rounded))
+                .foregroundStyle(.white.opacity(0.7))
+                .frame(maxWidth: .infinity)
+                .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
     }
 }
 
@@ -368,6 +519,9 @@ private func heroImage(height: CGFloat) -> some View {
         )
     }
     .clipped()
+    // Puur decoratief; de fill-foto mag nooit tikken afvangen van de
+    // knoppen/velden die eroverheen of eronder liggen.
+    .allowsHitTesting(false)
 }
 
 // MARK: - Feature row

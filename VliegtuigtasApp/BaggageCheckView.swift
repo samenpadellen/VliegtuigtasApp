@@ -44,7 +44,24 @@ struct BaggageCheckView: View {
         }
         .sheet(isPresented: $showResult) {
             if let result = checkStore.result, let airline = selectedAirline {
-                ResultSheet(result: result, airline: airline)
+                // Zelfde resultaatscherm als de grote checker: verdict,
+                // passende tassen, shoproute en vervolgstappen.
+                NavigationStack {
+                    ResultStepView(
+                        result: result,
+                        airline: airline,
+                        dimensions: (length, width, depth, weight),
+                        onReset: { showResult = false }
+                    )
+                    .background(Color(.systemGroupedBackground))
+                    .navigationTitle("Resultaat")
+                    .navigationBarTitleDisplayMode(.inline)
+                    .toolbar {
+                        ToolbarItem(placement: .topBarTrailing) {
+                            Button("Klaar") { showResult = false }
+                        }
+                    }
+                }
             }
         }
         .onChange(of: checkStore.result) { _, new in
@@ -235,183 +252,5 @@ struct AirlinePickerSheet: View {
                 }
             }
         }
-    }
-}
-
-// MARK: - Result sheet
-
-struct ResultSheet: View {
-    let result: CheckResponse
-    let airline: Airline
-    @Environment(\.dismiss) private var dismiss
-
-    @State private var firstName = ""
-    @State private var email = ""
-    @State private var leadSent = false
-
-    var body: some View {
-        NavigationStack {
-            ScrollView {
-                VStack(spacing: 20) {
-                    // Verdict icon + titel
-                    VerdictBanner(result: result, airlineName: airline.name)
-
-                    // Variant info card
-                    if let variant = result.variant {
-                        Card {
-                            VStack(alignment: .leading, spacing: 8) {
-                                Text(variant.variantName)
-                                    .font(.headline2).foregroundStyle(Theme.sky)
-                                if let w = variant.maxWeightKg {
-                                    Label("Max gewicht: \(Int(w)) kg", systemImage: "scalemass")
-                                        .font(.body1).foregroundStyle(Theme.textSecondary)
-                                }
-                                if let large = variant.includesLargeBag {
-                                    Label(large ? "Grote tas inbegrepen" : "Alleen klein item",
-                                          systemImage: large ? "bag.fill" : "bag")
-                                        .font(.body1).foregroundStyle(large ? Theme.green : Theme.orange)
-                                }
-                            }
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .padding(16)
-                        }
-                        .padding(.horizontal, 16)
-                    }
-
-                    // Redenen
-                    if let reasons = result.reasons, !reasons.isEmpty {
-                        Card {
-                            VStack(alignment: .leading, spacing: 8) {
-                                ForEach(reasons, id: \.self) { reason in
-                                    Label(reason, systemImage: "exclamationmark.circle")
-                                        .font(.body1).foregroundStyle(Theme.orange)
-                                }
-                            }
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .padding(16)
-                        }
-                        .padding(.horizontal, 16)
-                    }
-
-                    // Lead capture
-                    if !leadSent {
-                        LeadCaptureCard(
-                            firstName: $firstName,
-                            email: $email,
-                            airlineSlug: airline.slug
-                        ) { leadSent = true }
-                    } else {
-                        Label("Bedankt! We sturen je de beste tas-tips.", systemImage: "envelope.badge.fill")
-                            .font(.body1).foregroundStyle(Theme.green)
-                            .padding(.horizontal, 24)
-                    }
-
-                    Text("Dit is een indicatie. Controleer altijd de officiële regels van de maatschappij.")
-                        .font(.caption1)
-                        .foregroundStyle(Theme.textSecondary)
-                        .multilineTextAlignment(.center)
-                        .padding(.horizontal, 24)
-                }
-                .padding(.vertical, 20)
-            }
-            .background(Color(.systemGroupedBackground))
-            .navigationTitle("Resultaat")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .confirmationAction) {
-                    Button("Klaar") { dismiss() }
-                }
-            }
-        }
-    }
-}
-
-private struct LeadCaptureCard: View {
-    @Binding var firstName: String
-    @Binding var email: String
-    let airlineSlug: String
-    let onSent: () -> Void
-
-    private var canSend: Bool {
-        !firstName.isEmpty && email.contains("@")
-    }
-
-    var body: some View {
-        Card {
-            VStack(alignment: .leading, spacing: 12) {
-                Label("Ontvang de beste tas-tips", systemImage: "star.fill")
-                    .font(.headline2)
-                    .foregroundStyle(Theme.yellow)
-
-                TextField("Voornaam", text: $firstName)
-                    .textContentType(.givenName)
-                    .padding(10)
-                    .background(Theme.card)
-                    .clipShape(RoundedRectangle(cornerRadius: 8))
-
-                TextField("E-mailadres", text: $email)
-                    .textContentType(.emailAddress)
-                    .keyboardType(.emailAddress)
-                    .autocorrectionDisabled()
-                    .textInputAutocapitalization(.never)
-                    .padding(10)
-                    .background(Theme.card)
-                    .clipShape(RoundedRectangle(cornerRadius: 8))
-
-                Button {
-                    APIClient.shared.saveLead(firstName: firstName, email: email, airlineSlug: airlineSlug)
-                    onSent()
-                } label: {
-                    Text("Stuur mij tips")
-                        .font(.body1).fontWeight(.semibold)
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 12)
-                        .background(canSend ? AnyShapeStyle(Theme.navyGradient) : AnyShapeStyle(Theme.navy.opacity(0.4)))
-                        .foregroundStyle(.white)
-                        .clipShape(RoundedRectangle(cornerRadius: 10))
-                }
-                .disabled(!canSend)
-            }
-            .padding(16)
-        }
-        .padding(.horizontal, 16)
-    }
-}
-
-private struct VerdictBanner: View {
-    let result: CheckResponse
-    let airlineName: String
-
-    var body: some View {
-        VStack(spacing: 10) {
-            Image(systemName: iconName)
-                .font(.system(size: 56))
-                .foregroundStyle(Theme.verdictColor(result.verdict))
-            Text(result.verdictTitle).font(.headline1)
-            Text(result.verdictMessage)
-                .font(.body1)
-                .foregroundStyle(Theme.textSecondary)
-                .multilineTextAlignment(.center)
-        }
-        .padding(.horizontal, 24)
-    }
-
-    private var iconName: String {
-        switch result.verdict {
-        case .ok:      return "checkmark.circle.fill"
-        case .warning: return "exclamationmark.triangle.fill"
-        case .fail:    return "xmark.circle.fill"
-        }
-    }
-}
-
-private struct _LegacyDetailRow: View {
-    // Kept to avoid unused code — will be removed when DetailRow is no longer needed
-    var body: some View {
-        HStack(spacing: 12) {
-            Spacer()
-        }
-        .padding(.horizontal, 16)
-        .padding(.vertical, 12)
     }
 }

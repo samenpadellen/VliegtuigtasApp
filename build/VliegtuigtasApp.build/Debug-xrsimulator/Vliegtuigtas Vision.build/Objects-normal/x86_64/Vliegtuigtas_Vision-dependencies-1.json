@@ -1,0 +1,831 @@
+[
+  {
+    "isFramework" : false,
+    "moduleName" : "ARKit",
+    "modulePath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Toolchains\/XcodeDefault.xctoolchain\/usr\/lib\/swift\/xrsimulator\/prebuilt-modules\/26.5\/ARKit.swiftmodule\/x86_64-apple-xros-simulator.swiftmodule"
+  },
+  {
+    "isFramework" : true,
+    "moduleName" : "AVFAudio",
+    "modulePath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Toolchains\/XcodeDefault.xctoolchain\/usr\/lib\/swift\/xrsimulator\/prebuilt-modules\/26.5\/AVFAudio.swiftmodule\/x86_64-apple-xros-simulator.swiftmodule"
+  },
+  {
+    "isFramework" : false,
+    "moduleName" : "AVFoundation",
+    "modulePath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Toolchains\/XcodeDefault.xctoolchain\/usr\/lib\/swift\/xrsimulator\/prebuilt-modules\/26.5\/AVFoundation.swiftmodule\/x86_64-apple-xros-simulator.swiftmodule"
+  },
+  {
+    "isFramework" : true,
+    "moduleName" : "Accessibility",
+    "modulePath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Toolchains\/XcodeDefault.xctoolchain\/usr\/lib\/swift\/xrsimulator\/prebuilt-modules\/26.5\/Accessibility.swiftmodule\/x86_64-apple-xros-simulator.swiftmodule"
+  },
+  {
+    "isFramework" : true,
+    "moduleName" : "AudioToolbox",
+    "modulePath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Toolchains\/XcodeDefault.xctoolchain\/usr\/lib\/swift\/xrsimulator\/prebuilt-modules\/26.5\/AudioToolbox.swiftmodule\/x86_64-apple-xros-simulator.swiftmodule"
+  },
+  {
+    "isFramework" : true,
+    "moduleName" : "CloudKit",
+    "modulePath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Toolchains\/XcodeDefault.xctoolchain\/usr\/lib\/swift\/xrsimulator\/prebuilt-modules\/26.5\/CloudKit.swiftmodule\/x86_64-apple-xros-simulator.swiftmodule"
+  },
+  {
+    "isFramework" : true,
+    "moduleName" : "Combine",
+    "modulePath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Toolchains\/XcodeDefault.xctoolchain\/usr\/lib\/swift\/xrsimulator\/prebuilt-modules\/26.5\/Combine.swiftmodule\/x86_64-apple-xros-simulator.swiftmodule"
+  },
+  {
+    "isFramework" : false,
+    "moduleName" : "CoreAudio",
+    "modulePath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Toolchains\/XcodeDefault.xctoolchain\/usr\/lib\/swift\/xrsimulator\/prebuilt-modules\/26.5\/CoreAudio.swiftmodule\/x86_64-apple-xros-simulator.swiftmodule"
+  },
+  {
+    "isFramework" : true,
+    "moduleName" : "CoreData",
+    "modulePath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Toolchains\/XcodeDefault.xctoolchain\/usr\/lib\/swift\/xrsimulator\/prebuilt-modules\/26.5\/CoreData.swiftmodule\/x86_64-apple-xros-simulator.swiftmodule"
+  },
+  {
+    "isFramework" : false,
+    "moduleName" : "CoreFoundation",
+    "modulePath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Toolchains\/XcodeDefault.xctoolchain\/usr\/lib\/swift\/xrsimulator\/prebuilt-modules\/26.5\/CoreFoundation.swiftmodule\/x86_64-apple-xros-simulator.swiftmodule"
+  },
+  {
+    "isFramework" : true,
+    "moduleName" : "CoreGraphics",
+    "modulePath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Toolchains\/XcodeDefault.xctoolchain\/usr\/lib\/swift\/xrsimulator\/prebuilt-modules\/26.5\/CoreGraphics.swiftmodule\/x86_64-apple-xros-simulator.swiftmodule"
+  },
+  {
+    "isFramework" : false,
+    "moduleName" : "CoreImage",
+    "modulePath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Toolchains\/XcodeDefault.xctoolchain\/usr\/lib\/swift\/xrsimulator\/prebuilt-modules\/26.5\/CoreImage.swiftmodule\/x86_64-apple-xros-simulator.swiftmodule"
+  },
+  {
+    "isFramework" : false,
+    "moduleName" : "CoreLocation",
+    "modulePath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Toolchains\/XcodeDefault.xctoolchain\/usr\/lib\/swift\/xrsimulator\/prebuilt-modules\/26.5\/CoreLocation.swiftmodule\/x86_64-apple-xros-simulator.swiftmodule"
+  },
+  {
+    "isFramework" : false,
+    "moduleName" : "CoreMIDI",
+    "modulePath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Toolchains\/XcodeDefault.xctoolchain\/usr\/lib\/swift\/xrsimulator\/prebuilt-modules\/26.5\/CoreMIDI.swiftmodule\/x86_64-apple-xros-simulator.swiftmodule"
+  },
+  {
+    "isFramework" : false,
+    "moduleName" : "CoreMedia",
+    "modulePath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Toolchains\/XcodeDefault.xctoolchain\/usr\/lib\/swift\/xrsimulator\/prebuilt-modules\/26.5\/CoreMedia.swiftmodule\/x86_64-apple-xros-simulator.swiftmodule"
+  },
+  {
+    "isFramework" : true,
+    "moduleName" : "CoreMotion",
+    "modulePath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Toolchains\/XcodeDefault.xctoolchain\/usr\/lib\/swift\/xrsimulator\/prebuilt-modules\/26.5\/CoreMotion.swiftmodule\/x86_64-apple-xros-simulator.swiftmodule"
+  },
+  {
+    "isFramework" : true,
+    "moduleName" : "CoreText",
+    "modulePath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Toolchains\/XcodeDefault.xctoolchain\/usr\/lib\/swift\/xrsimulator\/prebuilt-modules\/26.5\/CoreText.swiftmodule\/x86_64-apple-xros-simulator.swiftmodule"
+  },
+  {
+    "isFramework" : true,
+    "moduleName" : "CoreTransferable",
+    "modulePath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Toolchains\/XcodeDefault.xctoolchain\/usr\/lib\/swift\/xrsimulator\/prebuilt-modules\/26.5\/CoreTransferable.swiftmodule\/x86_64-apple-xros-simulator.swiftmodule"
+  },
+  {
+    "isFramework" : true,
+    "moduleName" : "CoreVideo",
+    "modulePath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Toolchains\/XcodeDefault.xctoolchain\/usr\/lib\/swift\/xrsimulator\/prebuilt-modules\/26.5\/CoreVideo.swiftmodule\/x86_64-apple-xros-simulator.swiftmodule"
+  },
+  {
+    "isFramework" : true,
+    "moduleName" : "CryptoKit",
+    "modulePath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Toolchains\/XcodeDefault.xctoolchain\/usr\/lib\/swift\/xrsimulator\/prebuilt-modules\/26.5\/CryptoKit.swiftmodule\/x86_64-apple-xros-simulator.swiftmodule"
+  },
+  {
+    "isFramework" : false,
+    "moduleName" : "Darwin",
+    "modulePath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Toolchains\/XcodeDefault.xctoolchain\/usr\/lib\/swift\/xrsimulator\/prebuilt-modules\/26.5\/Darwin.swiftmodule\/x86_64-apple-xros-simulator.swiftmodule"
+  },
+  {
+    "isFramework" : true,
+    "moduleName" : "DataDetection",
+    "modulePath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Toolchains\/XcodeDefault.xctoolchain\/usr\/lib\/swift\/xrsimulator\/prebuilt-modules\/26.5\/DataDetection.swiftmodule\/x86_64-apple-xros-simulator.swiftmodule"
+  },
+  {
+    "isFramework" : true,
+    "moduleName" : "DeveloperToolsSupport",
+    "modulePath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Toolchains\/XcodeDefault.xctoolchain\/usr\/lib\/swift\/xrsimulator\/prebuilt-modules\/26.5\/DeveloperToolsSupport.swiftmodule\/x86_64-apple-xros-simulator.swiftmodule"
+  },
+  {
+    "isFramework" : false,
+    "moduleName" : "Dispatch",
+    "modulePath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Toolchains\/XcodeDefault.xctoolchain\/usr\/lib\/swift\/xrsimulator\/prebuilt-modules\/26.5\/Dispatch.swiftmodule\/x86_64-apple-xros-simulator.swiftmodule"
+  },
+  {
+    "isFramework" : false,
+    "moduleName" : "Distributed",
+    "modulePath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Toolchains\/XcodeDefault.xctoolchain\/usr\/lib\/swift\/xrsimulator\/prebuilt-modules\/26.5\/Distributed.swiftmodule\/x86_64-apple-xros-simulator.swiftmodule"
+  },
+  {
+    "isFramework" : true,
+    "moduleName" : "FileProvider",
+    "modulePath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Toolchains\/XcodeDefault.xctoolchain\/usr\/lib\/swift\/xrsimulator\/prebuilt-modules\/26.5\/FileProvider.swiftmodule\/x86_64-apple-xros-simulator.swiftmodule"
+  },
+  {
+    "isFramework" : true,
+    "moduleName" : "Foundation",
+    "modulePath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Toolchains\/XcodeDefault.xctoolchain\/usr\/lib\/swift\/xrsimulator\/prebuilt-modules\/26.5\/Foundation.swiftmodule\/x86_64-apple-xros-simulator.swiftmodule"
+  },
+  {
+    "isFramework" : true,
+    "moduleName" : "GameController",
+    "modulePath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Toolchains\/XcodeDefault.xctoolchain\/usr\/lib\/swift\/xrsimulator\/prebuilt-modules\/26.5\/GameController.swiftmodule\/x86_64-apple-xros-simulator.swiftmodule"
+  },
+  {
+    "isFramework" : true,
+    "moduleName" : "GroupActivities",
+    "modulePath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Toolchains\/XcodeDefault.xctoolchain\/usr\/lib\/swift\/xrsimulator\/prebuilt-modules\/26.5\/GroupActivities.swiftmodule\/x86_64-apple-xros-simulator.swiftmodule"
+  },
+  {
+    "isFramework" : true,
+    "moduleName" : "LocalAuthentication",
+    "modulePath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Toolchains\/XcodeDefault.xctoolchain\/usr\/lib\/swift\/xrsimulator\/prebuilt-modules\/26.5\/LocalAuthentication.swiftmodule\/x86_64-apple-xros-simulator.swiftmodule"
+  },
+  {
+    "isFramework" : false,
+    "moduleName" : "Metal",
+    "modulePath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Toolchains\/XcodeDefault.xctoolchain\/usr\/lib\/swift\/xrsimulator\/prebuilt-modules\/26.5\/Metal.swiftmodule\/x86_64-apple-xros-simulator.swiftmodule"
+  },
+  {
+    "isFramework" : true,
+    "moduleName" : "Network",
+    "modulePath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Toolchains\/XcodeDefault.xctoolchain\/usr\/lib\/swift\/xrsimulator\/prebuilt-modules\/26.5\/Network.swiftmodule\/x86_64-apple-xros-simulator.swiftmodule"
+  },
+  {
+    "isFramework" : false,
+    "moduleName" : "OSLog",
+    "modulePath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Toolchains\/XcodeDefault.xctoolchain\/usr\/lib\/swift\/xrsimulator\/prebuilt-modules\/26.5\/OSLog.swiftmodule\/x86_64-apple-xros-simulator.swiftmodule"
+  },
+  {
+    "isFramework" : false,
+    "moduleName" : "ObjectiveC",
+    "modulePath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Toolchains\/XcodeDefault.xctoolchain\/usr\/lib\/swift\/xrsimulator\/prebuilt-modules\/26.5\/ObjectiveC.swiftmodule\/x86_64-apple-xros-simulator.swiftmodule"
+  },
+  {
+    "isFramework" : false,
+    "moduleName" : "Observation",
+    "modulePath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Toolchains\/XcodeDefault.xctoolchain\/usr\/lib\/swift\/xrsimulator\/prebuilt-modules\/26.5\/Observation.swiftmodule\/x86_64-apple-xros-simulator.swiftmodule"
+  },
+  {
+    "isFramework" : false,
+    "moduleName" : "QuartzCore",
+    "modulePath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Toolchains\/XcodeDefault.xctoolchain\/usr\/lib\/swift\/xrsimulator\/prebuilt-modules\/26.5\/QuartzCore.swiftmodule\/x86_64-apple-xros-simulator.swiftmodule"
+  },
+  {
+    "isFramework" : true,
+    "moduleName" : "RealityFoundation",
+    "modulePath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Toolchains\/XcodeDefault.xctoolchain\/usr\/lib\/swift\/xrsimulator\/prebuilt-modules\/26.5\/RealityFoundation.swiftmodule\/x86_64-apple-xros-simulator.swiftmodule"
+  },
+  {
+    "isFramework" : true,
+    "moduleName" : "RealityKit",
+    "modulePath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Toolchains\/XcodeDefault.xctoolchain\/usr\/lib\/swift\/xrsimulator\/prebuilt-modules\/26.5\/RealityKit.swiftmodule\/x86_64-apple-xros-simulator.swiftmodule"
+  },
+  {
+    "isFramework" : false,
+    "moduleName" : "Spatial",
+    "modulePath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Toolchains\/XcodeDefault.xctoolchain\/usr\/lib\/swift\/xrsimulator\/prebuilt-modules\/26.5\/Spatial.swiftmodule\/x86_64-apple-xros-simulator.swiftmodule"
+  },
+  {
+    "isFramework" : false,
+    "moduleName" : "Swift",
+    "modulePath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Toolchains\/XcodeDefault.xctoolchain\/usr\/lib\/swift\/xrsimulator\/prebuilt-modules\/26.5\/Swift.swiftmodule\/x86_64-apple-xros-simulator.swiftmodule"
+  },
+  {
+    "isFramework" : false,
+    "moduleName" : "SwiftOnoneSupport",
+    "modulePath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Toolchains\/XcodeDefault.xctoolchain\/usr\/lib\/swift\/xrsimulator\/prebuilt-modules\/26.5\/SwiftOnoneSupport.swiftmodule\/x86_64-apple-xros-simulator.swiftmodule"
+  },
+  {
+    "isFramework" : true,
+    "moduleName" : "SwiftUI",
+    "modulePath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Toolchains\/XcodeDefault.xctoolchain\/usr\/lib\/swift\/xrsimulator\/prebuilt-modules\/26.5\/SwiftUI.swiftmodule\/x86_64-apple-xros-simulator.swiftmodule"
+  },
+  {
+    "isFramework" : true,
+    "moduleName" : "SwiftUICore",
+    "modulePath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Toolchains\/XcodeDefault.xctoolchain\/usr\/lib\/swift\/xrsimulator\/prebuilt-modules\/26.5\/SwiftUICore.swiftmodule\/x86_64-apple-xros-simulator.swiftmodule"
+  },
+  {
+    "isFramework" : true,
+    "moduleName" : "Symbols",
+    "modulePath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Toolchains\/XcodeDefault.xctoolchain\/usr\/lib\/swift\/xrsimulator\/prebuilt-modules\/26.5\/Symbols.swiftmodule\/x86_64-apple-xros-simulator.swiftmodule"
+  },
+  {
+    "isFramework" : false,
+    "moduleName" : "Synchronization",
+    "modulePath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Toolchains\/XcodeDefault.xctoolchain\/usr\/lib\/swift\/xrsimulator\/prebuilt-modules\/26.5\/Synchronization.swiftmodule\/x86_64-apple-xros-simulator.swiftmodule"
+  },
+  {
+    "isFramework" : false,
+    "moduleName" : "System",
+    "modulePath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Toolchains\/XcodeDefault.xctoolchain\/usr\/lib\/swift\/xrsimulator\/prebuilt-modules\/26.5\/System.swiftmodule\/x86_64-apple-xros-simulator.swiftmodule"
+  },
+  {
+    "isFramework" : true,
+    "moduleName" : "UIKit",
+    "modulePath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Toolchains\/XcodeDefault.xctoolchain\/usr\/lib\/swift\/xrsimulator\/prebuilt-modules\/26.5\/UIKit.swiftmodule\/x86_64-apple-xros-simulator.swiftmodule"
+  },
+  {
+    "isFramework" : false,
+    "moduleName" : "UniformTypeIdentifiers",
+    "modulePath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Toolchains\/XcodeDefault.xctoolchain\/usr\/lib\/swift\/xrsimulator\/prebuilt-modules\/26.5\/UniformTypeIdentifiers.swiftmodule\/x86_64-apple-xros-simulator.swiftmodule"
+  },
+  {
+    "isFramework" : false,
+    "moduleName" : "XPC",
+    "modulePath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Toolchains\/XcodeDefault.xctoolchain\/usr\/lib\/swift\/xrsimulator\/prebuilt-modules\/26.5\/XPC.swiftmodule\/x86_64-apple-xros-simulator.swiftmodule"
+  },
+  {
+    "isFramework" : false,
+    "moduleName" : "_Builtin_float",
+    "modulePath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Toolchains\/XcodeDefault.xctoolchain\/usr\/lib\/swift\/xrsimulator\/prebuilt-modules\/26.5\/_Builtin_float.swiftmodule\/x86_64-apple-xros-simulator.swiftmodule"
+  },
+  {
+    "isFramework" : false,
+    "moduleName" : "_Concurrency",
+    "modulePath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Toolchains\/XcodeDefault.xctoolchain\/usr\/lib\/swift\/xrsimulator\/prebuilt-modules\/26.5\/_Concurrency.swiftmodule\/x86_64-apple-xros-simulator.swiftmodule"
+  },
+  {
+    "isFramework" : false,
+    "moduleName" : "_DarwinFoundation1",
+    "modulePath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Toolchains\/XcodeDefault.xctoolchain\/usr\/lib\/swift\/xrsimulator\/prebuilt-modules\/26.5\/_DarwinFoundation1.swiftmodule\/x86_64-apple-xros-simulator.swiftmodule"
+  },
+  {
+    "isFramework" : false,
+    "moduleName" : "_DarwinFoundation2",
+    "modulePath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Toolchains\/XcodeDefault.xctoolchain\/usr\/lib\/swift\/xrsimulator\/prebuilt-modules\/26.5\/_DarwinFoundation2.swiftmodule\/x86_64-apple-xros-simulator.swiftmodule"
+  },
+  {
+    "isFramework" : false,
+    "moduleName" : "_DarwinFoundation3",
+    "modulePath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Toolchains\/XcodeDefault.xctoolchain\/usr\/lib\/swift\/xrsimulator\/prebuilt-modules\/26.5\/_DarwinFoundation3.swiftmodule\/x86_64-apple-xros-simulator.swiftmodule"
+  },
+  {
+    "isFramework" : true,
+    "moduleName" : "_RealityKit_SwiftUI",
+    "modulePath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Toolchains\/XcodeDefault.xctoolchain\/usr\/lib\/swift\/xrsimulator\/prebuilt-modules\/26.5\/_RealityKit_SwiftUI.swiftmodule\/x86_64-apple-xros-simulator.swiftmodule"
+  },
+  {
+    "isFramework" : false,
+    "moduleName" : "_StringProcessing",
+    "modulePath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Toolchains\/XcodeDefault.xctoolchain\/usr\/lib\/swift\/xrsimulator\/prebuilt-modules\/26.5\/_StringProcessing.swiftmodule\/x86_64-apple-xros-simulator.swiftmodule"
+  },
+  {
+    "isFramework" : false,
+    "moduleName" : "os",
+    "modulePath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Toolchains\/XcodeDefault.xctoolchain\/usr\/lib\/swift\/xrsimulator\/prebuilt-modules\/26.5\/os.swiftmodule\/x86_64-apple-xros-simulator.swiftmodule"
+  },
+  {
+    "isFramework" : false,
+    "moduleName" : "simd",
+    "modulePath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Toolchains\/XcodeDefault.xctoolchain\/usr\/lib\/swift\/xrsimulator\/prebuilt-modules\/26.5\/simd.swiftmodule\/x86_64-apple-xros-simulator.swiftmodule"
+  },
+  {
+    "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/XRSimulator.platform\/Developer\/SDKs\/XRSimulator.sdk\/System\/Library\/Frameworks\/ARKit.framework\/Modules\/module.modulemap",
+    "clangModulePath" : "\/Users\/wouterschut\/Documents\/VliegtuigtasApp\/build\/SwiftExplicitPrecompiledModules\/ARKit-1844LDMEIUYQ3L26SY5WJOHLO.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "ARKit"
+  },
+  {
+    "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/XRSimulator.platform\/Developer\/SDKs\/XRSimulator.sdk\/System\/Library\/Frameworks\/AVFAudio.framework\/Modules\/module.modulemap",
+    "clangModulePath" : "\/Users\/wouterschut\/Documents\/VliegtuigtasApp\/build\/SwiftExplicitPrecompiledModules\/AVFAudio-68FPBW42XDSLXIJK6ZG3YGDRH.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "AVFAudio"
+  },
+  {
+    "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/XRSimulator.platform\/Developer\/SDKs\/XRSimulator.sdk\/System\/Library\/Frameworks\/AVFoundation.framework\/Modules\/module.modulemap",
+    "clangModulePath" : "\/Users\/wouterschut\/Documents\/VliegtuigtasApp\/build\/SwiftExplicitPrecompiledModules\/AVFoundation-69J7PVHYXEEJ56Y0JWHT1S2WW.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "AVFoundation"
+  },
+  {
+    "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/XRSimulator.platform\/Developer\/SDKs\/XRSimulator.sdk\/System\/Library\/Frameworks\/AVRouting.framework\/Modules\/module.modulemap",
+    "clangModulePath" : "\/Users\/wouterschut\/Documents\/VliegtuigtasApp\/build\/SwiftExplicitPrecompiledModules\/AVRouting-CTX470HDKTM9FYNXPEE2KG9GJ.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "AVRouting"
+  },
+  {
+    "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/XRSimulator.platform\/Developer\/SDKs\/XRSimulator.sdk\/System\/Library\/Frameworks\/Accessibility.framework\/Modules\/module.modulemap",
+    "clangModulePath" : "\/Users\/wouterschut\/Documents\/VliegtuigtasApp\/build\/SwiftExplicitPrecompiledModules\/Accessibility-4HRBRUR1IYGY3A05XUKAR9GV3.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "Accessibility"
+  },
+  {
+    "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/XRSimulator.platform\/Developer\/SDKs\/XRSimulator.sdk\/System\/Library\/Frameworks\/AudioToolbox.framework\/Modules\/module.modulemap",
+    "clangModulePath" : "\/Users\/wouterschut\/Documents\/VliegtuigtasApp\/build\/SwiftExplicitPrecompiledModules\/AudioToolbox-32A9SXARHRRULTVVM4GFJ65J3.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "AudioToolbox"
+  },
+  {
+    "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/XRSimulator.platform\/Developer\/SDKs\/XRSimulator.sdk\/System\/Library\/Frameworks\/CFNetwork.framework\/Modules\/module.modulemap",
+    "clangModulePath" : "\/Users\/wouterschut\/Documents\/VliegtuigtasApp\/build\/SwiftExplicitPrecompiledModules\/CFNetwork-AQZ5JCKGGGYJBPG7HLX4ULGWK.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "CFNetwork"
+  },
+  {
+    "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/XRSimulator.platform\/Developer\/SDKs\/XRSimulator.sdk\/System\/Library\/Frameworks\/CloudKit.framework\/Modules\/module.modulemap",
+    "clangModulePath" : "\/Users\/wouterschut\/Documents\/VliegtuigtasApp\/build\/SwiftExplicitPrecompiledModules\/CloudKit-96B9I9BOZP7IYL7OYQXH7MDA2.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "CloudKit"
+  },
+  {
+    "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/XRSimulator.platform\/Developer\/SDKs\/XRSimulator.sdk\/System\/Library\/Frameworks\/CoreAudio.framework\/Modules\/module.modulemap",
+    "clangModulePath" : "\/Users\/wouterschut\/Documents\/VliegtuigtasApp\/build\/SwiftExplicitPrecompiledModules\/CoreAudio-D4KA9BCGZBHDHNKRPVP0A9PVP.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "CoreAudio"
+  },
+  {
+    "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/XRSimulator.platform\/Developer\/SDKs\/XRSimulator.sdk\/System\/Library\/Frameworks\/CoreAudioTypes.framework\/Modules\/module.modulemap",
+    "clangModulePath" : "\/Users\/wouterschut\/Documents\/VliegtuigtasApp\/build\/SwiftExplicitPrecompiledModules\/CoreAudioTypes-6EKQ7S6QYADYFVI1ZF0EH5MQV.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "CoreAudioTypes"
+  },
+  {
+    "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/XRSimulator.platform\/Developer\/SDKs\/XRSimulator.sdk\/System\/Library\/Frameworks\/CoreData.framework\/Modules\/module.modulemap",
+    "clangModulePath" : "\/Users\/wouterschut\/Documents\/VliegtuigtasApp\/build\/SwiftExplicitPrecompiledModules\/CoreData-6FJER8D5FBKV7P5OI7BSXQDBZ.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "CoreData"
+  },
+  {
+    "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/XRSimulator.platform\/Developer\/SDKs\/XRSimulator.sdk\/System\/Library\/Frameworks\/CoreFoundation.framework\/Modules\/module.modulemap",
+    "clangModulePath" : "\/Users\/wouterschut\/Documents\/VliegtuigtasApp\/build\/SwiftExplicitPrecompiledModules\/CoreFoundation-C7INDOF94SJ8D75JIQBHSEH1H.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "CoreFoundation"
+  },
+  {
+    "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/XRSimulator.platform\/Developer\/SDKs\/XRSimulator.sdk\/System\/Library\/Frameworks\/CoreGraphics.framework\/Modules\/module.modulemap",
+    "clangModulePath" : "\/Users\/wouterschut\/Documents\/VliegtuigtasApp\/build\/SwiftExplicitPrecompiledModules\/CoreGraphics-RLHQX6WEBTG8XL9C6JY564EM.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "CoreGraphics"
+  },
+  {
+    "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/XRSimulator.platform\/Developer\/SDKs\/XRSimulator.sdk\/System\/Library\/Frameworks\/CoreImage.framework\/Modules\/module.modulemap",
+    "clangModulePath" : "\/Users\/wouterschut\/Documents\/VliegtuigtasApp\/build\/SwiftExplicitPrecompiledModules\/CoreImage-C7JCBDI4JG2IB8W8D5EWWGXX5.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "CoreImage"
+  },
+  {
+    "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/XRSimulator.platform\/Developer\/SDKs\/XRSimulator.sdk\/System\/Library\/Frameworks\/CoreLocation.framework\/Modules\/module.modulemap",
+    "clangModulePath" : "\/Users\/wouterschut\/Documents\/VliegtuigtasApp\/build\/SwiftExplicitPrecompiledModules\/CoreLocation-6QJZJOXTC2R6C0C98FZ2FIU2Z.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "CoreLocation"
+  },
+  {
+    "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/XRSimulator.platform\/Developer\/SDKs\/XRSimulator.sdk\/System\/Library\/Frameworks\/CoreMIDI.framework\/Modules\/module.modulemap",
+    "clangModulePath" : "\/Users\/wouterschut\/Documents\/VliegtuigtasApp\/build\/SwiftExplicitPrecompiledModules\/CoreMIDI-AO30IQIMDTUIJ3T6L3SDFNOGZ.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "CoreMIDI"
+  },
+  {
+    "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/XRSimulator.platform\/Developer\/SDKs\/XRSimulator.sdk\/System\/Library\/Frameworks\/CoreMedia.framework\/Modules\/module.modulemap",
+    "clangModulePath" : "\/Users\/wouterschut\/Documents\/VliegtuigtasApp\/build\/SwiftExplicitPrecompiledModules\/CoreMedia-3DAKKD51OS5MQS3ASBZ8O8QZA.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "CoreMedia"
+  },
+  {
+    "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/XRSimulator.platform\/Developer\/SDKs\/XRSimulator.sdk\/System\/Library\/Frameworks\/CoreMotion.framework\/Modules\/module.modulemap",
+    "clangModulePath" : "\/Users\/wouterschut\/Documents\/VliegtuigtasApp\/build\/SwiftExplicitPrecompiledModules\/CoreMotion-PUXG64NF6YBF468OJIC11J8.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "CoreMotion"
+  },
+  {
+    "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/XRSimulator.platform\/Developer\/SDKs\/XRSimulator.sdk\/System\/Library\/Frameworks\/CoreServices.framework\/Modules\/module.modulemap",
+    "clangModulePath" : "\/Users\/wouterschut\/Documents\/VliegtuigtasApp\/build\/SwiftExplicitPrecompiledModules\/CoreServices-26VQRXFW8CP6MVZCED8S2A5PO.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "CoreServices"
+  },
+  {
+    "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/XRSimulator.platform\/Developer\/SDKs\/XRSimulator.sdk\/System\/Library\/Frameworks\/CoreText.framework\/Modules\/module.modulemap",
+    "clangModulePath" : "\/Users\/wouterschut\/Documents\/VliegtuigtasApp\/build\/SwiftExplicitPrecompiledModules\/CoreText-DF4JIEOF5GNKNZCHIOQRJ8W3W.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "CoreText"
+  },
+  {
+    "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/XRSimulator.platform\/Developer\/SDKs\/XRSimulator.sdk\/System\/Library\/Frameworks\/CoreTransferable.framework\/Modules\/module.modulemap",
+    "clangModulePath" : "\/Users\/wouterschut\/Documents\/VliegtuigtasApp\/build\/SwiftExplicitPrecompiledModules\/CoreTransferable-1KWKEANZ0DPS5GHXDU4O4MQFN.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "CoreTransferable"
+  },
+  {
+    "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/XRSimulator.platform\/Developer\/SDKs\/XRSimulator.sdk\/System\/Library\/Frameworks\/CoreVideo.framework\/Modules\/module.modulemap",
+    "clangModulePath" : "\/Users\/wouterschut\/Documents\/VliegtuigtasApp\/build\/SwiftExplicitPrecompiledModules\/CoreVideo-DB5205YA9TYGN0APZVH58BFGS.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "CoreVideo"
+  },
+  {
+    "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/XRSimulator.platform\/Developer\/SDKs\/XRSimulator.sdk\/usr\/include\/Darwin.modulemap",
+    "clangModulePath" : "\/Users\/wouterschut\/Documents\/VliegtuigtasApp\/build\/SwiftExplicitPrecompiledModules\/Darwin-CQTRAB2LWQXCCIALA63N8M20Y.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "Darwin"
+  },
+  {
+    "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/XRSimulator.platform\/Developer\/SDKs\/XRSimulator.sdk\/System\/Library\/Frameworks\/DataDetection.framework\/Modules\/module.modulemap",
+    "clangModulePath" : "\/Users\/wouterschut\/Documents\/VliegtuigtasApp\/build\/SwiftExplicitPrecompiledModules\/DataDetection-3NP3GIELFBOG6TZ06MZ1RO6ZO.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "DataDetection"
+  },
+  {
+    "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/XRSimulator.platform\/Developer\/SDKs\/XRSimulator.sdk\/System\/Library\/Frameworks\/DeveloperToolsSupport.framework\/Modules\/module.modulemap",
+    "clangModulePath" : "\/Users\/wouterschut\/Documents\/VliegtuigtasApp\/build\/SwiftExplicitPrecompiledModules\/DeveloperToolsSupport-C2XMLX2IVC6QJSM82XOBKWO1N.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "DeveloperToolsSupport"
+  },
+  {
+    "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/XRSimulator.platform\/Developer\/SDKs\/XRSimulator.sdk\/usr\/include\/dispatch.modulemap",
+    "clangModulePath" : "\/Users\/wouterschut\/Documents\/VliegtuigtasApp\/build\/SwiftExplicitPrecompiledModules\/Dispatch-IKN1DBNNZCNGEIVHQ3JPK6NE.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "Dispatch"
+  },
+  {
+    "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/XRSimulator.platform\/Developer\/SDKs\/XRSimulator.sdk\/System\/Library\/Frameworks\/FileProvider.framework\/Modules\/module.modulemap",
+    "clangModulePath" : "\/Users\/wouterschut\/Documents\/VliegtuigtasApp\/build\/SwiftExplicitPrecompiledModules\/FileProvider-6QAZBMNCJFZVUWWIN2V2VBUAB.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "FileProvider"
+  },
+  {
+    "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/XRSimulator.platform\/Developer\/SDKs\/XRSimulator.sdk\/System\/Library\/Frameworks\/Foundation.framework\/Modules\/module.modulemap",
+    "clangModulePath" : "\/Users\/wouterschut\/Documents\/VliegtuigtasApp\/build\/SwiftExplicitPrecompiledModules\/Foundation-DT00LIGGK7ZAOWGO1R4K4R6EI.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "Foundation"
+  },
+  {
+    "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/XRSimulator.platform\/Developer\/SDKs\/XRSimulator.sdk\/System\/Library\/Frameworks\/GameController.framework\/Modules\/module.modulemap",
+    "clangModulePath" : "\/Users\/wouterschut\/Documents\/VliegtuigtasApp\/build\/SwiftExplicitPrecompiledModules\/GameController-1TCLI0GQY36PQ2PSG9WRG1WGT.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "GameController"
+  },
+  {
+    "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/XRSimulator.platform\/Developer\/SDKs\/XRSimulator.sdk\/System\/Library\/Frameworks\/GroupActivities.framework\/Modules\/module.modulemap",
+    "clangModulePath" : "\/Users\/wouterschut\/Documents\/VliegtuigtasApp\/build\/SwiftExplicitPrecompiledModules\/GroupActivities-1AFV1AHGYZ6FJBKM1R6AN7RNJ.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "GroupActivities"
+  },
+  {
+    "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/XRSimulator.platform\/Developer\/SDKs\/XRSimulator.sdk\/System\/Library\/Frameworks\/IOSurface.framework\/Modules\/module.modulemap",
+    "clangModulePath" : "\/Users\/wouterschut\/Documents\/VliegtuigtasApp\/build\/SwiftExplicitPrecompiledModules\/IOSurface-5KV74XB0TMCFO6S3RSKZDVCAM.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "IOSurface"
+  },
+  {
+    "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/XRSimulator.platform\/Developer\/SDKs\/XRSimulator.sdk\/System\/Library\/Frameworks\/ImageIO.framework\/Modules\/module.modulemap",
+    "clangModulePath" : "\/Users\/wouterschut\/Documents\/VliegtuigtasApp\/build\/SwiftExplicitPrecompiledModules\/ImageIO-6WN5F59G93EINNAKK1MDOZIXT.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "ImageIO"
+  },
+  {
+    "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/XRSimulator.platform\/Developer\/SDKs\/XRSimulator.sdk\/System\/Library\/Frameworks\/LocalAuthentication.framework\/Modules\/module.modulemap",
+    "clangModulePath" : "\/Users\/wouterschut\/Documents\/VliegtuigtasApp\/build\/SwiftExplicitPrecompiledModules\/LocalAuthentication-68N9F3FV06YYTFQOX9FTVYEI3.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "LocalAuthentication"
+  },
+  {
+    "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/XRSimulator.platform\/Developer\/SDKs\/XRSimulator.sdk\/usr\/include\/DarwinBasic.modulemap",
+    "clangModulePath" : "\/Users\/wouterschut\/Documents\/VliegtuigtasApp\/build\/SwiftExplicitPrecompiledModules\/MachO-489LMIXKSWFADLXSHT3573CX9.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "MachO"
+  },
+  {
+    "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/XRSimulator.platform\/Developer\/SDKs\/XRSimulator.sdk\/System\/Library\/Frameworks\/MediaToolbox.framework\/Modules\/module.modulemap",
+    "clangModulePath" : "\/Users\/wouterschut\/Documents\/VliegtuigtasApp\/build\/SwiftExplicitPrecompiledModules\/MediaToolbox-AAOPK3GN0NYKNY9QWZ723E0IH.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "MediaToolbox"
+  },
+  {
+    "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/XRSimulator.platform\/Developer\/SDKs\/XRSimulator.sdk\/System\/Library\/Frameworks\/Metal.framework\/Modules\/module.modulemap",
+    "clangModulePath" : "\/Users\/wouterschut\/Documents\/VliegtuigtasApp\/build\/SwiftExplicitPrecompiledModules\/Metal-B8FSLLUMMD02735IIRDRT2US5.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "Metal"
+  },
+  {
+    "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/XRSimulator.platform\/Developer\/SDKs\/XRSimulator.sdk\/System\/Library\/Frameworks\/MultipeerConnectivity.framework\/Modules\/module.modulemap",
+    "clangModulePath" : "\/Users\/wouterschut\/Documents\/VliegtuigtasApp\/build\/SwiftExplicitPrecompiledModules\/MultipeerConnectivity-4LKC8U9LBLYSJRI8915VR4DMO.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "MultipeerConnectivity"
+  },
+  {
+    "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/XRSimulator.platform\/Developer\/SDKs\/XRSimulator.sdk\/System\/Library\/Frameworks\/Network.framework\/Modules\/module.modulemap",
+    "clangModulePath" : "\/Users\/wouterschut\/Documents\/VliegtuigtasApp\/build\/SwiftExplicitPrecompiledModules\/Network-516PAEWEAX1UFATMW6IXKCSQ5.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "Network"
+  },
+  {
+    "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/XRSimulator.platform\/Developer\/SDKs\/XRSimulator.sdk\/System\/Library\/Frameworks\/OSLog.framework\/Modules\/module.modulemap",
+    "clangModulePath" : "\/Users\/wouterschut\/Documents\/VliegtuigtasApp\/build\/SwiftExplicitPrecompiledModules\/OSLog-DAJG0YPNGMK7GKZQI0VTRJSPD.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "OSLog"
+  },
+  {
+    "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/XRSimulator.platform\/Developer\/SDKs\/XRSimulator.sdk\/usr\/include\/ObjectiveC.modulemap",
+    "clangModulePath" : "\/Users\/wouterschut\/Documents\/VliegtuigtasApp\/build\/SwiftExplicitPrecompiledModules\/ObjectiveC-R4LDTZVD1A6Z3DKGWD74PJ38.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "ObjectiveC"
+  },
+  {
+    "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/XRSimulator.platform\/Developer\/SDKs\/XRSimulator.sdk\/System\/Library\/Frameworks\/OpenGLES.framework\/Modules\/module.modulemap",
+    "clangModulePath" : "\/Users\/wouterschut\/Documents\/VliegtuigtasApp\/build\/SwiftExplicitPrecompiledModules\/OpenGLES-B09NOAQYWD9EZLA19IU57TFDL.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "OpenGLES"
+  },
+  {
+    "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/XRSimulator.platform\/Developer\/SDKs\/XRSimulator.sdk\/System\/Library\/Frameworks\/QuartzCore.framework\/Modules\/module.modulemap",
+    "clangModulePath" : "\/Users\/wouterschut\/Documents\/VliegtuigtasApp\/build\/SwiftExplicitPrecompiledModules\/QuartzCore-86SRLPI173IHNYKG0VYITG2UY.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "QuartzCore"
+  },
+  {
+    "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/XRSimulator.platform\/Developer\/SDKs\/XRSimulator.sdk\/System\/Library\/Frameworks\/Security.framework\/Modules\/module.modulemap",
+    "clangModulePath" : "\/Users\/wouterschut\/Documents\/VliegtuigtasApp\/build\/SwiftExplicitPrecompiledModules\/Security-1QNXQ3RZOVJGVTEOYYLADC1EA.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "Security"
+  },
+  {
+    "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/XRSimulator.platform\/Developer\/SDKs\/XRSimulator.sdk\/usr\/include\/Spatial\/module.modulemap",
+    "clangModulePath" : "\/Users\/wouterschut\/Documents\/VliegtuigtasApp\/build\/SwiftExplicitPrecompiledModules\/Spatial-2G942X5LJ610RG3X72X3TS7TV.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "Spatial"
+  },
+  {
+    "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/XRSimulator.platform\/Developer\/SDKs\/XRSimulator.sdk\/usr\/lib\/swift\/shims\/module.modulemap",
+    "clangModulePath" : "\/Users\/wouterschut\/Documents\/VliegtuigtasApp\/build\/SwiftExplicitPrecompiledModules\/SwiftShims-1G5VFERG9BJYO0883WS3EVVIQ.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "SwiftShims"
+  },
+  {
+    "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/XRSimulator.platform\/Developer\/SDKs\/XRSimulator.sdk\/System\/Library\/Frameworks\/SwiftUI.framework\/Modules\/module.modulemap",
+    "clangModulePath" : "\/Users\/wouterschut\/Documents\/VliegtuigtasApp\/build\/SwiftExplicitPrecompiledModules\/SwiftUI-7KX3K50NF7KFMKFGZ2BS9QD2.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "SwiftUI"
+  },
+  {
+    "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/XRSimulator.platform\/Developer\/SDKs\/XRSimulator.sdk\/System\/Library\/Frameworks\/SwiftUICore.framework\/Modules\/module.modulemap",
+    "clangModulePath" : "\/Users\/wouterschut\/Documents\/VliegtuigtasApp\/build\/SwiftExplicitPrecompiledModules\/SwiftUICore-824YBI1WXTLB20RAF2UR1PUFR.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "SwiftUICore"
+  },
+  {
+    "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/XRSimulator.platform\/Developer\/SDKs\/XRSimulator.sdk\/System\/Library\/Frameworks\/Symbols.framework\/Modules\/module.modulemap",
+    "clangModulePath" : "\/Users\/wouterschut\/Documents\/VliegtuigtasApp\/build\/SwiftExplicitPrecompiledModules\/Symbols-D1PO8ZG73V9TPMF02H4HGLWM1.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "Symbols"
+  },
+  {
+    "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/XRSimulator.platform\/Developer\/SDKs\/XRSimulator.sdk\/System\/Library\/Frameworks\/UIKit.framework\/Modules\/module.modulemap",
+    "clangModulePath" : "\/Users\/wouterschut\/Documents\/VliegtuigtasApp\/build\/SwiftExplicitPrecompiledModules\/UIKit-D7C3KRVVZQ1FHTCU9MQ84HMC2.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "UIKit"
+  },
+  {
+    "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/XRSimulator.platform\/Developer\/SDKs\/XRSimulator.sdk\/System\/Library\/SubFrameworks\/UIUtilities.framework\/Modules\/module.modulemap",
+    "clangModulePath" : "\/Users\/wouterschut\/Documents\/VliegtuigtasApp\/build\/SwiftExplicitPrecompiledModules\/UIUtilities-4WK6RNW02KJ56BWWWJIAW0TBJ.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "UIUtilities"
+  },
+  {
+    "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/XRSimulator.platform\/Developer\/SDKs\/XRSimulator.sdk\/System\/Library\/Frameworks\/UniformTypeIdentifiers.framework\/Modules\/module.modulemap",
+    "clangModulePath" : "\/Users\/wouterschut\/Documents\/VliegtuigtasApp\/build\/SwiftExplicitPrecompiledModules\/UniformTypeIdentifiers-3JYDT8SAVYEZDMOGHWUS0WGY8.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "UniformTypeIdentifiers"
+  },
+  {
+    "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/XRSimulator.platform\/Developer\/SDKs\/XRSimulator.sdk\/System\/Library\/Frameworks\/UserNotifications.framework\/Modules\/module.modulemap",
+    "clangModulePath" : "\/Users\/wouterschut\/Documents\/VliegtuigtasApp\/build\/SwiftExplicitPrecompiledModules\/UserNotifications-CDVTBTH5A6ZLSJG9777U1D1MJ.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "UserNotifications"
+  },
+  {
+    "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/XRSimulator.platform\/Developer\/SDKs\/XRSimulator.sdk\/usr\/include\/xpc.modulemap",
+    "clangModulePath" : "\/Users\/wouterschut\/Documents\/VliegtuigtasApp\/build\/SwiftExplicitPrecompiledModules\/XPC-2N1P36RVKAKNL3MPASVFK9F9P.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "XPC"
+  },
+  {
+    "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/XRSimulator.platform\/Developer\/SDKs\/XRSimulator.sdk\/usr\/include\/DarwinFoundation1.modulemap",
+    "clangModulePath" : "\/Users\/wouterschut\/Documents\/VliegtuigtasApp\/build\/SwiftExplicitPrecompiledModules\/_AvailabilityInternal-7S9HTZMA9DHCOSHANITYEFTLB.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "_AvailabilityInternal"
+  },
+  {
+    "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Toolchains\/XcodeDefault.xctoolchain\/usr\/lib\/clang\/21\/include\/module.modulemap",
+    "clangModulePath" : "\/Users\/wouterschut\/Documents\/VliegtuigtasApp\/build\/SwiftExplicitPrecompiledModules\/_Builtin_float-3UESY65Y2RHMXOISINC8IF5YY.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "_Builtin_float"
+  },
+  {
+    "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Toolchains\/XcodeDefault.xctoolchain\/usr\/lib\/clang\/21\/include\/module.modulemap",
+    "clangModulePath" : "\/Users\/wouterschut\/Documents\/VliegtuigtasApp\/build\/SwiftExplicitPrecompiledModules\/_Builtin_intrinsics-CHG3Q9TKR9I95FMFDYXFXCI64.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "_Builtin_intrinsics"
+  },
+  {
+    "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Toolchains\/XcodeDefault.xctoolchain\/usr\/lib\/clang\/21\/include\/module.modulemap",
+    "clangModulePath" : "\/Users\/wouterschut\/Documents\/VliegtuigtasApp\/build\/SwiftExplicitPrecompiledModules\/_Builtin_inttypes-4HNY708VT86POHFV9JL0PLJ8V.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "_Builtin_inttypes"
+  },
+  {
+    "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Toolchains\/XcodeDefault.xctoolchain\/usr\/lib\/clang\/21\/include\/module.modulemap",
+    "clangModulePath" : "\/Users\/wouterschut\/Documents\/VliegtuigtasApp\/build\/SwiftExplicitPrecompiledModules\/_Builtin_limits-6YXUM53QRK2QUBQFYM22Y9Y58.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "_Builtin_limits"
+  },
+  {
+    "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Toolchains\/XcodeDefault.xctoolchain\/usr\/lib\/clang\/21\/include\/module.modulemap",
+    "clangModulePath" : "\/Users\/wouterschut\/Documents\/VliegtuigtasApp\/build\/SwiftExplicitPrecompiledModules\/_Builtin_stdarg-EWDEHO3S4MNSS72UARWQFSJTA.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "_Builtin_stdarg"
+  },
+  {
+    "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Toolchains\/XcodeDefault.xctoolchain\/usr\/lib\/clang\/21\/include\/module.modulemap",
+    "clangModulePath" : "\/Users\/wouterschut\/Documents\/VliegtuigtasApp\/build\/SwiftExplicitPrecompiledModules\/_Builtin_stdatomic-1H5EV1IGUIRYVYJN8QF1KZLB2.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "_Builtin_stdatomic"
+  },
+  {
+    "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Toolchains\/XcodeDefault.xctoolchain\/usr\/lib\/clang\/21\/include\/module.modulemap",
+    "clangModulePath" : "\/Users\/wouterschut\/Documents\/VliegtuigtasApp\/build\/SwiftExplicitPrecompiledModules\/_Builtin_stdbool-3J1QK6SL5JFIN2SL1WZ54EXI8.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "_Builtin_stdbool"
+  },
+  {
+    "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Toolchains\/XcodeDefault.xctoolchain\/usr\/lib\/clang\/21\/include\/module.modulemap",
+    "clangModulePath" : "\/Users\/wouterschut\/Documents\/VliegtuigtasApp\/build\/SwiftExplicitPrecompiledModules\/_Builtin_stddef-15RQ3OV1RKJR0O73XCJ4VF6G8.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "_Builtin_stddef"
+  },
+  {
+    "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Toolchains\/XcodeDefault.xctoolchain\/usr\/lib\/clang\/21\/include\/module.modulemap",
+    "clangModulePath" : "\/Users\/wouterschut\/Documents\/VliegtuigtasApp\/build\/SwiftExplicitPrecompiledModules\/_Builtin_stdint-DN7HN7RL0LZD9ZXEYSSVAAYVL.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "_Builtin_stdint"
+  },
+  {
+    "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Toolchains\/XcodeDefault.xctoolchain\/usr\/lib\/clang\/21\/include\/module.modulemap",
+    "clangModulePath" : "\/Users\/wouterschut\/Documents\/VliegtuigtasApp\/build\/SwiftExplicitPrecompiledModules\/_Builtin_tgmath-D57PZCKDKMF5A1BJWD1MLUF57.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "_Builtin_tgmath"
+  },
+  {
+    "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/XRSimulator.platform\/Developer\/SDKs\/XRSimulator.sdk\/usr\/include\/DarwinFoundation1.modulemap",
+    "clangModulePath" : "\/Users\/wouterschut\/Documents\/VliegtuigtasApp\/build\/SwiftExplicitPrecompiledModules\/_DarwinFoundation1-7A90EN8GY0LQR8F1UKC7LJ8EW.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "_DarwinFoundation1"
+  },
+  {
+    "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/XRSimulator.platform\/Developer\/SDKs\/XRSimulator.sdk\/usr\/include\/DarwinFoundation2.modulemap",
+    "clangModulePath" : "\/Users\/wouterschut\/Documents\/VliegtuigtasApp\/build\/SwiftExplicitPrecompiledModules\/_DarwinFoundation2-8QWQ90WVGL0ZBG15U8ZPQFH3E.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "_DarwinFoundation2"
+  },
+  {
+    "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/XRSimulator.platform\/Developer\/SDKs\/XRSimulator.sdk\/usr\/include\/DarwinFoundation3.modulemap",
+    "clangModulePath" : "\/Users\/wouterschut\/Documents\/VliegtuigtasApp\/build\/SwiftExplicitPrecompiledModules\/_DarwinFoundation3-DGOMHX1Q3RZFHC8WQ6KMZCP90.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "_DarwinFoundation3"
+  },
+  {
+    "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/XRSimulator.platform\/Developer\/SDKs\/XRSimulator.sdk\/System\/Library\/Frameworks\/_LocationEssentials.framework\/Modules\/module.modulemap",
+    "clangModulePath" : "\/Users\/wouterschut\/Documents\/VliegtuigtasApp\/build\/SwiftExplicitPrecompiledModules\/_LocationEssentials-3D2J76HNHYUKOSN9KOJXSY77F.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "_LocationEssentials"
+  },
+  {
+    "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/XRSimulator.platform\/Developer\/SDKs\/XRSimulator.sdk\/usr\/lib\/swift\/shims\/module.modulemap",
+    "clangModulePath" : "\/Users\/wouterschut\/Documents\/VliegtuigtasApp\/build\/SwiftExplicitPrecompiledModules\/_SwiftConcurrencyShims-ESRL6EX805S95KE0DQZE2USVB.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "_SwiftConcurrencyShims"
+  },
+  {
+    "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/XRSimulator.platform\/Developer\/SDKs\/XRSimulator.sdk\/usr\/include\/dnssd.modulemap",
+    "clangModulePath" : "\/Users\/wouterschut\/Documents\/VliegtuigtasApp\/build\/SwiftExplicitPrecompiledModules\/dnssd-111B1TH8AEVIXM4PBGDBW6BEB.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "dnssd"
+  },
+  {
+    "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/XRSimulator.platform\/Developer\/SDKs\/XRSimulator.sdk\/usr\/include\/os.modulemap",
+    "clangModulePath" : "\/Users\/wouterschut\/Documents\/VliegtuigtasApp\/build\/SwiftExplicitPrecompiledModules\/os-2M3Y4K4ZAVRLQSXR77VU5RPWK.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "os"
+  },
+  {
+    "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/XRSimulator.platform\/Developer\/SDKs\/XRSimulator.sdk\/usr\/include\/os.modulemap",
+    "clangModulePath" : "\/Users\/wouterschut\/Documents\/VliegtuigtasApp\/build\/SwiftExplicitPrecompiledModules\/os_object-IMVJDH3IZM7PX2RPZO3STQ2Z.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "os_object"
+  },
+  {
+    "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/XRSimulator.platform\/Developer\/SDKs\/XRSimulator.sdk\/usr\/include\/os.modulemap",
+    "clangModulePath" : "\/Users\/wouterschut\/Documents\/VliegtuigtasApp\/build\/SwiftExplicitPrecompiledModules\/os_workgroup-1SZ2SJWZFN6TMHTTDDWWLVRMI.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "os_workgroup"
+  },
+  {
+    "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Toolchains\/XcodeDefault.xctoolchain\/usr\/lib\/clang\/21\/include\/module.modulemap",
+    "clangModulePath" : "\/Users\/wouterschut\/Documents\/VliegtuigtasApp\/build\/SwiftExplicitPrecompiledModules\/ptrauth-85HFMZ40PCC2LYW2RP8XE5QS6.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "ptrauth"
+  },
+  {
+    "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Toolchains\/XcodeDefault.xctoolchain\/usr\/lib\/clang\/21\/include\/module.modulemap",
+    "clangModulePath" : "\/Users\/wouterschut\/Documents\/VliegtuigtasApp\/build\/SwiftExplicitPrecompiledModules\/ptrcheck-694F7FKK5Y6O0QDK1G8DW1Y46.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "ptrcheck"
+  },
+  {
+    "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/XRSimulator.platform\/Developer\/SDKs\/XRSimulator.sdk\/usr\/include\/simd\/module.modulemap",
+    "clangModulePath" : "\/Users\/wouterschut\/Documents\/VliegtuigtasApp\/build\/SwiftExplicitPrecompiledModules\/simd-GU50WJ1LVHN1XBJKRQHS4UGE.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "simd"
+  },
+  {
+    "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/XRSimulator.platform\/Developer\/SDKs\/XRSimulator.sdk\/usr\/include\/DarwinFoundation2.modulemap",
+    "clangModulePath" : "\/Users\/wouterschut\/Documents\/VliegtuigtasApp\/build\/SwiftExplicitPrecompiledModules\/sys_types-EES0R43R9KOLEWK5B7KSJ78OK.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "sys_types"
+  }
+]

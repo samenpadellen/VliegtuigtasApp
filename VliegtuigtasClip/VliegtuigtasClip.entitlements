@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>com.apple.developer.parent-application-identifiers</key>
+	<array>
+		<string>$(AppIdentifierPrefix)com.vliegtuigtas.app</string>
+	</array>
+	<!-- Zonder appclips-domeinen komt een URL-invocatie (met ?airline=…)
+	     nooit bij de clip aan en start hij altijd "kaal". -->
+	<key>com.apple.developer.associated-domains</key>
+	<array>
+		<string>appclips:vliegtuigtas.com</string>
+		<string>appclips:www.vliegtuigtas.com</string>
+	</array>
+</dict>
+</plist>

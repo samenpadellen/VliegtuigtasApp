@@ -61,7 +61,7 @@ private struct WAPIResponse<T: Decodable>: Decodable {
 
 private enum WidgetAPI {
     static let apiKey = "lFkEQW18oyMrdMsbfNK1DtnDnoCcqwNSBRfMCXmszUgbAoLf"
-    static let base = URL(string: "https://www.vliegtuigtas.com/api/public/v1")!
+    static let base = URL(string: "https://vliegtuigtas.com/api/public/v1")!
     static let cacheKey = "vt_widget_airlines_cache"
 
     static func fetchAirlines() async throws -> [WAirline] {
@@ -209,6 +209,36 @@ struct BagageProvider: AppIntentTimelineProvider {
     }
 }
 
+// MARK: - Solari-klepjes (statisch: widgets zijn snapshots)
+
+/// Zelfde vertrekbord-look als in de app: donkere klepjes met monospaced
+/// kapitalen en de horizontale naad. Zonder animatie, maar onmiskenbaar
+/// hetzelfde bord.
+private struct FlapTiles: View {
+    let text: String
+    var size: CGFloat = 15
+
+    var body: some View {
+        HStack(spacing: size * 0.14) {
+            ForEach(Array(text.uppercased().enumerated()), id: \.offset) { _, char in
+                Text(String(char))
+                    .font(.system(size: size, weight: .heavy, design: .monospaced))
+                    .foregroundStyle(.white)
+                    .frame(width: size * 0.78, height: size * 1.35)
+                    .background(
+                        RoundedRectangle(cornerRadius: size * 0.14)
+                            .fill(Color(red: 0.03, green: 0.06, blue: 0.13))
+                    )
+                    .overlay(
+                        Rectangle()
+                            .fill(.black.opacity(0.35))
+                            .frame(height: 1)
+                    )
+            }
+        }
+    }
+}
+
 // MARK: - Widget views
 
 struct BagageWidgetView: View {
@@ -250,13 +280,10 @@ struct BagageWidgetView: View {
                     .font(.system(size: 8, weight: .bold, design: .rounded))
                     .foregroundStyle(.white.opacity(0.55))
                     .kerning(0.8)
-                Text(entry.largeDims ?? entry.smallDims ?? "—")
-                    .font(.system(size: 21, weight: .black, design: .rounded))
-                    .foregroundStyle(.white)
-                    .minimumScaleFactor(0.6)
-                    .lineLimit(1)
+                FlapTiles(text: entry.largeDims ?? entry.smallDims ?? "—", size: 15)
                 Text("cm" + (entry.maxWeight.map { " · max \($0)" } ?? ""))
                     .font(.system(size: 10, weight: .medium, design: .rounded))
+                    .monospacedDigit()
                     .foregroundStyle(.white.opacity(0.75))
             }
         }
@@ -312,11 +339,7 @@ struct BagageWidgetView: View {
             }
             .foregroundStyle(.white.opacity(0.6))
 
-            Text(dims ?? "—")
-                .font(.system(size: 19, weight: .black, design: .rounded))
-                .foregroundStyle(.white)
-                .minimumScaleFactor(0.6)
-                .lineLimit(1)
+            FlapTiles(text: dims ?? "—", size: 13)
 
             if let footnote {
                 Text(footnote)
@@ -330,10 +353,14 @@ struct BagageWidgetView: View {
     }
 
     // — Lock screen —
+    // Let op: óók accessory-families hebben sinds iOS 17 een
+    // containerBackground nodig, anders rendert WidgetKit ze niet.
 
     private var inlineView: some View {
         // Eén regel boven de klok: "KLM · 55×35×25 cm"
         Text("\(entry.airlineName) · \(entry.largeDims ?? entry.smallDims ?? "—") cm")
+            .monospacedDigit()
+            .containerBackground(for: .widget) { Color.clear }
     }
 
     private var circularView: some View {
@@ -341,31 +368,38 @@ struct BagageWidgetView: View {
             AccessoryWidgetBackground()
             VStack(spacing: 1) {
                 Image(systemName: "bag.fill")
-                    .font(.system(size: 13, weight: .semibold))
+                    .font(.system(size: 12, weight: .semibold))
+                    .widgetAccentable()
                 Text(entry.maxWeight ?? String(entry.airlineName.prefix(4)))
-                    .font(.system(size: 10, weight: .bold, design: .rounded))
+                    .font(.system(size: 11, weight: .heavy, design: .rounded))
+                    .monospacedDigit()
                     .minimumScaleFactor(0.6)
                     .lineLimit(1)
             }
         }
+        .containerBackground(for: .widget) { Color.clear }
     }
 
     private var rectangularView: some View {
-        VStack(alignment: .leading, spacing: 1) {
+        VStack(alignment: .leading, spacing: 2) {
             HStack(spacing: 4) {
                 Image(systemName: "bag.fill")
                     .font(.system(size: 10, weight: .semibold))
+                    .widgetAccentable()
                 Text(entry.airlineName)
-                    .font(.system(size: 13, weight: .bold, design: .rounded))
+                    .font(.system(size: 13, weight: .heavy, design: .rounded))
                     .lineLimit(1)
             }
             Text("Cabine \(entry.largeDims ?? "—") cm")
-                .font(.system(size: 12, weight: .medium, design: .rounded))
+                .font(.system(size: 12, weight: .semibold, design: .rounded))
+                .monospacedDigit()
             Text("Stoel \(entry.smallDims ?? "—")" + (entry.maxWeight.map { " · \($0)" } ?? ""))
                 .font(.system(size: 12, weight: .medium, design: .rounded))
+                .monospacedDigit()
                 .foregroundStyle(.secondary)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
+        .containerBackground(for: .widget) { Color.clear }
     }
 }
 
@@ -384,6 +418,15 @@ private enum SharedFlight {
         return Date(timeIntervalSince1970: t)
     }
 
+    /// "AMS → LHR", of nil als de route niet bekend is.
+    static var routeLabel: String? {
+        guard let dep = nonEmpty(suite?.string(forKey: "vt_shared_flight_dep_iata")),
+              let arr = nonEmpty(suite?.string(forKey: "vt_shared_flight_arr_iata")) else { return nil }
+        return "\(dep) → \(arr)"
+    }
+
+    static var arrivalAirport: String? { nonEmpty(suite?.string(forKey: "vt_shared_flight_arr_name")) }
+
     private static func nonEmpty(_ s: String?) -> String? {
         guard let s, !s.isEmpty else { return nil }
         return s
@@ -399,6 +442,8 @@ struct VluchtEntry: TimelineEntry {
     let airlineName: String?
     let airlineSlug: String?
     let departure: Date?
+    var routeLabel: String? = nil
+    var arrivalAirport: String? = nil
 
     /// Hele dagen tot vertrek (0 = vandaag, negatief = geweest).
     var daysLeft: Int? {
@@ -420,6 +465,16 @@ struct VluchtEntry: TimelineEntry {
         firstName.map { "Hey \($0) 👋" } ?? "Jouw vlucht"
     }
 
+    /// Korte variant voor de Solari-klepjes op de widget.
+    var flapCountdown: String {
+        guard let days = daysLeft, days >= 0 else { return "GEEN VLUCHT" }
+        switch days {
+        case 0:  return "VANDAAG"
+        case 1:  return "MORGEN"
+        default: return "\(days) DAGEN"
+        }
+    }
+
     var countdownTitle: String {
         guard let days = daysLeft, days >= 0 else { return "Geen vlucht gepland" }
         switch days {
@@ -436,7 +491,7 @@ struct VluchtEntry: TimelineEntry {
         switch days {
         case 0:  return firstName.map { "Goede reis, \($0)! ✈️" } ?? "Goede reis! ✈️"
         case 1:  return "Laatste check: past je handbagage?"
-        case 2...4: return "Bijna zover — let op je koffer!"
+        case 2...4: return "Bijna zover, let op je koffer!"
         default: return "Let op je koffer: check alvast de maten."
         }
     }
@@ -486,7 +541,9 @@ struct VluchtProvider: TimelineProvider {
             flightNumber: SharedFlight.flightNumber,
             airlineName: SharedFlight.airlineName,
             airlineSlug: SharedFlight.airlineSlug,
-            departure: SharedFlight.departure
+            departure: SharedFlight.departure,
+            routeLabel: SharedFlight.routeLabel,
+            arrivalAirport: SharedFlight.arrivalAirport
         )
     }
 }
@@ -532,11 +589,7 @@ struct VluchtWidgetView: View {
                 Image(systemName: "airplane.departure")
                     .font(.system(size: 16, weight: .semibold))
                     .foregroundStyle(WTheme.yellow)
-                Text(entry.countdownTitle)
-                    .font(.system(size: 19, weight: .black, design: .rounded))
-                    .foregroundStyle(.white)
-                    .minimumScaleFactor(0.6)
-                    .lineLimit(1)
+                FlapTiles(text: entry.flapCountdown, size: 13)
                 if let flightLine {
                     Text(flightLine)
                         .font(.system(size: 10, weight: .semibold, design: .rounded))
@@ -573,15 +626,18 @@ struct VluchtWidgetView: View {
                 Text(entry.greeting)
                     .font(.system(size: 12, weight: .semibold, design: .rounded))
                     .foregroundStyle(.white.opacity(0.75))
-                Text(entry.countdownTitle)
-                    .font(.system(size: 24, weight: .black, design: .rounded))
-                    .foregroundStyle(.white)
-                    .minimumScaleFactor(0.6)
-                    .lineLimit(1)
+                FlapTiles(text: entry.flapCountdown, size: 17)
                 if let flightLine {
                     Text(flightLine)
                         .font(.system(size: 12, weight: .semibold, design: .rounded))
                         .foregroundStyle(WTheme.yellow)
+                        .lineLimit(1)
+                }
+                if let route = entry.routeLabel {
+                    Text(route + (entry.arrivalAirport.map { " · \($0)" } ?? ""))
+                        .font(.system(size: 11, weight: .bold, design: .rounded))
+                        .monospacedDigit()
+                        .foregroundStyle(.white.opacity(0.85))
                         .lineLimit(1)
                 }
                 Spacer(minLength: 0)
@@ -607,6 +663,7 @@ struct VluchtWidgetView: View {
                     VStack(spacing: 0) {
                         Text("\(days)")
                             .font(.system(size: 22, weight: .black, design: .rounded))
+                            .monospacedDigit()
                             .foregroundStyle(.white)
                         Text(days == 1 ? "dag" : "dgn")
                             .font(.system(size: 9, weight: .semibold, design: .rounded))
@@ -631,15 +688,18 @@ struct VluchtWidgetView: View {
     }
 
     // — Lock screen —
+    // Ook hier: containerBackground verplicht, anders geen rendering.
 
     private var inlineView: some View {
         Group {
             if entry.hasUpcomingFlight, let days = entry.daysLeft {
                 Text("✈︎ \(entry.flightNumber ?? "Vlucht") · \(days == 0 ? "vandaag" : days == 1 ? "morgen" : "nog \(days) dgn")")
+                    .monospacedDigit()
             } else {
                 Text("✈︎ Geen vlucht gepland")
             }
         }
+        .containerBackground(for: .widget) { Color.clear }
     }
 
     private var circularView: some View {
@@ -648,34 +708,42 @@ struct VluchtWidgetView: View {
             if entry.hasUpcomingFlight, let days = entry.daysLeft {
                 VStack(spacing: 0) {
                     Text("\(days)")
-                        .font(.system(size: 18, weight: .black, design: .rounded))
+                        .font(.system(size: 20, weight: .black, design: .rounded))
+                        .monospacedDigit()
+                        .widgetAccentable()
                     Text(days == 1 ? "dag" : "dgn")
                         .font(.system(size: 9, weight: .semibold, design: .rounded))
                 }
             } else {
                 Image(systemName: "airplane")
                     .font(.system(size: 16, weight: .semibold))
+                    .widgetAccentable()
             }
         }
+        .containerBackground(for: .widget) { Color.clear }
     }
 
     private var rectangularView: some View {
-        VStack(alignment: .leading, spacing: 1) {
+        VStack(alignment: .leading, spacing: 2) {
             HStack(spacing: 4) {
                 Image(systemName: "airplane.departure")
                     .font(.system(size: 10, weight: .semibold))
+                    .widgetAccentable()
                 Text(flightLine ?? entry.greeting)
                     .font(.system(size: 12, weight: .bold, design: .rounded))
                     .lineLimit(1)
             }
             Text(entry.countdownTitle)
-                .font(.system(size: 14, weight: .black, design: .rounded))
-            Text(entry.bagReminder)
+                .font(.system(size: 15, weight: .black, design: .rounded))
+                .monospacedDigit()
+                .widgetAccentable()
+            Text(entry.routeLabel ?? entry.bagReminder)
                 .font(.system(size: 11, weight: .medium, design: .rounded))
                 .foregroundStyle(.secondary)
                 .lineLimit(1)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
+        .containerBackground(for: .widget) { Color.clear }
     }
 }
 
@@ -686,7 +754,7 @@ struct VluchtCountdownWidget: Widget {
         StaticConfiguration(kind: kind, provider: VluchtProvider()) { entry in
             VluchtWidgetView(entry: entry)
         }
-        .configurationDisplayName("Vlucht-aftelling")
+        .configurationDisplayName("Vluchtaftelling")
         .description("Telt af naar je opgeslagen vlucht en herinnert je op tijd aan je koffer.")
         .supportedFamilies([
             .systemSmall,
@@ -695,6 +763,304 @@ struct VluchtCountdownWidget: Widget {
             .accessoryCircular,
             .accessoryRectangular
         ])
+    }
+}
+
+// MARK: - Purser Pim: dagelijkse pak-tip
+
+/// Zelfde pet-mascotte als in de app (géén sparkles/AI-iconografie) — eigen
+/// kopie hier, want de widget-extensie deelt geen SwiftUI-bestanden met de
+/// hoofdapp.
+private struct PimCapIcon: View {
+    var size: CGFloat = 30
+
+    var body: some View {
+        ZStack {
+            Ellipse()
+                .fill(Color(red: 0.08, green: 0.10, blue: 0.16))
+                .frame(width: size * 0.78, height: size * 0.34)
+                .offset(y: size * 0.22)
+            Ellipse()
+                .fill(.white)
+                .frame(width: size, height: size * 0.62)
+                .offset(y: -size * 0.10)
+            Capsule()
+                .fill(WTheme.navy)
+                .frame(width: size * 0.94, height: size * 0.30)
+                .offset(y: size * 0.10)
+            Image(systemName: "airplane")
+                .font(.system(size: size * 0.20, weight: .bold))
+                .foregroundStyle(WTheme.yellow)
+                .offset(y: size * 0.10)
+        }
+        .frame(width: size, height: size * 0.9)
+    }
+}
+
+/// Statische pak-tips van Purser Pim, in vaste rotatie — getoond zolang er
+/// geen recente, écht door Apple Intelligence gegenereerde tip in de cache
+/// staat (zie `PimTipCache` hieronder, geschreven door de hoofdapp).
+private enum PimStaticTips {
+    static let all: [String] = [
+        "Rol kleding op in plaats van vouwen: je wint zo al snel 30% ruimte in je handbagage.",
+        "Zet je zwaarste spullen onderin, tegen de wielenkant — dat rolt het prettigst en is het stevigst.",
+        "Draag je dikste jas of trui aan boord in plaats van in te pakken: dat scheelt letterlijk kilo's in je tas.",
+        "Vloeistoffen boven 100 ml horen in de ruimbagage, niet in je handbagage.",
+        "Powerbanks moeten juist wél in je handbagage — nooit in de ruimbagage.",
+        "Weeg je tas thuis op de badkamerweegschaal voor je vertrekt: geen verrassingen bij de balie.",
+        "Gebruik packing cubes: ze houden je tas overzichtelijk én persen kleding compacter.",
+        "Print of download je instapkaart alvast: sommige maatschappijen rekenen extra aan de balie.",
+        "Bewaar medicijnen in de originele verpakking mét etiket, voor het geval security ernaar vraagt.",
+        "Check de bagageregels van je maatschappij vóór je een nieuwe koffer koopt: maten verschillen enorm.",
+        "Een universele stekkeradapter weegt bijna niets en past in elk hoekje van je tas.",
+        "Label je koffer aan de binnen- én buitenkant: dan vindt de luchthaven 'm altijd terug.",
+        "Kom ruim op tijd bij de gate: bagagevakken raken snel vol bij het instappen.",
+        "Check vlak voor vertrek nog eens de regels van je maatschappij: die wijzigen weleens."
+    ]
+
+    /// Rouleert per kalenderdag, zodat de tip een hele dag hetzelfde blijft.
+    static func forDay(_ date: Date) -> String {
+        let dayNumber = Calendar.current.ordinality(of: .day, in: .year, for: date) ?? 0
+        return all[dayNumber % all.count]
+    }
+}
+
+/// Écht door Pim (Apple Intelligence) gegenereerde tip, geschreven door de
+/// hoofdapp zodra je daar pakadvies opvraagt — widgets kunnen zelf geen
+/// taalmodel-sessie starten, dus dit is de brug tussen de twee.
+private enum PimTipCache {
+    static var tip: String? {
+        guard let t = SharedFlight.suite?.string(forKey: "vt_shared_pim_tip"), !t.isEmpty else { return nil }
+        return t
+    }
+
+    static var airlineName: String? {
+        let name = SharedFlight.suite?.string(forKey: "vt_shared_pim_tip_airline")
+        return (name?.isEmpty ?? true) ? nil : name
+    }
+
+    /// Ouder dan 7 dagen tonen we niet meer als "van Pim": dan is de
+    /// statische rotatie actueler dan een oude AI-tip.
+    static var isFresh: Bool {
+        let stamp = SharedFlight.suite?.double(forKey: "vt_shared_pim_tip_stamp") ?? 0
+        guard stamp > 0 else { return false }
+        return Date().timeIntervalSince1970 - stamp < 7 * 24 * 3600
+    }
+}
+
+struct PimTipEntry: TimelineEntry {
+    let date: Date
+    let tip: String
+    let airlineName: String?
+    /// Écht door Apple Intelligence gegenereerd, i.p.v. statisch geroteerd.
+    let isFromPim: Bool
+}
+
+extension PimTipEntry {
+    static let placeholder = PimTipEntry(
+        date: .now,
+        tip: "Rol kleding op in plaats van vouwen: je wint zo al snel 30% ruimte in je handbagage.",
+        airlineName: nil,
+        isFromPim: false
+    )
+}
+
+struct PimTipProvider: TimelineProvider {
+    func placeholder(in context: Context) -> PimTipEntry { .placeholder }
+
+    func getSnapshot(in context: Context, completion: @escaping (PimTipEntry) -> Void) {
+        completion(context.isPreview ? .placeholder : entry(at: .now))
+    }
+
+    func getTimeline(in context: Context, completion: @escaping (Timeline<PimTipEntry>) -> Void) {
+        // Eén entry per dag voor een week: de tip rouleert zonder netwerk
+        // of achtergrondwerk. Verandert de AI-cache tussentijds (nieuw
+        // pakadvies in de app), dan herlaadt de app de timeline zelf.
+        let cal = Calendar.current
+        var entries: [PimTipEntry] = []
+        var day = cal.startOfDay(for: .now)
+        for _ in 0..<7 {
+            entries.append(entry(at: day))
+            guard let next = cal.date(byAdding: .day, value: 1, to: day) else { break }
+            day = next
+        }
+        completion(Timeline(entries: entries, policy: .atEnd))
+    }
+
+    private func entry(at date: Date) -> PimTipEntry {
+        if PimTipCache.isFresh, let cached = PimTipCache.tip {
+            return PimTipEntry(date: date, tip: cached, airlineName: PimTipCache.airlineName, isFromPim: true)
+        }
+        return PimTipEntry(date: date, tip: PimStaticTips.forDay(date), airlineName: nil, isFromPim: false)
+    }
+}
+
+struct PurserPimWidgetView: View {
+    @Environment(\.widgetFamily) private var family
+    let entry: PimTipEntry
+
+    var body: some View {
+        Group {
+            switch family {
+            case .accessoryInline:      inlineView
+            case .accessoryCircular:    circularView
+            case .accessoryRectangular: rectangularView
+            case .systemMedium:         mediumView
+            default:                    smallView
+            }
+        }
+        .widgetURL(URL(string: "vliegtuigtas://pim"))
+    }
+
+    private var kicker: String {
+        if entry.isFromPim, let airline = entry.airlineName {
+            return "PIM'S TIP VOOR \(airline.uppercased())"
+        }
+        return "PIM'S TIP VAN DE DAG"
+    }
+
+    // — Home screen: klein —
+
+    private var smallView: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack(spacing: 6) {
+                PimCapIcon(size: 22)
+                Text("Purser Pim")
+                    .font(.system(size: 12, weight: .bold, design: .rounded))
+                    .foregroundStyle(.white)
+            }
+            Spacer(minLength: 0)
+            Text(kicker)
+                .font(.system(size: 8, weight: .bold, design: .rounded))
+                .foregroundStyle(WTheme.yellow)
+                .kerning(0.5)
+            Text(entry.tip)
+                .font(.system(size: 11, weight: .medium, design: .rounded))
+                .foregroundStyle(.white.opacity(0.9))
+                .lineLimit(5)
+                .minimumScaleFactor(0.85)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
+        .containerBackground(for: .widget) { WTheme.navyGradient }
+    }
+
+    // — Home screen: medium —
+
+    private var mediumView: some View {
+        HStack(alignment: .top, spacing: 12) {
+            PimCapIcon(size: 34)
+            VStack(alignment: .leading, spacing: 6) {
+                HStack(spacing: 6) {
+                    Text("Purser Pim")
+                        .font(.system(size: 14, weight: .bold, design: .rounded))
+                        .foregroundStyle(.white)
+                    if entry.isFromPim {
+                        Image(systemName: "checkmark.seal.fill")
+                            .font(.system(size: 10))
+                            .foregroundStyle(WTheme.yellow)
+                    }
+                }
+                Text(kicker)
+                    .font(.system(size: 9, weight: .bold, design: .rounded))
+                    .foregroundStyle(WTheme.yellow)
+                    .kerning(0.5)
+                Text(entry.tip)
+                    .font(.system(size: 12, weight: .medium, design: .rounded))
+                    .foregroundStyle(.white.opacity(0.9))
+                    .lineLimit(4)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
+        .containerBackground(for: .widget) { WTheme.navyGradient }
+    }
+
+    // — Lock screen —
+    // Accessory-families renderen monochroom: geen custom mascotte-vormen
+    // hier, gewoon een duidelijk SF Symbol zoals bij de andere widgets.
+
+    private var inlineView: some View {
+        Text("Pim: \(entry.tip)")
+            .containerBackground(for: .widget) { Color.clear }
+    }
+
+    private var circularView: some View {
+        ZStack {
+            AccessoryWidgetBackground()
+            VStack(spacing: 1) {
+                Image(systemName: "quote.bubble.fill")
+                    .font(.system(size: 14, weight: .semibold))
+                    .widgetAccentable()
+                Text("PIM")
+                    .font(.system(size: 9, weight: .heavy, design: .rounded))
+            }
+        }
+        .containerBackground(for: .widget) { Color.clear }
+    }
+
+    private var rectangularView: some View {
+        VStack(alignment: .leading, spacing: 2) {
+            HStack(spacing: 4) {
+                Image(systemName: "quote.bubble.fill")
+                    .font(.system(size: 10, weight: .semibold))
+                    .widgetAccentable()
+                Text("Purser Pim")
+                    .font(.system(size: 12, weight: .bold, design: .rounded))
+            }
+            Text(entry.tip)
+                .font(.system(size: 11, weight: .medium, design: .rounded))
+                .foregroundStyle(.secondary)
+                .lineLimit(3)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .containerBackground(for: .widget) { Color.clear }
+    }
+}
+
+struct PurserPimWidget: Widget {
+    let kind = "PurserPimWidget"
+
+    var body: some WidgetConfiguration {
+        StaticConfiguration(kind: kind, provider: PimTipProvider()) { entry in
+            PurserPimWidgetView(entry: entry)
+        }
+        .configurationDisplayName("Purser Pim")
+        .description("Elke dag een pak-tip van Purser Pim — persoonlijk zodra je pakadvies in de app hebt gevraagd.")
+        .supportedFamilies([
+            .systemSmall,
+            .systemMedium,
+            .accessoryInline,
+            .accessoryCircular,
+            .accessoryRectangular
+        ])
+    }
+}
+
+// MARK: - Control Center-knop (iOS 18+)
+
+/// Bedieningspaneel-knop: één veeg en tik en je staat in de bagagecheck —
+/// ook vanaf het toegangsscherm. Vervangbaar via Instellingen > Bedieningspaneel.
+@available(iOS 18.0, *)
+struct OpenCheckerControlIntent: AppIntent {
+    static var title: LocalizedStringResource = "Open de bagagecheck"
+    static var description = IntentDescription("Opent Vliegtuigtas op het checkscherm.")
+    static let openAppWhenRun = true
+
+    func perform() async throws -> some IntentResult & OpensIntent {
+        .result(opensIntent: OpenURLIntent(URL(string: "vliegtuigtas://check")!))
+    }
+}
+
+@available(iOS 18.0, *)
+struct BagageCheckControl: ControlWidget {
+    var body: some ControlWidgetConfiguration {
+        StaticControlConfiguration(kind: "BagageCheckControl") {
+            ControlWidgetButton(action: OpenCheckerControlIntent()) {
+                Label("Bagagecheck", systemImage: "suitcase.rolling.fill")
+            }
+        }
+        .displayName("Bagagecheck")
+        .description("Open de handbagagecheck direct vanuit het Bedieningspaneel.")
     }
 }
 
@@ -712,7 +1078,7 @@ struct BagageRegelsWidget: Widget {
             BagageWidgetView(entry: entry)
         }
         .configurationDisplayName("Bagageregels")
-        .description("De handbagagematen van jouw maatschappij, altijd binnen handbereik — ook op je toegangsscherm.")
+        .description("De handbagagematen van jouw maatschappij, altijd binnen handbereik, ook op je toegangsscherm.")
         .supportedFamilies([
             .systemSmall,
             .systemMedium,
@@ -728,5 +1094,19 @@ struct VliegtuigtasWidgets: WidgetBundle {
     var body: some Widget {
         VluchtCountdownWidget()
         BagageRegelsWidget()
+        PurserPimWidget()
+        #if !targetEnvironment(macCatalyst)
+        FlightLiveActivity()
+        #endif
+        controlWidgets
+    }
+
+    /// Apart @WidgetBundleBuilder-blok: zo kan de Control Center-knop achter
+    /// een availability-check zitten terwijl de extensie op iOS 17 blijft draaien.
+    @WidgetBundleBuilder
+    private var controlWidgets: some Widget {
+        if #available(iOS 18.0, *) {
+            BagageCheckControl()
+        }
     }
 }

@@ -1,0 +1,12 @@
+Target dependency graph (6 targets)
+Target 'Vliegtuigtas' in project 'VliegtuigtasApp'
+➜ Explicit dependency on target 'Vliegtuigtas Extension' in project 'VliegtuigtasApp'
+➜ Explicit dependency on target 'Vliegtuigtas Widgets' in project 'VliegtuigtasApp'
+➜ Explicit dependency on target 'Vliegtuigtas Watch' in project 'VliegtuigtasApp'
+➜ Explicit dependency on target 'Vliegtuigtas Clip' in project 'VliegtuigtasApp'
+Target 'Vliegtuigtas Clip' in project 'VliegtuigtasApp' (no dependencies)
+Target 'Vliegtuigtas Watch' in project 'VliegtuigtasApp'
+➜ Explicit dependency on target 'Vliegtuigtas Watch Widgets' in project 'VliegtuigtasApp'
+Target 'Vliegtuigtas Watch Widgets' in project 'VliegtuigtasApp' (no dependencies)
+Target 'Vliegtuigtas Widgets' in project 'VliegtuigtasApp' (no dependencies)
+Target 'Vliegtuigtas Extension' in project 'VliegtuigtasApp' (no dependencies)

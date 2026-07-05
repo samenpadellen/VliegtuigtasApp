@@ -1,0 +1,24 @@
+{
+  "source": "/Users/wouterschut/Documents/VliegtuigtasApp/VliegtuigtasVision/BagVolumeView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "%lld × %lld × %lld cm",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 101
+        }
+      },
+      {
+        "comment": "",
+        "key": "Limiet%@: %lld × %lld × %lld cm",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 112
+        }
+      }
+    ]
+  },
+  "version": 1
+}

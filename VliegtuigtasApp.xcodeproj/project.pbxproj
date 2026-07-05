@@ -10,6 +10,7 @@
 		0E2EC02F1056B42AC59ECA95 /* popup.js in Resources */ = {isa = PBXBuildFile; fileRef = 8B284427ED128365BE8C3321 /* popup.js */; };
 		18D8B3FE6E1390DE7D09613D /* manifest.json in Resources */ = {isa = PBXBuildFile; fileRef = 34E24E52B02698D530FF2739 /* manifest.json */; };
 		18DA73838EF3EBE610CF3986 /* SafariWebExtensionHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52135C5BAE8E94DC433994F8 /* SafariWebExtensionHandler.swift */; };
+		319DCE792FF6E8C1009D1A42 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 319DCE782FF6E8C1009D1A42 /* Assets.xcassets */; };
 		6CF06350598D7E5D6A9B9DD4 /* popup.css in Resources */ = {isa = PBXBuildFile; fileRef = A8916FB229A565877D528BD1 /* popup.css */; };
 		720CB503C779908E8BE558CD /* background.js in Resources */ = {isa = PBXBuildFile; fileRef = 5CEAAFB156F178B5F137720C /* background.js */; };
 		A42E076F007410E892B63F3D /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 95FEEF1589C24BFB462E5C23 /* Foundation.framework */; };
@@ -31,12 +32,59 @@
 		AA000016 /* UserSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA100016 /* UserSession.swift */; };
 		AA000017 /* AppStrings.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA100017 /* AppStrings.swift */; };
 		AA000018 /* airplane_beep.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = AA100018 /* airplane_beep.mp3 */; };
+		AA000030 /* solari_flap.wav in Resources */ = {isa = PBXBuildFile; fileRef = AA100030 /* solari_flap.wav */; };
 		AA000019 /* SplashView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA100019 /* SplashView.swift */; };
 		AA000020 /* BagDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA100020 /* BagDetailView.swift */; };
 		AAW00001 /* VliegtuigtasWidgets.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAW10001 /* VliegtuigtasWidgets.swift */; };
 		AAW00002 /* Vliegtuigtas Widgets.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = AAW10003 /* Vliegtuigtas Widgets.appex */; settings = {ATTRIBUTES = (RemoveHeaderOnCopy, ); }; };
 		AB61B0FF462FD1FB680C4E54 /* content.js in Resources */ = {isa = PBXBuildFile; fileRef = D21544F7D8CDB9643A45CBB3 /* content.js */; };
-		BE744C57DCD58610FDB56695 /* Vliegtuigtas Extension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 1777E1FA4F444DC27257F0E8 /* Vliegtuigtas Extension.appex */; settings = {ATTRIBUTES = (RemoveHeaderOnCopy, ); }; };
+		AC000001 /* BagScannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC100001 /* BagScannerView.swift */; };
+		AVN00001 /* VliegtuigtasVisionApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = AVN10001 /* VliegtuigtasVisionApp.swift */; };
+		AVN00002 /* VisionContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AVN10002 /* VisionContentView.swift */; };
+		AVN00003 /* BagVolumeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AVN10003 /* BagVolumeView.swift */; };
+		AVN00004 /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA100004 /* Models.swift */; };
+		AVN00005 /* APIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA100005 /* APIClient.swift */; };
+		AVN00006 /* AirlineStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA100006 /* AirlineStore.swift */; };
+		AVN00007 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AVN10004 /* Assets.xcassets */; };
+		ACL00001 /* VliegtuigtasClipApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACL10001 /* VliegtuigtasClipApp.swift */; };
+		ACL00002 /* ClipCheckView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACL10002 /* ClipCheckView.swift */; };
+		ACL00003 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA100003 /* Theme.swift */; };
+		ACL00004 /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA100004 /* Models.swift */; };
+		ACL00005 /* APIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA100005 /* APIClient.swift */; };
+		ACL00006 /* AirlineStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA100006 /* AirlineStore.swift */; };
+		ACL00007 /* Vliegtuigtas Clip.app in Embed App Clips */ = {isa = PBXBuildFile; fileRef = ACLPROD1 /* Vliegtuigtas Clip.app */; platformFilter = ios; settings = {ATTRIBUTES = (RemoveHeaderOnCopy, ); }; };
+		AG000001 /* BaggageGuideView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AG100001 /* BaggageGuideView.swift */; };
+		AI000001 /* AIAssistant.swift in Sources */ = {isa = PBXBuildFile; fileRef = AI100001 /* AIAssistant.swift */; };
+		AI000002 /* AIAssistantView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AI100002 /* AIAssistantView.swift */; };
+		AL000001 /* FlightActivityAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = AL100001 /* FlightActivityAttributes.swift */; };
+		AL000002 /* FlightLiveActivityManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = AL100002 /* FlightLiveActivityManager.swift */; };
+		AL000003 /* FlightActivityAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = AL100001 /* FlightActivityAttributes.swift */; };
+		AL000004 /* FlightLiveActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = AL100003 /* FlightLiveActivity.swift */; };
+		AP000001 /* AppIntentsSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = AP100001 /* AppIntentsSupport.swift */; };
+		AS000001 /* SplitFlapBoard.swift in Sources */ = {isa = PBXBuildFile; fileRef = AS100001 /* SplitFlapBoard.swift */; };
+		AW000001 /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA100004 /* Models.swift */; };
+		AW000002 /* APIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA100005 /* APIClient.swift */; };
+		AW000003 /* AirlineStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA100006 /* AirlineStore.swift */; };
+		AW000004 /* VliegtuigtasWatchApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = AW100001 /* VliegtuigtasWatchApp.swift */; };
+		AW000005 /* WatchContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AW100002 /* WatchContentView.swift */; };
+		AW000006 /* WatchAirlineDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AW100003 /* WatchAirlineDetailView.swift */; };
+		AW000007 /* WatchMyBagView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AW100004 /* WatchMyBagView.swift */; };
+		AW000008 /* WatchTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = AW100005 /* WatchTheme.swift */; };
+		AW000009 /* WatchBagStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = AW100006 /* WatchBagStore.swift */; };
+		AW000010 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AW100007 /* Assets.xcassets */; };
+		AWI00001 /* WatchIntents.swift in Sources */ = {isa = PBXBuildFile; fileRef = AW100008 /* WatchIntents.swift */; };
+		AWW00001 /* VliegtuigtasWatchWidgets.swift in Sources */ = {isa = PBXBuildFile; fileRef = AWW10001 /* VliegtuigtasWatchWidgets.swift */; };
+		AWW00002 /* Vliegtuigtas Watch Widgets.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = AWWPROD1 /* Vliegtuigtas Watch Widgets.appex */; settings = {ATTRIBUTES = (RemoveHeaderOnCopy, ); }; };
+		AW000011 /* Vliegtuigtas Watch.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = AWPROD01 /* Vliegtuigtas Watch.app */; platformFilter = ios; settings = {ATTRIBUTES = (RemoveHeaderOnCopy, ); }; };
+		AY000001 /* CloudSync.swift in Sources */ = {isa = PBXBuildFile; fileRef = AY100001 /* CloudSync.swift */; };
+		AZ000001 /* ProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AZ100001 /* ProfileView.swift */; };
+		AN000001 /* NotificationPlanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = AN100001 /* NotificationPlanner.swift */; };
+		AM000001 /* MyBags.swift in Sources */ = {isa = PBXBuildFile; fileRef = AM100001 /* MyBags.swift */; };
+		AFL00001 /* Flights.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFL10001 /* Flights.swift */; };
+		AIC00001 /* AppIconPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = AIC10001 /* AppIconPicker.swift */; };
+		APA00001 /* PackingAlarms.swift in Sources */ = {isa = PBXBuildFile; fileRef = APA10001 /* PackingAlarms.swift */; };
+		ACP00001 /* CarPlayDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACP10001 /* CarPlayDelegate.swift */; };
+		BE744C57DCD58610FDB56695 /* Vliegtuigtas Extension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 1777E1FA4F444DC27257F0E8 /* Vliegtuigtas Extension.appex */; platformFilter = ios; settings = {ATTRIBUTES = (RemoveHeaderOnCopy, ); }; };
 		C5E6B9AF86AF28274364CFE3 /* images in Resources */ = {isa = PBXBuildFile; fileRef = 44FDB403A24A66E3FB14354C /* images */; };
 		E8C2A7FEED5C23D12D8205F0 /* popup.html in Resources */ = {isa = PBXBuildFile; fileRef = CBC02DF0768DC8CAD9E90E6A /* popup.html */; };
 /* End PBXBuildFile section */
@@ -56,6 +104,27 @@
 			remoteGlobalIDString = AAWTGT01;
 			remoteInfo = "Vliegtuigtas Widgets";
 		};
+		AWWPRX01 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = AAPROJECT1 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = AWWTGT01;
+			remoteInfo = "Vliegtuigtas Watch Widgets";
+		};
+		ACLPRX01 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = AAPROJECT1 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = ACLTGT01;
+			remoteInfo = "Vliegtuigtas Clip";
+		};
+		AWPRX01 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = AAPROJECT1 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = AWTGT01;
+			remoteInfo = "Vliegtuigtas Watch";
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -71,10 +140,44 @@
 			name = "Embed Foundation Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		ACLEMBED /* Embed App Clips */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "$(CONTENTS_FOLDER_PATH)/AppClips";
+			dstSubfolderSpec = 16;
+			files = (
+				ACL00007 /* Vliegtuigtas Clip.app in Embed App Clips */,
+			);
+			name = "Embed App Clips";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AWWEMBED /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				AWW00002 /* Vliegtuigtas Watch Widgets.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AWEMBED1 /* Embed Watch Content */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "$(CONTENTS_FOLDER_PATH)/Watch";
+			dstSubfolderSpec = 16;
+			files = (
+				AW000011 /* Vliegtuigtas Watch.app in Embed Watch Content */,
+			);
+			name = "Embed Watch Content";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		1777E1FA4F444DC27257F0E8 /* Vliegtuigtas Extension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "Vliegtuigtas Extension.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
+		319DCE782FF6E8C1009D1A42 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		34E24E52B02698D530FF2739 /* manifest.json */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.json; name = manifest.json; path = Resources/manifest.json; sourceTree = "<group>"; };
 		44FDB403A24A66E3FB14354C /* images */ = {isa = PBXFileReference; explicitFileType = folder; name = images; path = Resources/images; sourceTree = "<group>"; };
 		52135C5BAE8E94DC433994F8 /* SafariWebExtensionHandler.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SafariWebExtensionHandler.swift; sourceTree = "<group>"; };
@@ -100,6 +203,7 @@
 		AA100016 /* UserSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserSession.swift; sourceTree = "<group>"; };
 		AA100017 /* AppStrings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppStrings.swift; sourceTree = "<group>"; };
 		AA100018 /* airplane_beep.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = airplane_beep.mp3; sourceTree = "<group>"; };
+		AA100030 /* solari_flap.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = solari_flap.wav; sourceTree = "<group>"; };
 		AA100019 /* SplashView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplashView.swift; sourceTree = "<group>"; };
 		AA100020 /* BagDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BagDetailView.swift; sourceTree = "<group>"; };
 		AA100021 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -109,6 +213,45 @@
 		AAW10002 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		AAW10003 /* Vliegtuigtas Widgets.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "Vliegtuigtas Widgets.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
 		AAW10004 /* VliegtuigtasWidgets.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = VliegtuigtasWidgets.entitlements; sourceTree = "<group>"; };
+		AC100001 /* BagScannerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BagScannerView.swift; sourceTree = "<group>"; };
+		ACL10001 /* VliegtuigtasClipApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VliegtuigtasClipApp.swift; sourceTree = "<group>"; };
+		ACL10002 /* ClipCheckView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClipCheckView.swift; sourceTree = "<group>"; };
+		ACL10003 /* VliegtuigtasClip.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = VliegtuigtasClip.entitlements; sourceTree = "<group>"; };
+		AVN10001 /* VliegtuigtasVisionApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VliegtuigtasVisionApp.swift; sourceTree = "<group>"; };
+		AVN10002 /* VisionContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisionContentView.swift; sourceTree = "<group>"; };
+		AVN10003 /* BagVolumeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BagVolumeView.swift; sourceTree = "<group>"; };
+		AVN10004 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		AVNPROD1 /* Vliegtuigtas Vision.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Vliegtuigtas Vision.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		ACLPROD1 /* Vliegtuigtas Clip.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Vliegtuigtas Clip.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		AG100001 /* BaggageGuideView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaggageGuideView.swift; sourceTree = "<group>"; };
+		AI100001 /* AIAssistant.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIAssistant.swift; sourceTree = "<group>"; };
+		AI100002 /* AIAssistantView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIAssistantView.swift; sourceTree = "<group>"; };
+		AL100001 /* FlightActivityAttributes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlightActivityAttributes.swift; sourceTree = "<group>"; };
+		AL100002 /* FlightLiveActivityManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlightLiveActivityManager.swift; sourceTree = "<group>"; };
+		AL100003 /* FlightLiveActivity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlightLiveActivity.swift; sourceTree = "<group>"; };
+		AP100001 /* AppIntentsSupport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppIntentsSupport.swift; sourceTree = "<group>"; };
+		AS100001 /* SplitFlapBoard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplitFlapBoard.swift; sourceTree = "<group>"; };
+		AW100001 /* VliegtuigtasWatchApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VliegtuigtasWatchApp.swift; sourceTree = "<group>"; };
+		AW100002 /* WatchContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchContentView.swift; sourceTree = "<group>"; };
+		AW100003 /* WatchAirlineDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchAirlineDetailView.swift; sourceTree = "<group>"; };
+		AW100004 /* WatchMyBagView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchMyBagView.swift; sourceTree = "<group>"; };
+		AW100005 /* WatchTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchTheme.swift; sourceTree = "<group>"; };
+		AW100006 /* WatchBagStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchBagStore.swift; sourceTree = "<group>"; };
+		AW100007 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		AW100008 /* WatchIntents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchIntents.swift; sourceTree = "<group>"; };
+		AWW10001 /* VliegtuigtasWatchWidgets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VliegtuigtasWatchWidgets.swift; sourceTree = "<group>"; };
+		AWW10002 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		AWW10003 /* VliegtuigtasWatchWidgets.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = VliegtuigtasWatchWidgets.entitlements; sourceTree = "<group>"; };
+		AWWPROD1 /* Vliegtuigtas Watch Widgets.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "Vliegtuigtas Watch Widgets.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
+		AWPROD01 /* Vliegtuigtas Watch.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Vliegtuigtas Watch.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		AY100001 /* CloudSync.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudSync.swift; sourceTree = "<group>"; };
+		AZ100001 /* ProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileView.swift; sourceTree = "<group>"; };
+		AN100001 /* NotificationPlanner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationPlanner.swift; sourceTree = "<group>"; };
+		AM100001 /* MyBags.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyBags.swift; sourceTree = "<group>"; };
+		AFL10001 /* Flights.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Flights.swift; sourceTree = "<group>"; };
+		AIC10001 /* AppIconPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppIconPicker.swift; sourceTree = "<group>"; };
+		APA10001 /* PackingAlarms.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PackingAlarms.swift; sourceTree = "<group>"; };
+		ACP10001 /* CarPlayDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CarPlayDelegate.swift; sourceTree = "<group>"; };
 		CBC02DF0768DC8CAD9E90E6A /* popup.html */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.html; name = popup.html; path = Resources/popup.html; sourceTree = "<group>"; };
 		D21544F7D8CDB9643A45CBB3 /* content.js */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.javascript; name = content.js; path = Resources/content.js; sourceTree = "<group>"; };
 		D4F2351D688C11BFA75D8756 /* Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -124,6 +267,34 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		AAWPH002 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AVNPH002 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		ACLPH002 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AWWPH002 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AWPH002 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -172,6 +343,10 @@
 				AAGRP002 /* Products */,
 				0FDF3B46CEF837A2E0680C07 /* VliegtuigtasExtension */,
 				AAWGRP01 /* VliegtuigtasWidgets */,
+				AWGRP01 /* VliegtuigtasWatch */,
+				AWWGRP01 /* VliegtuigtasWatchWidgets */,
+				ACLGRP01 /* VliegtuigtasClip */,
+				AVNGRP01 /* VliegtuigtasVision */,
 				A2A76474FA7E96403C8DE346 /* Frameworks */,
 			);
 			sourceTree = "<group>";
@@ -197,8 +372,25 @@
 				AA100016 /* UserSession.swift */,
 				AA100017 /* AppStrings.swift */,
 				AA100018 /* airplane_beep.mp3 */,
+				AA100030 /* solari_flap.wav */,
 				AA100019 /* SplashView.swift */,
 				AA100020 /* BagDetailView.swift */,
+				AL100001 /* FlightActivityAttributes.swift */,
+				AL100002 /* FlightLiveActivityManager.swift */,
+				AI100001 /* AIAssistant.swift */,
+				AI100002 /* AIAssistantView.swift */,
+				AP100001 /* AppIntentsSupport.swift */,
+				AS100001 /* SplitFlapBoard.swift */,
+				AC100001 /* BagScannerView.swift */,
+				AG100001 /* BaggageGuideView.swift */,
+				AY100001 /* CloudSync.swift */,
+				AZ100001 /* ProfileView.swift */,
+				AN100001 /* NotificationPlanner.swift */,
+				AM100001 /* MyBags.swift */,
+				AFL10001 /* Flights.swift */,
+				AIC10001 /* AppIconPicker.swift */,
+				APA10001 /* PackingAlarms.swift */,
+				ACP10001 /* CarPlayDelegate.swift */,
 				AA100021 /* Info.plist */,
 				AA100022 /* Vliegtuigtas.entitlements */,
 			);
@@ -211,6 +403,10 @@
 				AAPROD001 /* Vliegtuigtas.app */,
 				1777E1FA4F444DC27257F0E8 /* Vliegtuigtas Extension.appex */,
 				AAW10003 /* Vliegtuigtas Widgets.appex */,
+				AWPROD01 /* Vliegtuigtas Watch.app */,
+				ACLPROD1 /* Vliegtuigtas Clip.app */,
+				AWWPROD1 /* Vliegtuigtas Watch Widgets.appex */,
+				AVNPROD1 /* Vliegtuigtas Vision.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -219,10 +415,58 @@
 			isa = PBXGroup;
 			children = (
 				AAW10001 /* VliegtuigtasWidgets.swift */,
+				AL100003 /* FlightLiveActivity.swift */,
 				AAW10002 /* Info.plist */,
 				AAW10004 /* VliegtuigtasWidgets.entitlements */,
 			);
 			path = VliegtuigtasWidgets;
+			sourceTree = "<group>";
+		};
+		AVNGRP01 /* VliegtuigtasVision */ = {
+			isa = PBXGroup;
+			children = (
+				AVN10004 /* Assets.xcassets */,
+				AVN10001 /* VliegtuigtasVisionApp.swift */,
+				AVN10002 /* VisionContentView.swift */,
+				AVN10003 /* BagVolumeView.swift */,
+			);
+			path = VliegtuigtasVision;
+			sourceTree = "<group>";
+		};
+		ACLGRP01 /* VliegtuigtasClip */ = {
+			isa = PBXGroup;
+			children = (
+				319DCE782FF6E8C1009D1A42 /* Assets.xcassets */,
+				ACL10001 /* VliegtuigtasClipApp.swift */,
+				ACL10002 /* ClipCheckView.swift */,
+				ACL10003 /* VliegtuigtasClip.entitlements */,
+			);
+			path = VliegtuigtasClip;
+			sourceTree = "<group>";
+		};
+		AWWGRP01 /* VliegtuigtasWatchWidgets */ = {
+			isa = PBXGroup;
+			children = (
+				AWW10001 /* VliegtuigtasWatchWidgets.swift */,
+				AWW10002 /* Info.plist */,
+				AWW10003 /* VliegtuigtasWatchWidgets.entitlements */,
+			);
+			path = VliegtuigtasWatchWidgets;
+			sourceTree = "<group>";
+		};
+		AWGRP01 /* VliegtuigtasWatch */ = {
+			isa = PBXGroup;
+			children = (
+				AW100001 /* VliegtuigtasWatchApp.swift */,
+				AW100002 /* WatchContentView.swift */,
+				AW100003 /* WatchAirlineDetailView.swift */,
+				AW100004 /* WatchMyBagView.swift */,
+				AW100005 /* WatchTheme.swift */,
+				AW100006 /* WatchBagStore.swift */,
+				AW100008 /* WatchIntents.swift */,
+				AW100007 /* Assets.xcassets */,
+			);
+			path = VliegtuigtasWatch;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -252,12 +496,16 @@
 				AAPHASE001 /* Sources */,
 				AAPHASE002 /* Resources */,
 				94A2A6104101983614E94051 /* Embed Foundation Extensions */,
+				AWEMBED1 /* Embed Watch Content */,
+				ACLEMBED /* Embed App Clips */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 				56539FABA16615F638E56135 /* PBXTargetDependency */,
 				AAWDEP01 /* PBXTargetDependency */,
+				AWDEP01 /* PBXTargetDependency */,
+				ACLDEP01 /* PBXTargetDependency */,
 			);
 			name = Vliegtuigtas;
 			productName = Vliegtuigtas;
@@ -280,6 +528,76 @@
 			productName = "Vliegtuigtas Widgets";
 			productReference = AAW10003 /* Vliegtuigtas Widgets.appex */;
 			productType = "com.apple.product-type.app-extension";
+		};
+		AVNTGT01 /* Vliegtuigtas Vision */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = AVNCFGL1 /* Build configuration list for PBXNativeTarget "Vliegtuigtas Vision" */;
+			buildPhases = (
+				AVNPH001 /* Sources */,
+				AVNPH002 /* Frameworks */,
+				AVNPH003 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "Vliegtuigtas Vision";
+			productName = "Vliegtuigtas Vision";
+			productReference = AVNPROD1 /* Vliegtuigtas Vision.app */;
+			productType = "com.apple.product-type.application";
+		};
+		ACLTGT01 /* Vliegtuigtas Clip */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = ACLCFGL1 /* Build configuration list for PBXNativeTarget "Vliegtuigtas Clip" */;
+			buildPhases = (
+				ACLPH001 /* Sources */,
+				ACLPH002 /* Frameworks */,
+				ACLPH003 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "Vliegtuigtas Clip";
+			productName = "Vliegtuigtas Clip";
+			productReference = ACLPROD1 /* Vliegtuigtas Clip.app */;
+			productType = "com.apple.product-type.application.on-demand-install-capable";
+		};
+		AWWTGT01 /* Vliegtuigtas Watch Widgets */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = AWWCFGL2 /* Build configuration list for PBXNativeTarget "Vliegtuigtas Watch Widgets" */;
+			buildPhases = (
+				AWWPH001 /* Sources */,
+				AWWPH002 /* Frameworks */,
+				AWWPH003 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "Vliegtuigtas Watch Widgets";
+			productName = "Vliegtuigtas Watch Widgets";
+			productReference = AWWPROD1 /* Vliegtuigtas Watch Widgets.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+		AWTGT01 /* Vliegtuigtas Watch */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = AWCFGL1 /* Build configuration list for PBXNativeTarget "Vliegtuigtas Watch" */;
+			buildPhases = (
+				AWPH001 /* Sources */,
+				AWPH002 /* Frameworks */,
+				AWPH003 /* Resources */,
+				AWWEMBED /* Embed Foundation Extensions */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				AWWDEP01 /* PBXTargetDependency */,
+			);
+			name = "Vliegtuigtas Watch";
+			productName = "Vliegtuigtas Watch";
+			productReference = AWPROD01 /* Vliegtuigtas Watch.app */;
+			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
 
@@ -313,6 +631,10 @@
 				AATARGET1 /* Vliegtuigtas */,
 				1CA59C60E1B2ACA8433200B3 /* Vliegtuigtas Extension */,
 				AAWTGT01 /* Vliegtuigtas Widgets */,
+				AWTGT01 /* Vliegtuigtas Watch */,
+				ACLTGT01 /* Vliegtuigtas Clip */,
+				AWWTGT01 /* Vliegtuigtas Watch Widgets */,
+				AVNTGT01 /* Vliegtuigtas Vision */,
 			);
 		};
 /* End PBXProject section */
@@ -338,6 +660,7 @@
 			files = (
 				AA000013 /* Assets.xcassets in Resources */,
 				AA000018 /* airplane_beep.mp3 in Resources */,
+				AA000030 /* solari_flap.wav in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -345,6 +668,37 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AVNPH003 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				AVN00007 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		ACLPH003 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				319DCE792FF6E8C1009D1A42 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AWWPH003 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AWPH003 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				AW000010 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -373,6 +727,22 @@
 				AA000017 /* AppStrings.swift in Sources */,
 				AA000019 /* SplashView.swift in Sources */,
 				AA000020 /* BagDetailView.swift in Sources */,
+				AL000001 /* FlightActivityAttributes.swift in Sources */,
+				AL000002 /* FlightLiveActivityManager.swift in Sources */,
+				AI000001 /* AIAssistant.swift in Sources */,
+				AI000002 /* AIAssistantView.swift in Sources */,
+				AP000001 /* AppIntentsSupport.swift in Sources */,
+				AS000001 /* SplitFlapBoard.swift in Sources */,
+				AC000001 /* BagScannerView.swift in Sources */,
+				AG000001 /* BaggageGuideView.swift in Sources */,
+				AY000001 /* CloudSync.swift in Sources */,
+				AZ000001 /* ProfileView.swift in Sources */,
+				AN000001 /* NotificationPlanner.swift in Sources */,
+				AM000001 /* MyBags.swift in Sources */,
+				AFL00001 /* Flights.swift in Sources */,
+				AIC00001 /* AppIconPicker.swift in Sources */,
+				APA00001 /* PackingAlarms.swift in Sources */,
+				ACP00001 /* CarPlayDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -381,6 +751,59 @@
 			buildActionMask = 2147483647;
 			files = (
 				AAW00001 /* VliegtuigtasWidgets.swift in Sources */,
+				AL000003 /* FlightActivityAttributes.swift in Sources */,
+				AL000004 /* FlightLiveActivity.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AVNPH001 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				AVN00001 /* VliegtuigtasVisionApp.swift in Sources */,
+				AVN00002 /* VisionContentView.swift in Sources */,
+				AVN00003 /* BagVolumeView.swift in Sources */,
+				AVN00004 /* Models.swift in Sources */,
+				AVN00005 /* APIClient.swift in Sources */,
+				AVN00006 /* AirlineStore.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		ACLPH001 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				ACL00001 /* VliegtuigtasClipApp.swift in Sources */,
+				ACL00002 /* ClipCheckView.swift in Sources */,
+				ACL00003 /* Theme.swift in Sources */,
+				ACL00004 /* Models.swift in Sources */,
+				ACL00005 /* APIClient.swift in Sources */,
+				ACL00006 /* AirlineStore.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AWWPH001 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				AWW00001 /* VliegtuigtasWatchWidgets.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AWPH001 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				AW000001 /* Models.swift in Sources */,
+				AW000002 /* APIClient.swift in Sources */,
+				AW000003 /* AirlineStore.swift in Sources */,
+				AW000004 /* VliegtuigtasWatchApp.swift in Sources */,
+				AW000005 /* WatchContentView.swift in Sources */,
+				AW000006 /* WatchAirlineDetailView.swift in Sources */,
+				AW000007 /* WatchMyBagView.swift in Sources */,
+				AW000008 /* WatchTheme.swift in Sources */,
+				AW000009 /* WatchBagStore.swift in Sources */,
+				AWI00001 /* WatchIntents.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -398,6 +821,7 @@
 		56539FABA16615F638E56135 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			name = "Vliegtuigtas Extension";
+			platformFilter = ios;
 			target = 1CA59C60E1B2ACA8433200B3 /* Vliegtuigtas Extension */;
 			targetProxy = 5E382108EDF2F9262B74C222 /* PBXContainerItemProxy */;
 		};
@@ -406,6 +830,26 @@
 			name = "Vliegtuigtas Widgets";
 			target = AAWTGT01 /* Vliegtuigtas Widgets */;
 			targetProxy = AAWPRX01 /* PBXContainerItemProxy */;
+		};
+		AWWDEP01 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = "Vliegtuigtas Watch Widgets";
+			target = AWWTGT01 /* Vliegtuigtas Watch Widgets */;
+			targetProxy = AWWPRX01 /* PBXContainerItemProxy */;
+		};
+		ACLDEP01 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = "Vliegtuigtas Clip";
+			platformFilter = ios;
+			target = ACLTGT01 /* Vliegtuigtas Clip */;
+			targetProxy = ACLPRX01 /* PBXContainerItemProxy */;
+		};
+		AWDEP01 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = "Vliegtuigtas Watch";
+			platformFilter = ios;
+			target = AWTGT01 /* Vliegtuigtas Watch */;
+			targetProxy = AWPRX01 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -424,6 +868,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
+				MARKETING_VERSION = 1.5;
 				PRODUCT_BUNDLE_IDENTIFIER = com.vliegtuigtas.app.SafariExtension;
 				PRODUCT_NAME = "Vliegtuigtas Extension";
 				SDKROOT = iphoneos;
@@ -486,7 +931,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 27.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -543,7 +988,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 27.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
@@ -557,6 +1002,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = VliegtuigtasApp/Vliegtuigtas.entitlements;
 				CODE_SIGN_STYLE = Automatic;
@@ -564,26 +1010,28 @@
 				DEVELOPMENT_ASSET_PATHS = "";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_FILE = VliegtuigtasApp/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = Vliegtuigtas;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.travel";
 				INFOPLIST_KEY_NSAppTransportSecurity = "<dict><key>NSAllowsArbitraryLoads</key><false/></dict>";
-				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
-				IPHONEOS_DEPLOYMENT_TARGET = 27.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.5;
 				PRODUCT_BUNDLE_IDENTIFIER = com.vliegtuigtas.app;
 				PRODUCT_NAME = Vliegtuigtas;
+				SUPPORTS_MACCATALYST = YES;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = 1;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
 		};
@@ -591,6 +1039,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = VliegtuigtasApp/Vliegtuigtas.entitlements;
 				CODE_SIGN_STYLE = Automatic;
@@ -598,25 +1047,27 @@
 				DEVELOPMENT_ASSET_PATHS = "";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_FILE = VliegtuigtasApp/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = Vliegtuigtas;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.travel";
-				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
-				IPHONEOS_DEPLOYMENT_TARGET = 27.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.5;
 				PRODUCT_BUNDLE_IDENTIFIER = com.vliegtuigtas.app;
 				PRODUCT_NAME = Vliegtuigtas;
+				SUPPORTS_MACCATALYST = YES;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = 1;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
 		};
@@ -628,6 +1079,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = FDH27DW6H2;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_FILE = VliegtuigtasWidgets/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = Vliegtuigtas;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
@@ -636,14 +1088,15 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.5;
 				PRODUCT_BUNDLE_IDENTIFIER = com.vliegtuigtas.app.Widgets;
 				PRODUCT_NAME = "Vliegtuigtas Widgets";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
+				SUPPORTS_MACCATALYST = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = 1;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
 		};
@@ -655,6 +1108,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = FDH27DW6H2;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_FILE = VliegtuigtasWidgets/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = Vliegtuigtas;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
@@ -663,15 +1117,254 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.5;
 				PRODUCT_BUNDLE_IDENTIFIER = com.vliegtuigtas.app.Widgets;
 				PRODUCT_NAME = "Vliegtuigtas Widgets";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
+				SUPPORTS_MACCATALYST = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = 1;
+				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		AVNCFG01 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = FDH27DW6H2;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
+				INFOPLIST_KEY_CFBundleDisplayName = Vliegtuigtas;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.5;
+				PRODUCT_BUNDLE_IDENTIFIER = com.vliegtuigtas.app;
+				PRODUCT_NAME = "Vliegtuigtas Vision";
+				SDKROOT = xros;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 7;
+				XROS_DEPLOYMENT_TARGET = 2.0;
+			};
+			name = Debug;
+		};
+		AVNCFG02 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = FDH27DW6H2;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
+				INFOPLIST_KEY_CFBundleDisplayName = Vliegtuigtas;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.5;
+				PRODUCT_BUNDLE_IDENTIFIER = com.vliegtuigtas.app;
+				PRODUCT_NAME = "Vliegtuigtas Vision";
+				SDKROOT = xros;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 7;
+				VALIDATE_PRODUCT = YES;
+				XROS_DEPLOYMENT_TARGET = 2.0;
+			};
+			name = Release;
+		};
+		ACLCFG01 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = VliegtuigtasClip/VliegtuigtasClip.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = FDH27DW6H2;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
+				INFOPLIST_KEY_CFBundleDisplayName = Vliegtuigtas;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.5;
+				PRODUCT_BUNDLE_IDENTIFIER = com.vliegtuigtas.app.Clip;
+				PRODUCT_NAME = "Vliegtuigtas Clip";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG APPCLIP $(inherited)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		ACLCFG02 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = VliegtuigtasClip/VliegtuigtasClip.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = FDH27DW6H2;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
+				INFOPLIST_KEY_CFBundleDisplayName = Vliegtuigtas;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.5;
+				PRODUCT_BUNDLE_IDENTIFIER = com.vliegtuigtas.app.Clip;
+				PRODUCT_NAME = "Vliegtuigtas Clip";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "APPCLIP $(inherited)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		AWWCFG01 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = VliegtuigtasWatchWidgets/VliegtuigtasWatchWidgets.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = FDH27DW6H2;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = VliegtuigtasWatchWidgets/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = Vliegtuigtas;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.5;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.vliegtuigtas.app.watchkitapp.Widgets";
+				PRODUCT_NAME = "Vliegtuigtas Watch Widgets";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 10.0;
+			};
+			name = Debug;
+		};
+		AWWCFG02 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = VliegtuigtasWatchWidgets/VliegtuigtasWatchWidgets.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = FDH27DW6H2;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = VliegtuigtasWatchWidgets/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = Vliegtuigtas;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.5;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.vliegtuigtas.app.watchkitapp.Widgets";
+				PRODUCT_NAME = "Vliegtuigtas Watch Widgets";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				VALIDATE_PRODUCT = YES;
+				WATCHOS_DEPLOYMENT_TARGET = 10.0;
+			};
+			name = Release;
+		};
+		AWCFG01 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = VliegtuigtasWatch/VliegtuigtasWatch.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = FDH27DW6H2;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
+				INFOPLIST_KEY_CFBundleDisplayName = Vliegtuigtas;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.vliegtuigtas.app;
+				INFOPLIST_KEY_WKRunsIndependentlyOfCompanionApp = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.5;
+				PRODUCT_BUNDLE_IDENTIFIER = com.vliegtuigtas.app.watchkitapp;
+				PRODUCT_NAME = "Vliegtuigtas Watch";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 10.0;
+			};
+			name = Debug;
+		};
+		AWCFG02 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = VliegtuigtasWatch/VliegtuigtasWatch.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = FDH27DW6H2;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
+				INFOPLIST_KEY_CFBundleDisplayName = Vliegtuigtas;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.vliegtuigtas.app;
+				INFOPLIST_KEY_WKRunsIndependentlyOfCompanionApp = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.5;
+				PRODUCT_BUNDLE_IDENTIFIER = com.vliegtuigtas.app.watchkitapp;
+				PRODUCT_NAME = "Vliegtuigtas Watch";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				VALIDATE_PRODUCT = YES;
+				WATCHOS_DEPLOYMENT_TARGET = 10.0;
 			};
 			name = Release;
 		};
@@ -689,6 +1382,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
+				MARKETING_VERSION = 1.5;
 				PRODUCT_BUNDLE_IDENTIFIER = com.vliegtuigtas.app.SafariExtension;
 				PRODUCT_NAME = "Vliegtuigtas Extension";
 				SDKROOT = iphoneos;
@@ -724,6 +1418,42 @@
 			buildConfigurations = (
 				AAWCFG01 /* Debug */,
 				AAWCFG02 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		AVNCFGL1 /* Build configuration list for PBXNativeTarget "Vliegtuigtas Vision" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				AVNCFG01 /* Debug */,
+				AVNCFG02 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		ACLCFGL1 /* Build configuration list for PBXNativeTarget "Vliegtuigtas Clip" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				ACLCFG01 /* Debug */,
+				ACLCFG02 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		AWWCFGL2 /* Build configuration list for PBXNativeTarget "Vliegtuigtas Watch Widgets" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				AWWCFG01 /* Debug */,
+				AWWCFG02 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		AWCFGL1 /* Build configuration list for PBXNativeTarget "Vliegtuigtas Watch" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				AWCFG01 /* Debug */,
+				AWCFG02 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

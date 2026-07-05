@@ -1,0 +1,39 @@
+{
+  "" : {
+    "diagnostics" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-iphonesimulator/Vliegtuigtas Widgets.build/Objects-normal/x86_64/Vliegtuigtas Widgets-primary.dia",
+    "emit-module-dependencies" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-iphonesimulator/Vliegtuigtas Widgets.build/Objects-normal/x86_64/Vliegtuigtas Widgets-primary-emit-module.d",
+    "emit-module-diagnostics" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-iphonesimulator/Vliegtuigtas Widgets.build/Objects-normal/x86_64/Vliegtuigtas Widgets-primary-emit-module.dia",
+    "pch" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-iphonesimulator/Vliegtuigtas Widgets.build/Objects-normal/x86_64/Vliegtuigtas Widgets-primary-Bridging-header.pch",
+    "swift-dependencies" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-iphonesimulator/Vliegtuigtas Widgets.build/Objects-normal/x86_64/Vliegtuigtas Widgets-primary.swiftdeps"
+  },
+  "/Users/wouterschut/Documents/VliegtuigtasApp/VliegtuigtasApp/FlightActivityAttributes.swift" : {
+    "const-values" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-iphonesimulator/Vliegtuigtas Widgets.build/Objects-normal/x86_64/FlightActivityAttributes.swiftconstvalues",
+    "dependencies" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-iphonesimulator/Vliegtuigtas Widgets.build/Objects-normal/x86_64/FlightActivityAttributes.d",
+    "diagnostics" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-iphonesimulator/Vliegtuigtas Widgets.build/Objects-normal/x86_64/FlightActivityAttributes.dia",
+    "index-unit-output-path" : "/VliegtuigtasApp.build/Debug-iphonesimulator/Vliegtuigtas Widgets.build/Objects-normal/x86_64/FlightActivityAttributes.o",
+    "llvm-bc" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-iphonesimulator/Vliegtuigtas Widgets.build/Objects-normal/x86_64/FlightActivityAttributes.bc",
+    "object" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-iphonesimulator/Vliegtuigtas Widgets.build/Objects-normal/x86_64/FlightActivityAttributes.o",
+    "swift-dependencies" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-iphonesimulator/Vliegtuigtas Widgets.build/Objects-normal/x86_64/FlightActivityAttributes.swiftdeps",
+    "swiftmodule" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-iphonesimulator/Vliegtuigtas Widgets.build/Objects-normal/x86_64/FlightActivityAttributes~partial.swiftmodule"
+  },
+  "/Users/wouterschut/Documents/VliegtuigtasApp/VliegtuigtasWidgets/FlightLiveActivity.swift" : {
+    "const-values" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-iphonesimulator/Vliegtuigtas Widgets.build/Objects-normal/x86_64/FlightLiveActivity.swiftconstvalues",
+    "dependencies" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-iphonesimulator/Vliegtuigtas Widgets.build/Objects-normal/x86_64/FlightLiveActivity.d",
+    "diagnostics" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-iphonesimulator/Vliegtuigtas Widgets.build/Objects-normal/x86_64/FlightLiveActivity.dia",
+    "index-unit-output-path" : "/VliegtuigtasApp.build/Debug-iphonesimulator/Vliegtuigtas Widgets.build/Objects-normal/x86_64/FlightLiveActivity.o",
+    "llvm-bc" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-iphonesimulator/Vliegtuigtas Widgets.build/Objects-normal/x86_64/FlightLiveActivity.bc",
+    "object" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-iphonesimulator/Vliegtuigtas Widgets.build/Objects-normal/x86_64/FlightLiveActivity.o",
+    "swift-dependencies" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-iphonesimulator/Vliegtuigtas Widgets.build/Objects-normal/x86_64/FlightLiveActivity.swiftdeps",
+    "swiftmodule" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-iphonesimulator/Vliegtuigtas Widgets.build/Objects-normal/x86_64/FlightLiveActivity~partial.swiftmodule"
+  },
+  "/Users/wouterschut/Documents/VliegtuigtasApp/VliegtuigtasWidgets/VliegtuigtasWidgets.swift" : {
+    "const-values" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-iphonesimulator/Vliegtuigtas Widgets.build/Objects-normal/x86_64/VliegtuigtasWidgets.swiftconstvalues",
+    "dependencies" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-iphonesimulator/Vliegtuigtas Widgets.build/Objects-normal/x86_64/VliegtuigtasWidgets.d",
+    "diagnostics" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-iphonesimulator/Vliegtuigtas Widgets.build/Objects-normal/x86_64/VliegtuigtasWidgets.dia",
+    "index-unit-output-path" : "/VliegtuigtasApp.build/Debug-iphonesimulator/Vliegtuigtas Widgets.build/Objects-normal/x86_64/VliegtuigtasWidgets.o",
+    "llvm-bc" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-iphonesimulator/Vliegtuigtas Widgets.build/Objects-normal/x86_64/VliegtuigtasWidgets.bc",
+    "object" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-iphonesimulator/Vliegtuigtas Widgets.build/Objects-normal/x86_64/VliegtuigtasWidgets.o",
+    "swift-dependencies" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-iphonesimulator/Vliegtuigtas Widgets.build/Objects-normal/x86_64/VliegtuigtasWidgets.swiftdeps",
+    "swiftmodule" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-iphonesimulator/Vliegtuigtas Widgets.build/Objects-normal/x86_64/VliegtuigtasWidgets~partial.swiftmodule"
+  }
+}

@@ -75,14 +75,21 @@ extension View {
 
 // MARK: - Zoom-navigatie (iOS 18 hero-overgang) & scroll-transities
 
+/// Alleen op iPhone: iPadOS heeft bekende hit-testing-problemen met
+/// matchedTransitionSource in (horizontale) ScrollViews — kaarten reageren
+/// dan niet of pas na meerdere tikken. Dit was de oorzaak van de
+/// App Review-rejectie "buttons unresponsive" op iPad. Op iPad vallen we
+/// terug op de standaard push; functioneel identiek, alleen zonder de
+/// zoom-animatie.
+private let zoomTransitionsSupported = UIDevice.current.userInterfaceIdiom == .phone
+
 extension View {
     /// Markeert een kaart als bron voor de native zoom-navigatieovergang
-    /// (iOS 18+): de detailpagina groeit vloeiend uit de kaart zelf, en zoomt
-    /// bij teruggaan weer terug — het moderne systeemgedrag uit o.a. de App
-    /// Store en Foto's. Op oudere versies gewoon de standaard push.
+    /// (iOS 18+, alleen iPhone): de detailpagina groeit vloeiend uit de kaart
+    /// zelf, en zoomt bij teruggaan weer terug. Elders de standaard push.
     @ViewBuilder
     func zoomSource(id: some Hashable, in namespace: Namespace.ID) -> some View {
-        if #available(iOS 18.0, *) {
+        if #available(iOS 18.0, *), zoomTransitionsSupported {
             self.matchedTransitionSource(id: id, in: namespace)
         } else {
             self
@@ -92,7 +99,7 @@ extension View {
     /// Tegenhanger van `zoomSource` voor de bestemmingspagina.
     @ViewBuilder
     func zoomDestination(id: some Hashable, in namespace: Namespace.ID) -> some View {
-        if #available(iOS 18.0, *) {
+        if #available(iOS 18.0, *), zoomTransitionsSupported {
             self.navigationTransition(.zoom(sourceID: id, in: namespace))
         } else {
             self
@@ -101,12 +108,18 @@ extension View {
 
     /// Subtiele scroll-transitie voor horizontale carrousels: kaarten die de
     /// schermrand naderen vervagen en krimpen licht mee met het scrollen —
-    /// native `scrollTransition`-gedrag, geen eigen scroll-observatie.
+    /// native `scrollTransition`-gedrag. Alleen op iPhone, om elke interactie
+    /// met pointer-hit-testing op iPad uit te sluiten.
+    @ViewBuilder
     func carouselTransition() -> some View {
-        scrollTransition(.interactive, axis: .horizontal) { content, phase in
-            content
-                .opacity(phase.isIdentity ? 1 : 0.55)
-                .scaleEffect(phase.isIdentity ? 1 : 0.94)
+        if zoomTransitionsSupported {
+            scrollTransition(.interactive, axis: .horizontal) { content, phase in
+                content
+                    .opacity(phase.isIdentity ? 1 : 0.55)
+                    .scaleEffect(phase.isIdentity ? 1 : 0.94)
+            }
+        } else {
+            self
         }
     }
 }
@@ -169,14 +182,14 @@ final class ImageLoader: ObservableObject {
         return cache
     }()
 
-    private static let diskCacheURL: URL = {
+    nonisolated private static let diskCacheURL: URL = {
         let dir = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)[0]
             .appendingPathComponent("VTImageCache", isDirectory: true)
         try? FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
         return dir
     }()
 
-    private static func diskPath(for key: String) -> URL {
+    nonisolated private static func diskPath(for key: String) -> URL {
         let safeName = String(abs(key.hashValue))
         return diskCacheURL.appendingPathComponent(safeName)
     }
@@ -206,32 +219,58 @@ final class ImageLoader: ObservableObject {
         return cg.bytesPerRow * cg.height
     }
 
+    /// Gelijktijdige aanvragen voor dezelfde URL delen één download —
+    /// hetzelfde productlogo in carrousel én grid werd voorheen dubbel gehaald.
+    @MainActor
+    private static var inFlight: [String: Task<UIImage?, Never>] = [:]
+
     func load(_ urlString: String) {
         let key = urlString as NSString
 
+        // Geheugencache: synchroon, geen flikker.
         if let cached = Self.memoryCache.object(forKey: key) {
             image = cached; return
         }
 
-        let diskURL = Self.diskPath(for: urlString)
-        if let data = try? Data(contentsOf: diskURL), let cachedImg = Self.downsampled(data) {
-            Self.memoryCache.setObject(cachedImg, forKey: key, cost: Self.cost(of: cachedImg))
-            image = cachedImg
-            return
+        // Disk en netwerk volledig off-main: het synchroon lezen +
+        // downsamplen van schijf in scrollende grids gaf haperingen.
+        Task { @MainActor [weak self] in
+            if let img = await Self.fetch(urlString) {
+                self?.image = img
+            }
+        }
+    }
+
+    @MainActor
+    private static func fetch(_ urlString: String) async -> UIImage? {
+        if let existing = inFlight[urlString] {
+            return await existing.value
         }
 
-        guard let url = URL(string: urlString) else { return }
-        var req = URLRequest(url: url)
-        req.setValue("Bearer lFkEQW18oyMrdMsbfNK1DtnDnoCcqwNSBRfMCXmszUgbAoLf",
-                     forHTTPHeaderField: "Authorization")
-        Task {
+        let task = Task<UIImage?, Never>.detached(priority: .userInitiated) {
+            let diskURL = diskPath(for: urlString)
+            if let data = try? Data(contentsOf: diskURL), let img = downsampled(data) {
+                return img
+            }
+            guard let url = URL(string: urlString) else { return nil }
+            var req = URLRequest(url: url)
+            req.setValue("Bearer lFkEQW18oyMrdMsbfNK1DtnDnoCcqwNSBRfMCXmszUgbAoLf",
+                         forHTTPHeaderField: "Authorization")
             guard let (data, resp) = try? await URLSession.shared.data(for: req),
                   (resp as? HTTPURLResponse)?.statusCode == 200,
-                  let img = Self.downsampled(data) else { return }
-            Self.memoryCache.setObject(img, forKey: key, cost: Self.cost(of: img))
+                  let img = downsampled(data) else { return nil }
             try? data.write(to: diskURL)
-            image = img
+            return img
         }
+
+        inFlight[urlString] = task
+        let image = await task.value
+        inFlight[urlString] = nil
+
+        if let image {
+            memoryCache.setObject(image, forKey: urlString as NSString, cost: cost(of: image))
+        }
+        return image
     }
 }
 
@@ -245,7 +284,11 @@ struct AuthorisedImage: View {
             if let img = loader.image {
                 Group {
                     if fill {
+                        // Fill-modus loopt buiten zijn kader (het kader clipt
+                        // alleen visueel) — nooit hit-testbaar laten zijn,
+                        // anders steelt de overloop tikken van views eromheen.
                         Image(uiImage: img).resizable().scaledToFill()
+                            .allowsHitTesting(false)
                     } else {
                         Image(uiImage: img).resizable().scaledToFit()
                     }
@@ -264,6 +307,66 @@ struct AuthorisedImage: View {
     }
 }
 
+// MARK: - Zwevende terugknop
+
+/// Eén consistente terugknop voor alle detailpagina's: navy-getint glas met
+/// witte chevron — altijd zichtbaar, óók op witte productfoto's en lichte
+/// hero's. Minimaal 44×44pt raakvlak (Apple's richtlijn), met ruime
+/// contentShape zodat een tik ernaast ook gewoon raak is.
+struct FloatingBackButton: View {
+    let action: () -> Void
+
+    var body: some View {
+        Button {
+            UIImpactFeedbackGenerator(style: .light).impactOccurred()
+            action()
+        } label: {
+            Image(systemName: "chevron.left")
+                .font(.system(size: 17, weight: .bold))
+                .foregroundStyle(.white)
+                .frame(width: 44, height: 44)
+                .glassChrome(in: Circle(), tint: Theme.navy, interactive: true,
+                             legacyFill: AnyShapeStyle(Theme.navy.opacity(0.85)))
+                .shadow(color: .black.opacity(0.20), radius: 6, x: 0, y: 2)
+                .contentShape(Circle().inset(by: -8))
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel("Ga terug")
+    }
+}
+
+// MARK: - Merkkleur uit een logo
+
+extension UIImage {
+    /// Gemiddelde merkkleur van een logo: negeert transparante en bijna-witte
+    /// pixels (het achtergrondvlak), zodat de dominante logokleur overblijft.
+    /// Bewust goedkoop (24×24 sample) — dit draait op de detailpagina.
+    var brandColor: UIColor? {
+        guard let cg = cgImage else { return nil }
+        let side = 24
+        var data = [UInt8](repeating: 0, count: side * side * 4)
+        guard let ctx = CGContext(
+            data: &data, width: side, height: side,
+            bitsPerComponent: 8, bytesPerRow: side * 4,
+            space: CGColorSpaceCreateDeviceRGB(),
+            bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue
+        ) else { return nil }
+        ctx.interpolationQuality = .low
+        ctx.draw(cg, in: CGRect(x: 0, y: 0, width: side, height: side))
+
+        var r = 0.0, g = 0.0, b = 0.0, count = 0.0
+        for i in stride(from: 0, to: data.count, by: 4) {
+            guard data[i + 3] > 128 else { continue }                    // transparant
+            let red = Double(data[i]), green = Double(data[i + 1]), blue = Double(data[i + 2])
+            if red > 232, green > 232, blue > 232 { continue }           // witvlak
+            r += red; g += green; b += blue; count += 1
+        }
+        guard count > 20 else { return nil }                             // te weinig signaal
+        return UIColor(red: r / count / 255, green: g / count / 255,
+                       blue: b / count / 255, alpha: 1)
+    }
+}
+
 // MARK: - Airline logo
 
 struct AirlineLogo: View {
@@ -279,14 +382,7 @@ struct AirlineLogo: View {
             }
         }
         .frame(width: size, height: size * 0.6)
-        .overlay(alignment: .bottomTrailing) {
-            if let emoji = airline.flagEmoji {
-                Text(emoji)
-                    .font(.system(size: max(size * 0.28, 10)))
-                    .shadow(color: .black.opacity(0.15), radius: 1, x: 0, y: 1)
-                    .offset(x: size * 0.06, y: size * 0.04)
-            }
-        }
+        // Bewust geen landvlag-overlay meer: die gaf visuele ruis op elk logo.
     }
 
     private var placeholder: some View {
