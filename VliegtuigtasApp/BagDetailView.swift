@@ -6,6 +6,9 @@ private var bagDetailStatusBarHeight: CGFloat {
         .first?.windows.first?.safeAreaInsets.top ?? 50
 }
 
+/// Seconden tussen het automatisch doorbladeren van de foto-carrousel.
+private let autoScrollInterval: Double = 4
+
 struct BagDetailView: View {
     let bagId: String
 
@@ -177,6 +180,17 @@ struct BagDetailView: View {
         }
         .frame(height: heroHeight)
         .clipped()
+        // Automatisch doorbladeren: de task herstart bij élke wijziging van
+        // selectedImage — dus ook na een handmatige veeg begint de teller
+        // opnieuw, zodat een foto na interactie niet meteen doorspringt.
+        .task(id: selectedImage) {
+            guard images.count > 1 else { return }
+            try? await Task.sleep(for: .seconds(autoScrollInterval))
+            guard !Task.isCancelled else { return }
+            withAnimation(.spring(response: 0.5, dampingFraction: 0.85)) {
+                selectedImage = (selectedImage + 1) % images.count
+            }
+        }
     }
 
     /// Stip-indicator voor de foto-carrousel — actieve stip breder in navy,
