@@ -603,11 +603,6 @@ struct HomeView: View {
 
     // MARK: - Handige acties (onderaan Home)
 
-    @State private var showReminderSheet = false
-    @State private var showBaggageGuide = false
-    @State private var showBagsOverview = false
-    @State private var showPackingAlarms = false
-
     private var quickActionsSection: some View {
         VStack(spacing: 14) {
             HStack {
