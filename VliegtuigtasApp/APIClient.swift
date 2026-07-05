@@ -19,28 +19,88 @@ final class APIClient: ObservableObject {
         return URLSession(configuration: cfg)
     }()
 
-    // MARK: - Generic helpers
+    // MARK: - Request coördinator (coalescing + korte responscache)
 
-    private func get<T: Decodable>(_ path: String, query: [String: String] = [:]) async throws -> T {
-        let data = try await getRaw(path, query: query)
-        return try JSONDecoder().decode(T.self, from: data)
+    /// Serialiseert de GET-cache en dedupliceert gelijktijdige, identieke
+    /// requests: als twee schermen tegelijk dezelfde data opvragen (bijv. bij
+    /// een koude start waar Home én een detailscherm allebei `airlines()`
+    /// aanroepen vóórdat de eerste klaar is), gaat er tóch maar één request
+    /// naar de server. Een actor houdt dit thread-safe zonder locks.
+    private actor RequestCoordinator {
+        private var cache: [String: (data: Data, at: Date)] = [:]
+        private var inFlight: [String: Task<Data, Error>] = [:]
+
+        /// `ttl == 0` betekent: wél dedupliceren, maar niet cachen (de
+        /// catalogus-endpoints hebben hun eigen gedecodeerde cache, dus we
+        /// bewaren de ruwe bytes daar niet nog een tweede keer bij).
+        func data(
+            for url: URL,
+            ttl: TimeInterval,
+            fetch: @Sendable @escaping (URL) async throws -> Data
+        ) async throws -> Data {
+            let key = url.absoluteString
+
+            if ttl > 0, let cached = cache[key], Date().timeIntervalSince(cached.at) < ttl {
+                return cached.data
+            }
+            if let existing = inFlight[key] {
+                return try await existing.value
+            }
+
+            let task = Task { try await fetch(url) }
+            inFlight[key] = task
+            do {
+                let data = try await task.value
+                inFlight[key] = nil
+                if ttl > 0 { cache[key] = (data, Date()) }
+                return data
+            } catch {
+                inFlight[key] = nil
+                throw error
+            }
+        }
+
+        func invalidate() {
+            cache.removeAll()
+        }
     }
 
-    /// Zelfde als `get`, maar geeft ook de ruwe bytes terug — die schrijven
-    /// we voor de catalogi naar schijf zodat een koude start instant data heeft.
-    private func getRaw(_ path: String, query: [String: String] = [:]) async throws -> Data {
+    private let coordinator = RequestCoordinator()
+
+    // MARK: - Generic helpers
+
+    private func buildURL(_ path: String, query: [String: String]) -> URL {
         var comps = URLComponents(url: base.appendingPathComponent(path), resolvingAgainstBaseURL: false)!
         if !query.isEmpty {
             comps.queryItems = query.map { URLQueryItem(name: $0.key, value: $0.value) }
         }
-        var req = URLRequest(url: comps.url!)
-        req.setValue("Bearer \(apiKey)", forHTTPHeaderField: "Authorization")
-        req.setValue("application/json", forHTTPHeaderField: "Accept")
-        let (data, response) = try await session.data(for: req)
-        if let http = response as? HTTPURLResponse, !(200..<300).contains(http.statusCode) {
-            throw APIError.http(http.statusCode)
+        return comps.url!
+    }
+
+    private func get<T: Decodable>(_ path: String, query: [String: String] = [:], ttl: TimeInterval = 0) async throws -> T {
+        let data = try await getRaw(path, query: query, ttl: ttl)
+        return try JSONDecoder().decode(T.self, from: data)
+    }
+
+    /// GET via de coördinator: gededupliceerd, en (bij `ttl > 0`) kort gecachet.
+    /// Geeft ook de ruwe bytes terug — die schrijven we voor de catalogi naar
+    /// schijf zodat een koude start instant data heeft.
+    private func getRaw(_ path: String, query: [String: String] = [:], ttl: TimeInterval = 0) async throws -> Data {
+        let url = buildURL(path, query: query)
+        // Alleen Sendable waarden (String + URLSession) invangen, niet `self`,
+        // zodat de coalescing-closure geen data race op de class introduceert.
+        let apiKey = self.apiKey
+        let session = self.session
+        return try await coordinator.data(for: url, ttl: ttl) { url in
+            var req = URLRequest(url: url)
+            req.setValue("Bearer \(apiKey)", forHTTPHeaderField: "Authorization")
+            req.setValue("application/json", forHTTPHeaderField: "Accept")
+            let (data, response) = try await session.data(for: req)
+            if let http = response as? HTTPURLResponse, !(200..<300).contains(http.statusCode) {
+                throw APIError.http(http.statusCode)
+            }
+            return data
         }
-        return data
     }
 
     private func post<Body: Encodable, T: Decodable>(_ path: String, body: Body) async throws -> T {
@@ -66,6 +126,8 @@ final class APIClient: ObservableObject {
     private var airlinesCache: (value: [Airline], at: Date)?
     private var bagsCache: [String: (value: [Bag], at: Date)] = [:]
     private let cacheTTL: TimeInterval = 5 * 60
+    /// Kortere cache voor vluchtstatus — die is tijdgevoeliger dan de catalogus.
+    private let flightLookupTTL: TimeInterval = 60
 
     // MARK: - Disk-catalogus (instant cold start & offline)
 
@@ -106,9 +168,10 @@ final class APIClient: ObservableObject {
         return airlines
     }
 
-    /// GET /airlines/{slug}
+    /// GET /airlines/{slug} — kort gecachet, zodat herhaald openen van dezelfde
+    /// maatschappij-detailpagina niet telkens de server raakt.
     func airline(slug: String) async throws -> Airline {
-        let res: APIResponse<Airline> = try await get("airlines/\(slug)")
+        let res: APIResponse<Airline> = try await get("airlines/\(slug)", ttl: cacheTTL)
         guard let airline = res.data else { throw APIError.noData }
         return airline
     }
@@ -134,9 +197,10 @@ final class APIClient: ObservableObject {
         return bags
     }
 
-    /// GET /bags/{id}
+    /// GET /bags/{id} — kort gecachet, zodat heen-en-weer navigeren tussen een
+    /// tas en vergelijkbare tassen niet steeds dezelfde detailrequest herhaalt.
     func bag(id: String) async throws -> BagDetail {
-        let res: APIResponse<BagDetail> = try await get("bags/\(id)")
+        let res: APIResponse<BagDetail> = try await get("bags/\(id)", ttl: cacheTTL)
         guard let data = res.data else { throw APIError.noData }
         return data
     }
@@ -157,9 +221,14 @@ final class APIClient: ObservableObject {
         return data
     }
 
-    /// GET /flight-lookup?flight=KL1234
+    /// GET /flight-lookup?flight=KL1234 — korte cache (60s): vluchtstatus
+    /// verandert wel, maar niet van seconde tot seconde. Dit vangt het typen
+    /// (auto-lookup) en herhaalde opzoekingen van dezelfde vlucht op zonder
+    /// merkbaar oudere status te tonen.
     func flightLookup(number: String) async throws -> FlightLookupResponse {
-        let res: APIResponse<FlightLookupResponse> = try await get("flight-lookup", query: ["flight": number])
+        let res: APIResponse<FlightLookupResponse> = try await get(
+            "flight-lookup", query: ["flight": number], ttl: flightLookupTTL
+        )
         guard let data = res.data else { throw APIError.noData }
         return data
     }
@@ -191,9 +260,26 @@ final class APIClient: ObservableObject {
         }
     }
 
-    /// POST /events
-    func sendEvent(_ type: String, path: String? = nil) {
-        Task {
+    /// Laatst verzonden tijdstip per (type|path) — om dubbele events te dempen.
+    /// Op de main actor geïsoleerd zodat de bookkeeping thread-safe blijft,
+    /// terwijl `sendEvent` zelf vanaf elke context aanroepbaar blijft.
+    @MainActor private var lastEventSent: [String: Date] = [:]
+    /// Binnen dit venster tellen identieke events als één (voorkomt dubbele
+    /// `page_view`/CTA-POSTs bij het opnieuw verschijnen van een scherm of
+    /// snel heen-en-weer tikken).
+    private let eventDedupeWindow: TimeInterval = 2
+
+    /// POST /events — fire-and-forget, met de-duplicatie van snel herhaalde
+    /// identieke events zodat de analytics-endpoint niet onnodig belast wordt.
+    nonisolated func sendEvent(_ type: String, path: String? = nil) {
+        Task { @MainActor in
+            let key = "\(type)|\(path ?? "")"
+            let now = Date()
+            if let last = lastEventSent[key], now.timeIntervalSince(last) < eventDedupeWindow {
+                return
+            }
+            lastEventSent[key] = now
+
             let body = EventRequest(
                 eventType: type,
                 path: path,
