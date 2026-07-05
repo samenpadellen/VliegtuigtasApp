@@ -140,6 +140,52 @@ struct AirlineVariant: Identifiable, Codable, Hashable {
     }
 }
 
+// MARK: - Product image
+
+/// Eén productafbeelding. Decodeert zowel een kale URL-string ("https://…")
+/// als een object met een `url`- of `image_url`-veld, zodat verschillende
+/// shop-feeds (die of losse strings óf objecten teruggeven) allebei werken.
+struct ProductImage: Decodable, Hashable {
+    let url: String
+
+    init(url: String) { self.url = url }
+
+    init(from decoder: Decoder) throws {
+        if let single = try? decoder.singleValueContainer(),
+           let s = try? single.decode(String.self) {
+            url = s
+            return
+        }
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        if let u = try c.decodeIfPresent(String.self, forKey: .url) {
+            url = u
+        } else if let u = try c.decodeIfPresent(String.self, forKey: .imageUrl) {
+            url = u
+        } else {
+            throw DecodingError.dataCorrupted(
+                .init(codingPath: decoder.codingPath,
+                      debugDescription: "ProductImage mist zowel een string als een url/image_url-veld")
+            )
+        }
+    }
+
+    enum CodingKeys: String, CodingKey {
+        case url
+        case imageUrl = "image_url"
+    }
+}
+
+/// Bouwt de carrousel-lijst: de hoofdafbeelding (`imageUrl`) vooraan, gevolgd
+/// door de extra `images`, gededupliceerd met behoud van volgorde.
+func galleryUrls(primary: String?, images: [ProductImage]?) -> [String] {
+    var seen = Set<String>()
+    var result: [String] = []
+    for u in ([primary].compactMap { $0 } + (images?.map(\.url) ?? [])) {
+        if seen.insert(u).inserted { result.append(u) }
+    }
+    return result
+}
+
 // MARK: - Bag (affiliate product)
 
 struct Bag: Identifiable, Decodable {
@@ -147,6 +193,7 @@ struct Bag: Identifiable, Decodable {
     let name: String
     let brand: String?
     let imageUrl: String?
+    let images: [ProductImage]?
     let affiliateUrl: String?
     let category: String?
     let type: String?
@@ -174,7 +221,7 @@ struct Bag: Identifiable, Decodable {
     let matchedAirlines: [Airline]?
 
     enum CodingKeys: String, CodingKey {
-        case id, name, brand, category, type, colors, featured
+        case id, name, brand, category, type, colors, featured, images
         case imageUrl          = "image_url"
         case affiliateUrl      = "affiliate_url"
         case lengthCm          = "length_cm"
@@ -204,6 +251,7 @@ struct Bag: Identifiable, Decodable {
         name = try c.decode(String.self, forKey: .name)
         brand = try c.decodeIfPresent(String.self, forKey: .brand)
         imageUrl = try c.decodeIfPresent(String.self, forKey: .imageUrl)
+        images = try c.decodeIfPresent([ProductImage].self, forKey: .images)
         affiliateUrl = try c.decodeIfPresent(String.self, forKey: .affiliateUrl)
         category = try c.decodeIfPresent(String.self, forKey: .category)
         type = try c.decodeIfPresent(String.self, forKey: .type)
@@ -231,6 +279,9 @@ struct Bag: Identifiable, Decodable {
     }
 
     var displayPrice: String? { priceLabel ?? priceEur.map { "€\(Int($0)),-" } }
+
+    /// Alle productafbeeldingen voor een carrousel (hoofdafbeelding vooraan).
+    var galleryImageUrls: [String] { galleryUrls(primary: imageUrl, images: images) }
 }
 
 // MARK: - Bag Detail
@@ -240,6 +291,7 @@ struct BagDetail: Identifiable, Decodable {
     let name: String
     let brand: String?
     let imageUrl: String?
+    let images: [ProductImage]?
     let affiliateUrl: String?
     let category: String?
     let type: String?
@@ -269,7 +321,7 @@ struct BagDetail: Identifiable, Decodable {
     let similarBags: [Bag]?
 
     enum CodingKeys: String, CodingKey {
-        case id, name, brand, category, type, colors, featured
+        case id, name, brand, category, type, colors, featured, images
         case imageUrl          = "image_url"
         case affiliateUrl      = "affiliate_url"
         case lengthCm          = "length_cm"
@@ -300,6 +352,7 @@ struct BagDetail: Identifiable, Decodable {
         name = try c.decode(String.self, forKey: .name)
         brand = try c.decodeIfPresent(String.self, forKey: .brand)
         imageUrl = try c.decodeIfPresent(String.self, forKey: .imageUrl)
+        images = try c.decodeIfPresent([ProductImage].self, forKey: .images)
         affiliateUrl = try c.decodeIfPresent(String.self, forKey: .affiliateUrl)
         category = try c.decodeIfPresent(String.self, forKey: .category)
         type = try c.decodeIfPresent(String.self, forKey: .type)
@@ -328,6 +381,9 @@ struct BagDetail: Identifiable, Decodable {
     }
 
     var displayPrice: String? { priceLabel ?? priceEur.map { "€\(Int($0)),-" } }
+
+    /// Alle productafbeeldingen voor de carrousel (hoofdafbeelding vooraan).
+    var galleryImageUrls: [String] { galleryUrls(primary: imageUrl, images: images) }
 }
 
 // MARK: - Bag fit type (onder de stoel vs. bagagevak)

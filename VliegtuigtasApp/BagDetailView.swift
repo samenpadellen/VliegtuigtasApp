@@ -12,6 +12,7 @@ struct BagDetailView: View {
     @EnvironmentObject private var airlineStore: AirlineStore
     @State private var detail: BagDetail?
     @State private var isLoading = true
+    @State private var selectedImage = 0
     @Environment(\.dismiss) private var dismiss
 
     // Airlines die de tas NIET accepteren
@@ -130,18 +131,36 @@ struct BagDetailView: View {
     // MARK: - Hero photo
 
     private func heroPhoto(_ d: BagDetail) -> some View {
-        ZStack(alignment: .bottom) {
-            Color.white.frame(height: bagDetailStatusBarHeight + 340)
+        let images = d.galleryImageUrls
+        let heroHeight = bagDetailStatusBarHeight + 340
 
-            if d.imageUrl != nil {
-                AuthorisedImage(urlString: d.imageUrl, fill: true)
-                    .frame(maxWidth: .infinity)
-                    .frame(height: bagDetailStatusBarHeight + 340)
-                    .clipped()
-            } else {
+        return ZStack(alignment: .bottom) {
+            Color.white.frame(height: heroHeight)
+
+            if images.isEmpty {
                 Image(systemName: "bag.fill")
                     .font(.system(size: 72, weight: .ultraLight))
                     .foregroundStyle(Theme.navy.opacity(0.10))
+            } else if images.count == 1 {
+                AuthorisedImage(urlString: images[0], fill: true)
+                    .frame(maxWidth: .infinity)
+                    .frame(height: heroHeight)
+                    .clipped()
+            } else {
+                // Meerdere shop-afbeeldingen: horizontaal veegbaar. Eigen
+                // stippen (hieronder) i.p.v. de systeem-index, zodat ze niet
+                // wegvallen achter het onderste verloop.
+                TabView(selection: $selectedImage) {
+                    ForEach(Array(images.enumerated()), id: \.offset) { idx, url in
+                        AuthorisedImage(urlString: url, fill: true)
+                            .frame(maxWidth: .infinity)
+                            .frame(height: heroHeight)
+                            .clipped()
+                            .tag(idx)
+                    }
+                }
+                .frame(height: heroHeight)
+                .tabViewStyle(.page(indexDisplayMode: .never))
             }
 
             LinearGradient(
@@ -149,9 +168,36 @@ struct BagDetailView: View {
                 startPoint: .bottom,
                 endPoint: .init(x: 0.5, y: 0.72)
             )
+            .allowsHitTesting(false)
+
+            if images.count > 1 {
+                pageDots(count: images.count)
+                    .padding(.bottom, 74)
+            }
         }
-        .frame(height: bagDetailStatusBarHeight + 340)
+        .frame(height: heroHeight)
         .clipped()
+    }
+
+    /// Stip-indicator voor de foto-carrousel — actieve stip breder in navy,
+    /// de rest gedempt. Tikbaar om direct naar een foto te springen.
+    private func pageDots(count: Int) -> some View {
+        HStack(spacing: 6) {
+            ForEach(0..<count, id: \.self) { i in
+                Capsule()
+                    .fill(i == selectedImage ? Theme.navy : Theme.navy.opacity(0.22))
+                    .frame(width: i == selectedImage ? 18 : 6, height: 6)
+                    .onTapGesture {
+                        withAnimation(.spring(response: 0.35, dampingFraction: 0.8)) {
+                            selectedImage = i
+                        }
+                    }
+            }
+        }
+        .padding(.horizontal, 10)
+        .padding(.vertical, 7)
+        .background(.ultraThinMaterial, in: Capsule())
+        .animation(.spring(response: 0.35, dampingFraction: 0.8), value: selectedImage)
     }
 
     // MARK: - Product info + CTA
