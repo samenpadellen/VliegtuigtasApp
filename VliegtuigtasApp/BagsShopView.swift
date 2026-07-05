@@ -434,6 +434,14 @@ struct BagsShopView: View {
             LazyVGrid(columns: [GridItem(.adaptive(minimum: 160), spacing: 12)], spacing: 12) {
                 ForEach(0..<6, id: \.self) { _ in SkeletonCard() }
             }
+        } else if bagStore.bags.isEmpty && activeFilterCount == 0 && searchText.isEmpty {
+            // Geen enkele tas geladen én geen filters actief: dan is het geen
+            // "niets gevonden" maar een laadprobleem (offline/koude start).
+            InlineRetryState(
+                message: "We konden de tassen niet laden. Controleer je verbinding en probeer het opnieuw.",
+                onRetry: { Task { await refreshAll() } }
+            )
+            .padding(.vertical, 40)
         } else if filtered.isEmpty {
             emptyState
         } else {

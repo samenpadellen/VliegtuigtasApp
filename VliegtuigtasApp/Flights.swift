@@ -184,6 +184,10 @@ struct MyFlightsSection: View {
 
     var body: some View {
         VStack(spacing: 10) {
+            if store.flights.isEmpty {
+                emptyState
+            }
+
             ForEach(store.sorted) { flight in
                 Button {
                     selectedFlightId = flight.id
@@ -212,6 +216,28 @@ struct MyFlightsSection: View {
         .sheet(isPresented: $showAddFlight) {
             AddFlightSheet()
         }
+    }
+
+    /// Vriendelijke lege staat: legt kort uit wat je hier wint, in plaats van
+    /// alleen een kale "toevoegen"-knop.
+    private var emptyState: some View {
+        VStack(spacing: 8) {
+            Image(systemName: "airplane.departure")
+                .font(.system(size: 26, weight: .light))
+                .foregroundStyle(Theme.sky)
+                .accessibilityHidden(true)
+            Text("Nog geen vlucht opgeslagen")
+                .font(.system(size: 14, weight: .semibold, design: .rounded))
+                .foregroundStyle(Theme.textPrimary)
+            Text("Bewaar je vlucht en de aftelling tot vertrek verschijnt op je widget, smartwatch en lockscreen.")
+                .font(.system(size: 12, design: .rounded))
+                .foregroundStyle(Theme.textSecondary)
+                .multilineTextAlignment(.center)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 20)
+        .padding(.horizontal, 8)
     }
 }
 

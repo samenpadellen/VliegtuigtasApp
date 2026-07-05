@@ -594,3 +594,40 @@ struct SaveToRemindersButton: View {
         }
     }
 }
+
+// MARK: - Inline retry-/foutstaat
+
+/// Compacte, herbruikbare "er ging iets mis"-staat met een opnieuw-knop.
+/// Voor plekken waar een volledig scherm te veel is (een carrousel, een
+/// sectie), maar we de gebruiker toch niet in het ongewisse willen laten.
+struct InlineRetryState: View {
+    let message: String
+    var systemImage: String = "wifi.exclamationmark"
+    let onRetry: () -> Void
+
+    var body: some View {
+        VStack(spacing: 12) {
+            Image(systemName: systemImage)
+                .font(.system(size: 26, weight: .light))
+                .foregroundStyle(Theme.textSecondary)
+                .accessibilityHidden(true)
+            Text(message)
+                .font(.system(size: 13, design: .rounded))
+                .foregroundStyle(Theme.textSecondary)
+                .multilineTextAlignment(.center)
+                .fixedSize(horizontal: false, vertical: true)
+            Button(action: onRetry) {
+                Label("Opnieuw proberen", systemImage: "arrow.clockwise")
+                    .font(.system(size: 13, weight: .semibold, design: .rounded))
+                    .foregroundStyle(Theme.navy)
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 9)
+                    .background(Theme.navy.opacity(0.10))
+                    .clipShape(Capsule())
+            }
+            .buttonStyle(.plain)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 24)
+    }
+}

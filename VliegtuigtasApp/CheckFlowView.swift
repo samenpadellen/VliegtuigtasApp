@@ -1516,6 +1516,7 @@ struct ResultStepView: View {
     @Environment(\.dismiss) private var dismissContainer
     @State private var bags: [Bag] = []
     @State private var loadingBags = false
+    @State private var bagsFailed = false
     @State private var firstName = ""
     @State private var email = ""
     @State private var leadSent = false
@@ -1621,6 +1622,18 @@ struct ResultStepView: View {
         }
         .padding(.top, 12)
         .frame(maxWidth: .infinity)
+        // VoiceOver leest de hele uitkomst als één duidelijke zin voor, in
+        // plaats van losse fragmenten (icoon, titel, logo, pillen).
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(verdictAccessibilityLabel)
+    }
+
+    /// Eén voorgelezen samenvatting van de uitkomst voor VoiceOver.
+    private var verdictAccessibilityLabel: String {
+        let dims = "\(Int(dimensions.0)) bij \(Int(dimensions.1)) bij \(Int(dimensions.2)) centimeter"
+        let weight = String(format: "%.1f", dimensions.3).replacingOccurrences(of: ".", with: ",")
+        return "\(result.verdictTitle). \(result.verdictMessage) Maatschappij \(airline.name). "
+            + "Ingevoerde maten: \(dims), \(weight) kilogram."
     }
 
     private var verdictIcon: String {
@@ -1688,6 +1701,7 @@ struct ResultStepView: View {
 
             if loadingBags {
                 ProgressView().tint(Theme.sky).frame(maxWidth: .infinity).padding()
+                    .accessibilityLabel("Passende tassen laden")
             } else if !bags.isEmpty {
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 12) {
@@ -1698,6 +1712,18 @@ struct ResultStepView: View {
                     .padding(.horizontal, 20)
                     .padding(.vertical, 4)
                 }
+            } else if bagsFailed {
+                InlineRetryState(
+                    message: "We konden de tas-suggesties niet laden. Controleer je verbinding.",
+                    onRetry: { Task { await loadBags() } }
+                )
+                .padding(.horizontal, 20)
+            } else {
+                // Geen fout, maar (nog) geen match — eerlijk en zonder lege ruimte.
+                Text("Nog geen passende tassen gevonden voor \(airline.name). Bekijk de hele shop hieronder.")
+                    .font(.system(size: 13, design: .rounded))
+                    .foregroundStyle(Theme.textSecondary)
+                    .padding(.horizontal, 20)
             }
         }
     }
@@ -1865,7 +1891,15 @@ struct ResultStepView: View {
     private func loadBags() async {
         guard !isFit else { return }
         loadingBags = true
-        bags = (try? await APIClient.shared.bags(airline: airline.slug)) ?? []
+        bagsFailed = false
+        do {
+            bags = try await APIClient.shared.bags(airline: airline.slug)
+        } catch {
+            // Onderscheid tussen "niets gevonden" en "kon niet laden": alleen
+            // bij een écht mislukte call tonen we de opnieuw-proberen-knop.
+            bagsFailed = true
+            bags = []
+        }
         loadingBags = false
     }
 }
