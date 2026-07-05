@@ -105,6 +105,10 @@ struct CheckFlowView: View {
             }
         }
         .navigationBarHidden(true)
+        // De checker schaalt volledig mee met Dynamic Type, met een bovengrens
+        // zodat de compactere rijen (sliders, pillen) ook bij grote letters
+        // leesbaar en heel blijven.
+        .dynamicTypeSize(...DynamicTypeSize.accessibility3)
         .task { await airlineStore.load() }
         .onChange(of: checkStore.result) { _, new in
             if let result = new {
@@ -178,7 +182,7 @@ struct CheckFlowView: View {
                         Image(systemName: "chevron.left")
                             .font(.system(size: 14, weight: .semibold))
                         Text("Terug")
-                            .font(.system(size: 14, weight: .semibold, design: .rounded))
+                            .scaledFont(size: 14, weight: .semibold)
                     }
                     .foregroundStyle(Theme.navy)
                 }
@@ -255,17 +259,17 @@ private struct FlightWidgetSheet: View {
             HStack(spacing: 10) {
                 AirlineLogo(airline: airline, size: 34)
                 Text("Vlucht met \(airline.name)")
-                    .font(.system(size: 15, weight: .semibold, design: .rounded))
+                    .scaledFont(size: 15, weight: .semibold)
             }
 
             VStack(alignment: .leading, spacing: 6) {
                 Text("Vluchtnummer (optioneel)")
-                    .font(.system(size: 12, weight: .semibold, design: .rounded))
+                    .scaledFont(size: 12, weight: .semibold)
                     .foregroundStyle(Theme.textSecondary)
                 TextField("bijv. KL1234", text: $flightNumber)
                     .autocorrectionDisabled()
                     .textInputAutocapitalization(.characters)
-                    .font(.system(size: 15, design: .rounded))
+                    .scaledFont(size: 15)
                     .padding(12)
                     .background(Color(.secondarySystemGroupedBackground))
                     .clipShape(RoundedRectangle(cornerRadius: 12))
@@ -273,7 +277,7 @@ private struct FlightWidgetSheet: View {
 
             VStack(alignment: .leading, spacing: 6) {
                 Text("Vertrek")
-                    .font(.system(size: 12, weight: .semibold, design: .rounded))
+                    .scaledFont(size: 12, weight: .semibold)
                     .foregroundStyle(Theme.textSecondary)
                 DatePicker("", selection: $departure, in: Date()..., displayedComponents: [.date, .hourAndMinute])
                     .labelsHidden()
@@ -297,7 +301,7 @@ private struct FlightWidgetSheet: View {
                 HStack(spacing: 8) {
                     Image(systemName: saved ? "checkmark" : "plus.square.on.square")
                     Text(saved ? "Vlucht opgeslagen" : "Vlucht opslaan")
-                        .font(.system(size: 16, weight: .semibold, design: .rounded))
+                        .scaledFont(size: 16, weight: .semibold)
                 }
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 15)
@@ -346,6 +350,8 @@ private struct FlowStepper: View {
             HStack(spacing: 0) {
                 ForEach(0..<3, id: \.self) { i in
                     Text(labels[i])
+                        // Vast: de stap-indicator staat in drie smalle kolommen
+                        // die niet mee mogen groeien met Dynamic Type.
                         .font(.system(size: 10, weight: .semibold, design: .rounded))
                         .foregroundStyle(i <= current ? activeColor : mutedText)
                         .frame(maxWidth: .infinity)
@@ -366,6 +372,7 @@ private struct FlowStepper: View {
                     .foregroundStyle(onDark ? Theme.navy : .white)
             } else {
                 Text("\(i + 1)")
+                    // Vast: het cijfer zit in een 24pt-cirkel.
                     .font(.system(size: 12, weight: .bold, design: .rounded))
                     .foregroundStyle(i == current ? (onDark ? Theme.navy : .white) : mutedText)
             }
@@ -528,7 +535,7 @@ private struct AirlineStepView: View {
                     selectedContinent = nil; selectedAlliance = nil; selectedAirlineType = nil
                 } label: {
                     Text("Wis alles")
-                        .font(.system(size: 12, weight: .semibold, design: .rounded))
+                        .scaledFont(size: 12, weight: .semibold)
                         .foregroundStyle(Theme.red)
                 }
             }
@@ -563,14 +570,15 @@ private struct AirlineStepView: View {
 
             VStack(alignment: .leading, spacing: 8) {
                 Text("STAP 1 VAN 3 · HANDBAGAGE CHECKER")
-                    .font(.system(size: 10, weight: .black, design: .rounded))
+                    .scaledFont(size: 10, weight: .black, relativeTo: .caption2)
                     .foregroundStyle(.white.opacity(0.70))
                     .kerning(1.2)
 
                 Text("Met welke\nmaatschappij\nvlieg je?")
-                    .font(.system(size: 32, weight: .bold, design: .rounded))
+                    .scaledFont(size: 32, weight: .bold, relativeTo: .largeTitle)
                     .foregroundStyle(.white)
                     .lineSpacing(2)
+                    .minimumScaleFactor(0.7)
             }
             .padding(.horizontal, 24)
             .padding(.bottom, 28)
@@ -588,7 +596,7 @@ private struct AirlineStepView: View {
                 .font(.system(size: 15))
             TextField("Zoek maatschappij…", text: $search)
                 .autocorrectionDisabled()
-                .font(.system(size: 15, design: .rounded))
+                .scaledFont(size: 15)
             if !search.isEmpty {
                 Button { search = "" } label: {
                     Image(systemName: "xmark.circle.fill")
@@ -609,7 +617,7 @@ private struct AirlineStepView: View {
     private var popularSection: some View {
         VStack(alignment: .leading, spacing: 12) {
             Text("Populaire maatschappijen")
-                .font(.system(size: 12, weight: .bold, design: .rounded))
+                .scaledFont(size: 12, weight: .bold)
                 .foregroundStyle(Theme.textSecondary)
                 .kerning(0.4)
                 .padding(.horizontal, 20)
@@ -635,7 +643,7 @@ private struct AirlineStepView: View {
     private var allAirlinesSection: some View {
         VStack(alignment: .leading, spacing: 12) {
             Text("Alle maatschappijen")
-                .font(.system(size: 12, weight: .bold, design: .rounded))
+                .scaledFont(size: 12, weight: .bold)
                 .foregroundStyle(Theme.textSecondary)
                 .kerning(0.4)
                 .padding(.horizontal, 20)
@@ -755,7 +763,7 @@ private struct AirlineFilterSheet: View {
             Button { selected.wrappedValue = nil } label: {
                 HStack {
                     Text(allLabel)
-                        .font(.system(size: 15, design: .rounded))
+                        .scaledFont(size: 15)
                         .foregroundStyle(Theme.textPrimary)
                     Spacer()
                     if selected.wrappedValue == nil {
@@ -770,7 +778,7 @@ private struct AirlineFilterSheet: View {
                 Button { selected.wrappedValue = option } label: {
                     HStack {
                         Text(display(option))
-                            .font(.system(size: 15, design: .rounded))
+                            .scaledFont(size: 15)
                             .foregroundStyle(Theme.textPrimary)
                         Spacer()
                         if selected.wrappedValue == option {
@@ -782,7 +790,7 @@ private struct AirlineFilterSheet: View {
                 .buttonStyle(.plain)
             }
         } header: {
-            Text(title).font(.system(size: 12, weight: .semibold, design: .rounded))
+            Text(title).scaledFont(size: 12, weight: .semibold)
         }
     }
 }
@@ -799,7 +807,7 @@ private struct PopularAirlinePill: View {
             HStack(spacing: 10) {
                 AirlineLogo(airline: airline, size: 30)
                 Text(airline.name)
-                    .font(.system(size: 13, weight: .semibold, design: .rounded))
+                    .scaledFont(size: 13, weight: .semibold)
                     .foregroundStyle(isSelected ? Theme.navy : Theme.textPrimary)
                     .lineLimit(1)
             }
@@ -829,7 +837,7 @@ private struct AirlineTile: View {
             VStack(spacing: 10) {
                 AirlineLogo(airline: airline, size: 72)
                 Text(airline.name)
-                    .font(.system(size: 12, weight: .semibold, design: .rounded))
+                    .scaledFont(size: 12, weight: .semibold)
                     .foregroundStyle(isSelected ? Theme.navy : Theme.textPrimary)
                     .multilineTextAlignment(.center)
                     .lineLimit(2)
@@ -896,7 +904,7 @@ private struct DimensionsStepView: View {
                 .foregroundStyle(Theme.sky)
             Text("Toegestaan bij \(variant.variantName): max. \(dims)"
                  + (variant.maxWeightKg.map { " · \(Int($0)) kg" } ?? ""))
-                .font(.system(size: 13, weight: .medium, design: .rounded))
+                .scaledFont(size: 13, weight: .medium)
                 .foregroundStyle(Theme.textSecondary)
                 .fixedSize(horizontal: false, vertical: true)
             Spacer(minLength: 0)
@@ -914,19 +922,19 @@ private struct DimensionsStepView: View {
                 // Title
                 VStack(alignment: .leading, spacing: 4) {
                     Text("STAP 2 VAN 3")
-                        .font(.system(size: 11, weight: .black, design: .rounded))
+                        .scaledFont(size: 11, weight: .black)
                         .foregroundStyle(Theme.sky)
                         .kerning(1.5)
                     if let name = airline?.name {
                         Text(name)
-                            .font(.system(size: 13, weight: .semibold, design: .rounded))
+                            .scaledFont(size: 13, weight: .semibold)
                             .foregroundStyle(Theme.textSecondary)
                     }
                     Text("Hoe groot is\njouw handbagage?")
-                        .font(.system(size: 26, weight: .bold, design: .rounded))
+                        .scaledFont(size: 26, weight: .bold)
                         .padding(.top, 2)
                     Text("Meet jouw tas op en vul de maten in.")
-                        .font(.body1).foregroundStyle(Theme.textSecondary)
+                        .scaledFont(size: 16).foregroundStyle(Theme.textSecondary)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.horizontal, 20)
@@ -953,10 +961,10 @@ private struct DimensionsStepView: View {
                         Image(systemName: "camera.viewfinder")
                             .font(.system(size: 15, weight: .semibold))
                         Text("Scan je tas met de camera")
-                            .font(.system(size: 15, weight: .semibold, design: .rounded))
+                            .scaledFont(size: 15, weight: .semibold)
                         Spacer()
                         Text("LiDAR")
-                            .font(.system(size: 10, weight: .black, design: .rounded))
+                            .scaledFont(size: 10, weight: .black)
                             .foregroundStyle(Theme.navy)
                             .padding(.horizontal, 8)
                             .padding(.vertical, 4)
@@ -1003,7 +1011,7 @@ private struct DimensionsStepView: View {
                     VStack(alignment: .leading, spacing: 10) {
                         HStack {
                             Image(systemName: "scalemass.fill").foregroundStyle(Theme.navy)
-                            Text("Gewicht").font(.headline2)
+                            Text("Gewicht").scaledFont(size: 20, weight: .semibold)
                         }
                         HStack(spacing: 0) {
                             Button {
@@ -1017,13 +1025,13 @@ private struct DimensionsStepView: View {
                             Spacer()
                             VStack(spacing: 2) {
                                 Text(String(format: "%.1f", weight))
-                                    .font(.system(size: 36, weight: .bold, design: .rounded))
+                                    .scaledFont(size: 36, weight: .bold)
                                     .monospacedDigit()
                                     // Cijfers rollen vloeiend om bij +/- in plaats
                                     // van hard te verspringen (native numericText).
                                     .contentTransition(.numericText(value: weight))
                                     .animation(.snappy(duration: 0.25), value: weight)
-                                Text("kilogram").font(.caption1).foregroundStyle(Theme.textSecondary)
+                                Text("kilogram").scaledFont(size: 13).foregroundStyle(Theme.textSecondary)
                             }
                             .accessibilityElement(children: .ignore)
                             .accessibilityLabel("Gewicht")
@@ -1058,7 +1066,7 @@ private struct DimensionsStepView: View {
                                     .font(.system(size: 16, weight: .semibold))
                             }
                             Text(isChecking ? "Controleren…" : "Controleer nu")
-                                .font(.system(size: 16, weight: .semibold, design: .rounded))
+                                .scaledFont(size: 16, weight: .semibold)
                         }
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 17)
@@ -1073,7 +1081,7 @@ private struct DimensionsStepView: View {
 
                     if let err = error {
                         Label(err, systemImage: "exclamationmark.circle")
-                            .font(.caption1).foregroundStyle(Theme.red)
+                            .scaledFont(size: 13).foregroundStyle(Theme.red)
                     }
                 }
                 .padding(.horizontal, 20)
@@ -1372,6 +1380,7 @@ private struct BagDiagram: View {
                 .frame(width: min(w * 0.3, 26), height: 8)
                 .overlay(
                     Text("VT")
+                        // Vast: onderdeel van de getekende koffer, geen leestekst.
                         .font(.system(size: 5.5, weight: .black, design: .rounded))
                         .foregroundStyle(Theme.yellow)
                 )
@@ -1464,6 +1473,7 @@ private struct BagDiagram: View {
             Image(systemName: icon)
                 .font(.system(size: 9, weight: .bold))
             Text("\(Int(value)) cm")
+                // Vast: maatlabel dat op de getekende koffer zweeft.
                 .font(.system(size: 11, weight: .semibold, design: .rounded))
                 .monospacedDigit()
                 .contentTransition(.numericText(value: value))
@@ -1488,7 +1498,7 @@ private struct DimSlider: View {
     var body: some View {
         HStack(spacing: 12) {
             Text(label)
-                .font(.body1).fontWeight(.medium)
+                .scaledFont(size: 16).fontWeight(.medium)
                 .frame(width: 60, alignment: .leading)
 
             Slider(value: $value, in: range, step: 1) { editing in
@@ -1499,11 +1509,11 @@ private struct DimSlider: View {
             .tint(color)
 
             Text("\(Int(value))")
-                .font(.system(size: 16, weight: .bold, design: .rounded))
+                .scaledFont(size: 16, weight: .bold)
                 .monospacedDigit()
                 .frame(width: 36, alignment: .trailing)
 
-            Text("cm").font(.caption1).foregroundStyle(Theme.textSecondary)
+            Text("cm").scaledFont(size: 13).foregroundStyle(Theme.textSecondary)
         }
     }
 }
@@ -1566,7 +1576,7 @@ struct ResultStepView: View {
                 VStack(spacing: 16) {
                     Button(action: onReset) {
                         Label("Opnieuw controleren", systemImage: "arrow.clockwise")
-                            .font(.body1).fontWeight(.semibold)
+                            .scaledFont(size: 16).fontWeight(.semibold)
                             .frame(maxWidth: .infinity)
                             .padding(.vertical, 15)
                             .background(Theme.navy.opacity(0.07))
@@ -1576,7 +1586,7 @@ struct ResultStepView: View {
                     .padding(.horizontal, 20)
 
                     Text("Indicatie: controleer altijd de officiële regels.")
-                        .font(.caption1).foregroundStyle(Theme.textSecondary)
+                        .scaledFont(size: 13).foregroundStyle(Theme.textSecondary)
                         .multilineTextAlignment(.center)
                 }
                 .padding(.bottom, 36)
@@ -1596,7 +1606,7 @@ struct ResultStepView: View {
     private var verdictHero: some View {
         VStack(spacing: 20) {
             Text("STAP 3 VAN 3 · RESULTAAT")
-                .font(.system(size: 11, weight: .black, design: .rounded))
+                .scaledFont(size: 11, weight: .black)
                 .foregroundStyle(Theme.verdictColor(result.verdict))
                 .kerning(1.5)
 
@@ -1611,13 +1621,13 @@ struct ResultStepView: View {
 
             VStack(spacing: 8) {
                 Text(result.verdictTitle)
-                    .font(.system(size: 30, weight: .bold, design: .rounded))
+                    .scaledFont(size: 30, weight: .bold)
                     .multilineTextAlignment(.center)
 
                 HStack(spacing: 6) {
                     AirlineLogo(airline: airline, size: 20)
                     Text(airline.name)
-                        .font(.system(size: 14, weight: .medium, design: .rounded))
+                        .scaledFont(size: 14, weight: .medium)
                         .foregroundStyle(Theme.textSecondary)
                 }
 
@@ -1683,12 +1693,12 @@ struct ResultStepView: View {
                 .foregroundStyle(color)
                 .frame(width: 22)
             Text(label)
-                .font(.system(size: 14, design: .rounded))
+                .scaledFont(size: 14)
                 .foregroundStyle(Theme.textPrimary)
             Spacer()
             if !value.isEmpty {
                 Text(value)
-                    .font(.system(size: 14, weight: .semibold, design: .rounded))
+                    .scaledFont(size: 14, weight: .semibold)
                     .foregroundStyle(Theme.textSecondary)
             }
         }
@@ -1701,9 +1711,9 @@ struct ResultStepView: View {
         VStack(alignment: .leading, spacing: 12) {
             VStack(alignment: .leading, spacing: 3) {
                 Text("Tassen & koffers die wél passen")
-                    .font(.system(size: 16, weight: .bold, design: .rounded))
+                    .scaledFont(size: 16, weight: .bold)
                 Text("Geselecteerd voor \(airline.name).")
-                    .font(.caption1).foregroundStyle(Theme.textSecondary)
+                    .scaledFont(size: 13).foregroundStyle(Theme.textSecondary)
             }
             .padding(.horizontal, 20)
 
@@ -1729,7 +1739,7 @@ struct ResultStepView: View {
             } else {
                 // Geen fout, maar (nog) geen match — eerlijk en zonder lege ruimte.
                 Text("Nog geen passende tassen gevonden voor \(airline.name). Bekijk de hele shop hieronder.")
-                    .font(.system(size: 13, design: .rounded))
+                    .scaledFont(size: 13)
                     .foregroundStyle(Theme.textSecondary)
                     .padding(.horizontal, 20)
             }
@@ -1749,7 +1759,7 @@ struct ResultStepView: View {
             HStack(spacing: 8) {
                 Image(systemName: "bag.fill")
                 Text("Bekijk alles wat past bij \(airline.name)")
-                    .font(.system(size: 15, weight: .semibold, design: .rounded))
+                    .scaledFont(size: 15, weight: .semibold)
                 Image(systemName: "arrow.right")
                     .font(.system(size: 12, weight: .semibold))
             }
@@ -1806,10 +1816,10 @@ struct ResultStepView: View {
                     .clipShape(RoundedRectangle(cornerRadius: 12))
                 VStack(alignment: .leading, spacing: 2) {
                     Text(title)
-                        .font(.system(size: 14, weight: .semibold, design: .rounded))
+                        .scaledFont(size: 14, weight: .semibold)
                         .foregroundStyle(Theme.textPrimary)
                     Text(subtitle)
-                        .font(.system(size: 12, design: .rounded))
+                        .scaledFont(size: 12)
                         .foregroundStyle(Theme.textSecondary)
                 }
                 Spacer()
@@ -1831,7 +1841,7 @@ struct ResultStepView: View {
             Image(systemName: "checkmark.seal.fill")
                 .foregroundStyle(Theme.green)
             Text("Gelukt! We houden je op de hoogte.")
-                .font(.system(size: 14, weight: .semibold, design: .rounded))
+                .scaledFont(size: 14, weight: .semibold)
         }
         .frame(maxWidth: .infinity)
         .padding(.vertical, 16)
@@ -1849,11 +1859,11 @@ struct ResultStepView: View {
                     Image(systemName: "envelope.fill")
                         .foregroundStyle(Theme.sky)
                     Text("Ontvang de beste tas-tips")
-                        .font(.headline2)
+                        .scaledFont(size: 20, weight: .semibold)
                 }
 
                 Text("We sturen je een overzicht van tassen en koffers die altijd passen bij \(airline.name).")
-                    .font(.caption1).foregroundStyle(Theme.textSecondary)
+                    .scaledFont(size: 13).foregroundStyle(Theme.textSecondary)
 
                 HStack(spacing: 10) {
                     TextField("Voornaam", text: $firstName)
@@ -1878,7 +1888,7 @@ struct ResultStepView: View {
                     withAnimation { leadSent = true }
                 } label: {
                     Text("Stuur mij tips")
-                        .font(.body1).fontWeight(.semibold)
+                        .scaledFont(size: 16).fontWeight(.semibold)
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 13)
                         .background(canSendLead ? Theme.sky : Theme.sky.opacity(0.35))
@@ -1926,14 +1936,14 @@ private struct BagRecommendationCard: View {
 
             VStack(alignment: .leading, spacing: 3) {
                 Text(bag.name)
-                    .font(.system(size: 13, weight: .semibold, design: .rounded))
+                    .scaledFont(size: 13, weight: .semibold)
                     .lineLimit(2)
                 if let brand = bag.brand {
-                    Text(brand).font(.caption1).foregroundStyle(Theme.textSecondary)
+                    Text(brand).scaledFont(size: 13).foregroundStyle(Theme.textSecondary)
                 }
                 if let price = bag.priceEur {
                     Text("€\(String(format: "%.0f", price))")
-                        .font(.system(size: 15, weight: .bold, design: .rounded))
+                        .scaledFont(size: 15, weight: .bold)
                         .foregroundStyle(Theme.sky)
                 }
             }
@@ -1941,7 +1951,7 @@ private struct BagRecommendationCard: View {
             if let url = bag.affiliateUrl.flatMap(URL.init) {
                 Link(destination: url) {
                     Text("Bekijk tas")
-                        .font(.system(size: 12, weight: .semibold, design: .rounded))
+                        .scaledFont(size: 12, weight: .semibold)
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 8)
                         .background(Theme.sky)
@@ -1966,7 +1976,7 @@ private struct DimPill: View {
 
     var body: some View {
         Label(value, systemImage: icon)
-            .font(.system(size: 12, weight: .medium, design: .rounded))
+            .scaledFont(size: 12, weight: .medium)
             .padding(.horizontal, 12)
             .padding(.vertical, 6)
             .background(Theme.card)

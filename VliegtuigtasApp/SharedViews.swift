@@ -631,3 +631,38 @@ struct InlineRetryState: View {
         .padding(.vertical, 24)
     }
 }
+
+// MARK: - Schaalbaar systeemlettertype (Dynamic Type)
+
+/// Zelfde ontwerp als `.font(.system(size:weight:design:))`, maar de grootte
+/// schaalt mee met de tekstgrootte-instelling van de gebruiker (Dynamic Type).
+/// Zo houden we de zorgvuldig afgestemde look op de standaardgrootte, terwijl
+/// wie grotere letters nodig heeft de hele checker gewoon groter ziet.
+private struct ScaledSystemFont: ViewModifier {
+    @ScaledMetric private var size: CGFloat
+    let weight: Font.Weight
+    let design: Font.Design
+
+    init(size: CGFloat, weight: Font.Weight, design: Font.Design, relativeTo textStyle: Font.TextStyle) {
+        _size = ScaledMetric(wrappedValue: size, relativeTo: textStyle)
+        self.weight = weight
+        self.design = design
+    }
+
+    func body(content: Content) -> some View {
+        content.font(.system(size: size, weight: weight, design: design))
+    }
+}
+
+extension View {
+    /// Drop-in vervanger voor `.font(.system(size:weight:design:.rounded))` die
+    /// met Dynamic Type meeschaalt. `relativeTo` bepaalt de schaalcurve.
+    func scaledFont(
+        size: CGFloat,
+        weight: Font.Weight = .regular,
+        design: Font.Design = .rounded,
+        relativeTo textStyle: Font.TextStyle = .body
+    ) -> some View {
+        modifier(ScaledSystemFont(size: size, weight: weight, design: design, relativeTo: textStyle))
+    }
+}
