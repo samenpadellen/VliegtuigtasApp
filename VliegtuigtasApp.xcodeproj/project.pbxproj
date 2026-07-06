@@ -74,10 +74,6 @@
 		FBL_VIS /* Frutiger_bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = FRUTBLD1 /* Frutiger_bold.ttf */; };
 		FRG_CLP /* Frutiger.ttf in Resources */ = {isa = PBXBuildFile; fileRef = FRUTREG1 /* Frutiger.ttf */; };
 		FBL_CLP /* Frutiger_bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = FRUTBLD1 /* Frutiger_bold.ttf */; };
-		FRG_WWG /* Frutiger.ttf in Resources */ = {isa = PBXBuildFile; fileRef = FRUTREG1 /* Frutiger.ttf */; };
-		FBL_WWG /* Frutiger_bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = FRUTBLD1 /* Frutiger_bold.ttf */; };
-		FRG_WCH /* Frutiger.ttf in Resources */ = {isa = PBXBuildFile; fileRef = FRUTREG1 /* Frutiger.ttf */; };
-		FBL_WCH /* Frutiger_bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = FRUTBLD1 /* Frutiger_bold.ttf */; };
 		REMS0001 /* RemindersService.swift in Sources */ = {isa = PBXBuildFile; fileRef = REMS1001 /* RemindersService.swift */; };
 		AL000001 /* FlightActivityAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = AL100001 /* FlightActivityAttributes.swift */; };
 		AL000002 /* FlightLiveActivityManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = AL100002 /* FlightLiveActivityManager.swift */; };
@@ -710,8 +706,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				FRG_WCH /* Frutiger.ttf in Resources */,
-				FBL_WCH /* Frutiger_bold.ttf in Resources */,
 				FRG_WID /* Frutiger.ttf in Resources */,
 				FBL_WID /* Frutiger_bold.ttf in Resources */,
 			);
@@ -741,8 +735,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				FRG_WWG /* Frutiger.ttf in Resources */,
-				FBL_WWG /* Frutiger_bold.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -807,7 +799,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				TYPO_WCH /* Typography.swift in Sources */,
 				TYPO_WID /* Typography.swift in Sources */,
 				AAW00001 /* VliegtuigtasWidgets.swift in Sources */,
 				AL000003 /* FlightActivityAttributes.swift in Sources */,
@@ -856,6 +847,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				TYPO_WCH /* Typography.swift in Sources */,
 				AW000001 /* Models.swift in Sources */,
 				AW000002 /* APIClient.swift in Sources */,
 				AW000003 /* AirlineStore.swift in Sources */,
