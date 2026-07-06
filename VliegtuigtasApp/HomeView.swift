@@ -595,7 +595,6 @@ struct HomeView: View {
             LazyVGrid(columns: [GridItem(.flexible(), spacing: 10), GridItem(.flexible(), spacing: 10)], spacing: 10) {
                 QuickActionCard(
                     icon: "checkmark.shield.fill",
-                    color: Theme.green,
                     title: "Check je tas",
                     subtitle: "Past hij in de cabine?"
                 ) {
@@ -603,7 +602,6 @@ struct HomeView: View {
                 }
                 QuickActionCard(
                     icon: "suitcase.rolling.fill",
-                    color: Theme.yellow,
                     title: "Passen mijn tassen?",
                     subtitle: "Al je tassen langs de regels"
                 ) {
@@ -611,7 +609,6 @@ struct HomeView: View {
                 }
                 QuickActionCard(
                     icon: "checkmark.seal.fill",
-                    color: Theme.navy,
                     title: "Wat mag mee?",
                     subtitle: "Vloeistoffen, powerbanks & meer"
                 ) {
@@ -619,7 +616,6 @@ struct HomeView: View {
                 }
                 QuickActionCard(
                     icon: "airplane.circle.fill",
-                    color: Theme.sky,
                     title: "Luchthavens",
                     subtitle: "Security & tips per vliegveld"
                 ) {
@@ -627,7 +623,6 @@ struct HomeView: View {
                 }
                 QuickActionCard(
                     icon: "eurosign.circle.fill",
-                    color: Theme.orange,
                     title: "Douane info",
                     subtitle: "Belastingvrij importeren"
                 ) {
@@ -635,7 +630,6 @@ struct HomeView: View {
                 }
                 QuickActionCard(
                     icon: "bell.badge.fill",
-                    color: Theme.red,
                     title: "Bagage kwijt?",
                     subtitle: "Je rechten & procedure"
                 ) {
@@ -860,10 +854,13 @@ private struct FlightStatusChip: View {
 
 private struct QuickActionCard: View {
     let icon: String
-    let color: Color
     let title: String
     let subtitle: String
     let action: () -> Void
+
+    // Eén rustige accentkleur voor álle acties (het merk-navy), zodat het
+    // raster kalm oogt in plaats van een bonte verzameling icoonkleuren.
+    private var accent: Color { Theme.navy }
 
     var body: some View {
         Button {
@@ -873,11 +870,11 @@ private struct QuickActionCard: View {
             VStack(alignment: .leading, spacing: 8) {
                 ZStack {
                     RoundedRectangle(cornerRadius: 12)
-                        .fill(color.opacity(0.12))
+                        .fill(accent.opacity(0.10))
                         .frame(width: 38, height: 38)
                     Image(systemName: icon)
                         .font(.system(size: 16, weight: .semibold))
-                        .foregroundStyle(color)
+                        .foregroundStyle(accent)
                 }
                 VStack(alignment: .leading, spacing: 2) {
                     Text(title)

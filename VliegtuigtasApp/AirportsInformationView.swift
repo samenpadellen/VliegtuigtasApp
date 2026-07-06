@@ -126,7 +126,7 @@ struct AirportDetailView: View {
                         }
                         HStack(spacing: 8) {
                             Badge(text: airport.iata, color: Theme.navy)
-                            Badge(text: airport.displayType, color: Theme.sky)
+                            Badge(text: airport.displayType, color: Theme.navy)
                         }
                         websiteLink
                     }
@@ -171,7 +171,7 @@ struct AirportDetailView: View {
                             VStack(alignment: .leading, spacing: 8) {
                                 HStack(spacing: 10) {
                                     Image(systemName: "lightbulb.fill")
-                                        .foregroundStyle(Theme.yellow)
+                                        .foregroundStyle(Theme.navy)
                                     Text("Bijzonderheden")
                                         .font(.frutiger(size: 14, weight: .semibold))
                                 }
@@ -242,7 +242,7 @@ struct AirportDetailView: View {
         VStack(alignment: .leading, spacing: 12) {
             HStack(spacing: 10) {
                 Image(systemName: "airplane")
-                    .foregroundStyle(Theme.sky)
+                    .foregroundStyle(Theme.navy)
                 Text("Maatschappijen die hier vliegen")
                     .font(.frutiger(size: 14, weight: .semibold))
             }
@@ -263,7 +263,7 @@ struct AirportDetailView: View {
             VStack(alignment: .leading, spacing: 12) {
                 HStack(spacing: 10) {
                     Image(systemName: "checkmark.shield.fill")
-                        .foregroundStyle(Theme.sky)
+                        .foregroundStyle(Theme.navy)
                     Text("Security-informatie")
                         .font(.frutiger(size: 14, weight: .semibold))
                 }
@@ -306,7 +306,7 @@ struct AirportDetailView: View {
             VStack(alignment: .leading, spacing: 12) {
                 HStack(spacing: 10) {
                     Image(systemName: "clock.fill")
-                        .foregroundStyle(Theme.sky)
+                        .foregroundStyle(Theme.navy)
                     Text("Goed om te weten")
                         .font(.frutiger(size: 14, weight: .semibold))
                 }
@@ -345,7 +345,7 @@ struct AirportDetailView: View {
         VStack(alignment: .leading, spacing: 12) {
             HStack(spacing: 10) {
                 Image(systemName: "lightbulb.fill")
-                    .foregroundStyle(Theme.yellow)
+                    .foregroundStyle(Theme.navy)
                 Text("Handige tips")
                     .font(.frutiger(size: 14, weight: .semibold))
             }
@@ -355,7 +355,7 @@ struct AirportDetailView: View {
                 ForEach(airport.tips ?? [], id: \.self) { tip in
                     HStack(alignment: .top, spacing: 12) {
                         Circle()
-                            .fill(Theme.sky)
+                            .fill(Theme.navy)
                             .frame(width: 6, height: 6)
                             .padding(.top, 7)
                         Text(tip)
@@ -435,7 +435,7 @@ struct AirportDetailView: View {
     private func recommendationRow(icon: String, label: String, value: String) -> some View {
         HStack {
             Image(systemName: icon)
-                .foregroundStyle(Theme.sky)
+                .foregroundStyle(Theme.navy)
                 .frame(width: 24)
             Text(label)
                 .font(.frutiger(size: 13))
@@ -443,7 +443,7 @@ struct AirportDetailView: View {
             Spacer()
             Text(value)
                 .font(.frutiger(size: 13, weight: .semibold))
-                .foregroundStyle(Theme.sky)
+                .foregroundStyle(Theme.navy)
         }
         .padding(.vertical, 4)
     }
@@ -564,7 +564,7 @@ struct EURulesView: View {
                         ForEach(details, id: \.self) { detail in
                             HStack(spacing: 8) {
                                 Circle()
-                                    .fill(Theme.sky)
+                                    .fill(Theme.navy)
                                     .frame(width: 4, height: 4)
                                 Text(detail)
                                     .font(.frutiger(size: 12))
@@ -618,7 +618,7 @@ struct CustomsInfoView: View {
                             VStack(alignment: .leading, spacing: 12) {
                                 HStack(spacing: 10) {
                                     Image(systemName: "eurosign.circle.fill")
-                                        .foregroundStyle(Theme.sky)
+                                        .foregroundStyle(Theme.navy)
                                     Text("Belastingvrije invoerlimieten")
                                         .font(.frutiger(size: 14, weight: .semibold))
                                 }
@@ -635,7 +635,7 @@ struct CustomsInfoView: View {
                             VStack(alignment: .leading, spacing: 12) {
                                 HStack(spacing: 10) {
                                     Image(systemName: "nosign")
-                                        .foregroundStyle(Theme.orange)
+                                        .foregroundStyle(Theme.navy)
                                     Text("Tabak (kies één optie)")
                                         .font(.frutiger(size: 14, weight: .semibold))
                                 }
@@ -656,7 +656,7 @@ struct CustomsInfoView: View {
                             VStack(alignment: .leading, spacing: 12) {
                                 HStack(spacing: 10) {
                                     Image(systemName: "wineglass")
-                                        .foregroundStyle(Theme.red)
+                                        .foregroundStyle(Theme.navy)
                                     Text("Alcohol")
                                         .font(.frutiger(size: 14, weight: .semibold))
                                 }
@@ -682,7 +682,7 @@ struct CustomsInfoView: View {
                             VStack(alignment: .leading, spacing: 12) {
                                 HStack(spacing: 10) {
                                     Image(systemName: "banknote.fill")
-                                        .foregroundStyle(Theme.green)
+                                        .foregroundStyle(Theme.navy)
                                     Text("Geldmiddelen")
                                         .font(.frutiger(size: 14, weight: .semibold))
                                 }
@@ -738,7 +738,7 @@ struct CustomsInfoView: View {
     private func customsRow(icon: String, label: String, value: String) -> some View {
         HStack {
             Image(systemName: icon)
-                .foregroundStyle(Theme.sky)
+                .foregroundStyle(Theme.navy)
                 .frame(width: 12)
                 .font(.system(size: 8, weight: .semibold))
             Text(label)
@@ -747,7 +747,7 @@ struct CustomsInfoView: View {
             Spacer()
             Text(value)
                 .font(.frutiger(size: 13, weight: .semibold))
-                .foregroundStyle(Theme.sky)
+                .foregroundStyle(Theme.navy)
         }
         .padding(.vertical, 4)
     }
@@ -802,7 +802,7 @@ struct BaggageIssuesView: View {
                         VStack(alignment: .leading, spacing: 12) {
                             HStack(spacing: 10) {
                                 Image(systemName: "doc.text.fill")
-                                    .foregroundStyle(Theme.sky)
+                                    .foregroundStyle(Theme.navy)
                                 Text("Claim-mogelijkheden")
                                     .font(.frutiger(size: 14, weight: .semibold))
                             }
@@ -821,7 +821,7 @@ struct BaggageIssuesView: View {
                             VStack(alignment: .leading, spacing: 12) {
                                 HStack(spacing: 10) {
                                     Image(systemName: "truck.box.fill")
-                                        .foregroundStyle(Theme.green)
+                                        .foregroundStyle(Theme.navy)
                                     Text("Thuisbezorging")
                                         .font(.frutiger(size: 14, weight: .semibold))
                                 }
@@ -839,7 +839,7 @@ struct BaggageIssuesView: View {
                             VStack(alignment: .leading, spacing: 12) {
                                 HStack(spacing: 10) {
                                     Image(systemName: "lightbulb.fill")
-                                        .foregroundStyle(Theme.yellow)
+                                        .foregroundStyle(Theme.navy)
                                     Text("Handige tips")
                                         .font(.frutiger(size: 14, weight: .semibold))
                                 }
@@ -848,7 +848,7 @@ struct BaggageIssuesView: View {
                                     ForEach(issues.tips, id: \.self) { tip in
                                         HStack(alignment: .top, spacing: 10) {
                                             Circle()
-                                                .fill(Theme.sky)
+                                                .fill(Theme.navy)
                                                 .frame(width: 4, height: 4)
                                                 .padding(.top, 7)
                                             Text(tip)
@@ -890,7 +890,7 @@ struct BaggageIssuesView: View {
             VStack(alignment: .leading, spacing: 12) {
                 HStack(spacing: 10) {
                     Image(systemName: "checkmark.circle.fill")
-                        .foregroundStyle(Theme.sky)
+                        .foregroundStyle(Theme.navy)
                     Text(claim.condition)
                         .font(.frutiger(size: 14, weight: .semibold))
                 }
@@ -907,7 +907,7 @@ struct BaggageIssuesView: View {
                         Spacer()
                         Text("Binnen \(claim.daysToReport) dagen")
                             .font(.frutiger(size: 12, weight: .semibold))
-                            .foregroundStyle(Theme.sky)
+                            .foregroundStyle(Theme.navy)
                     }
 
                     HStack {
@@ -1038,7 +1038,7 @@ struct AirportLogo: View {
                     case .success(let image):
                         image.resizable().scaledToFit().padding(size * 0.16)
                     case .empty:
-                        ProgressView().tint(Theme.sky).scaleEffect(0.6)
+                        ProgressView().tint(Theme.navy).scaleEffect(0.6)
                     case .failure:
                         fallbackIcon
                     @unknown default:
