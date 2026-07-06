@@ -888,34 +888,6 @@ private struct DimensionsStepView: View {
         return nil
     }
 
-    /// Tariefvariant waarvan we de toegestane maat als referentie tonen.
-    private var referenceVariant: AirlineVariant? {
-        airline?.variants?.first { $0.includesLargeBag == true } ?? airline?.variants?.first
-    }
-
-    /// Toont wat de maatschappij toestaat, puur als richtlijn terwijl je
-    /// meet — het echte oordeel volgt na "Controleer nu" (met wielmarge en
-    /// eventuele uitzonderingen die hier niet meegewogen zijn).
-    private func limitReference(_ variant: AirlineVariant) -> some View {
-        let dims = variant.includesLargeBag == true ? variant.largeDimString : variant.smallDimString
-        return HStack(spacing: 10) {
-            Image(systemName: "ruler.fill")
-                .font(.system(size: 13, weight: .semibold))
-                .foregroundStyle(Theme.sky)
-            Text("Toegestaan bij \(variant.variantName): max. \(dims)"
-                 + (variant.maxWeightKg.map { " · \(Int($0)) kg" } ?? ""))
-                .scaledFont(size: 13, weight: .medium)
-                .foregroundStyle(Theme.textSecondary)
-                .fixedSize(horizontal: false, vertical: true)
-            Spacer(minLength: 0)
-        }
-        .padding(.horizontal, 14)
-        .padding(.vertical, 10)
-        .background(Theme.skyLight)
-        .clipShape(RoundedRectangle(cornerRadius: 12))
-        .padding(.horizontal, 20)
-    }
-
     var body: some View {
         ScrollView {
             VStack(spacing: 20) {
@@ -938,12 +910,6 @@ private struct DimensionsStepView: View {
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.horizontal, 20)
-
-                // Referentie: de toegestane maat, zodat je weet waar je
-                // naartoe meet vóórdat je op "Controleer" tikt.
-                if let variant = referenceVariant {
-                    limitReference(variant)
-                }
 
                 // Visual bag diagram
                 BagDiagram(length: length, width: width, depth: depth)
@@ -1298,16 +1264,20 @@ private struct BagDiagram: View {
                 .frame(width: w, height: 1)
                 .offset(x: d, y: 0)
 
-            // Zijvlak (donkerder) + draaggreep op de zijkant
+            // Zijvlak (donkerder). Een recessed draaggreep tekenen we alleen bij
+            // een diepe koffer, als een smalle verticale gleuf midden op het
+            // zijvlak — daar is het parallellogram op zijn breedst, zodat de
+            // gleuf nooit over de voor/zij-rand heen valt.
             BagSideFace(skew: d)
                 .fill(.black.opacity(0.16))
                 .frame(width: d, height: h + d)
                 .offset(x: w)
-            if d > 12 {
-                RoundedRectangle(cornerRadius: 3)
-                    .strokeBorder(Theme.navyDark.opacity(0.35), lineWidth: 2)
-                    .frame(width: max(d * 0.45, 6), height: h * 0.16)
-                    .offset(x: w + d * 0.28, y: d + h * 0.18)
+            if d > 15 {
+                Capsule()
+                    .fill(Theme.navyDark.opacity(0.28))
+                    .frame(width: max(d * 0.20, 3.5), height: h * 0.22)
+                    .offset(x: w + d * 0.5 - max(d * 0.20, 3.5) / 2,
+                            y: (h + d) / 2 - h * 0.11)
             }
 
             frontFaceDetails
