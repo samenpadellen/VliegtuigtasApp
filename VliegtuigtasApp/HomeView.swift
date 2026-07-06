@@ -46,14 +46,18 @@ struct HomeView: View {
                 VStack(spacing: 0) {
                     heroSection
                     VStack(spacing: 20) {
+                        // De hele feed lost één probleem op: nooit meer voor
+                        // verrassingen bij de gate. Eerst checken (vlucht,
+                        // maatschappij), dan alles wat een verrassing kán geven,
+                        // en pas onderaan — als een tas níét past — de suggesties.
                         flightLookupCard
+                        airlineGridSection
+                        preventSurprisesSection
+                        howItWorksSection
                         if #available(iOS 26.0, *) {
                             AIAssistentHomeCard()
                         }
-                        airlineGridSection
                         shopCarouselSection
-                        howItWorksSection
-                        quickActionsSection
                         #if !targetEnvironment(macCatalyst)
                         // Instellingen > Safari > Extensies bestaat niet op de Mac.
                         safariExtensionTip
@@ -478,57 +482,29 @@ struct HomeView: View {
     // MARK: - Shop carousel
 
     private var shopCarouselSection: some View {
-        VStack(alignment: .leading, spacing: 14) {
-            // Foto-banner header — alleen de "Bekijk alle"-knop is tikbaar,
-            // niet de hele banner als sectie.
-            ZStack(alignment: .bottomLeading) {
-                Image("PhotoOverheadBlue")
-                    .resizable()
-                    .scaledToFill()
-                    .frame(maxWidth: .infinity)
-                    .frame(height: 110)
-                    .clipped()
-                    .clipShape(RoundedRectangle(cornerRadius: 18))
-                    .allowsHitTesting(false)
-
-                LinearGradient(
-                    colors: [.black.opacity(0.55), .black.opacity(0.0)],
-                    startPoint: .bottomLeading, endPoint: .topTrailing
-                )
-                .clipShape(RoundedRectangle(cornerRadius: 18))
-                .allowsHitTesting(false)
-
-                HStack {
-                    VStack(alignment: .leading, spacing: 3) {
-                        Text("Aanbevolen tassen & koffers")
-                            .font(.frutiger(size: 17, weight: .bold))
-                            .foregroundStyle(.white)
-                        HStack(spacing: 4) {
-                            Image(systemName: "checkmark.seal.fill")
-                                .font(.system(size: 10, weight: .semibold))
-                                .foregroundStyle(.white.opacity(0.85))
-                            Text("Gecontroleerd op maat")
-                                .font(.frutiger(size: 12))
-                                .foregroundStyle(.white.opacity(0.85))
-                        }
-                    }
-                    Spacer()
-                    Button { nav.openShop() } label: {
-                        HStack(spacing: 4) {
-                            Text("Bekijk alle")
-                                .font(.system(size: 13, weight: .semibold))
-                            Image(systemName: "arrow.right")
-                                .font(.system(size: 11, weight: .semibold))
-                        }
-                        .foregroundStyle(.white)
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 7)
-                        .glassChrome(in: Capsule(), interactive: true, legacyFill: AnyShapeStyle(.white.opacity(0.20)))
-                    }
-                    .buttonStyle(.plain)
+        VStack(alignment: .leading, spacing: 12) {
+            // Rustige koptekst i.p.v. een salesy fotobanner: de shop is hier de
+            // oplossing als je tas níét past, niet de hoofdmoot van de app.
+            HStack(alignment: .firstTextBaseline) {
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Past je tas niet? Deze wél")
+                        .font(.frutiger(size: 16, weight: .bold))
+                        .foregroundStyle(Theme.textPrimary)
+                    Text("Cabinegoedgekeurde tassen — geen bijbetalen aan de gate.")
+                        .font(.frutiger(size: 12))
+                        .foregroundStyle(Theme.textSecondary)
                 }
-                .padding(.horizontal, 16)
-                .padding(.bottom, 14)
+                Spacer()
+                Button { nav.openShop() } label: {
+                    HStack(spacing: 3) {
+                        Text("Alle")
+                            .font(.frutiger(size: 13, weight: .semibold))
+                        Image(systemName: "arrow.right")
+                            .font(.system(size: 10, weight: .semibold))
+                    }
+                    .foregroundStyle(Theme.navy)
+                }
+                .buttonStyle(.plain)
             }
 
             // Edge-to-edge scroll (compenseer de 16pt parent padding)
@@ -601,18 +577,30 @@ struct HomeView: View {
         }
     }
 
-    // MARK: - Handige acties (onderaan Home)
+    // MARK: - Voorkom verrassingen bij de gate
 
-    private var quickActionsSection: some View {
-        VStack(spacing: 14) {
-            HStack {
-                Text("Handige acties")
+    /// De kern van de app in één blok: alles wat je vóór vertrek regelt zodat
+    /// je bij de gate niet voor verrassingen (of bijbetalen) komt te staan.
+    private var preventSurprisesSection: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            VStack(alignment: .leading, spacing: 3) {
+                Text("Voorkom verrassingen bij de gate")
                     .font(.frutiger(size: 18, weight: .bold))
                     .foregroundStyle(Theme.textPrimary)
-                Spacer()
+                Text("Regel het thuis, dan sta je nergens voor bij het instappen.")
+                    .font(.frutiger(size: 13))
+                    .foregroundStyle(Theme.textSecondary)
             }
 
             LazyVGrid(columns: [GridItem(.flexible(), spacing: 10), GridItem(.flexible(), spacing: 10)], spacing: 10) {
+                QuickActionCard(
+                    icon: "checkmark.shield.fill",
+                    color: Theme.green,
+                    title: "Check je tas",
+                    subtitle: "Past hij in de cabine?"
+                ) {
+                    nav.openChecker(preselected: nil)
+                }
                 QuickActionCard(
                     icon: "suitcase.rolling.fill",
                     color: Theme.yellow,
@@ -630,8 +618,16 @@ struct HomeView: View {
                     showEURules = true
                 }
                 QuickActionCard(
-                    icon: "alarm.fill",
-                    color: Theme.red,
+                    icon: "airplane.circle.fill",
+                    color: Theme.sky,
+                    title: "Luchthavens",
+                    subtitle: "Security & tips per vliegveld"
+                ) {
+                    showAirportSelection = true
+                }
+                QuickActionCard(
+                    icon: "eurosign.circle.fill",
+                    color: Theme.orange,
                     title: "Douane info",
                     subtitle: "Belastingvrij importeren"
                 ) {
@@ -639,27 +635,11 @@ struct HomeView: View {
                 }
                 QuickActionCard(
                     icon: "bell.badge.fill",
-                    color: Theme.orange,
+                    color: Theme.red,
                     title: "Bagage kwijt?",
                     subtitle: "Je rechten & procedure"
                 ) {
                     showBaggageIssues = true
-                }
-                QuickActionCard(
-                    icon: "checkmark.shield.fill",
-                    color: Theme.green,
-                    title: "Check je tas",
-                    subtitle: "Past hij in de cabine?"
-                ) {
-                    nav.openChecker(preselected: nil)
-                }
-                QuickActionCard(
-                    icon: "airplane.circle.fill",
-                    color: Theme.sky,
-                    title: "Luchthavens",
-                    subtitle: "Info per vliegveld"
-                ) {
-                    showAirportSelection = true
                 }
             }
         }

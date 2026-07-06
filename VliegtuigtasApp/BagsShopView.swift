@@ -419,8 +419,7 @@ struct BagsShopView: View {
             LoyaltyCard(
                 brand: "AMERICAN EXPRESS",
                 title: "American Express Platinum Card",
-                benefit: "Welkomstbonus aan Membership Rewards punten via onze referral. Punten wissel je in voor onder andere Flying Blue miles.",
-                disclosure: "Referral-aanbieding · wij kunnen een vergoeding ontvangen",
+                benefit: "Welkomstbonus aan Membership Rewards punten. Punten wissel je in voor onder andere Flying Blue miles.",
                 url: LoyaltyLinks.amexReferral
             )
         }
@@ -581,13 +580,11 @@ enum LoyaltyLinks {
 }
 
 /// Loyaltykaart: ingetogen en volwassen — donker vlak, gedempt goud als
-/// accent, typografie doet het werk. Duidelijke referral-disclosure
-/// (App Store-eis voor affiliate/referral-aanbiedingen).
+/// accent, typografie doet het werk.
 private struct LoyaltyCard: View {
     let brand: String
     let title: String
     let benefit: String
-    let disclosure: String
     let url: URL
 
     /// Gedempt goud: chic accent in plaats van felgeel.
@@ -647,12 +644,7 @@ private struct LoyaltyCard: View {
             }
             .padding(.horizontal, 18)
             .padding(.vertical, 8)
-
-            Text(disclosure)
-                .font(.frutiger(size: 8.5))
-                .foregroundStyle(.white.opacity(0.35))
-                .padding(.horizontal, 18)
-                .padding(.bottom, 10)
+            .padding(.bottom, 6)
         }
         .background(Color(red: 0.07, green: 0.09, blue: 0.14))
         .clipShape(RoundedRectangle(cornerRadius: 18))
