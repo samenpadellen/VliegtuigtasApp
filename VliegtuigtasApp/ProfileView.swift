@@ -7,6 +7,7 @@ struct ProfileView: View {
     @Environment(\.dismiss) private var dismiss
 
     @ObservedObject private var bagCollection = BagCollectionStore.shared
+    @ObservedObject private var flights = FlightsStore.shared
     @State private var editingBag: SavedBag?
     @State private var showNewBag = false
     @State private var showBagsOverview = false
@@ -17,9 +18,9 @@ struct ProfileView: View {
         NavigationStack {
             ScrollView(showsIndicators: false) {
                 VStack(spacing: 18) {
-                    header
+                    baggageTag
 
-                    personalDataCard
+                    personalStub
 
                     sectionTitle("Mijn tassen & koffers")
                     bagsSection
@@ -58,74 +59,128 @@ struct ProfileView: View {
         }
     }
 
-    // MARK: - Header
+    // MARK: - Bagagelabel (kop)
 
-    private var initials: String {
-        let parts = session.firstName.split(separator: " ")
-        let letters = parts.prefix(2).compactMap(\.first)
-        return letters.isEmpty ? "✈︎" : String(letters).uppercased()
+    /// Seed voor labelnummer + streepjescode: stabiel per gebruiker.
+    private var tagSeed: String {
+        if !session.email.isEmpty { return session.email }
+        if !session.firstName.isEmpty { return session.firstName }
+        return "vliegtuigtas"
+    }
+    private var passengerName: String {
+        session.firstName.isEmpty ? "REIZIGER" : session.firstName.uppercased()
+    }
+    private var nextFlight: SavedFlightRecord? { flights.next }
+    private var fromCode: String { nextFlight?.departureIata?.uppercased() ?? "—" }
+    private var toCode: String { nextFlight?.arrivalIata?.uppercased() ?? "—" }
+    private var seqNumber: String {
+        var g = SeededGen(tagSeed + "-seq")
+        return String(format: "%03d", g.int(1...999))
+    }
+    private var tagNumber: String {
+        var g = SeededGen(tagSeed)
+        return String(format: "0%03d %06d", g.int(100...999), g.int(0...999_999))
+    }
+    private var tagDate: String {
+        let f = DateFormatter()
+        f.locale = Locale(identifier: "en_US")
+        f.dateFormat = "dd MMM"
+        return f.string(from: nextFlight?.departure ?? Date()).uppercased()
     }
 
-    private var header: some View {
-        VStack(spacing: 10) {
-            ZStack {
-                Circle()
-                    .fill(Theme.navyGradient)
-                    .frame(width: 76, height: 76)
-                Text(initials)
-                    .font(.frutiger(size: 28, weight: .bold))
-                    .foregroundStyle(.white)
+    private var baggageTag: some View {
+        TagPaper(corner: 16) {
+            VStack(spacing: 0) {
+                // Navy kop met ophangoog + wordmark
+                HStack(spacing: 12) {
+                    punchHole
+                    Text("VLIEGTUIGTAS")
+                        .font(.frutiger(size: 13, weight: .bold))
+                        .kerning(2)
+                        .foregroundStyle(.white)
+                    Spacer()
+                    Image(systemName: "airplane")
+                        .font(.system(size: 13, weight: .bold))
+                        .foregroundStyle(.white.opacity(0.9))
+                }
+                .padding(.horizontal, 16)
+                .padding(.vertical, 12)
+                .background(Theme.navy)
+
+                // Signaalstrook
+                HStack {
+                    Text(nextFlight != nil ? "PRIORITY" : "PASSAGIER")
+                        .printed(9, weight: .bold).foregroundStyle(.white).kerning(1)
+                    Spacer()
+                    Text("SEQ \(seqNumber)")
+                        .printed(9, weight: .bold).foregroundStyle(.white).kerning(1)
+                }
+                .padding(.horizontal, 16)
+                .padding(.vertical, 5)
+                .background(TagPalette.priority)
+
+                // Gedrukte body
+                VStack(alignment: .leading, spacing: 14) {
+                    VStack(alignment: .leading, spacing: 3) {
+                        Text("PASSENGER NAME")
+                            .printed(8, weight: .semibold, soft: true).kerning(1)
+                        Text(passengerName)
+                            .printed(24, weight: .bold)
+                            .minimumScaleFactor(0.5).lineLimit(1)
+                    }
+
+                    HStack(alignment: .top, spacing: 10) {
+                        TagField(label: "FROM", value: fromCode)
+                        Image(systemName: "arrow.right")
+                            .font(.system(size: 11, weight: .bold))
+                            .foregroundStyle(TagPalette.inkSoft)
+                            .padding(.top, 11)
+                        TagField(label: "TO", value: toCode)
+                        TagField(label: "FLIGHT", value: nextFlight?.number.uppercased() ?? "—")
+                        TagField(label: "PCS", value: "\(bagCollection.bags.count)", alignment: .trailing)
+                    }
+
+                    Rectangle().fill(TagPalette.paperEdge).frame(height: 1)
+
+                    Barcode(seed: tagSeed, height: 46)
+                    HStack {
+                        Text(tagNumber).printed(13, weight: .bold).kerning(1.5)
+                        Spacer()
+                        Text(tagDate).printed(11, weight: .semibold, soft: true)
+                    }
+                }
+                .padding(16)
             }
-            Text(session.firstName.isEmpty ? "Reiziger" : session.firstName)
-                .font(.frutiger(size: 20, weight: .bold))
         }
-        .padding(.top, 8)
     }
 
-    // MARK: - Persoonsgegevens
+    /// Het gereinforceerde ophangoog van het label.
+    private var punchHole: some View {
+        Circle()
+            .strokeBorder(.white.opacity(0.55), lineWidth: 2)
+            .frame(width: 16, height: 16)
+            .overlay(Circle().fill(Theme.navyDark).frame(width: 7, height: 7))
+    }
 
-    private var personalDataCard: some View {
-        VStack(spacing: 0) {
-            profileRow(icon: "person.fill", label: "Naam",
-                       value: session.firstName.isEmpty ? "—" : session.firstName)
-            Divider().padding(.leading, 44)
-            profileRow(icon: "envelope.fill", label: "E-mail",
-                       value: session.email.isEmpty ? "—" : session.email)
-            Divider().padding(.leading, 44)
-            HStack(spacing: 12) {
-                Image(systemName: "icloud.fill")
-                    .font(.system(size: 13))
-                    .foregroundStyle(Theme.sky)
-                    .frame(width: 20)
-                Text("Je gegevens, tasmaten en vlucht syncen via iCloud naar je andere Apple-apparaten. Er is geen apart account.")
-                    .font(.frutiger(size: 11))
-                    .foregroundStyle(Theme.textSecondary)
+    // MARK: - PAX-strook (persoonsgegevens als afscheurstrook)
+
+    private var personalStub: some View {
+        TagPaper(corner: 12) {
+            VStack(alignment: .leading, spacing: 10) {
+                HStack {
+                    Text("PAX RECEIPT")
+                        .printed(8, weight: .bold, soft: true).kerning(1.5)
+                    Spacer()
+                    Label("iCLOUD SYNC", systemImage: "icloud.fill")
+                        .printed(8, weight: .bold, soft: true).kerning(1)
+                }
+                TagField(label: "E-MAIL", value: session.email.isEmpty ? "—" : session.email)
+                Text("Je gegevens, tasmaten en vlucht syncen via iCloud naar je andere Apple-apparaten — geen apart account.")
+                    .printed(9, soft: true)
                     .fixedSize(horizontal: false, vertical: true)
             }
-            .padding(.vertical, 11)
+            .padding(14)
         }
-        .padding(.horizontal, 16)
-        .background(Color(.systemBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 16))
-    }
-
-    private func profileRow(icon: String, label: String, value: String) -> some View {
-        HStack(spacing: 12) {
-            Image(systemName: icon)
-                .font(.system(size: 13))
-                .foregroundStyle(Theme.navy)
-                .frame(width: 20)
-            Text(label)
-                .font(.frutiger(size: 13))
-                .foregroundStyle(Theme.textSecondary)
-            Spacer()
-            Text(value)
-                .font(.frutiger(size: 13, weight: .semibold))
-                .foregroundStyle(Theme.textPrimary)
-                .lineLimit(1)
-                .truncationMode(.middle)
-        }
-        .padding(.vertical, 12)
     }
 
     // MARK: - Mijn tassen & koffers
@@ -273,11 +328,21 @@ struct ProfileView: View {
 
     // MARK: - Bouwstenen
 
+    /// Sectiekop in de stijl van een gedrukt labelveld: monospace, gespatieerd,
+    /// met een gestippelde scheurlijn erachter. Blijft adaptief (leesbaar in
+    /// licht én donker), want deze staat buiten het papier.
     private func sectionTitle(_ title: String) -> some View {
-        Text(title)
-            .font(.frutiger(size: 13, weight: .semibold))
-            .foregroundStyle(Theme.textSecondary)
-            .frame(maxWidth: .infinity, alignment: .leading)
+        HStack(spacing: 10) {
+            Text(title.uppercased())
+                .font(.system(size: 11, weight: .bold, design: .monospaced))
+                .kerning(1.4)
+                .foregroundStyle(Theme.textSecondary)
+                .fixedSize()
+            DashedRule()
+                .frame(height: 1)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.top, 4)
     }
 
     private var logoutButton: some View {

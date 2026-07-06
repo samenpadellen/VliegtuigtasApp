@@ -61,6 +61,7 @@
 		TYPO_APP /* Typography.swift in Sources */ = {isa = PBXBuildFile; fileRef = TYPOREF1 /* Typography.swift */; };
 		PMEDIA01 /* ProductMedia.swift in Sources */ = {isa = PBXBuildFile; fileRef = PMEDIAR1 /* ProductMedia.swift */; };
 		REVW01 /* ReviewInvite.swift in Sources */ = {isa = PBXBuildFile; fileRef = REVWR1 /* ReviewInvite.swift */; };
+		BTAG01 /* BaggageTagUI.swift in Sources */ = {isa = PBXBuildFile; fileRef = BTAGR1 /* BaggageTagUI.swift */; };
 		AMICE01 /* AmiceKoffer.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = AMICER1 /* AmiceKoffer.mp4 */; };
 		TYPO_WID /* Typography.swift in Sources */ = {isa = PBXBuildFile; fileRef = TYPOREF1 /* Typography.swift */; };
 		TYPO_VIS /* Typography.swift in Sources */ = {isa = PBXBuildFile; fileRef = TYPOREF1 /* Typography.swift */; };
@@ -251,6 +252,7 @@
 		TYPOREF1 /* Typography.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Typography.swift; sourceTree = "<group>"; };
 		PMEDIAR1 /* ProductMedia.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductMedia.swift; sourceTree = "<group>"; };
 		REVWR1 /* ReviewInvite.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewInvite.swift; sourceTree = "<group>"; };
+		BTAGR1 /* BaggageTagUI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaggageTagUI.swift; sourceTree = "<group>"; };
 		AMICER1 /* AmiceKoffer.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = AmiceKoffer.mp4; sourceTree = "<group>"; };
 		FRUTREG1 /* Frutiger.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Frutiger.ttf; sourceTree = "<group>"; };
 		FRUTBLD1 /* Frutiger_bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Frutiger_bold.ttf; sourceTree = "<group>"; };
@@ -411,6 +413,7 @@
 				TYPOREF1 /* Typography.swift */,
 				PMEDIAR1 /* ProductMedia.swift */,
 				REVWR1 /* ReviewInvite.swift */,
+				BTAGR1 /* BaggageTagUI.swift */,
 				AMICER1 /* AmiceKoffer.mp4 */,
 				FRUTREG1 /* Frutiger.ttf */,
 				FRUTBLD1 /* Frutiger_bold.ttf */,
@@ -756,6 +759,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BTAG01 /* BaggageTagUI.swift in Sources */,
 				REVW01 /* ReviewInvite.swift in Sources */,
 				PMEDIA01 /* ProductMedia.swift in Sources */,
 				TYPO_APP /* Typography.swift in Sources */,
