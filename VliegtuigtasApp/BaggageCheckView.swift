@@ -202,7 +202,7 @@ private struct VariantChip: View {
     var body: some View {
         Button(action: action) {
             Text(variant.variantName)
-                .font(.system(size: 13, weight: selected ? .semibold : .regular, design: .rounded))
+                .font(.frutiger(size: 13, weight: selected ? .semibold : .regular))
                 .padding(.horizontal, 14)
                 .padding(.vertical, 8)
                 .background(selected ? Theme.navy : Theme.card)

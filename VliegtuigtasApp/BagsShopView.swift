@@ -220,7 +220,7 @@ struct BagsShopView: View {
                             .font(.system(size: 11, weight: .bold))
                             .foregroundStyle(Theme.yellow)
                         Text("VERTREKHAL · HANDBAGAGE")
-                            .font(.system(size: 10, weight: .bold, design: .rounded))
+                            .font(.frutiger(size: 10, weight: .bold))
                             .foregroundStyle(.white.opacity(0.75))
                             .kerning(1.8)
                     }
@@ -229,7 +229,7 @@ struct BagsShopView: View {
                     SplitFlapText("TRAVEL SHOP", size: 24)
 
                     Text("Elke tas én koffer hier is gecheckt op de maten van de maatschappijen.")
-                        .font(.system(size: 13, design: .rounded))
+                        .font(.frutiger(size: 13))
                         .foregroundStyle(.white.opacity(0.85))
                         .lineSpacing(1)
 
@@ -258,7 +258,7 @@ struct BagsShopView: View {
                 .font(.system(size: 9, weight: .semibold))
                 .foregroundStyle(Theme.yellow)
             Text(label.uppercased())
-                .font(.system(size: 9, weight: .bold, design: .rounded))
+                .font(.frutiger(size: 9, weight: .bold))
                 .foregroundStyle(.white.opacity(0.80))
                 .kerning(0.8)
         }
@@ -273,7 +273,7 @@ struct BagsShopView: View {
                     .foregroundStyle(Theme.textSecondary)
                     .font(.system(size: 15))
                 TextField("Zoek op naam of merk…", text: $searchText)
-                    .font(.system(size: 15, design: .rounded))
+                    .font(.frutiger(size: 15))
                     .autocorrectionDisabled()
                 if !searchText.isEmpty {
                     Button { searchText = "" } label: {
@@ -376,7 +376,7 @@ struct BagsShopView: View {
                         selectedFitType = nil; selectedBrand = nil; selectedType = nil
                     } label: {
                         Text("Wis alles")
-                            .font(.system(size: 12, weight: .semibold, design: .rounded))
+                            .font(.frutiger(size: 12, weight: .semibold))
                             .foregroundStyle(Theme.red)
                     }
                 }
@@ -411,7 +411,7 @@ struct BagsShopView: View {
                     .font(.system(size: 10, weight: .semibold))
                     .foregroundStyle(Theme.navy.opacity(0.6))
                 Text("LOYALTY LOUNGE")
-                    .font(.system(size: 11, weight: .bold, design: .rounded))
+                    .font(.frutiger(size: 11, weight: .bold))
                     .foregroundStyle(Theme.textSecondary)
                     .kerning(1.4)
             }
@@ -448,7 +448,7 @@ struct BagsShopView: View {
             VStack(spacing: 0) {
                 HStack {
                     Text("\(filtered.count) TASSEN & KOFFERS · CABIN CHECKED")
-                        .font(.system(size: 11, weight: .bold, design: .rounded))
+                        .font(.frutiger(size: 11, weight: .bold))
                         .foregroundStyle(Theme.textSecondary)
                         .kerning(1.2)
                         .monospacedDigit()
@@ -459,7 +459,7 @@ struct BagsShopView: View {
                         HStack(spacing: 4) {
                             Image(systemName: sortOption.icon).font(.system(size: 11))
                             Text(sortOption.rawValue)
-                                .font(.system(size: 12, design: .rounded))
+                                .font(.frutiger(size: 12))
                         }
                         .foregroundStyle(Theme.navy)
                     }
@@ -498,10 +498,10 @@ struct BagsShopView: View {
             }
             VStack(spacing: 6) {
                 Text("Niets gevonden")
-                    .font(.system(size: 16, weight: .bold, design: .rounded))
+                    .font(.frutiger(size: 16, weight: .bold))
                     .foregroundStyle(Theme.textPrimary)
                 Text("Pas je filters aan of zoek op een ander merk.")
-                    .font(.system(size: 14, design: .rounded))
+                    .font(.frutiger(size: 14))
                     .foregroundStyle(Theme.textSecondary)
                     .multilineTextAlignment(.center)
             }
@@ -512,7 +512,7 @@ struct BagsShopView: View {
                     selectedType = nil; searchText = ""
                 } label: {
                     Text("Wis alle filters")
-                        .font(.system(size: 14, weight: .semibold, design: .rounded))
+                        .font(.frutiger(size: 14, weight: .semibold))
                         .foregroundStyle(.white)
                         .padding(.horizontal, 24).padding(.vertical, 12)
                         .background(Theme.navyGradient)
@@ -608,11 +608,11 @@ private struct LoyaltyCard: View {
                 }
 
                 Text(title)
-                    .font(.system(size: 18, weight: .semibold, design: .rounded))
+                    .font(.frutiger(size: 18, weight: .semibold))
                     .foregroundStyle(.white)
 
                 Text(benefit)
-                    .font(.system(size: 12.5, design: .rounded))
+                    .font(.frutiger(size: 12.5))
                     .foregroundStyle(.white.opacity(0.65))
                     .lineSpacing(2.5)
                     .fixedSize(horizontal: false, vertical: true)
@@ -627,7 +627,7 @@ private struct LoyaltyCard: View {
                 Link(destination: url) {
                     HStack(spacing: 6) {
                         Text("Bekijk het aanbod")
-                            .font(.system(size: 13, weight: .semibold, design: .rounded))
+                            .font(.frutiger(size: 13, weight: .semibold))
                         Image(systemName: "arrow.right")
                             .font(.system(size: 10, weight: .semibold))
                     }
@@ -649,7 +649,7 @@ private struct LoyaltyCard: View {
             .padding(.vertical, 8)
 
             Text(disclosure)
-                .font(.system(size: 8.5, design: .rounded))
+                .font(.frutiger(size: 8.5))
                 .foregroundStyle(.white.opacity(0.35))
                 .padding(.horizontal, 18)
                 .padding(.bottom, 10)
@@ -811,7 +811,7 @@ private struct FeaturedBagCard: View {
                             .font(.system(size: 9, weight: .bold))
                             .foregroundStyle(Theme.yellow)
                         Text(badgeLabel)
-                            .font(.system(size: 10, weight: .bold, design: .rounded))
+                            .font(.frutiger(size: 10, weight: .bold))
                             .foregroundStyle(Theme.yellow)
                             .kerning(1.2)
                     }
@@ -824,12 +824,12 @@ private struct FeaturedBagCard: View {
                     VStack(alignment: .leading, spacing: 3) {
                         if let brand = bag?.brand {
                             Text(brand.uppercased())
-                                .font(.system(size: 9, weight: .bold, design: .rounded))
+                                .font(.frutiger(size: 9, weight: .bold))
                                 .foregroundStyle(.white.opacity(0.50))
                                 .kerning(0.7)
                         }
                         Text(bag?.name ?? "Aanbevolen tas")
-                            .font(.system(size: 17, weight: .bold, design: .rounded))
+                            .font(.frutiger(size: 17, weight: .bold))
                             .foregroundStyle(.white)
                             .lineLimit(3)
                             .lineSpacing(1)
@@ -841,12 +841,12 @@ private struct FeaturedBagCard: View {
                     VStack(alignment: .leading, spacing: 4) {
                         if let label = bag?.displayPrice {
                             Text(label)
-                                .font(.system(size: 26, weight: .black, design: .rounded))
+                                .font(.frutiger(size: 26, weight: .black))
                                 .foregroundStyle(Theme.yellow)
                         }
                         if let domain = bag?.shopDomain {
                             Text(domain)
-                                .font(.system(size: 10, design: .rounded))
+                                .font(.frutiger(size: 10))
                                 .foregroundStyle(.white.opacity(0.50))
                         }
                     }
@@ -854,7 +854,7 @@ private struct FeaturedBagCard: View {
                     // CTA knop
                     HStack(spacing: 5) {
                         Text("Bekijk aanbieding")
-                            .font(.system(size: 13, weight: .bold, design: .rounded))
+                            .font(.frutiger(size: 13, weight: .bold))
                         Image(systemName: "arrow.up.right")
                             .font(.system(size: 11, weight: .bold))
                     }
@@ -919,7 +919,7 @@ private struct BagCard: View {
                 // Afmetingen badge rechtsboven
                 if let dims = dimensionsBadge {
                     Text(dims)
-                        .font(.system(size: 9, weight: .bold, design: .rounded))
+                        .font(.frutiger(size: 9, weight: .bold))
                         .foregroundStyle(.white)
                         .padding(.horizontal, 7)
                         .padding(.vertical, 4)
@@ -944,12 +944,12 @@ private struct BagCard: View {
             VStack(alignment: .leading, spacing: 4) {
                 if let brand = bag.brand {
                     Text(brand.uppercased())
-                        .font(.system(size: 9, weight: .bold, design: .rounded))
+                        .font(.frutiger(size: 9, weight: .bold))
                         .foregroundStyle(Theme.navy.opacity(0.55))
                         .kerning(0.7)
                 }
                 Text(bag.name)
-                    .font(.system(size: 13, weight: .semibold, design: .rounded))
+                    .font(.frutiger(size: 13, weight: .semibold))
                     .foregroundStyle(Theme.textPrimary)
                     .lineLimit(2)
                     .fixedSize(horizontal: false, vertical: true)
@@ -964,7 +964,7 @@ private struct BagCard: View {
                         }
                         if colors.count > 5 {
                             Text("+\(colors.count - 5)")
-                                .font(.system(size: 9, weight: .medium, design: .rounded))
+                                .font(.frutiger(size: 9, weight: .medium))
                                 .foregroundStyle(Theme.textSecondary)
                         }
                     }
@@ -973,14 +973,14 @@ private struct BagCard: View {
 
                 if let label = bag.displayPrice {
                     Text(label)
-                        .font(.system(size: 18, weight: .black, design: .rounded))
+                        .font(.frutiger(size: 18, weight: .black))
                         .monospacedDigit()
                         .foregroundStyle(Theme.navy)
                         .padding(.top, 4)
                 }
                 if let domain = bag.shopDomain {
                     Text(domain)
-                        .font(.system(size: 9, design: .rounded))
+                        .font(.frutiger(size: 9))
                         .foregroundStyle(Theme.textSecondary)
                 }
 
@@ -990,7 +990,7 @@ private struct BagCard: View {
                         Image(systemName: "checkmark.seal.fill")
                             .font(.system(size: 8, weight: .bold))
                         Text(count == 1 ? "Past bij 1 maatschappij" : "Past bij \(count) maatschappijen")
-                            .font(.system(size: 9, weight: .semibold, design: .rounded))
+                            .font(.frutiger(size: 9, weight: .semibold))
                     }
                     .foregroundStyle(Theme.green)
                     .padding(.top, 3)
@@ -1039,7 +1039,7 @@ private struct FilterSheet: View {
                                     .frame(width: 20)
                                     .foregroundStyle(Theme.navy)
                                 Text(option.rawValue)
-                                    .font(.system(size: 15, design: .rounded))
+                                    .font(.frutiger(size: 15))
                                     .foregroundStyle(Theme.textPrimary)
                                 Spacer()
                                 if sortOption == option {
@@ -1052,7 +1052,7 @@ private struct FilterSheet: View {
                         .buttonStyle(.plain)
                     }
                 } header: {
-                    Text("Sorteer op").font(.system(size: 12, weight: .semibold, design: .rounded))
+                    Text("Sorteer op").font(.frutiger(size: 12, weight: .semibold))
                 }
 
                 if !airlines.isEmpty {
@@ -1062,7 +1062,7 @@ private struct FilterSheet: View {
                         } label: {
                             HStack {
                                 Text("Alle maatschappijen")
-                                    .font(.system(size: 15, design: .rounded))
+                                    .font(.frutiger(size: 15))
                                     .foregroundStyle(Theme.textPrimary)
                                 Spacer()
                                 if selectedAirlineSlug == nil {
@@ -1080,7 +1080,7 @@ private struct FilterSheet: View {
                                 HStack(spacing: 12) {
                                     AirlineLogo(airline: airline, size: 36)
                                     Text(airline.name)
-                                        .font(.system(size: 15, design: .rounded))
+                                        .font(.frutiger(size: 15))
                                         .foregroundStyle(Theme.textPrimary)
                                     Spacer()
                                     if selectedAirlineSlug == airline.slug {
@@ -1092,7 +1092,7 @@ private struct FilterSheet: View {
                             .buttonStyle(.plain)
                         }
                     } header: {
-                        Text("Maatschappij").font(.system(size: 12, weight: .semibold, design: .rounded))
+                        Text("Maatschappij").font(.frutiger(size: 12, weight: .semibold))
                     }
                 }
 
@@ -1103,7 +1103,7 @@ private struct FilterSheet: View {
                         } label: {
                             HStack {
                                 Text("Alle types")
-                                    .font(.system(size: 15, design: .rounded))
+                                    .font(.frutiger(size: 15))
                                     .foregroundStyle(Theme.textPrimary)
                                 Spacer()
                                 if selectedFitType == nil {
@@ -1123,7 +1123,7 @@ private struct FilterSheet: View {
                                         .frame(width: 20)
                                         .foregroundStyle(Theme.navy)
                                     Text(fit.label)
-                                        .font(.system(size: 15, design: .rounded))
+                                        .font(.frutiger(size: 15))
                                         .foregroundStyle(Theme.textPrimary)
                                     Spacer()
                                     if selectedFitType == fit {
@@ -1135,7 +1135,7 @@ private struct FilterSheet: View {
                             .buttonStyle(.plain)
                         }
                     } header: {
-                        Text("Waar past de tas?").font(.system(size: 12, weight: .semibold, design: .rounded))
+                        Text("Waar past de tas?").font(.frutiger(size: 12, weight: .semibold))
                     }
                 }
             }
@@ -1161,7 +1161,7 @@ struct ActiveFilterChip: View {
     var body: some View {
         HStack(spacing: 5) {
             Text(label)
-                .font(.system(size: 12, weight: .semibold, design: .rounded))
+                .font(.frutiger(size: 12, weight: .semibold))
             Button(action: onRemove) {
                 Image(systemName: "xmark")
                     .font(.system(size: 10, weight: .bold))
@@ -1185,7 +1185,7 @@ private struct CategoryChip: View {
     var body: some View {
         Button(action: action) {
             Text(label)
-                .font(.system(size: 13, weight: .semibold, design: .rounded))
+                .font(.frutiger(size: 13, weight: .semibold))
                 .padding(.horizontal, 18).padding(.vertical, 9)
                 .background(selected ? AnyShapeStyle(Theme.navyGradient) : AnyShapeStyle(Color(.systemBackground)))
                 .foregroundStyle(selected ? .white : Theme.textPrimary)

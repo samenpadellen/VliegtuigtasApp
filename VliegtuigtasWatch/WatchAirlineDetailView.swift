@@ -12,7 +12,7 @@ struct WatchAirlineDetailView: View {
                 HStack(spacing: 8) {
                     WatchAirlineLogo(airline: airline, height: 22)
                     Text(airline.name)
-                        .font(.headline)
+                        .font(.frutiger(size: 17, weight: .semibold, relativeTo: .headline))
                 }
             }
 
@@ -53,7 +53,7 @@ struct WatchAirlineDetailView: View {
                     }
                     if variant.includesLargeBag == false {
                         Text("Grote handbagage niet inbegrepen bij dit ticket.")
-                            .font(.footnote)
+                            .font(.frutiger(size: 13, relativeTo: .footnote))
                             .foregroundStyle(.secondary)
                     }
                 }
@@ -62,17 +62,17 @@ struct WatchAirlineDetailView: View {
             if let notes = airline.extraNotes, !notes.isEmpty {
                 Section("Let op") {
                     Text(notes)
-                        .font(.footnote)
+                        .font(.frutiger(size: 13, relativeTo: .footnote))
                         .foregroundStyle(.secondary)
                 }
             }
 
             Section {
                 Text("Jouw tas: \(bag.dimsLabel)")
-                    .font(.footnote)
+                    .font(.frutiger(size: 13, relativeTo: .footnote))
                     .foregroundStyle(.secondary)
                 Text("Pasindicatie is een benadering; de app op je iPhone doet de officiële check.")
-                    .font(.footnote)
+                    .font(.frutiger(size: 13, relativeTo: .footnote))
                     .foregroundStyle(.secondary)
             }
         }
@@ -100,7 +100,7 @@ private struct DimRow: View {
         HStack(alignment: .firstTextBaseline) {
             VStack(alignment: .leading, spacing: 2) {
                 Text(title)
-                    .font(.footnote)
+                    .font(.frutiger(size: 13, relativeTo: .footnote))
                     .foregroundStyle(.secondary)
                 Text(dims)
                     .font(.body.weight(.semibold))

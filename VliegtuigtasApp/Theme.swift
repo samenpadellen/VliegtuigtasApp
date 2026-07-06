@@ -45,8 +45,8 @@ enum Theme {
 }
 
 extension Font {
-    static let headline1 = Font.system(size: 30, weight: .bold,     design: .rounded)
-    static let headline2 = Font.system(size: 20, weight: .semibold, design: .rounded)
-    static let body1     = Font.system(size: 16, weight: .regular,  design: .rounded)
-    static let caption1  = Font.system(size: 13, weight: .regular,  design: .rounded)
+    static let headline1 = Font.frutiger(size: 30, weight: .bold,     relativeTo: .largeTitle)
+    static let headline2 = Font.frutiger(size: 20, weight: .semibold, relativeTo: .title3)
+    static let body1     = Font.frutiger(size: 16, weight: .regular,  relativeTo: .body)
+    static let caption1  = Font.frutiger(size: 13, weight: .regular,  relativeTo: .footnote)
 }

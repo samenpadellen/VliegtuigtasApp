@@ -17,6 +17,11 @@ struct VliegtuigtasApp: App {
     // Gehouden als property zodat ARC de player niet meteen dealloct
     private let soundPlayer = StartupSoundPlayer()
 
+    init() {
+        // Frutiger als hoofdlettertype registreren vóór de eerste render.
+        AppFont.register()
+    }
+
     var body: some Scene {
         WindowGroup {
             RootView(soundPlayer: soundPlayer)

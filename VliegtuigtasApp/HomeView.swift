@@ -148,7 +148,7 @@ struct HomeView: View {
                         .font(.system(size: 16, weight: .semibold))
                         .foregroundStyle(.white)
                     Text("Vliegtuigtas")
-                        .font(.system(size: 15, weight: .bold, design: .rounded))
+                        .font(.frutiger(size: 15, weight: .bold))
                         .foregroundStyle(.white)
                 }
                 Spacer()
@@ -163,10 +163,10 @@ struct HomeView: View {
                             Image(systemName: "person.circle")
                                 .font(.system(size: 13, weight: .semibold))
                             Text("Profiel")
-                                .font(.system(size: 13, weight: .semibold, design: .rounded))
+                                .font(.frutiger(size: 13, weight: .semibold))
                         } else {
                             Text("Hey \(session.firstName) 👋")
-                                .font(.system(size: 13, weight: .semibold, design: .rounded))
+                                .font(.frutiger(size: 13, weight: .semibold))
                         }
                         Image(systemName: "chevron.right")
                             .font(.system(size: 9, weight: .bold))
@@ -195,7 +195,7 @@ struct HomeView: View {
                     SplitFlapText("PAST JOUW TAS\nIN HET VLIEGTUIG?", size: 21)
 
                     Text("Check direct de regels van Ryanair,\nKLM, easyJet en meer.")
-                        .font(.system(size: 15, design: .rounded))
+                        .font(.frutiger(size: 15))
                         .foregroundStyle(.white.opacity(0.80))
                         .lineSpacing(2)
                 }
@@ -208,7 +208,7 @@ struct HomeView: View {
                         Image(systemName: "checkmark.shield.fill")
                             .font(.system(size: 16, weight: .semibold))
                         Text("Controleer mijn handbagage")
-                            .font(.system(size: 16, weight: .semibold, design: .rounded))
+                            .font(.frutiger(size: 16, weight: .semibold))
                     }
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 17)
@@ -233,7 +233,7 @@ struct HomeView: View {
                     .font(.system(size: 14, weight: .semibold))
                     .foregroundStyle(Theme.navy)
                 Text("Vluchtnummer opzoeken")
-                    .font(.system(size: 15, weight: .bold, design: .rounded))
+                    .font(.frutiger(size: 15, weight: .bold))
                     .foregroundStyle(Theme.textPrimary)
             }
 
@@ -247,7 +247,7 @@ struct HomeView: View {
                     .textInputAutocapitalization(.characters)
                     .submitLabel(.search)
                     .onSubmit { lookupFlight() }
-                    .font(.system(size: 15, design: .rounded))
+                    .font(.frutiger(size: 15))
 
                 if flightStore.isLoading {
                     ProgressView().tint(Theme.sky).scaleEffect(0.8)
@@ -275,7 +275,7 @@ struct HomeView: View {
                                 Image(systemName: "checkmark.circle.fill").foregroundStyle(Theme.green)
                             }
                             Text(airline.name)
-                                .font(.system(size: 14, weight: .semibold, design: .rounded))
+                                .font(.frutiger(size: 14, weight: .semibold))
                             if let status = result.statusLabel {
                                 FlightStatusChip(status: status, rawStatus: result.status)
                             }
@@ -312,11 +312,11 @@ struct HomeView: View {
                                     .font(.system(size: 13))
                                     .foregroundStyle(Theme.navy)
                                 Text("Vertrek")
-                                    .font(.system(size: 12, weight: .medium, design: .rounded))
+                                    .font(.frutiger(size: 12, weight: .medium))
                                     .foregroundStyle(Theme.textSecondary)
                                 if flightStore.result?.flightDate != nil {
                                     Label("Automatisch ingevuld", systemImage: "wand.and.stars")
-                                        .font(.system(size: 9, weight: .semibold, design: .rounded))
+                                        .font(.frutiger(size: 9, weight: .semibold))
                                         .foregroundStyle(Theme.green)
                                 }
                                 Spacer()
@@ -338,7 +338,7 @@ struct HomeView: View {
                                     Image(systemName: flightSaved ? "checkmark" : "plus.square.on.square")
                                         .font(.system(size: 12, weight: .bold))
                                     Text(flightSaved ? "Vlucht opgeslagen" : "Vlucht opslaan")
-                                        .font(.system(size: 13, weight: .semibold, design: .rounded))
+                                        .font(.frutiger(size: 13, weight: .semibold))
                                 }
                                 .frame(maxWidth: .infinity)
                                 .padding(.vertical, 11)
@@ -365,7 +365,7 @@ struct HomeView: View {
                             Image(systemName: "info.circle.fill").foregroundStyle(Theme.yellow)
                             VStack(alignment: .leading, spacing: 1) {
                                 Text(name)
-                                    .font(.system(size: 14, weight: .semibold, design: .rounded))
+                                    .font(.frutiger(size: 14, weight: .semibold))
                                 Text("Niet in onze database, kies handmatig")
                                     .font(.system(size: 11))
                                     .foregroundStyle(Theme.textSecondary)
@@ -422,7 +422,7 @@ struct HomeView: View {
         VStack(spacing: 14) {
             HStack {
                 Text("Populaire maatschappijen")
-                    .font(.system(size: 18, weight: .bold, design: .rounded))
+                    .font(.frutiger(size: 18, weight: .bold))
                     .foregroundStyle(Theme.textPrimary)
                 Spacer()
                 Button { nav.openAirlines() } label: {
@@ -501,14 +501,14 @@ struct HomeView: View {
                 HStack {
                     VStack(alignment: .leading, spacing: 3) {
                         Text("Aanbevolen tassen & koffers")
-                            .font(.system(size: 17, weight: .bold, design: .rounded))
+                            .font(.frutiger(size: 17, weight: .bold))
                             .foregroundStyle(.white)
                         HStack(spacing: 4) {
                             Image(systemName: "checkmark.seal.fill")
                                 .font(.system(size: 10, weight: .semibold))
                                 .foregroundStyle(.white.opacity(0.85))
                             Text("Gecontroleerd op maat")
-                                .font(.system(size: 12, design: .rounded))
+                                .font(.frutiger(size: 12))
                                 .foregroundStyle(.white.opacity(0.85))
                         }
                     }
@@ -582,7 +582,7 @@ struct HomeView: View {
 
             VStack(alignment: .leading, spacing: 16) {
                 Text("Hoe werkt het?")
-                    .font(.system(size: 18, weight: .bold, design: .rounded))
+                    .font(.frutiger(size: 18, weight: .bold))
                     .foregroundStyle(.white)
 
                 VStack(spacing: 12) {
@@ -607,7 +607,7 @@ struct HomeView: View {
         VStack(spacing: 14) {
             HStack {
                 Text("Handige acties")
-                    .font(.system(size: 18, weight: .bold, design: .rounded))
+                    .font(.frutiger(size: 18, weight: .bold))
                     .foregroundStyle(Theme.textPrimary)
                 Spacer()
             }
@@ -711,7 +711,7 @@ struct HomeView: View {
 
                 VStack(alignment: .leading, spacing: 2) {
                     Text("Check tassen tijdens het shoppen")
-                        .font(.system(size: 14, weight: .semibold, design: .rounded))
+                        .font(.frutiger(size: 14, weight: .semibold))
                         .foregroundStyle(Theme.textPrimary)
                     Text("Zet de Vliegtuigtas-extensie aan in Instellingen > Safari > Extensies.")
                         .font(.caption1)
@@ -815,7 +815,7 @@ private struct FlightRouteRow: View {
                     .foregroundStyle(Theme.sky)
                 if let date = formattedDate {
                     Text(date)
-                        .font(.system(size: 9, weight: .medium, design: .rounded))
+                        .font(.frutiger(size: 9, weight: .medium))
                         .foregroundStyle(Theme.textSecondary)
                 }
             }
@@ -828,12 +828,12 @@ private struct FlightRouteRow: View {
     private func endpoint(code: String?, airport: String?, alignment: HorizontalAlignment) -> some View {
         VStack(alignment: alignment, spacing: 1) {
             Text(code ?? "—")
-                .font(.system(size: 22, weight: .black, design: .rounded))
+                .font(.frutiger(size: 22, weight: .black))
                 .foregroundStyle(Theme.navy)
                 .kerning(1)
             if let airport {
                 Text(airport)
-                    .font(.system(size: 10, weight: .medium, design: .rounded))
+                    .font(.frutiger(size: 10, weight: .medium))
                     .foregroundStyle(Theme.textSecondary)
                     .lineLimit(1)
             }
@@ -867,7 +867,7 @@ private struct FlightStatusChip: View {
 
     var body: some View {
         Text(status)
-            .font(.system(size: 10, weight: .bold, design: .rounded))
+            .font(.frutiger(size: 10, weight: .bold))
             .foregroundStyle(color)
             .padding(.horizontal, 8)
             .padding(.vertical, 4)
@@ -901,12 +901,12 @@ private struct QuickActionCard: View {
                 }
                 VStack(alignment: .leading, spacing: 2) {
                     Text(title)
-                        .font(.system(size: 12, weight: .bold, design: .rounded))
+                        .font(.frutiger(size: 12, weight: .bold))
                         .foregroundStyle(Theme.textPrimary)
                         .lineLimit(1)
                         .minimumScaleFactor(0.8)
                     Text(subtitle)
-                        .font(.system(size: 10, design: .rounded))
+                        .font(.frutiger(size: 10))
                         .foregroundStyle(Theme.textSecondary)
                         .lineLimit(2)
                 }
@@ -964,15 +964,15 @@ private struct DepartureReminderSheet: View {
         Group {
             VStack(alignment: .leading, spacing: 18) {
                 Text("Geen vluchtnummer? Geen probleem: kies je vertrekmoment en we herinneren je op tijd aan je handbagage.")
-                    .font(.system(size: 13, design: .rounded))
+                    .font(.frutiger(size: 13))
                     .foregroundStyle(Theme.textSecondary)
 
                 VStack(alignment: .leading, spacing: 6) {
                     Text("Naam (optioneel)")
-                        .font(.system(size: 12, weight: .semibold, design: .rounded))
+                        .font(.frutiger(size: 12, weight: .semibold))
                         .foregroundStyle(Theme.textSecondary)
                     TextField("Bijv. Vakantie Ibiza", text: $label)
-                        .font(.system(size: 15, design: .rounded))
+                        .font(.frutiger(size: 15))
                         .padding(12)
                         .background(Color(.secondarySystemGroupedBackground))
                         .clipShape(RoundedRectangle(cornerRadius: 12))
@@ -980,7 +980,7 @@ private struct DepartureReminderSheet: View {
 
                 VStack(alignment: .leading, spacing: 6) {
                     Text("Vertrek")
-                        .font(.system(size: 12, weight: .semibold, design: .rounded))
+                        .font(.frutiger(size: 12, weight: .semibold))
                         .foregroundStyle(Theme.textSecondary)
                     DatePicker("", selection: $departure, in: Date()..., displayedComponents: [.date, .hourAndMinute])
                         .labelsHidden()
@@ -1001,7 +1001,7 @@ private struct DepartureReminderSheet: View {
                     HStack(spacing: 8) {
                         Image(systemName: saved ? "checkmark" : "bell.badge.fill")
                         Text(saved ? "Reminder staat aan" : "Zet reminder")
-                            .font(.system(size: 16, weight: .semibold, design: .rounded))
+                            .font(.frutiger(size: 16, weight: .semibold))
                     }
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 15)
@@ -1034,7 +1034,7 @@ private struct AirlineCard: View {
         VStack(spacing: 8) {
             AirlineLogo(airline: airline, size: 50)
             Text(airline.name)
-                .font(.system(size: 11, weight: .medium, design: .rounded))
+                .font(.frutiger(size: 11, weight: .medium))
                 .foregroundStyle(Theme.textPrimary)
                 .multilineTextAlignment(.center)
                 .lineLimit(2)
@@ -1084,25 +1084,25 @@ private struct ShopCarouselCard: View {
             VStack(alignment: .leading, spacing: 5) {
                 if let brand = bag.brand {
                     Text(brand.uppercased())
-                        .font(.system(size: 9, weight: .bold, design: .rounded))
+                        .font(.frutiger(size: 9, weight: .bold))
                         .foregroundStyle(Theme.navy.opacity(0.65))
                         .kerning(0.7)
                 }
                 Text(bag.name)
-                    .font(.system(size: 12, weight: .semibold, design: .rounded))
+                    .font(.frutiger(size: 12, weight: .semibold))
                     .foregroundStyle(Theme.textPrimary)
                     .lineLimit(2)
                     .fixedSize(horizontal: false, vertical: true)
                 if let dims = dimensionsText {
                     Text(dims)
-                        .font(.system(size: 9, design: .rounded))
+                        .font(.frutiger(size: 9))
                         .foregroundStyle(Theme.textSecondary)
                 }
                 Spacer(minLength: 6)
                 HStack(alignment: .center) {
                     if let price = bag.priceEur {
                         Text("€\(Int(price))")
-                            .font(.system(size: 18, weight: .bold, design: .rounded))
+                            .font(.frutiger(size: 18, weight: .bold))
                             .foregroundStyle(Theme.textPrimary)
                     }
                     Spacer()
@@ -1147,10 +1147,10 @@ private struct ViewAllShopCard: View {
                 }
                 VStack(spacing: 3) {
                     Text("Bekijk alles")
-                        .font(.system(size: 13, weight: .bold, design: .rounded))
+                        .font(.frutiger(size: 13, weight: .bold))
                         .foregroundStyle(Theme.navy)
                     Text("in de shop")
-                        .font(.system(size: 12, design: .rounded))
+                        .font(.frutiger(size: 12))
                         .foregroundStyle(Theme.textSecondary)
                 }
                 Image(systemName: "arrow.right")
@@ -1219,15 +1219,15 @@ private struct PhotoStepRow: View {
                 .glassChrome(in: Circle(), legacyFill: AnyShapeStyle(.white.opacity(0.15)))
             VStack(alignment: .leading, spacing: 2) {
                 Text(title)
-                    .font(.system(size: 14, weight: .semibold, design: .rounded))
+                    .font(.frutiger(size: 14, weight: .semibold))
                     .foregroundStyle(.white)
                 Text(description)
-                    .font(.system(size: 12, design: .rounded))
+                    .font(.frutiger(size: 12))
                     .foregroundStyle(.white.opacity(0.75))
             }
             Spacer()
             Text(number)
-                .font(.system(size: 20, weight: .bold, design: .rounded))
+                .font(.frutiger(size: 20, weight: .bold))
                 .foregroundStyle(.white.opacity(0.20))
         }
     }
@@ -1252,15 +1252,15 @@ private struct StepRow: View {
             }
             VStack(alignment: .leading, spacing: 4) {
                 Text(title)
-                    .font(.system(size: 15, weight: .semibold, design: .rounded))
+                    .font(.frutiger(size: 15, weight: .semibold))
                     .foregroundStyle(Theme.textPrimary)
                 Text(description)
-                    .font(.system(size: 13, design: .rounded))
+                    .font(.frutiger(size: 13))
                     .foregroundStyle(Theme.textSecondary)
             }
             Spacer()
             Text(number)
-                .font(.system(size: 22, weight: .bold, design: .rounded))
+                .font(.frutiger(size: 22, weight: .bold))
                 .foregroundStyle(color.opacity(0.20))
         }
         .padding(16)

@@ -118,7 +118,7 @@ struct BagVolumeView: View {
                 }
             }
         }
-        .font(.system(size: 15, weight: .medium, design: .rounded))
+        .font(.frutiger(size: 15, weight: .medium))
         .padding(.horizontal, 20)
         .padding(.vertical, 12)
         .glassBackgroundEffect()

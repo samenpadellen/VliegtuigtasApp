@@ -69,12 +69,12 @@ struct ClipCheckView: View {
                     .font(.system(size: 14, weight: .semibold))
                     .foregroundStyle(Theme.yellow)
                 Text("SNELLE BAGAGECHECK")
-                    .font(.system(size: 10, weight: .bold, design: .rounded))
+                    .font(.frutiger(size: 10, weight: .bold))
                     .foregroundStyle(.white.opacity(0.75))
                     .kerning(1.6)
             }
             Text("Past jouw tas\nin het vliegtuig?")
-                .font(.system(size: 22, weight: .bold, design: .rounded))
+                .font(.frutiger(size: 22, weight: .bold))
                 .foregroundStyle(.white)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -93,7 +93,7 @@ struct ClipCheckView: View {
             HStack(spacing: 10) {
                 ProgressView().tint(Theme.sky)
                 Text("Maatschappijen laden…")
-                    .font(.system(size: 13, design: .rounded))
+                    .font(.frutiger(size: 13))
                     .foregroundStyle(Theme.textSecondary)
             }
             .frame(maxWidth: .infinity)
@@ -103,14 +103,14 @@ struct ClipCheckView: View {
         } else if airlineStore.airlines.isEmpty {
             VStack(spacing: 10) {
                 Label("Maatschappijen konden niet laden. Check je verbinding.", systemImage: "wifi.exclamationmark")
-                    .font(.system(size: 13, design: .rounded))
+                    .font(.frutiger(size: 13))
                     .foregroundStyle(Theme.textSecondary)
                     .multilineTextAlignment(.center)
                 Button {
                     Task { await airlineStore.load() }
                 } label: {
                     Label("Opnieuw proberen", systemImage: "arrow.clockwise")
-                        .font(.system(size: 13, weight: .semibold, design: .rounded))
+                        .font(.frutiger(size: 13, weight: .semibold))
                         .foregroundStyle(.white)
                         .padding(.horizontal, 16)
                         .padding(.vertical, 10)
@@ -126,7 +126,7 @@ struct ClipCheckView: View {
         } else {
             VStack(alignment: .leading, spacing: 12) {
                 Text("Met welke maatschappij vlieg je?")
-                    .font(.system(size: 14, weight: .semibold, design: .rounded))
+                    .font(.frutiger(size: 14, weight: .semibold))
 
                 // Snelle keuze: de bekendste maatschappijen als chips.
                 ScrollView(.horizontal, showsIndicators: false) {
@@ -139,7 +139,7 @@ struct ClipCheckView: View {
                                 HStack(spacing: 5) {
                                     if let flag = airline.flagEmoji { Text(flag) }
                                     Text(airline.name)
-                                        .font(.system(size: 13, weight: .semibold, design: .rounded))
+                                        .font(.frutiger(size: 13, weight: .semibold))
                                 }
                                 .foregroundStyle(selectedAirline?.id == airline.id ? .white : Theme.textPrimary)
                                 .padding(.horizontal, 12)
@@ -158,7 +158,7 @@ struct ClipCheckView: View {
 
                 HStack {
                     Text("Alle maatschappijen")
-                        .font(.system(size: 13, design: .rounded))
+                        .font(.frutiger(size: 13))
                         .foregroundStyle(Theme.textSecondary)
                     Spacer()
                     Picker("Maatschappij", selection: $selectedAirline) {
@@ -207,10 +207,10 @@ struct ClipCheckView: View {
         VStack(spacing: 4) {
             HStack {
                 Text(label)
-                    .font(.system(size: 13, weight: .semibold, design: .rounded))
+                    .font(.frutiger(size: 13, weight: .semibold))
                 Spacer()
                 Text("\(value.wrappedValue.formatted()) \(unit)")
-                    .font(.system(size: 13, weight: .bold, design: .rounded))
+                    .font(.frutiger(size: 13, weight: .bold))
                     .monospacedDigit()
                     .foregroundStyle(Theme.navy)
             }
@@ -240,7 +240,7 @@ struct ClipCheckView: View {
                     Image(systemName: "checkmark.shield.fill")
                 }
                 Text("Controleer mijn tas")
-                    .font(.system(size: 16, weight: .semibold, design: .rounded))
+                    .font(.frutiger(size: 16, weight: .semibold))
             }
             .frame(maxWidth: .infinity)
             .padding(.vertical, 16)
@@ -258,13 +258,13 @@ struct ClipCheckView: View {
                 .font(.system(size: 40, weight: .semibold))
                 .foregroundStyle(Theme.verdictColor(result.verdict))
             Text(result.verdictTitle)
-                .font(.system(size: 18, weight: .bold, design: .rounded))
+                .font(.frutiger(size: 18, weight: .bold))
             Text(result.verdictMessage)
-                .font(.system(size: 13, design: .rounded))
+                .font(.frutiger(size: 13))
                 .foregroundStyle(Theme.textSecondary)
                 .multilineTextAlignment(.center)
             Text("Meer regels, widgets en Purser Pim? Haal de volledige app.")
-                .font(.system(size: 11, design: .rounded))
+                .font(.frutiger(size: 11))
                 .foregroundStyle(Theme.textSecondary)
                 .padding(.top, 4)
         }

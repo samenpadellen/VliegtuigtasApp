@@ -157,7 +157,7 @@ struct PackingAlarmsSheet: View {
                     Text(departure != nil
                          ? "Tijden zijn voorgesteld rond je vertrek. Pas aan en zet per moment een alarm."
                          : "Geen vlucht opgeslagen: kies zelf de momenten. Sla je een vlucht op, dan stellen we de tijden voor.")
-                        .font(.system(size: 13, design: .rounded))
+                        .font(.frutiger(size: 13))
                         .foregroundStyle(Theme.textSecondary)
 
                     ForEach(PackingAlarmKind.allCases) { kind in
@@ -197,9 +197,9 @@ struct PackingAlarmsSheet: View {
                     .clipShape(RoundedRectangle(cornerRadius: 11))
                 VStack(alignment: .leading, spacing: 1) {
                     Text(kind.title)
-                        .font(.system(size: 14, weight: .bold, design: .rounded))
+                        .font(.frutiger(size: 14, weight: .bold))
                     Text(kind.subtitle)
-                        .font(.system(size: 11, design: .rounded))
+                        .font(.frutiger(size: 11))
                         .foregroundStyle(Theme.textSecondary)
                 }
                 Spacer()
@@ -221,7 +221,7 @@ struct PackingAlarmsSheet: View {
                         result == .alarm ? "Alarm gezet" : "Herinnering gezet",
                         systemImage: "checkmark.circle.fill"
                     )
-                    .font(.system(size: 12, weight: .semibold, design: .rounded))
+                    .font(.frutiger(size: 12, weight: .semibold))
                     .foregroundStyle(Theme.green)
                 } else {
                     Button {
@@ -235,7 +235,7 @@ struct PackingAlarmsSheet: View {
                         }
                     } label: {
                         Label("Zet alarm", systemImage: "alarm.fill")
-                            .font(.system(size: 12, weight: .bold, design: .rounded))
+                            .font(.frutiger(size: 12, weight: .bold))
                             .foregroundStyle(.white)
                             .padding(.horizontal, 12)
                             .padding(.vertical, 8)
@@ -261,7 +261,7 @@ struct PackingAlarmsSheet: View {
     private func footnote(_ text: String) -> some View {
         Label {
             Text(text)
-                .font(.system(size: 11, design: .rounded))
+                .font(.frutiger(size: 11))
                 .foregroundStyle(Theme.textSecondary)
         } icon: {
             Image(systemName: "info.circle")

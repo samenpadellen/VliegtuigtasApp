@@ -520,7 +520,7 @@ private struct TapFeedbackView: View {
 
             if !feedback.text.isEmpty {
                 Text(feedback.text)
-                    .font(.system(size: 12, weight: .semibold, design: .rounded))
+                    .font(.frutiger(size: 12, weight: .semibold))
                     .foregroundStyle(.white)
                     .padding(.horizontal, 10)
                     .padding(.vertical, 6)
@@ -564,7 +564,7 @@ struct BagScannerView: View {
                         .font(.system(size: 40))
                         .foregroundStyle(Theme.textSecondary)
                     Text("AR wordt niet ondersteund op dit toestel.")
-                        .font(.system(size: 15, design: .rounded))
+                        .font(.frutiger(size: 15))
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .background(Color(.systemBackground))
@@ -606,7 +606,7 @@ struct BagScannerView: View {
                     Image(systemName: "sensor.tag.radiowaves.forward.fill")
                         .font(.system(size: 11, weight: .semibold))
                     Text("LiDAR actief")
-                        .font(.system(size: 12, weight: .semibold, design: .rounded))
+                        .font(.frutiger(size: 12, weight: .semibold))
                 }
                 .foregroundStyle(.white)
                 .padding(.horizontal, 12)
@@ -636,16 +636,16 @@ struct BagScannerView: View {
                     .font(.system(size: 24))
                     .foregroundStyle(Theme.yellow)
                 Text("Tik op de vloer vlak naast je tas")
-                    .font(.system(size: 15, weight: .semibold, design: .rounded))
+                    .font(.frutiger(size: 15, weight: .semibold))
                     .foregroundStyle(.white)
                     .multilineTextAlignment(.center)
                 Text("Zorg voor goed licht. Het gele kader verschijnt op de plek waar je tikt.")
-                    .font(.system(size: 12, design: .rounded))
+                    .font(.frutiger(size: 12))
                     .foregroundStyle(.white.opacity(0.65))
                     .multilineTextAlignment(.center)
             } else {
                 Text("Pas het gele kader aan tot je tas er helemaal in past")
-                    .font(.system(size: 14, weight: .semibold, design: .rounded))
+                    .font(.frutiger(size: 14, weight: .semibold))
                     .foregroundStyle(.white)
                     .multilineTextAlignment(.center)
 
@@ -666,7 +666,7 @@ struct BagScannerView: View {
                         model.reset()
                     } label: {
                         Text("Opnieuw tikken")
-                            .font(.system(size: 13, weight: .semibold, design: .rounded))
+                            .font(.frutiger(size: 13, weight: .semibold))
                             .foregroundStyle(.white)
                             .padding(.horizontal, 14)
                             .padding(.vertical, 11)
@@ -677,7 +677,7 @@ struct BagScannerView: View {
                         model.startScanning()
                     } label: {
                         Label("Start scannen", systemImage: "viewfinder")
-                            .font(.system(size: 14, weight: .bold, design: .rounded))
+                            .font(.frutiger(size: 14, weight: .bold))
                             .foregroundStyle(Theme.navy)
                             .padding(.horizontal, 18)
                             .padding(.vertical, 12)
@@ -698,7 +698,7 @@ struct BagScannerView: View {
     private func volumeStepper(icon: String, label: String, adjust: @escaping (Float) -> Void) -> some View {
         VStack(spacing: 6) {
             Text(label)
-                .font(.system(size: 10, weight: .semibold, design: .rounded))
+                .font(.frutiger(size: 10, weight: .semibold))
                 .foregroundStyle(.white.opacity(0.6))
             HStack(spacing: 10) {
                 Button { adjust(-1) } label: {
@@ -728,7 +728,7 @@ struct BagScannerView: View {
                     .frame(width: 7, height: 7)
                     .opacity(model.pointCount > 0 ? 1 : 0.3)
                 Text("Loop om je tas heen en bekijk 'm van alle kanten")
-                    .font(.system(size: 13, weight: .semibold, design: .rounded))
+                    .font(.frutiger(size: 13, weight: .semibold))
                     .foregroundStyle(.white)
                     .multilineTextAlignment(.center)
             }
@@ -736,26 +736,26 @@ struct BagScannerView: View {
             if let l = model.liveLengthCm, let w = model.liveWidthCm, let h = model.liveHeightCm, model.pointCount > 0 {
                 let breedte = max(l, w), diepte = min(l, w)
                 Text("\(Int(h)) × \(Int(breedte)) × \(Int(diepte)) cm")
-                    .font(.system(size: 26, weight: .black, design: .rounded))
+                    .font(.frutiger(size: 26, weight: .black))
                     .monospacedDigit()
                     .foregroundStyle(.white)
                     .contentTransition(.numericText())
                     .animation(.snappy(duration: 0.3), value: h + breedte + diepte)
             } else {
                 Text("— × — × — cm")
-                    .font(.system(size: 26, weight: .black, design: .rounded))
+                    .font(.frutiger(size: 26, weight: .black))
                     .foregroundStyle(.white.opacity(0.4))
             }
 
             Text(model.accuracyLabel)
-                .font(.system(size: 11, weight: .medium, design: .rounded))
+                .font(.frutiger(size: 11, weight: .medium))
                 .foregroundStyle(model.canFinish ? Theme.green : .white.opacity(0.6))
 
             Button {
                 model.finish()
             } label: {
                 Label("Klaar", systemImage: "checkmark")
-                    .font(.system(size: 15, weight: .bold, design: .rounded))
+                    .font(.frutiger(size: 15, weight: .bold))
                     .foregroundStyle(model.canFinish ? Theme.navy : .white.opacity(0.5))
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 13)
@@ -769,7 +769,7 @@ struct BagScannerView: View {
                 model.reset()
             } label: {
                 Text("Opnieuw beginnen")
-                    .font(.system(size: 12, weight: .semibold, design: .rounded))
+                    .font(.frutiger(size: 12, weight: .semibold))
                     .foregroundStyle(.white.opacity(0.7))
             }
         }
@@ -790,14 +790,14 @@ struct BagScannerView: View {
 
                 VStack(spacing: 10) {
                     Text("Gemeten met LiDAR")
-                        .font(.system(size: 12, weight: .semibold, design: .rounded))
+                        .font(.frutiger(size: 12, weight: .semibold))
                         .foregroundStyle(.white.opacity(0.7))
                     Text("\(Int(h)) × \(Int(breedte)) × \(Int(diepte)) cm")
-                        .font(.system(size: 30, weight: .black, design: .rounded))
+                        .font(.frutiger(size: 30, weight: .black))
                         .monospacedDigit()
                         .foregroundStyle(.white)
                     Text("hoogte × breedte × diepte · \(model.accuracyLabel.lowercased())")
-                        .font(.system(size: 11, design: .rounded))
+                        .font(.frutiger(size: 11))
                         .foregroundStyle(.white.opacity(0.6))
 
                     if let fits = model.fitsLimits, let name = model.airlineName {
@@ -805,7 +805,7 @@ struct BagScannerView: View {
                             Image(systemName: fits ? "checkmark.seal.fill" : "xmark.seal.fill")
                                 .font(.system(size: 12, weight: .bold))
                             Text(fits ? "Binnen de limiet van \(name)" : "Groter dan de limiet van \(name)")
-                                .font(.system(size: 12, weight: .bold, design: .rounded))
+                                .font(.frutiger(size: 12, weight: .bold))
                         }
                         .foregroundStyle(fits ? Theme.green : Theme.red)
                         .padding(.horizontal, 12)
@@ -819,7 +819,7 @@ struct BagScannerView: View {
                             model.reset()
                         } label: {
                             Label("Opnieuw", systemImage: "arrow.counterclockwise")
-                                .font(.system(size: 14, weight: .semibold, design: .rounded))
+                                .font(.frutiger(size: 14, weight: .semibold))
                                 .foregroundStyle(.white)
                                 .padding(.horizontal, 16)
                                 .padding(.vertical, 12)
@@ -832,7 +832,7 @@ struct BagScannerView: View {
                             dismiss()
                         } label: {
                             Label("Gebruik maten", systemImage: "checkmark")
-                                .font(.system(size: 14, weight: .bold, design: .rounded))
+                                .font(.frutiger(size: 14, weight: .bold))
                                 .foregroundStyle(Theme.navy)
                                 .padding(.horizontal, 18)
                                 .padding(.vertical, 12)

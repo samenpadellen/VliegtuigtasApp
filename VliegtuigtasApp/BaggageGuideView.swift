@@ -169,15 +169,15 @@ struct BaggageGuideView: View {
                     .font(.system(size: 13, weight: .bold))
                     .foregroundStyle(Theme.yellow)
                 Text("EU-REGELS · SECURITY CHECK")
-                    .font(.system(size: 10, weight: .bold, design: .rounded))
+                    .font(.frutiger(size: 10, weight: .bold))
                     .foregroundStyle(.white.opacity(0.75))
                     .kerning(1.6)
             }
             Text("Dit mag wel en niet\nin je handbagage")
-                .font(.system(size: 22, weight: .bold, design: .rounded))
+                .font(.frutiger(size: 22, weight: .bold))
                 .foregroundStyle(.white)
             Text("De 100 ml regel is sinds 1 september 2024 in de hele EU weer de standaard, ook op luchthavens met nieuwe CT-scanners. Die scanners betekenen alleen dat je spullen vaak in je tas mogen blijven, niet dat er meer mee mag.")
-                .font(.system(size: 12, design: .rounded))
+                .font(.frutiger(size: 12))
                 .foregroundStyle(.white.opacity(0.85))
                 .lineSpacing(2)
         }
@@ -191,7 +191,7 @@ struct BaggageGuideView: View {
         HStack(spacing: 6) {
             Circle().fill(color).frame(width: 7, height: 7)
             Text(title)
-                .font(.system(size: 11, weight: .bold, design: .rounded))
+                .font(.frutiger(size: 11, weight: .bold))
                 .foregroundStyle(Theme.textSecondary)
                 .kerning(1.4)
         }
@@ -203,7 +203,7 @@ struct BaggageGuideView: View {
                 .foregroundStyle(Theme.sky)
                 .font(.system(size: 15))
             Text("Regels kunnen per maatschappij en luchthaven strenger zijn (vooral rond vloeistoffen en powerbanks). Check bij twijfel de detailpagina van je maatschappij in deze app of de site van je luchthaven.")
-                .font(.system(size: 12, design: .rounded))
+                .font(.frutiger(size: 12))
                 .foregroundStyle(Theme.textSecondary)
                 .fixedSize(horizontal: false, vertical: true)
         }
@@ -235,7 +235,7 @@ private struct RuleCard: View {
                     }
 
                     Text(rule.title)
-                        .font(.system(size: 14, weight: .bold, design: .rounded))
+                        .font(.frutiger(size: 14, weight: .bold))
                         .foregroundStyle(Theme.textPrimary)
                         .multilineTextAlignment(.leading)
 
@@ -245,7 +245,7 @@ private struct RuleCard: View {
                         Image(systemName: rule.status.icon)
                             .font(.system(size: 9, weight: .bold))
                         Text(rule.status.label)
-                            .font(.system(size: 10, weight: .bold, design: .rounded))
+                            .font(.frutiger(size: 10, weight: .bold))
                     }
                     .foregroundStyle(rule.status.color)
                     .padding(.horizontal, 8)
@@ -256,7 +256,7 @@ private struct RuleCard: View {
 
                 if expanded {
                     Text(rule.text)
-                        .font(.system(size: 13, design: .rounded))
+                        .font(.frutiger(size: 13))
                         .foregroundStyle(Theme.textSecondary)
                         .lineSpacing(2)
                         .fixedSize(horizontal: false, vertical: true)

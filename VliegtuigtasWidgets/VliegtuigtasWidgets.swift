@@ -267,7 +267,7 @@ struct BagageWidgetView: View {
                     .font(.system(size: 11, weight: .semibold))
                     .foregroundStyle(WTheme.yellow)
                 Text(entry.airlineName)
-                    .font(.system(size: 12, weight: .bold, design: .rounded))
+                    .font(.frutiger(size: 12, weight: .bold))
                     .foregroundStyle(.white)
                     .lineLimit(1)
                     .minimumScaleFactor(0.7)
@@ -277,12 +277,12 @@ struct BagageWidgetView: View {
 
             VStack(alignment: .leading, spacing: 2) {
                 Text("HANDBAGAGE")
-                    .font(.system(size: 8, weight: .bold, design: .rounded))
+                    .font(.frutiger(size: 8, weight: .bold))
                     .foregroundStyle(.white.opacity(0.55))
                     .kerning(0.8)
                 FlapTiles(text: entry.largeDims ?? entry.smallDims ?? "—", size: 15)
                 Text("cm" + (entry.maxWeight.map { " · max \($0)" } ?? ""))
-                    .font(.system(size: 10, weight: .medium, design: .rounded))
+                    .font(.frutiger(size: 10, weight: .medium))
                     .monospacedDigit()
                     .foregroundStyle(.white.opacity(0.75))
             }
@@ -300,12 +300,12 @@ struct BagageWidgetView: View {
                     .font(.system(size: 12, weight: .semibold))
                     .foregroundStyle(WTheme.yellow)
                 Text(entry.airlineName)
-                    .font(.system(size: 14, weight: .bold, design: .rounded))
+                    .font(.frutiger(size: 14, weight: .bold))
                     .foregroundStyle(.white)
                     .lineLimit(1)
                 Spacer()
                 Text("Handbagage")
-                    .font(.system(size: 10, weight: .semibold, design: .rounded))
+                    .font(.frutiger(size: 10, weight: .semibold))
                     .foregroundStyle(.white.opacity(0.6))
             }
 
@@ -334,7 +334,7 @@ struct BagageWidgetView: View {
                 Image(systemName: icon)
                     .font(.system(size: 9, weight: .semibold))
                 Text(title)
-                    .font(.system(size: 8, weight: .bold, design: .rounded))
+                    .font(.frutiger(size: 8, weight: .bold))
                     .kerning(0.6)
             }
             .foregroundStyle(.white.opacity(0.6))
@@ -343,7 +343,7 @@ struct BagageWidgetView: View {
 
             if let footnote {
                 Text(footnote)
-                    .font(.system(size: 9, weight: .medium, design: .rounded))
+                    .font(.frutiger(size: 9, weight: .medium))
                     .foregroundStyle(.white.opacity(0.7))
             }
         }
@@ -371,7 +371,7 @@ struct BagageWidgetView: View {
                     .font(.system(size: 12, weight: .semibold))
                     .widgetAccentable()
                 Text(entry.maxWeight ?? String(entry.airlineName.prefix(4)))
-                    .font(.system(size: 11, weight: .heavy, design: .rounded))
+                    .font(.frutiger(size: 11, weight: .heavy))
                     .monospacedDigit()
                     .minimumScaleFactor(0.6)
                     .lineLimit(1)
@@ -387,14 +387,14 @@ struct BagageWidgetView: View {
                     .font(.system(size: 10, weight: .semibold))
                     .widgetAccentable()
                 Text(entry.airlineName)
-                    .font(.system(size: 13, weight: .heavy, design: .rounded))
+                    .font(.frutiger(size: 13, weight: .heavy))
                     .lineLimit(1)
             }
             Text("Cabine \(entry.largeDims ?? "—") cm")
-                .font(.system(size: 12, weight: .semibold, design: .rounded))
+                .font(.frutiger(size: 12, weight: .semibold))
                 .monospacedDigit()
             Text("Stoel \(entry.smallDims ?? "—")" + (entry.maxWeight.map { " · \($0)" } ?? ""))
-                .font(.system(size: 12, weight: .medium, design: .rounded))
+                .font(.frutiger(size: 12, weight: .medium))
                 .monospacedDigit()
                 .foregroundStyle(.secondary)
         }
@@ -578,7 +578,7 @@ struct VluchtWidgetView: View {
     private var smallView: some View {
         VStack(alignment: .leading, spacing: 4) {
             Text(entry.greeting)
-                .font(.system(size: 11, weight: .semibold, design: .rounded))
+                .font(.frutiger(size: 11, weight: .semibold))
                 .foregroundStyle(.white.opacity(0.75))
                 .lineLimit(1)
                 .minimumScaleFactor(0.7)
@@ -592,13 +592,13 @@ struct VluchtWidgetView: View {
                 FlapTiles(text: entry.flapCountdown, size: 13)
                 if let flightLine {
                     Text(flightLine)
-                        .font(.system(size: 10, weight: .semibold, design: .rounded))
+                        .font(.frutiger(size: 10, weight: .semibold))
                         .foregroundStyle(.white.opacity(0.75))
                         .lineLimit(1)
                         .minimumScaleFactor(0.7)
                 }
                 Text(entry.bagReminder)
-                    .font(.system(size: 9, weight: .medium, design: .rounded))
+                    .font(.frutiger(size: 9, weight: .medium))
                     .foregroundStyle(.white.opacity(0.6))
                     .lineLimit(2)
             } else {
@@ -606,10 +606,10 @@ struct VluchtWidgetView: View {
                     .font(.system(size: 16, weight: .semibold))
                     .foregroundStyle(WTheme.yellow)
                 Text("Geen vlucht")
-                    .font(.system(size: 17, weight: .black, design: .rounded))
+                    .font(.frutiger(size: 17, weight: .black))
                     .foregroundStyle(.white)
                 Text(entry.bagReminder)
-                    .font(.system(size: 9, weight: .medium, design: .rounded))
+                    .font(.frutiger(size: 9, weight: .medium))
                     .foregroundStyle(.white.opacity(0.6))
                     .lineLimit(3)
             }
@@ -624,18 +624,18 @@ struct VluchtWidgetView: View {
         HStack(spacing: 14) {
             VStack(alignment: .leading, spacing: 4) {
                 Text(entry.greeting)
-                    .font(.system(size: 12, weight: .semibold, design: .rounded))
+                    .font(.frutiger(size: 12, weight: .semibold))
                     .foregroundStyle(.white.opacity(0.75))
                 FlapTiles(text: entry.flapCountdown, size: 17)
                 if let flightLine {
                     Text(flightLine)
-                        .font(.system(size: 12, weight: .semibold, design: .rounded))
+                        .font(.frutiger(size: 12, weight: .semibold))
                         .foregroundStyle(WTheme.yellow)
                         .lineLimit(1)
                 }
                 if let route = entry.routeLabel {
                     Text(route + (entry.arrivalAirport.map { " · \($0)" } ?? ""))
-                        .font(.system(size: 11, weight: .bold, design: .rounded))
+                        .font(.frutiger(size: 11, weight: .bold))
                         .monospacedDigit()
                         .foregroundStyle(.white.opacity(0.85))
                         .lineLimit(1)
@@ -645,7 +645,7 @@ struct VluchtWidgetView: View {
                     Image(systemName: "bag.fill")
                         .font(.system(size: 10, weight: .semibold))
                     Text(entry.bagReminder)
-                        .font(.system(size: 11, weight: .medium, design: .rounded))
+                        .font(.frutiger(size: 11, weight: .medium))
                         .lineLimit(2)
                 }
                 .foregroundStyle(.white.opacity(0.75))
@@ -662,11 +662,11 @@ struct VluchtWidgetView: View {
                         .rotationEffect(.degrees(-90))
                     VStack(spacing: 0) {
                         Text("\(days)")
-                            .font(.system(size: 22, weight: .black, design: .rounded))
+                            .font(.frutiger(size: 22, weight: .black))
                             .monospacedDigit()
                             .foregroundStyle(.white)
                         Text(days == 1 ? "dag" : "dgn")
-                            .font(.system(size: 9, weight: .semibold, design: .rounded))
+                            .font(.frutiger(size: 9, weight: .semibold))
                             .foregroundStyle(.white.opacity(0.7))
                     }
                 }
@@ -708,11 +708,11 @@ struct VluchtWidgetView: View {
             if entry.hasUpcomingFlight, let days = entry.daysLeft {
                 VStack(spacing: 0) {
                     Text("\(days)")
-                        .font(.system(size: 20, weight: .black, design: .rounded))
+                        .font(.frutiger(size: 20, weight: .black))
                         .monospacedDigit()
                         .widgetAccentable()
                     Text(days == 1 ? "dag" : "dgn")
-                        .font(.system(size: 9, weight: .semibold, design: .rounded))
+                        .font(.frutiger(size: 9, weight: .semibold))
                 }
             } else {
                 Image(systemName: "airplane")
@@ -730,15 +730,15 @@ struct VluchtWidgetView: View {
                     .font(.system(size: 10, weight: .semibold))
                     .widgetAccentable()
                 Text(flightLine ?? entry.greeting)
-                    .font(.system(size: 12, weight: .bold, design: .rounded))
+                    .font(.frutiger(size: 12, weight: .bold))
                     .lineLimit(1)
             }
             Text(entry.countdownTitle)
-                .font(.system(size: 15, weight: .black, design: .rounded))
+                .font(.frutiger(size: 15, weight: .black))
                 .monospacedDigit()
                 .widgetAccentable()
             Text(entry.routeLabel ?? entry.bagReminder)
-                .font(.system(size: 11, weight: .medium, design: .rounded))
+                .font(.frutiger(size: 11, weight: .medium))
                 .foregroundStyle(.secondary)
                 .lineLimit(1)
         }
@@ -926,16 +926,16 @@ struct PurserPimWidgetView: View {
             HStack(spacing: 6) {
                 PimCapIcon(size: 22)
                 Text("Purser Pim")
-                    .font(.system(size: 12, weight: .bold, design: .rounded))
+                    .font(.frutiger(size: 12, weight: .bold))
                     .foregroundStyle(.white)
             }
             Spacer(minLength: 0)
             Text(kicker)
-                .font(.system(size: 8, weight: .bold, design: .rounded))
+                .font(.frutiger(size: 8, weight: .bold))
                 .foregroundStyle(WTheme.yellow)
                 .kerning(0.5)
             Text(entry.tip)
-                .font(.system(size: 11, weight: .medium, design: .rounded))
+                .font(.frutiger(size: 11, weight: .medium))
                 .foregroundStyle(.white.opacity(0.9))
                 .lineLimit(5)
                 .minimumScaleFactor(0.85)
@@ -952,7 +952,7 @@ struct PurserPimWidgetView: View {
             VStack(alignment: .leading, spacing: 6) {
                 HStack(spacing: 6) {
                     Text("Purser Pim")
-                        .font(.system(size: 14, weight: .bold, design: .rounded))
+                        .font(.frutiger(size: 14, weight: .bold))
                         .foregroundStyle(.white)
                     if entry.isFromPim {
                         Image(systemName: "checkmark.seal.fill")
@@ -961,11 +961,11 @@ struct PurserPimWidgetView: View {
                     }
                 }
                 Text(kicker)
-                    .font(.system(size: 9, weight: .bold, design: .rounded))
+                    .font(.frutiger(size: 9, weight: .bold))
                     .foregroundStyle(WTheme.yellow)
                     .kerning(0.5)
                 Text(entry.tip)
-                    .font(.system(size: 12, weight: .medium, design: .rounded))
+                    .font(.frutiger(size: 12, weight: .medium))
                     .foregroundStyle(.white.opacity(0.9))
                     .lineLimit(4)
             }
@@ -992,7 +992,7 @@ struct PurserPimWidgetView: View {
                     .font(.system(size: 14, weight: .semibold))
                     .widgetAccentable()
                 Text("PIM")
-                    .font(.system(size: 9, weight: .heavy, design: .rounded))
+                    .font(.frutiger(size: 9, weight: .heavy))
             }
         }
         .containerBackground(for: .widget) { Color.clear }
@@ -1005,10 +1005,10 @@ struct PurserPimWidgetView: View {
                     .font(.system(size: 10, weight: .semibold))
                     .widgetAccentable()
                 Text("Purser Pim")
-                    .font(.system(size: 12, weight: .bold, design: .rounded))
+                    .font(.frutiger(size: 12, weight: .bold))
             }
             Text(entry.tip)
-                .font(.system(size: 11, weight: .medium, design: .rounded))
+                .font(.frutiger(size: 11, weight: .medium))
                 .foregroundStyle(.secondary)
                 .lineLimit(3)
         }
@@ -1091,6 +1091,8 @@ struct BagageRegelsWidget: Widget {
 
 @main
 struct VliegtuigtasWidgets: WidgetBundle {
+    init() { AppFont.register() }
+
     var body: some Widget {
         VluchtCountdownWidget()
         BagageRegelsWidget()

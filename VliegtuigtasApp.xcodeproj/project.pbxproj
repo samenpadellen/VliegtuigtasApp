@@ -58,6 +58,24 @@
 		AI000002 /* AIAssistantView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AI100002 /* AIAssistantView.swift */; };
 		APRT0001 /* AirportsInformationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = APRT1001 /* AirportsInformationView.swift */; };
 		APST0001 /* AirportsStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = APST1001 /* AirportsStore.swift */; };
+		TYPO_APP /* Typography.swift in Sources */ = {isa = PBXBuildFile; fileRef = TYPOREF1 /* Typography.swift */; };
+		TYPO_WID /* Typography.swift in Sources */ = {isa = PBXBuildFile; fileRef = TYPOREF1 /* Typography.swift */; };
+		TYPO_VIS /* Typography.swift in Sources */ = {isa = PBXBuildFile; fileRef = TYPOREF1 /* Typography.swift */; };
+		TYPO_CLP /* Typography.swift in Sources */ = {isa = PBXBuildFile; fileRef = TYPOREF1 /* Typography.swift */; };
+		TYPO_WWG /* Typography.swift in Sources */ = {isa = PBXBuildFile; fileRef = TYPOREF1 /* Typography.swift */; };
+		TYPO_WCH /* Typography.swift in Sources */ = {isa = PBXBuildFile; fileRef = TYPOREF1 /* Typography.swift */; };
+		FRG_APP /* Frutiger.ttf in Resources */ = {isa = PBXBuildFile; fileRef = FRUTREG1 /* Frutiger.ttf */; };
+		FBL_APP /* Frutiger_bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = FRUTBLD1 /* Frutiger_bold.ttf */; };
+		FRG_WID /* Frutiger.ttf in Resources */ = {isa = PBXBuildFile; fileRef = FRUTREG1 /* Frutiger.ttf */; };
+		FBL_WID /* Frutiger_bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = FRUTBLD1 /* Frutiger_bold.ttf */; };
+		FRG_VIS /* Frutiger.ttf in Resources */ = {isa = PBXBuildFile; fileRef = FRUTREG1 /* Frutiger.ttf */; };
+		FBL_VIS /* Frutiger_bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = FRUTBLD1 /* Frutiger_bold.ttf */; };
+		FRG_CLP /* Frutiger.ttf in Resources */ = {isa = PBXBuildFile; fileRef = FRUTREG1 /* Frutiger.ttf */; };
+		FBL_CLP /* Frutiger_bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = FRUTBLD1 /* Frutiger_bold.ttf */; };
+		FRG_WWG /* Frutiger.ttf in Resources */ = {isa = PBXBuildFile; fileRef = FRUTREG1 /* Frutiger.ttf */; };
+		FBL_WWG /* Frutiger_bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = FRUTBLD1 /* Frutiger_bold.ttf */; };
+		FRG_WCH /* Frutiger.ttf in Resources */ = {isa = PBXBuildFile; fileRef = FRUTREG1 /* Frutiger.ttf */; };
+		FBL_WCH /* Frutiger_bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = FRUTBLD1 /* Frutiger_bold.ttf */; };
 		REMS0001 /* RemindersService.swift in Sources */ = {isa = PBXBuildFile; fileRef = REMS1001 /* RemindersService.swift */; };
 		AL000001 /* FlightActivityAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = AL100001 /* FlightActivityAttributes.swift */; };
 		AL000002 /* FlightLiveActivityManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = AL100002 /* FlightLiveActivityManager.swift */; };
@@ -231,6 +249,9 @@
 		AI100002 /* AIAssistantView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIAssistantView.swift; sourceTree = "<group>"; };
 		APRT1001 /* AirportsInformationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AirportsInformationView.swift; sourceTree = "<group>"; };
 		APST1001 /* AirportsStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AirportsStore.swift; sourceTree = "<group>"; };
+		TYPOREF1 /* Typography.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Typography.swift; sourceTree = "<group>"; };
+		FRUTREG1 /* Frutiger.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Frutiger.ttf; sourceTree = "<group>"; };
+		FRUTBLD1 /* Frutiger_bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Frutiger_bold.ttf; sourceTree = "<group>"; };
 		REMS1001 /* RemindersService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemindersService.swift; sourceTree = "<group>"; };
 		AL100001 /* FlightActivityAttributes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlightActivityAttributes.swift; sourceTree = "<group>"; };
 		AL100002 /* FlightLiveActivityManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlightLiveActivityManager.swift; sourceTree = "<group>"; };
@@ -385,6 +406,9 @@
 				AL100002 /* FlightLiveActivityManager.swift */,
 				AI100001 /* AIAssistant.swift */,
 				AI100002 /* AIAssistantView.swift */,
+				TYPOREF1 /* Typography.swift */,
+				FRUTREG1 /* Frutiger.ttf */,
+				FRUTBLD1 /* Frutiger_bold.ttf */,
 				APRT1001 /* AirportsInformationView.swift */,
 				APST1001 /* AirportsStore.swift */,
 				REMS1001 /* RemindersService.swift */,
@@ -667,6 +691,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FRG_APP /* Frutiger.ttf in Resources */,
+				FBL_APP /* Frutiger_bold.ttf in Resources */,
 				AA000013 /* Assets.xcassets in Resources */,
 				AA000018 /* airplane_beep.mp3 in Resources */,
 				AA000030 /* solari_flap.wav in Resources */,
@@ -677,6 +703,10 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FRG_WCH /* Frutiger.ttf in Resources */,
+				FBL_WCH /* Frutiger_bold.ttf in Resources */,
+				FRG_WID /* Frutiger.ttf in Resources */,
+				FBL_WID /* Frutiger_bold.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -684,6 +714,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FRG_VIS /* Frutiger.ttf in Resources */,
+				FBL_VIS /* Frutiger_bold.ttf in Resources */,
 				AVN00007 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -692,6 +724,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FRG_CLP /* Frutiger.ttf in Resources */,
+				FBL_CLP /* Frutiger_bold.ttf in Resources */,
 				319DCE792FF6E8C1009D1A42 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -700,6 +734,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FRG_WWG /* Frutiger.ttf in Resources */,
+				FBL_WWG /* Frutiger_bold.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -718,6 +754,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				TYPO_APP /* Typography.swift in Sources */,
 				AA000001 /* VliegtuigtasApp.swift in Sources */,
 				AA000002 /* ContentView.swift in Sources */,
 				AA000003 /* Theme.swift in Sources */,
@@ -762,6 +799,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				TYPO_WCH /* Typography.swift in Sources */,
+				TYPO_WID /* Typography.swift in Sources */,
 				AAW00001 /* VliegtuigtasWidgets.swift in Sources */,
 				AL000003 /* FlightActivityAttributes.swift in Sources */,
 				AL000004 /* FlightLiveActivity.swift in Sources */,
@@ -772,6 +811,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				TYPO_VIS /* Typography.swift in Sources */,
 				AVN00001 /* VliegtuigtasVisionApp.swift in Sources */,
 				AVN00002 /* VisionContentView.swift in Sources */,
 				AVN00003 /* BagVolumeView.swift in Sources */,
@@ -785,6 +825,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				TYPO_CLP /* Typography.swift in Sources */,
 				ACL00001 /* VliegtuigtasClipApp.swift in Sources */,
 				ACL00002 /* ClipCheckView.swift in Sources */,
 				ACL00003 /* Theme.swift in Sources */,
@@ -798,6 +839,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				TYPO_WWG /* Typography.swift in Sources */,
 				AWW00001 /* VliegtuigtasWatchWidgets.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

@@ -76,10 +76,10 @@ struct AIAssistentHomeCard: View {
 
                     VStack(alignment: .leading, spacing: 2) {
                         Text("Purser Pim")
-                            .font(.system(size: 15, weight: .bold, design: .rounded))
+                            .font(.frutiger(size: 15, weight: .bold))
                             .foregroundStyle(.white)
                         Text("Jouw persoonlijke bagageassistent, privé op je iPhone")
-                            .font(.system(size: 12, design: .rounded))
+                            .font(.frutiger(size: 12))
                             .foregroundStyle(.white.opacity(0.8))
                     }
 
@@ -223,7 +223,7 @@ struct BagageAssistentView: View {
                         Image(systemName: "checkmark.shield.fill")
                             .font(.system(size: 12, weight: .semibold))
                         Text("Check je tas bij \(airline.name)")
-                            .font(.system(size: 13, weight: .bold, design: .rounded))
+                            .font(.frutiger(size: 13, weight: .bold))
                         Image(systemName: "arrow.right")
                             .font(.system(size: 10, weight: .bold))
                     }
@@ -243,7 +243,7 @@ struct BagageAssistentView: View {
                             Task { await assistent.ask(vraag) }
                         } label: {
                             Text(vraag)
-                                .font(.system(size: 12, weight: .medium, design: .rounded))
+                                .font(.frutiger(size: 12, weight: .medium))
                                 .foregroundStyle(Theme.navy)
                                 .padding(.horizontal, 11)
                                 .padding(.vertical, 7)
@@ -263,9 +263,9 @@ struct BagageAssistentView: View {
             PurserPimCap(size: 52)
                 .padding(.top, 24)
             Text("Vraag Purser Pim alles over handbagage")
-                .font(.system(size: 17, weight: .bold, design: .rounded))
+                .font(.frutiger(size: 17, weight: .bold))
             Text("Pim antwoordt via Apple Intelligence op je iPhone en gebruikt de actuele regels uit onze database. Niets verlaat je toestel.")
-                .font(.system(size: 13, design: .rounded))
+                .font(.frutiger(size: 13))
                 .foregroundStyle(Theme.textSecondary)
                 .multilineTextAlignment(.center)
 
@@ -275,7 +275,7 @@ struct BagageAssistentView: View {
                         Task { await assistent.ask(suggestie) }
                     } label: {
                         Text(suggestie)
-                            .font(.system(size: 13, weight: .medium, design: .rounded))
+                            .font(.frutiger(size: 13, weight: .medium))
                             .foregroundStyle(Theme.navy)
                             .padding(.horizontal, 14)
                             .padding(.vertical, 9)
@@ -293,7 +293,7 @@ struct BagageAssistentView: View {
     private var inputBar: some View {
         HStack(spacing: 10) {
             TextField("Typ je vraag…", text: $input)
-                .font(.system(size: 15, design: .rounded))
+                .font(.frutiger(size: 15))
                 .submitLabel(.send)
                 .onSubmit(send)
                 .padding(.horizontal, 14)
@@ -346,7 +346,7 @@ private struct PimThinkingView: View {
                 .animation(.easeInOut(duration: 0.65).repeatForever(autoreverses: true), value: rocking)
 
             Text(phrases[phraseIndex])
-                .font(.system(size: 13, weight: .medium, design: .rounded))
+                .font(.frutiger(size: 13, weight: .medium))
                 .foregroundStyle(Theme.textSecondary)
                 .id(phraseIndex)
                 .transition(.asymmetric(
@@ -404,7 +404,7 @@ private struct ChatBubble: View {
         HStack {
             if message.role == .user { Spacer(minLength: 40) }
             Text(message.text)
-                .font(.system(size: 14, design: .rounded))
+                .font(.frutiger(size: 14))
                 .foregroundStyle(message.role == .user ? .white : Theme.textPrimary)
                 .padding(.horizontal, 14)
                 .padding(.vertical, 10)
@@ -442,7 +442,7 @@ struct PakAdviesButton: View {
                 HStack(spacing: 8) {
                     PurserPimCap(size: 22)
                     Text("Pakadvies van Purser Pim")
-                        .font(.system(size: 15, weight: .semibold, design: .rounded))
+                        .font(.frutiger(size: 15, weight: .semibold))
                 }
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 14)
@@ -492,25 +492,25 @@ private struct PakAdviesSheet: View {
                         VStack(spacing: 12) {
                             ProgressView().tint(Theme.sky)
                             Text("Advies wordt op je toestel gegenereerd…")
-                                .font(.system(size: 13, design: .rounded))
+                                .font(.frutiger(size: 13))
                                 .foregroundStyle(Theme.textSecondary)
                         }
                         .frame(maxWidth: .infinity)
                         .padding(.top, 60)
                     } else if let advies = model.advies {
                         Text(advies.titel)
-                            .font(.system(size: 20, weight: .bold, design: .rounded))
+                            .font(.frutiger(size: 20, weight: .bold))
 
                         ForEach(Array(advies.tips.enumerated()), id: \.offset) { index, tip in
                             HStack(alignment: .top, spacing: 12) {
                                 Text("\(index + 1)")
-                                    .font(.system(size: 13, weight: .bold, design: .rounded))
+                                    .font(.frutiger(size: 13, weight: .bold))
                                     .foregroundStyle(.white)
                                     .frame(width: 24, height: 24)
                                     .background(Theme.sky)
                                     .clipShape(Circle())
                                 Text(tip)
-                                    .font(.system(size: 14, design: .rounded))
+                                    .font(.frutiger(size: 14))
                                     .fixedSize(horizontal: false, vertical: true)
                             }
                             .padding(14)
@@ -523,7 +523,7 @@ private struct PakAdviesSheet: View {
                             Image(systemName: "exclamationmark.triangle.fill")
                                 .foregroundStyle(Theme.orange)
                             Text(advies.waarschuwing)
-                                .font(.system(size: 13, weight: .medium, design: .rounded))
+                                .font(.frutiger(size: 13, weight: .medium))
                                 .fixedSize(horizontal: false, vertical: true)
                         }
                         .padding(14)
@@ -532,7 +532,7 @@ private struct PakAdviesSheet: View {
                         .clipShape(RoundedRectangle(cornerRadius: 14))
 
                         Text("Gegenereerd op je toestel met Apple Intelligence, op basis van de bagageregels van \(airline.name).")
-                            .font(.system(size: 11, design: .rounded))
+                            .font(.frutiger(size: 11))
                             .foregroundStyle(Theme.textSecondary)
                     } else if let error = model.error {
                         Label(error, systemImage: "exclamationmark.circle.fill")

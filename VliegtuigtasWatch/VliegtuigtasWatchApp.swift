@@ -6,6 +6,8 @@ struct VliegtuigtasWatchApp: App {
     @StateObject private var airlineStore = AirlineStore()
     @StateObject private var bagStore = WatchBagStore.shared
 
+    init() { AppFont.register() }
+
     var body: some Scene {
         WindowGroup {
             WatchContentView()

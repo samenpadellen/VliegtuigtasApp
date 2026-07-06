@@ -30,7 +30,7 @@ struct PrimaryButton: View {
         Button(action: action) {
             HStack(spacing: 8) {
                 if let icon { Image(systemName: icon).font(.system(size: 16, weight: .semibold)) }
-                Text(title).font(.system(size: 16, weight: .semibold, design: .rounded))
+                Text(title).font(.frutiger(size: 16, weight: .semibold))
             }
             .frame(maxWidth: .infinity)
             .padding(.vertical, 17)
@@ -389,7 +389,7 @@ struct AirlineLogo: View {
         ZStack {
             RoundedRectangle(cornerRadius: 8).fill(Theme.skyLight)
             Text(airline.name.prefix(2).uppercased())
-                .font(.system(size: size * 0.25, weight: .bold, design: .rounded))
+                .font(.frutiger(size: size * 0.25, weight: .bold))
                 .foregroundStyle(Theme.sky)
         }
     }
@@ -482,16 +482,16 @@ struct MeasurementField: View {
             HStack {
                 Button { value = max(range.lowerBound, value - step) } label: {
                     Image(systemName: "minus.circle.fill")
-                        .font(.title2).foregroundStyle(Theme.sky)
+                        .font(.frutiger(size: 22, weight: .bold, relativeTo: .title2)).foregroundStyle(Theme.sky)
                 }
                 Spacer()
                 Text("\(Int(value)) \(unit)")
-                    .font(.system(size: 18, weight: .semibold, design: .rounded))
+                    .font(.frutiger(size: 18, weight: .semibold))
                     .monospacedDigit()
                 Spacer()
                 Button { value = min(range.upperBound, value + step) } label: {
                     Image(systemName: "plus.circle.fill")
-                        .font(.title2).foregroundStyle(Theme.sky)
+                        .font(.frutiger(size: 22, weight: .bold, relativeTo: .title2)).foregroundStyle(Theme.sky)
                 }
             }
             .padding(.horizontal, 12)
@@ -549,7 +549,7 @@ struct SaveToRemindersButton: View {
                     }
                 }
                 Text(state == .saved ? "Opgeslagen" : label)
-                    .font(.system(size: compact ? 12 : 14, weight: .semibold, design: .rounded))
+                    .font(.frutiger(size: compact ? 12 : 14, weight: .semibold))
             }
             .foregroundStyle(state == .saved ? Theme.green : Theme.navy)
             .padding(.horizontal, compact ? 12 : 16)
@@ -612,13 +612,13 @@ struct InlineRetryState: View {
                 .foregroundStyle(Theme.textSecondary)
                 .accessibilityHidden(true)
             Text(message)
-                .font(.system(size: 13, design: .rounded))
+                .font(.frutiger(size: 13))
                 .foregroundStyle(Theme.textSecondary)
                 .multilineTextAlignment(.center)
                 .fixedSize(horizontal: false, vertical: true)
             Button(action: onRetry) {
                 Label("Opnieuw proberen", systemImage: "arrow.clockwise")
-                    .font(.system(size: 13, weight: .semibold, design: .rounded))
+                    .font(.frutiger(size: 13, weight: .semibold))
                     .foregroundStyle(Theme.navy)
                     .padding(.horizontal, 16)
                     .padding(.vertical, 9)
@@ -632,37 +632,3 @@ struct InlineRetryState: View {
     }
 }
 
-// MARK: - Schaalbaar systeemlettertype (Dynamic Type)
-
-/// Zelfde ontwerp als `.font(.system(size:weight:design:))`, maar de grootte
-/// schaalt mee met de tekstgrootte-instelling van de gebruiker (Dynamic Type).
-/// Zo houden we de zorgvuldig afgestemde look op de standaardgrootte, terwijl
-/// wie grotere letters nodig heeft de hele checker gewoon groter ziet.
-private struct ScaledSystemFont: ViewModifier {
-    @ScaledMetric private var size: CGFloat
-    let weight: Font.Weight
-    let design: Font.Design
-
-    init(size: CGFloat, weight: Font.Weight, design: Font.Design, relativeTo textStyle: Font.TextStyle) {
-        _size = ScaledMetric(wrappedValue: size, relativeTo: textStyle)
-        self.weight = weight
-        self.design = design
-    }
-
-    func body(content: Content) -> some View {
-        content.font(.system(size: size, weight: weight, design: design))
-    }
-}
-
-extension View {
-    /// Drop-in vervanger voor `.font(.system(size:weight:design:.rounded))` die
-    /// met Dynamic Type meeschaalt. `relativeTo` bepaalt de schaalcurve.
-    func scaledFont(
-        size: CGFloat,
-        weight: Font.Weight = .regular,
-        design: Font.Design = .rounded,
-        relativeTo textStyle: Font.TextStyle = .body
-    ) -> some View {
-        modifier(ScaledSystemFont(size: size, weight: weight, design: design, relativeTo: textStyle))
-    }
-}

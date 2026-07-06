@@ -30,7 +30,7 @@ struct AirlineListView: View {
                             .font(.system(size: 15))
                         TextField("Zoek maatschappij…", text: $search)
                             .autocorrectionDisabled()
-                            .font(.system(size: 15, design: .rounded))
+                            .font(.frutiger(size: 15))
                         if !search.isEmpty {
                             Button { search = "" } label: {
                                 Image(systemName: "xmark.circle.fill")
@@ -101,12 +101,12 @@ struct AirlineListView: View {
                         .font(.system(size: 14, weight: .semibold))
                         .foregroundStyle(.white.opacity(0.80))
                     Text("MAATSCHAPPIJEN")
-                        .font(.system(size: 11, weight: .bold, design: .rounded))
+                        .font(.frutiger(size: 11, weight: .bold))
                         .foregroundStyle(.white.opacity(0.75))
                         .kerning(1.2)
                 }
                 Text("Vlieg met\nelk merk")
-                    .font(.system(size: 26, weight: .bold, design: .rounded))
+                    .font(.frutiger(size: 26, weight: .bold))
                     .foregroundStyle(.white)
                     .lineSpacing(1)
             }
@@ -126,14 +126,14 @@ private struct AirlineListCard: View {
         VStack(spacing: 10) {
             AirlineLogo(airline: airline, size: 80)
             Text(airline.name)
-                .font(.system(size: 14, weight: .semibold, design: .rounded))
+                .font(.frutiger(size: 14, weight: .semibold))
                 .multilineTextAlignment(.center)
                 .foregroundStyle(Theme.textPrimary)
             HStack(spacing: 4) {
                 Image(systemName: "bag")
                     .font(.system(size: 11, weight: .medium))
                 Text("Bekijk regels")
-                    .font(.system(size: 11, weight: .medium, design: .rounded))
+                    .font(.frutiger(size: 11, weight: .medium))
             }
             .foregroundStyle(Theme.navy)
         }

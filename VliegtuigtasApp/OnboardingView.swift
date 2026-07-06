@@ -60,7 +60,7 @@ struct OnboardingView: View {
                 session.completeWithoutAccount()
             } label: {
                 Text("Sla over")
-                    .font(.system(size: 13, weight: .semibold, design: .rounded))
+                    .font(.frutiger(size: 13, weight: .semibold))
                     .foregroundStyle(.white)
                     .padding(.horizontal, 14)
                     .padding(.vertical, 8)
@@ -155,18 +155,18 @@ private struct WelcomePage: View {
                         .font(.system(size: 13, weight: .semibold))
                         .foregroundStyle(Theme.yellow)
                     Text("VLIEGTUIGTAS")
-                        .font(.system(size: 11, weight: .black, design: .rounded))
+                        .font(.frutiger(size: 11, weight: .black))
                         .foregroundStyle(.white.opacity(0.8))
                         .kerning(2)
                 }
 
                 VStack(alignment: .leading, spacing: 8) {
                     Text("Nooit meer verrast\nbij de gate.")
-                        .font(.system(size: 34, weight: .bold, design: .rounded))
+                        .font(.frutiger(size: 34, weight: .bold))
                         .foregroundStyle(.white)
                         .lineSpacing(2)
                     Text("Controleer in seconden of jouw handbagage past bij Ryanair, KLM, easyJet en meer.")
-                        .font(.system(size: 15, design: .rounded))
+                        .font(.frutiger(size: 15))
                         .foregroundStyle(.white.opacity(0.8))
                         .lineSpacing(2)
                 }
@@ -183,7 +183,7 @@ private struct WelcomePage: View {
                 Button(action: onNext) {
                     HStack(spacing: 8) {
                         Text("Aan de slag")
-                            .font(.system(size: 17, weight: .semibold, design: .rounded))
+                            .font(.frutiger(size: 17, weight: .semibold))
                         Image(systemName: "arrow.right")
                             .font(.system(size: 15, weight: .semibold))
                     }
@@ -220,7 +220,7 @@ private struct WelcomeFeatureRow: View {
                 .background(.white.opacity(0.12))
                 .clipShape(RoundedRectangle(cornerRadius: 10))
             Text(text)
-                .font(.system(size: 14, weight: .medium, design: .rounded))
+                .font(.frutiger(size: 14, weight: .medium))
                 .foregroundStyle(.white.opacity(0.92))
             Spacer(minLength: 0)
         }
@@ -243,11 +243,11 @@ private struct NamePage: View {
 
                 VStack(alignment: .leading, spacing: 8) {
                     Text("Hoe mogen we\nje noemen?")
-                        .font(.system(size: 32, weight: .bold, design: .rounded))
+                        .font(.frutiger(size: 32, weight: .bold))
                         .foregroundStyle(.white)
                         .lineSpacing(2)
                     Text("Zodat we je persoonlijk kunnen helpen.")
-                        .font(.system(size: 15, design: .rounded))
+                        .font(.frutiger(size: 15))
                         .foregroundStyle(.white.opacity(0.75))
                 }
 
@@ -299,10 +299,10 @@ private struct EmailPage: View {
 
                 VStack(alignment: .leading, spacing: 8) {
                     Text("Hoi \(firstName.isEmpty ? "daar" : firstName)! 👋")
-                        .font(.system(size: 32, weight: .bold, design: .rounded))
+                        .font(.frutiger(size: 32, weight: .bold))
                         .foregroundStyle(.white)
                     Text("Waar mogen we reistips en alerts naartoe sturen als regels veranderen?")
-                        .font(.system(size: 15, design: .rounded))
+                        .font(.frutiger(size: 15))
                         .foregroundStyle(.white.opacity(0.75))
                         .lineSpacing(2)
                 }
@@ -338,7 +338,7 @@ private struct EmailPage: View {
                 OnboardBackButton(action: onBack)
 
                 Text("We delen je gegevens nooit met derden.")
-                    .font(.system(size: 11, design: .rounded))
+                    .font(.frutiger(size: 11))
                     .foregroundStyle(.white.opacity(0.45))
                     .frame(maxWidth: .infinity)
             }
@@ -394,7 +394,7 @@ private struct OnboardKicker: View {
                 .font(.system(size: 12, weight: .semibold))
                 .foregroundStyle(Theme.yellow)
             Text(text)
-                .font(.system(size: 10, weight: .black, design: .rounded))
+                .font(.frutiger(size: 10, weight: .black))
                 .foregroundStyle(.white.opacity(0.75))
                 .kerning(1.8)
         }
@@ -420,7 +420,7 @@ private struct DarkInputField: View {
                 .foregroundStyle(error ? Theme.red : (isFocused ? Theme.yellow : .white.opacity(0.5)))
                 .frame(width: 20)
             TextField("", text: $text, prompt: Text(placeholder).foregroundStyle(.white.opacity(0.35)))
-                .font(.system(size: 16, design: .rounded))
+                .font(.frutiger(size: 16))
                 .foregroundStyle(.white)
                 .tint(Theme.yellow)
                 .keyboardType(keyboard)
@@ -459,7 +459,7 @@ private struct OnboardPrimaryButton: View {
                     ProgressView().tint(Theme.navy)
                 }
                 Text(title)
-                    .font(.system(size: 17, weight: .semibold, design: .rounded))
+                    .font(.frutiger(size: 17, weight: .semibold))
                 if let icon, !loading {
                     Image(systemName: icon)
                         .font(.system(size: 15, weight: .semibold))
@@ -482,7 +482,7 @@ private struct OnboardBackButton: View {
     var body: some View {
         Button(action: action) {
             Label("Terug", systemImage: "chevron.left")
-                .font(.system(size: 14, weight: .medium, design: .rounded))
+                .font(.frutiger(size: 14, weight: .medium))
                 .foregroundStyle(.white.opacity(0.7))
                 .frame(maxWidth: .infinity)
                 .contentShape(Rectangle())
@@ -541,7 +541,7 @@ private struct FeatureRow: View {
                     .foregroundStyle(color)
             }
             Text(text)
-                .font(.system(size: 15, design: .rounded))
+                .font(.frutiger(size: 15))
                 .foregroundStyle(Theme.textPrimary)
             Spacer()
         }
@@ -563,7 +563,7 @@ private struct OnboardButton: View {
                     ProgressView().tint(.white)
                 } else {
                     Text(title)
-                        .font(.system(size: 17, weight: .semibold, design: .rounded))
+                        .font(.frutiger(size: 17, weight: .semibold))
                     if let icon {
                         Image(systemName: icon)
                             .font(.system(size: 15, weight: .semibold))

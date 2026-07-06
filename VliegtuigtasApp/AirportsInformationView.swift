@@ -13,9 +13,9 @@ struct AirportSelectionView: View {
                 VStack(alignment: .leading, spacing: 12) {
                     VStack(alignment: .leading, spacing: 8) {
                         Text("Nederlandse luchthavens")
-                            .font(.system(size: 24, weight: .bold, design: .rounded))
+                            .font(.frutiger(size: 24, weight: .bold))
                         Text("Kies een luchthaven voor security-info, tips en aankomsttijden.")
-                            .font(.system(size: 13, design: .rounded))
+                            .font(.frutiger(size: 13))
                             .foregroundStyle(Theme.textSecondary)
                             .fixedSize(horizontal: false, vertical: true)
                     }
@@ -36,7 +36,7 @@ struct AirportSelectionView: View {
                         "Regels en tijden wijzigen regelmatig — controleer vlak voor vertrek altijd de officiële luchthavensite.",
                         systemImage: "info.circle"
                     )
-                    .font(.system(size: 11, design: .rounded))
+                    .font(.frutiger(size: 11))
                     .foregroundStyle(Theme.textSecondary)
                     .padding(.horizontal, 20)
                     .padding(.top, 6)
@@ -63,19 +63,19 @@ struct AirportSelectionView: View {
                 .opacity(airport.isOperational ? 1 : 0.5)
             VStack(alignment: .leading, spacing: 4) {
                 Text(airport.name)
-                    .font(.system(size: 16, weight: .semibold, design: .rounded))
+                    .font(.frutiger(size: 16, weight: .semibold))
                     .foregroundStyle(Theme.textPrimary)
                     .multilineTextAlignment(.leading)
                 HStack(spacing: 8) {
                     Text(airport.iata)
-                        .font(.system(size: 11, weight: .bold, design: .rounded))
+                        .font(.frutiger(size: 11, weight: .bold))
                         .foregroundStyle(.white)
                         .padding(.horizontal, 8)
                         .padding(.vertical, 4)
                         .background(airport.isOperational ? Theme.navy : Color(.systemGray))
                         .clipShape(Capsule())
                     Text(airport.displayType)
-                        .font(.system(size: 11, design: .rounded))
+                        .font(.frutiger(size: 11))
                         .foregroundStyle(Theme.textSecondary)
                         .lineLimit(1)
                 }
@@ -87,7 +87,7 @@ struct AirportSelectionView: View {
                     .font(.system(size: 13, weight: .semibold))
             } else {
                 Text("Binnenkort")
-                    .font(.system(size: 10, weight: .bold, design: .rounded))
+                    .font(.frutiger(size: 10, weight: .bold))
                     .foregroundStyle(Theme.orange)
                     .padding(.horizontal, 8)
                     .padding(.vertical, 4)
@@ -117,10 +117,10 @@ struct AirportDetailView: View {
                             AirportLogo(airport: airport, size: 56)
                             VStack(alignment: .leading, spacing: 3) {
                                 Text(airport.name)
-                                    .font(.system(size: 24, weight: .bold, design: .rounded))
+                                    .font(.frutiger(size: 24, weight: .bold))
                                     .fixedSize(horizontal: false, vertical: true)
                                 Text(airport.city)
-                                    .font(.system(size: 13, weight: .medium, design: .rounded))
+                                    .font(.frutiger(size: 13, weight: .medium))
                                     .foregroundStyle(Theme.textSecondary)
                             }
                         }
@@ -173,10 +173,10 @@ struct AirportDetailView: View {
                                     Image(systemName: "lightbulb.fill")
                                         .foregroundStyle(Theme.yellow)
                                     Text("Bijzonderheden")
-                                        .font(.system(size: 14, weight: .semibold, design: .rounded))
+                                        .font(.frutiger(size: 14, weight: .semibold))
                                 }
                                 Text(notes)
-                                    .font(.system(size: 13, design: .rounded))
+                                    .font(.frutiger(size: 13))
                                     .foregroundStyle(Theme.textSecondary)
                             }
                             .padding(16)
@@ -202,7 +202,7 @@ struct AirportDetailView: View {
                     Image(systemName: "safari.fill")
                         .font(.system(size: 12, weight: .semibold))
                     Text("Officiële website")
-                        .font(.system(size: 13, weight: .semibold, design: .rounded))
+                        .font(.frutiger(size: 13, weight: .semibold))
                     Image(systemName: "arrow.up.right")
                         .font(.system(size: 10, weight: .bold))
                 }
@@ -223,10 +223,10 @@ struct AirportDetailView: View {
                 .foregroundStyle(Theme.orange)
             VStack(alignment: .leading, spacing: 3) {
                 Text("Nog niet open voor passagiers")
-                    .font(.system(size: 14, weight: .semibold, design: .rounded))
+                    .font(.frutiger(size: 14, weight: .semibold))
                     .foregroundStyle(Theme.textPrimary)
                 Text("Deze luchthaven verwerkt nog geen commerciële vluchten. We houden de status in de gaten.")
-                    .font(.system(size: 12, design: .rounded))
+                    .font(.frutiger(size: 12))
                     .foregroundStyle(Theme.textSecondary)
                     .fixedSize(horizontal: false, vertical: true)
             }
@@ -244,7 +244,7 @@ struct AirportDetailView: View {
                 Image(systemName: "airplane")
                     .foregroundStyle(Theme.sky)
                 Text("Maatschappijen die hier vliegen")
-                    .font(.system(size: 14, weight: .semibold, design: .rounded))
+                    .font(.frutiger(size: 14, weight: .semibold))
             }
 
             // Flexibele chip-wrap zodat het bij elk aantal netjes oogt.
@@ -265,7 +265,7 @@ struct AirportDetailView: View {
                     Image(systemName: "checkmark.shield.fill")
                         .foregroundStyle(Theme.sky)
                     Text("Security-informatie")
-                        .font(.system(size: 14, weight: .semibold, design: .rounded))
+                        .font(.frutiger(size: 14, weight: .semibold))
                 }
 
                 if let has3D = airport.has3DCtScan {
@@ -308,7 +308,7 @@ struct AirportDetailView: View {
                     Image(systemName: "clock.fill")
                         .foregroundStyle(Theme.sky)
                     Text("Goed om te weten")
-                        .font(.system(size: 14, weight: .semibold, design: .rounded))
+                        .font(.frutiger(size: 14, weight: .semibold))
                 }
 
                 if let minutes = airport.recommendedArrivalMinutes {
@@ -347,7 +347,7 @@ struct AirportDetailView: View {
                 Image(systemName: "lightbulb.fill")
                     .foregroundStyle(Theme.yellow)
                 Text("Handige tips")
-                    .font(.system(size: 14, weight: .semibold, design: .rounded))
+                    .font(.frutiger(size: 14, weight: .semibold))
             }
             .padding(.horizontal, 20)
 
@@ -359,7 +359,7 @@ struct AirportDetailView: View {
                             .frame(width: 6, height: 6)
                             .padding(.top, 7)
                         Text(tip)
-                            .font(.system(size: 13, design: .rounded))
+                            .font(.frutiger(size: 13))
                             .foregroundStyle(Theme.textSecondary)
                             .frame(maxWidth: .infinity, alignment: .leading)
                     }
@@ -388,7 +388,7 @@ struct AirportDetailView: View {
                 Image(systemName: "exclamationmark.triangle.fill")
                     .foregroundStyle(Theme.red)
                 Text("Let op!")
-                    .font(.system(size: 14, weight: .semibold, design: .rounded))
+                    .font(.frutiger(size: 14, weight: .semibold))
             }
             .padding(.horizontal, 20)
 
@@ -399,7 +399,7 @@ struct AirportDetailView: View {
                             .foregroundStyle(Theme.red)
                             .font(.system(size: 14))
                         Text(warning)
-                            .font(.system(size: 13, design: .rounded))
+                            .font(.frutiger(size: 13))
                             .foregroundStyle(Theme.red)
                     }
                 }
@@ -422,11 +422,11 @@ struct AirportDetailView: View {
                 .foregroundStyle(color)
                 .frame(width: 24)
             Text(label)
-                .font(.system(size: 13, design: .rounded))
+                .font(.frutiger(size: 13))
                 .foregroundStyle(Theme.textPrimary)
             Spacer()
             Text(value)
-                .font(.system(size: 13, weight: .semibold, design: .rounded))
+                .font(.frutiger(size: 13, weight: .semibold))
                 .foregroundStyle(color)
         }
         .padding(.vertical, 4)
@@ -438,11 +438,11 @@ struct AirportDetailView: View {
                 .foregroundStyle(Theme.sky)
                 .frame(width: 24)
             Text(label)
-                .font(.system(size: 13, design: .rounded))
+                .font(.frutiger(size: 13))
                 .foregroundStyle(Theme.textPrimary)
             Spacer()
             Text(value)
-                .font(.system(size: 13, weight: .semibold, design: .rounded))
+                .font(.frutiger(size: 13, weight: .semibold))
                 .foregroundStyle(Theme.sky)
         }
         .padding(.vertical, 4)
@@ -461,9 +461,9 @@ struct EURulesView: View {
                 VStack(alignment: .leading, spacing: 16) {
                     VStack(alignment: .leading, spacing: 8) {
                         Text("EU Handbagage Regels")
-                            .font(.system(size: 28, weight: .bold, design: .rounded))
+                            .font(.frutiger(size: 28, weight: .bold))
                         Text("Deze regels gelden op alle Nederlandse luchthavens")
-                            .font(.system(size: 13, design: .rounded))
+                            .font(.frutiger(size: 13))
                             .foregroundStyle(Theme.textSecondary)
                     }
                     .padding(.horizontal, 20)
@@ -506,7 +506,7 @@ struct EURulesView: View {
                                     Image(systemName: "xmark.circle.fill")
                                         .foregroundStyle(Theme.red)
                                     Text("Volledig verboden")
-                                        .font(.system(size: 14, weight: .semibold, design: .rounded))
+                                        .font(.frutiger(size: 14, weight: .semibold))
                                 }
 
                                 VStack(spacing: 8) {
@@ -516,7 +516,7 @@ struct EURulesView: View {
                                                 .foregroundStyle(Theme.red)
                                                 .font(.system(size: 12))
                                             Text(item.name)
-                                                .font(.system(size: 13, design: .rounded))
+                                                .font(.frutiger(size: 13))
                                                 .foregroundStyle(Theme.textSecondary)
                                         }
                                     }
@@ -552,11 +552,11 @@ struct EURulesView: View {
         Card {
             VStack(alignment: .leading, spacing: 12) {
                 Text(title)
-                    .font(.system(size: 14, weight: .semibold, design: .rounded))
+                    .font(.frutiger(size: 14, weight: .semibold))
                     .foregroundStyle(Theme.textPrimary)
 
                 Text(description)
-                    .font(.system(size: 13, design: .rounded))
+                    .font(.frutiger(size: 13))
                     .foregroundStyle(Theme.textSecondary)
 
                 if !details.isEmpty {
@@ -567,7 +567,7 @@ struct EURulesView: View {
                                     .fill(Theme.sky)
                                     .frame(width: 4, height: 4)
                                 Text(detail)
-                                    .font(.system(size: 12, design: .rounded))
+                                    .font(.frutiger(size: 12))
                                     .foregroundStyle(Theme.textSecondary)
                             }
                         }
@@ -604,9 +604,9 @@ struct CustomsInfoView: View {
                 VStack(alignment: .leading, spacing: 16) {
                     VStack(alignment: .leading, spacing: 8) {
                         Text("Douane & Belastingvrij Importeren")
-                            .font(.system(size: 28, weight: .bold, design: .rounded))
+                            .font(.frutiger(size: 28, weight: .bold))
                         Text("Informatie voor vluchten van buiten de EU")
-                            .font(.system(size: 13, design: .rounded))
+                            .font(.frutiger(size: 13))
                             .foregroundStyle(Theme.textSecondary)
                     }
                     .padding(.horizontal, 20)
@@ -620,7 +620,7 @@ struct CustomsInfoView: View {
                                     Image(systemName: "eurosign.circle.fill")
                                         .foregroundStyle(Theme.sky)
                                     Text("Belastingvrije invoerlimieten")
-                                        .font(.system(size: 14, weight: .semibold, design: .rounded))
+                                        .font(.frutiger(size: 14, weight: .semibold))
                                 }
 
                                 customsRow(icon: "airplane", label: "Per vliegtuig", value: "€\(String(format: "%.0f", customs.dutyfreeImportLimit))")
@@ -637,7 +637,7 @@ struct CustomsInfoView: View {
                                     Image(systemName: "nosign")
                                         .foregroundStyle(Theme.orange)
                                     Text("Tabak (kies één optie)")
-                                        .font(.system(size: 14, weight: .semibold, design: .rounded))
+                                        .font(.frutiger(size: 14, weight: .semibold))
                                 }
 
                                 VStack(spacing: 8) {
@@ -658,7 +658,7 @@ struct CustomsInfoView: View {
                                     Image(systemName: "wineglass")
                                         .foregroundStyle(Theme.red)
                                     Text("Alcohol")
-                                        .font(.system(size: 14, weight: .semibold, design: .rounded))
+                                        .font(.frutiger(size: 14, weight: .semibold))
                                 }
 
                                 VStack(spacing: 8) {
@@ -669,7 +669,7 @@ struct CustomsInfoView: View {
                                 if let notes = customs.alcohol.notes {
                                     Divider().padding(.vertical, 4)
                                     Text(notes)
-                                        .font(.system(size: 12, design: .rounded))
+                                        .font(.frutiger(size: 12))
                                         .foregroundStyle(Theme.textSecondary)
                                 }
                             }
@@ -684,7 +684,7 @@ struct CustomsInfoView: View {
                                     Image(systemName: "banknote.fill")
                                         .foregroundStyle(Theme.green)
                                     Text("Geldmiddelen")
-                                        .font(.system(size: 14, weight: .semibold, design: .rounded))
+                                        .font(.frutiger(size: 14, weight: .semibold))
                                 }
 
                                 customsRow(icon: "circle", label: "Aangifte verplicht bij", value: "€\(String(format: "%.0f", customs.cashDeclarationThreshold))+")
@@ -700,7 +700,7 @@ struct CustomsInfoView: View {
                                     Image(systemName: "xmark.circle.fill")
                                         .foregroundStyle(Theme.red)
                                     Text("Nooit toegestaan")
-                                        .font(.system(size: 14, weight: .semibold, design: .rounded))
+                                        .font(.frutiger(size: 14, weight: .semibold))
                                 }
 
                                 VStack(spacing: 8) {
@@ -710,7 +710,7 @@ struct CustomsInfoView: View {
                                                 .foregroundStyle(Theme.red)
                                                 .font(.system(size: 12))
                                             Text(item)
-                                                .font(.system(size: 13, design: .rounded))
+                                                .font(.frutiger(size: 13))
                                                 .foregroundStyle(Theme.textSecondary)
                                         }
                                     }
@@ -742,11 +742,11 @@ struct CustomsInfoView: View {
                 .frame(width: 12)
                 .font(.system(size: 8, weight: .semibold))
             Text(label)
-                .font(.system(size: 13, design: .rounded))
+                .font(.frutiger(size: 13))
                 .foregroundStyle(Theme.textPrimary)
             Spacer()
             Text(value)
-                .font(.system(size: 13, weight: .semibold, design: .rounded))
+                .font(.frutiger(size: 13, weight: .semibold))
                 .foregroundStyle(Theme.sky)
         }
         .padding(.vertical, 4)
@@ -765,9 +765,9 @@ struct BaggageIssuesView: View {
                 VStack(alignment: .leading, spacing: 16) {
                     VStack(alignment: .leading, spacing: 8) {
                         Text("Bagage Kwijt of Beschadigd?")
-                            .font(.system(size: 28, weight: .bold, design: .rounded))
+                            .font(.frutiger(size: 28, weight: .bold))
                         Text("Procedure en je rechten")
-                            .font(.system(size: 13, design: .rounded))
+                            .font(.frutiger(size: 13))
                             .foregroundStyle(Theme.textSecondary)
                     }
                     .padding(.horizontal, 20)
@@ -781,17 +781,17 @@ struct BaggageIssuesView: View {
                                     Image(systemName: "exclamationmark.circle.fill")
                                         .foregroundStyle(Theme.red)
                                     Text("Direct na aankomst")
-                                        .font(.system(size: 14, weight: .semibold, design: .rounded))
+                                        .font(.frutiger(size: 14, weight: .semibold))
                                 }
 
                                 Text(issues.immediateReporting)
-                                    .font(.system(size: 13, design: .rounded))
+                                    .font(.frutiger(size: 13))
                                     .foregroundStyle(Theme.textSecondary)
 
                                 Divider().padding(.vertical, 4)
 
                                 Text(issues.pirForm)
-                                    .font(.system(size: 13, design: .rounded))
+                                    .font(.frutiger(size: 13))
                                     .foregroundStyle(Theme.textSecondary)
                             }
                             .padding(16)
@@ -804,7 +804,7 @@ struct BaggageIssuesView: View {
                                 Image(systemName: "doc.text.fill")
                                     .foregroundStyle(Theme.sky)
                                 Text("Claim-mogelijkheden")
-                                    .font(.system(size: 14, weight: .semibold, design: .rounded))
+                                    .font(.frutiger(size: 14, weight: .semibold))
                             }
                             .padding(.horizontal, 20)
 
@@ -823,11 +823,11 @@ struct BaggageIssuesView: View {
                                     Image(systemName: "truck.box.fill")
                                         .foregroundStyle(Theme.green)
                                     Text("Thuisbezorging")
-                                        .font(.system(size: 14, weight: .semibold, design: .rounded))
+                                        .font(.frutiger(size: 14, weight: .semibold))
                                 }
 
                                 Text(issues.baggageRedelivery)
-                                    .font(.system(size: 13, design: .rounded))
+                                    .font(.frutiger(size: 13))
                                     .foregroundStyle(Theme.textSecondary)
                             }
                             .padding(16)
@@ -841,7 +841,7 @@ struct BaggageIssuesView: View {
                                     Image(systemName: "lightbulb.fill")
                                         .foregroundStyle(Theme.yellow)
                                     Text("Handige tips")
-                                        .font(.system(size: 14, weight: .semibold, design: .rounded))
+                                        .font(.frutiger(size: 14, weight: .semibold))
                                 }
 
                                 VStack(spacing: 12) {
@@ -852,7 +852,7 @@ struct BaggageIssuesView: View {
                                                 .frame(width: 4, height: 4)
                                                 .padding(.top, 7)
                                             Text(tip)
-                                                .font(.system(size: 12, design: .rounded))
+                                                .font(.frutiger(size: 12))
                                                 .foregroundStyle(Theme.textSecondary)
                                                 .frame(maxWidth: .infinity, alignment: .leading)
                                         }
@@ -892,31 +892,31 @@ struct BaggageIssuesView: View {
                     Image(systemName: "checkmark.circle.fill")
                         .foregroundStyle(Theme.sky)
                     Text(claim.condition)
-                        .font(.system(size: 14, weight: .semibold, design: .rounded))
+                        .font(.frutiger(size: 14, weight: .semibold))
                 }
 
                 Text(claim.description)
-                    .font(.system(size: 13, design: .rounded))
+                    .font(.frutiger(size: 13))
                     .foregroundStyle(Theme.textSecondary)
 
                 VStack(spacing: 6) {
                     HStack {
                         Text("Termijn melden:")
-                            .font(.system(size: 12, design: .rounded))
+                            .font(.frutiger(size: 12))
                             .foregroundStyle(Theme.textSecondary)
                         Spacer()
                         Text("Binnen \(claim.daysToReport) dagen")
-                            .font(.system(size: 12, weight: .semibold, design: .rounded))
+                            .font(.frutiger(size: 12, weight: .semibold))
                             .foregroundStyle(Theme.sky)
                     }
 
                     HStack {
                         Text("Max. vergoeding:")
-                            .font(.system(size: 12, design: .rounded))
+                            .font(.frutiger(size: 12))
                             .foregroundStyle(Theme.textSecondary)
                         Spacer()
                         Text("€\(String(format: "%.0f", claim.maxCompensationEur))")
-                            .font(.system(size: 12, weight: .semibold, design: .rounded))
+                            .font(.frutiger(size: 12, weight: .semibold))
                             .foregroundStyle(Theme.green)
                     }
                 }
@@ -934,7 +934,7 @@ private struct Badge: View {
 
     var body: some View {
         Text(text)
-            .font(.system(size: 11, weight: .bold, design: .rounded))
+            .font(.frutiger(size: 11, weight: .bold))
             .foregroundStyle(.white)
             .padding(.horizontal, 10)
             .padding(.vertical, 5)
@@ -954,7 +954,7 @@ struct FlowChips: View {
         FlowLayout(spacing: 8, lineSpacing: 8) {
             ForEach(items, id: \.self) { item in
                 Text(item)
-                    .font(.system(size: 12, weight: .semibold, design: .rounded))
+                    .font(.frutiger(size: 12, weight: .semibold))
                     .foregroundStyle(Theme.navy)
                     .padding(.horizontal, 12)
                     .padding(.vertical, 7)

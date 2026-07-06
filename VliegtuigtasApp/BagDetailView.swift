@@ -73,7 +73,7 @@ struct BagDetailView: View {
                 .font(.system(size: 44, weight: .light))
                 .foregroundStyle(Theme.navy.opacity(0.30))
             Text("Tas niet gevonden")
-                .font(.system(size: 17, weight: .semibold, design: .rounded))
+                .font(.frutiger(size: 17, weight: .semibold))
                 .foregroundStyle(Theme.textPrimary)
             Button("Terug") { dismiss() }
                 .foregroundStyle(Theme.navy)
@@ -251,12 +251,12 @@ struct BagDetailView: View {
             VStack(alignment: .leading, spacing: 5) {
                 if let brand = d.brand {
                     Text(brand.uppercased())
-                        .font(.system(size: 11, weight: .bold, design: .rounded))
+                        .font(.frutiger(size: 11, weight: .bold))
                         .foregroundStyle(Theme.navy.opacity(0.45))
                         .kerning(1.2)
                 }
                 Text(d.name)
-                    .font(.system(size: 24, weight: .bold, design: .rounded))
+                    .font(.frutiger(size: 24, weight: .bold))
                     .foregroundStyle(Theme.textPrimary)
                     .fixedSize(horizontal: false, vertical: true)
             }
@@ -265,7 +265,7 @@ struct BagDetailView: View {
                 VStack(alignment: .leading, spacing: 3) {
                     if let label = d.displayPrice {
                         Text(label)
-                            .font(.system(size: 32, weight: .black, design: .rounded))
+                            .font(.frutiger(size: 32, weight: .black))
                             .foregroundStyle(Theme.navy)
                     }
                     if let domain = d.shopDomain {
@@ -276,7 +276,7 @@ struct BagDetailView: View {
                                     .clipShape(RoundedRectangle(cornerRadius: 3))
                             }
                             Text(domain)
-                                .font(.system(size: 11, design: .rounded))
+                                .font(.frutiger(size: 11))
                                 .foregroundStyle(Theme.textSecondary)
                         }
                     }
@@ -288,7 +288,7 @@ struct BagDetailView: View {
                     Link(destination: url) {
                         HStack(spacing: 6) {
                             Text("Bekijk aanbieding")
-                                .font(.system(size: 14, weight: .bold, design: .rounded))
+                                .font(.frutiger(size: 14, weight: .bold))
                             Image(systemName: "arrow.up.right")
                                 .font(.system(size: 11, weight: .bold))
                         }
@@ -339,11 +339,11 @@ struct BagDetailView: View {
                     .font(.system(size: 10))
                     .foregroundStyle(Theme.navy.opacity(0.55))
                 Text(label)
-                    .font(.system(size: 10, design: .rounded))
+                    .font(.frutiger(size: 10))
                     .foregroundStyle(Theme.textSecondary)
             }
             Text(value)
-                .font(.system(size: 12, weight: .semibold, design: .rounded))
+                .font(.frutiger(size: 12, weight: .semibold))
                 .foregroundStyle(Theme.textPrimary)
         }
         .padding(.horizontal, 12)
@@ -367,7 +367,7 @@ struct BagDetailView: View {
                                 .frame(width: 14, height: 14)
                                 .overlay(Circle().strokeBorder(Color(.systemGray4), lineWidth: 0.8))
                             Text(color.capitalized)
-                                .font(.system(size: 12, weight: .medium, design: .rounded))
+                                .font(.frutiger(size: 12, weight: .medium))
                                 .foregroundStyle(Theme.textPrimary)
                         }
                         .padding(.horizontal, 12)
@@ -404,10 +404,10 @@ struct BagDetailView: View {
                             AirlineLogo(airline: ma, size: 42)
                             VStack(alignment: .leading, spacing: 2) {
                                 Text(ma.name)
-                                    .font(.system(size: 15, weight: .semibold, design: .rounded))
+                                    .font(.frutiger(size: 15, weight: .semibold))
                                     .foregroundStyle(Theme.textPrimary)
                                 Label("Deze tas is toegestaan", systemImage: "checkmark.circle.fill")
-                                    .font(.system(size: 12, weight: .medium, design: .rounded))
+                                    .font(.frutiger(size: 12, weight: .medium))
                                     .foregroundStyle(Theme.green)
                             }
                             Spacer()
@@ -424,7 +424,7 @@ struct BagDetailView: View {
                                 Image(systemName: "bag.fill")
                                     .font(.system(size: 13, weight: .semibold))
                                 Text("Koop deze tas")
-                                    .font(.system(size: 14, weight: .bold, design: .rounded))
+                                    .font(.frutiger(size: 14, weight: .bold))
                                 Image(systemName: "arrow.up.right")
                                     .font(.system(size: 11, weight: .bold))
                             }
@@ -479,7 +479,7 @@ struct BagDetailView: View {
                     VStack(alignment: .leading, spacing: 2) {
                         sectionHeader(title)
                         Text(subtitle)
-                            .font(.system(size: 12, design: .rounded))
+                            .font(.frutiger(size: 12))
                             .foregroundStyle(Theme.textSecondary)
                             .multilineTextAlignment(.leading)
                     }
@@ -504,7 +504,7 @@ struct BagDetailView: View {
                             HStack(spacing: 14) {
                                 AirlineLogo(airline: ma, size: 42)
                                 Text(ma.name)
-                                    .font(.system(size: 15, weight: .semibold, design: .rounded))
+                                    .font(.frutiger(size: 15, weight: .semibold))
                                     .foregroundStyle(Theme.textPrimary)
                                 Spacer()
                                 if style == .rejected {
@@ -568,7 +568,7 @@ struct BagDetailView: View {
 
     private func sectionHeader(_ text: String) -> some View {
         Text(text)
-            .font(.system(size: 18, weight: .bold, design: .rounded))
+            .font(.frutiger(size: 18, weight: .bold))
             .foregroundStyle(Theme.textPrimary)
     }
 
@@ -608,18 +608,18 @@ private struct SimilarBagTile: View {
             VStack(alignment: .leading, spacing: 4) {
                 if let brand = bag.brand {
                     Text(brand.uppercased())
-                        .font(.system(size: 9, weight: .bold, design: .rounded))
+                        .font(.frutiger(size: 9, weight: .bold))
                         .foregroundStyle(Theme.navy.opacity(0.45))
                         .kerning(0.5)
                 }
                 Text(bag.name)
-                    .font(.system(size: 12, weight: .semibold, design: .rounded))
+                    .font(.frutiger(size: 12, weight: .semibold))
                     .foregroundStyle(Theme.textPrimary)
                     .lineLimit(2)
                     .fixedSize(horizontal: false, vertical: true)
                 if let label = bag.displayPrice {
                     Text(label)
-                        .font(.system(size: 14, weight: .bold, design: .rounded))
+                        .font(.frutiger(size: 14, weight: .bold))
                         .foregroundStyle(Theme.navy)
                         .padding(.top, 2)
                 }

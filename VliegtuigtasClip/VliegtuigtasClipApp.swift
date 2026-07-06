@@ -7,6 +7,8 @@ struct VliegtuigtasClipApp: App {
     @StateObject private var airlineStore = AirlineStore()
     @State private var invokedAirlineSlug: String?
 
+    init() { AppFont.register() }
+
     var body: some Scene {
         WindowGroup {
             ClipCheckView(invokedAirlineSlug: $invokedAirlineSlug)

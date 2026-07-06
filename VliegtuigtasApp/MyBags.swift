@@ -154,7 +154,7 @@ struct MyBagsOverviewView: View {
                         showNewBag = true
                     } label: {
                         Label("Tas of koffer toevoegen", systemImage: "plus")
-                            .font(.system(size: 14, weight: .semibold, design: .rounded))
+                            .font(.frutiger(size: 14, weight: .semibold))
                             .frame(maxWidth: .infinity)
                             .padding(.vertical, 13)
                             .background(Theme.navy.opacity(0.07))
@@ -202,7 +202,7 @@ struct MyBagsOverviewView: View {
                         withAnimation(.spring(response: 0.3)) { selectedAirline = airline }
                     } label: {
                         Text(airline.name)
-                            .font(.system(size: 13, weight: .semibold, design: .rounded))
+                            .font(.frutiger(size: 13, weight: .semibold))
                             .foregroundStyle(selectedAirline?.id == airline.id ? .white : Theme.textPrimary)
                             .padding(.horizontal, 13)
                             .padding(.vertical, 8)
@@ -228,9 +228,9 @@ struct MyBagsOverviewView: View {
                 .font(.system(size: 34, weight: .light))
                 .foregroundStyle(Theme.textSecondary)
             Text("Nog geen tassen of koffers")
-                .font(.system(size: 15, weight: .bold, design: .rounded))
+                .font(.frutiger(size: 15, weight: .bold))
             Text("Voeg je tassen toe met naam en maten. Daarna zie je hier per maatschappij direct wat mee mag.")
-                .font(.system(size: 13, design: .rounded))
+                .font(.frutiger(size: 13))
                 .foregroundStyle(Theme.textSecondary)
                 .multilineTextAlignment(.center)
         }
@@ -260,9 +260,9 @@ private struct BagFitCard: View {
 
                 VStack(alignment: .leading, spacing: 2) {
                     Text(bag.name)
-                        .font(.system(size: 15, weight: .bold, design: .rounded))
+                        .font(.frutiger(size: 15, weight: .bold))
                     Text("\(bag.dimsLabel) · \(bag.weight.formatted()) kg")
-                        .font(.system(size: 12, design: .rounded))
+                        .font(.frutiger(size: 12))
                         .monospacedDigit()
                         .foregroundStyle(Theme.textSecondary)
                 }
@@ -336,7 +336,7 @@ private struct BagFitCard: View {
             Image(systemName: icon)
                 .font(.system(size: 11, weight: .bold))
             Text(text)
-                .font(.system(size: 12, weight: .bold, design: .rounded))
+                .font(.frutiger(size: 12, weight: .bold))
         }
         .foregroundStyle(color)
         .padding(.horizontal, 10)
@@ -355,17 +355,17 @@ private struct BagFitCard: View {
                     : (status == false ? Theme.red : Theme.textSecondary))
             VStack(alignment: .leading, spacing: 1) {
                 Text(title)
-                    .font(.system(size: 13, weight: .semibold, design: .rounded))
+                    .font(.frutiger(size: 13, weight: .semibold))
                 if let detail {
                     Text(detail)
-                        .font(.system(size: 11, design: .rounded))
+                        .font(.frutiger(size: 11))
                         .monospacedDigit()
                         .foregroundStyle(Theme.textSecondary)
                 }
             }
             Spacer()
             Text(status == true ? "Ja" : (status == false ? "Nee" : "Onbekend"))
-                .font(.system(size: 12, weight: .bold, design: .rounded))
+                .font(.frutiger(size: 12, weight: .bold))
                 .foregroundStyle(status == true ? Theme.green
                     : (status == false ? Theme.red : Theme.textSecondary))
         }
@@ -401,10 +401,10 @@ struct BagEditorSheet: View {
                 VStack(alignment: .leading, spacing: 16) {
                     VStack(alignment: .leading, spacing: 6) {
                         Text("Naam")
-                            .font(.system(size: 12, weight: .semibold, design: .rounded))
+                            .font(.frutiger(size: 12, weight: .semibold))
                             .foregroundStyle(Theme.textSecondary)
                         TextField("Bijv. Rode trolley of Werkrugzak", text: $name)
-                            .font(.system(size: 15, design: .rounded))
+                            .font(.frutiger(size: 15))
                             .padding(12)
                             .background(Color(.secondarySystemGroupedBackground))
                             .clipShape(RoundedRectangle(cornerRadius: 12))
@@ -436,7 +436,7 @@ struct BagEditorSheet: View {
                         dismiss()
                     } label: {
                         Text(bag == nil ? "Tas toevoegen" : "Opslaan")
-                            .font(.system(size: 16, weight: .semibold, design: .rounded))
+                            .font(.frutiger(size: 16, weight: .semibold))
                             .frame(maxWidth: .infinity)
                             .padding(.vertical, 15)
                             .background(Theme.navyGradient)
@@ -451,7 +451,7 @@ struct BagEditorSheet: View {
                             dismiss()
                         } label: {
                             Label("Verwijder deze tas", systemImage: "trash")
-                                .font(.system(size: 13, weight: .semibold, design: .rounded))
+                                .font(.frutiger(size: 13, weight: .semibold))
                                 .foregroundStyle(Theme.red)
                                 .frame(maxWidth: .infinity)
                                 .padding(.vertical, 10)
@@ -479,10 +479,10 @@ struct BagEditorSheet: View {
         VStack(spacing: 4) {
             HStack {
                 Text(label)
-                    .font(.system(size: 13, weight: .semibold, design: .rounded))
+                    .font(.frutiger(size: 13, weight: .semibold))
                 Spacer()
                 Text("\(value.wrappedValue.formatted()) \(unit)")
-                    .font(.system(size: 13, weight: .bold, design: .rounded))
+                    .font(.frutiger(size: 13, weight: .bold))
                     .monospacedDigit()
                     .foregroundStyle(Theme.navy)
             }

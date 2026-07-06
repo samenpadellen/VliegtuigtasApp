@@ -99,14 +99,14 @@ struct AirlineDetailView: View {
                             .clipShape(RoundedRectangle(cornerRadius: 14))
                     } else {
                         Text(display.name.prefix(2).uppercased())
-                            .font(.system(size: 26, weight: .bold, design: .rounded))
+                            .font(.frutiger(size: 26, weight: .bold))
                             .foregroundStyle(Theme.sky)
                     }
                 }
 
                 VStack(spacing: 4) {
                     Text(display.name)
-                        .font(.system(size: 24, weight: .bold, design: .rounded))
+                        .font(.frutiger(size: 24, weight: .bold))
                         .foregroundStyle(Theme.textPrimary)
 
                     if let date = display.lastVerifiedDate {
@@ -115,7 +115,7 @@ struct AirlineDetailView: View {
                                 .font(.system(size: 11))
                                 .foregroundStyle(Theme.green)
                             Text("Geverifieerd op \(formattedDate(date))")
-                                .font(.system(size: 12, design: .rounded))
+                                .font(.frutiger(size: 12))
                                 .foregroundStyle(Theme.textSecondary)
                         }
                     }
@@ -137,7 +137,7 @@ struct AirlineDetailView: View {
                 HStack(spacing: 8) {
                     Image(systemName: "checkmark.shield.fill").font(.system(size: 16))
                     Text("Controleer mijn tas")
-                        .font(.system(size: 16, weight: .semibold, design: .rounded))
+                        .font(.frutiger(size: 16, weight: .semibold))
                 }
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 16)
@@ -175,7 +175,7 @@ struct AirlineDetailView: View {
                         .foregroundStyle(Theme.sky)
                         .font(.system(size: 18))
                     Text(notes)
-                        .font(.system(size: 14, design: .rounded))
+                        .font(.frutiger(size: 14))
                         .foregroundStyle(Theme.textSecondary)
                         .fixedSize(horizontal: false, vertical: true)
                 }
@@ -215,7 +215,7 @@ struct AirlineDetailView: View {
                 } label: {
                     HStack(spacing: 6) {
                         Text("Bekijk alles wat past in de shop")
-                            .font(.system(size: 14, weight: .semibold, design: .rounded))
+                            .font(.frutiger(size: 14, weight: .semibold))
                         Image(systemName: "arrow.right")
                             .font(.system(size: 11, weight: .semibold))
                     }
@@ -233,7 +233,7 @@ struct AirlineDetailView: View {
                     HStack {
                         Image(systemName: "safari")
                         Text("Bekijk officiële bagagepagina")
-                            .font(.system(size: 14, weight: .medium, design: .rounded))
+                            .font(.frutiger(size: 14, weight: .medium))
                         Spacer()
                         Image(systemName: "arrow.up.right")
                             .font(.system(size: 12))
@@ -359,7 +359,7 @@ struct AirlineDetailView: View {
 
     private func sectionHeader(_ title: String) -> some View {
         Text(title)
-            .font(.system(size: 13, weight: .semibold, design: .rounded))
+            .font(.frutiger(size: 13, weight: .semibold))
             .foregroundStyle(Theme.textSecondary)
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.top, 4)
@@ -408,17 +408,17 @@ private struct BaggageTypeCard: View {
 
             VStack(alignment: .leading, spacing: 2) {
                 Text(title)
-                    .font(.system(size: 13, weight: .bold, design: .rounded))
+                    .font(.frutiger(size: 13, weight: .bold))
                     .foregroundStyle(Theme.textPrimary)
                 Text(subtitle)
-                    .font(.system(size: 10, design: .rounded))
+                    .font(.frutiger(size: 10))
                     .foregroundStyle(Theme.textSecondary)
                     .fixedSize(horizontal: false, vertical: true)
             }
 
             if let detail {
                 Text(detail)
-                    .font(.system(size: 11, weight: .semibold, design: .rounded))
+                    .font(.frutiger(size: 11, weight: .semibold))
                     .foregroundStyle(Theme.textPrimary)
             }
 
@@ -426,7 +426,7 @@ private struct BaggageTypeCard: View {
 
             if let priceLabel {
                 Text(priceLabel)
-                    .font(.system(size: 10, weight: .semibold, design: .rounded))
+                    .font(.frutiger(size: 10, weight: .semibold))
                     .foregroundStyle(color)
                     .padding(.horizontal, 9)
                     .padding(.vertical, 5)
@@ -464,7 +464,7 @@ private struct MatchingBagCard: View {
             .clipShape(RoundedRectangle(cornerRadius: 12))
 
             Text(bag.name)
-                .font(.system(size: 11, weight: .semibold, design: .rounded))
+                .font(.frutiger(size: 11, weight: .semibold))
                 .foregroundStyle(Theme.textPrimary)
                 .lineLimit(2)
                 .multilineTextAlignment(.leading)
@@ -473,7 +473,7 @@ private struct MatchingBagCard: View {
             HStack(spacing: 4) {
                 if let price = bag.displayPrice {
                     Text(price)
-                        .font(.system(size: 13, weight: .bold, design: .rounded))
+                        .font(.frutiger(size: 13, weight: .bold))
                         .monospacedDigit()
                         .foregroundStyle(Theme.navy)
                 }
@@ -506,11 +506,11 @@ private struct SpecRow: View {
                 .foregroundStyle(Theme.navy)
                 .frame(width: 20)
             Text(label)
-                .font(.system(size: 13, design: .rounded))
+                .font(.frutiger(size: 13))
                 .foregroundStyle(Theme.textSecondary)
             Spacer()
             Text(value)
-                .font(.system(size: 13, weight: .semibold, design: .rounded))
+                .font(.frutiger(size: 13, weight: .semibold))
                 .foregroundStyle(Theme.textPrimary)
         }
         .padding(.vertical, 11)
@@ -530,11 +530,11 @@ private struct VariantCard: View {
                 HStack(spacing: 10) {
                     VStack(alignment: .leading, spacing: 3) {
                         Text(variant.variantName)
-                            .font(.system(size: 15, weight: .bold, design: .rounded))
+                            .font(.frutiger(size: 15, weight: .bold))
                             .foregroundStyle(Theme.textPrimary)
                         if let large = variant.includesLargeBag {
                             Text(large ? "Incl. grote handbagage" : "Klein persoonlijk item")
-                                .font(.system(size: 12, design: .rounded))
+                                .font(.frutiger(size: 12))
                                 .foregroundStyle(Theme.textSecondary)
                         }
                     }
@@ -582,7 +582,7 @@ private struct VariantCard: View {
                                 .foregroundStyle(Theme.sky)
                                 .frame(width: 20)
                             Text("Max. gewicht: \(String(format: "%.0f", w)) kg")
-                                .font(.system(size: 14, design: .rounded))
+                                .font(.frutiger(size: 14))
                         }
                         .padding(.horizontal, 16)
                     }
@@ -593,7 +593,7 @@ private struct VariantCard: View {
                                 .foregroundStyle(Theme.yellow)
                                 .font(.system(size: 14))
                             Text(notes)
-                                .font(.system(size: 13, design: .rounded))
+                                .font(.frutiger(size: 13))
                                 .foregroundStyle(Theme.textSecondary)
                                 .fixedSize(horizontal: false, vertical: true)
                         }
@@ -631,20 +631,20 @@ private struct DimBlock: View {
             }
             VStack(alignment: .leading, spacing: 2) {
                 Text(title)
-                    .font(.system(size: 13, weight: .semibold, design: .rounded))
+                    .font(.frutiger(size: 13, weight: .semibold))
                     .foregroundStyle(Theme.textPrimary)
                 Text(subtitle)
-                    .font(.system(size: 11, design: .rounded))
+                    .font(.frutiger(size: 11))
                     .foregroundStyle(Theme.textSecondary)
             }
             Spacer()
             VStack(alignment: .trailing, spacing: 2) {
                 Text(dims)
-                    .font(.system(size: 14, weight: .bold, design: .rounded))
+                    .font(.frutiger(size: 14, weight: .bold))
                     .foregroundStyle(Theme.textPrimary)
                 if let w = weight {
                     Text("max. \(String(format: "%.0f", w)) kg")
-                        .font(.system(size: 11, design: .rounded))
+                        .font(.frutiger(size: 11))
                         .foregroundStyle(Theme.textSecondary)
                 }
             }

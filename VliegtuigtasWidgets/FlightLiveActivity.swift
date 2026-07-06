@@ -19,12 +19,12 @@ struct FlightLiveActivity: Widget {
                             .font(.system(size: 13, weight: .semibold))
                             .foregroundStyle(LATheme.yellow)
                         Text(context.attributes.flightNumber)
-                            .font(.system(size: 15, weight: .bold, design: .rounded))
+                            .font(.frutiger(size: 15, weight: .bold))
                     }
                 }
                 DynamicIslandExpandedRegion(.trailing) {
                     CountdownText(context: context)
-                        .font(.system(size: 15, weight: .black, design: .rounded))
+                        .font(.frutiger(size: 15, weight: .black))
                         .foregroundStyle(LATheme.yellow)
                         .frame(maxWidth: 70)
                         .multilineTextAlignment(.trailing)
@@ -32,12 +32,12 @@ struct FlightLiveActivity: Widget {
                 DynamicIslandExpandedRegion(.center) {
                     if let route = context.attributes.routeLabel {
                         Text(route)
-                            .font(.system(size: 13, weight: .bold, design: .rounded))
+                            .font(.frutiger(size: 13, weight: .bold))
                             .monospacedDigit()
                             .lineLimit(1)
                     } else if let airline = context.attributes.airlineName {
                         Text(airline)
-                            .font(.system(size: 12, weight: .semibold, design: .rounded))
+                            .font(.frutiger(size: 12, weight: .semibold))
                             .foregroundStyle(.secondary)
                             .lineLimit(1)
                     }
@@ -61,7 +61,7 @@ struct FlightLiveActivity: Widget {
                     .foregroundStyle(context.state.bagChecked ? LATheme.green : LATheme.yellow)
             } compactTrailing: {
                 CountdownText(context: context)
-                    .font(.system(size: 12, weight: .heavy, design: .rounded))
+                    .font(.frutiger(size: 12, weight: .heavy))
                     .foregroundStyle(LATheme.yellow)
                     .frame(maxWidth: 52)
                     .multilineTextAlignment(.trailing)
@@ -133,7 +133,7 @@ private struct ReminderLine: View {
                 .font(.system(size: 11, weight: .semibold))
                 .foregroundStyle(context.state.bagChecked || departed ? LATheme.green : LATheme.yellow)
             Text(reminderText)
-                .font(.system(size: 12, weight: .medium, design: .rounded))
+                .font(.frutiger(size: 12, weight: .medium))
                 .lineLimit(1)
                 .minimumScaleFactor(0.8)
         }
@@ -158,16 +158,16 @@ private struct LockScreenView: View {
                     .font(.system(size: 13, weight: .semibold))
                     .foregroundStyle(LATheme.yellow)
                 Text(context.attributes.flightNumber)
-                    .font(.system(size: 15, weight: .bold, design: .rounded))
+                    .font(.frutiger(size: 15, weight: .bold))
                     .foregroundStyle(.white)
                 if let route = context.attributes.routeLabel {
                     Text("· \(route)")
-                        .font(.system(size: 13, weight: .bold, design: .rounded))
+                        .font(.frutiger(size: 13, weight: .bold))
                         .foregroundStyle(.white.opacity(0.85))
                         .lineLimit(1)
                 } else if let airline = context.attributes.airlineName {
                     Text("· \(airline)")
-                        .font(.system(size: 13, weight: .medium, design: .rounded))
+                        .font(.frutiger(size: 13, weight: .medium))
                         .foregroundStyle(.white.opacity(0.7))
                         .lineLimit(1)
                 }
@@ -176,10 +176,10 @@ private struct LockScreenView: View {
 
             HStack(alignment: .firstTextBaseline, spacing: 8) {
                 Text(context.state.departure > .now ? "Vertrek over" : "")
-                    .font(.system(size: 12, weight: .medium, design: .rounded))
+                    .font(.frutiger(size: 12, weight: .medium))
                     .foregroundStyle(.white.opacity(0.7))
                 CountdownText(context: context)
-                    .font(.system(size: 28, weight: .black, design: .rounded))
+                    .font(.frutiger(size: 28, weight: .black))
                     .foregroundStyle(.white)
             }
 

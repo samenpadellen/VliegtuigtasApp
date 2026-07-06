@@ -11,6 +11,9 @@ enum AppIconOption: String, CaseIterable, Identifiable {
     case standaard
     case pim
     case flap
+    case vertrek
+    case bagage
+    case gate
 
     var id: String { rawValue }
 
@@ -19,6 +22,9 @@ enum AppIconOption: String, CaseIterable, Identifiable {
         case .standaard: return nil
         case .pim:       return "AppIcon-Pim"
         case .flap:      return "AppIcon-Flap"
+        case .vertrek:   return "AppIcon-Vertrek"
+        case .bagage:    return "AppIcon-Bagage"
+        case .gate:      return "AppIcon-Gate"
         }
     }
 
@@ -30,6 +36,9 @@ enum AppIconOption: String, CaseIterable, Identifiable {
         case .standaard: return "AppIconPreviewDefault"
         case .pim:       return "AppIconPreviewPim"
         case .flap:      return "AppIconPreviewFlap"
+        case .vertrek:   return "AppIconPreviewVertrek"
+        case .bagage:    return "AppIconPreviewBagage"
+        case .gate:      return "AppIconPreviewGate"
         }
     }
 
@@ -38,6 +47,9 @@ enum AppIconOption: String, CaseIterable, Identifiable {
         case .standaard: return "Standaard"
         case .pim:       return "Purser Pim"
         case .flap:      return "Vertrekbord"
+        case .vertrek:   return "Vertrek"
+        case .bagage:    return "Bagagehal"
+        case .gate:      return "Gate 21"
         }
     }
 
@@ -46,6 +58,9 @@ enum AppIconOption: String, CaseIterable, Identifiable {
         case .standaard: return "Het originele Vliegtuigtas-icoon"
         case .pim:       return "De pet van je bagageassistent"
         case .flap:      return "Solari-klepjes, zoals op Home"
+        case .vertrek:   return "Geel bord richting vertrek"
+        case .bagage:    return "Blauw bord van de bagagehal"
+        case .gate:      return "Bijna instappen"
         }
     }
 
@@ -79,10 +94,10 @@ struct AppIconPicker: View {
 
                         VStack(alignment: .leading, spacing: 2) {
                             Text(option.title)
-                                .font(.system(size: 15, weight: .bold, design: .rounded))
+                                .font(.frutiger(size: 15, weight: .bold))
                                 .foregroundStyle(Theme.textPrimary)
                             Text(option.subtitle)
-                                .font(.system(size: 12, design: .rounded))
+                                .font(.frutiger(size: 12))
                                 .foregroundStyle(Theme.textSecondary)
                         }
 
@@ -102,7 +117,7 @@ struct AppIconPicker: View {
 
             if let errorMessage {
                 Label(errorMessage, systemImage: "exclamationmark.circle")
-                    .font(.system(size: 12, design: .rounded))
+                    .font(.frutiger(size: 12))
                     .foregroundStyle(Theme.red)
                     .frame(maxWidth: .infinity, alignment: .leading)
             }

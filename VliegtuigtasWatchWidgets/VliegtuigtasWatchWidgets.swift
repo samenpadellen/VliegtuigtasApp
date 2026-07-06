@@ -125,11 +125,11 @@ struct WatchVluchtWidgetView: View {
             if entry.hasUpcomingFlight, let days = entry.daysLeft {
                 VStack(spacing: 0) {
                     Text("\(days)")
-                        .font(.system(size: 20, weight: .black, design: .rounded))
+                        .font(.frutiger(size: 20, weight: .black))
                         .monospacedDigit()
                         .widgetAccentable()
                     Text(days == 1 ? "dag" : "dgn")
-                        .font(.system(size: 9, weight: .semibold, design: .rounded))
+                        .font(.frutiger(size: 9, weight: .semibold))
                 }
             } else {
                 Image(systemName: "airplane")
@@ -175,16 +175,16 @@ struct WatchVluchtWidgetView: View {
                     .font(.system(size: 10, weight: .semibold))
                     .widgetAccentable()
                 Text(entry.flightNumber ?? "Vliegtuigtas")
-                    .font(.system(size: 12, weight: .bold, design: .rounded))
+                    .font(.frutiger(size: 12, weight: .bold))
                     .lineLimit(1)
             }
             Text(entry.countdownLabel)
-                .font(.system(size: 15, weight: .black, design: .rounded))
+                .font(.frutiger(size: 15, weight: .black))
                 .monospacedDigit()
                 .widgetAccentable()
             if let detail = entry.routeLabel ?? entry.airlineName {
                 Text(detail)
-                    .font(.system(size: 11, weight: .medium, design: .rounded))
+                    .font(.frutiger(size: 11, weight: .medium))
                     .foregroundStyle(.secondary)
                     .lineLimit(1)
             }
@@ -216,6 +216,8 @@ struct WatchVluchtWidget: Widget {
 
 @main
 struct VliegtuigtasWatchWidgets: WidgetBundle {
+    init() { AppFont.register() }
+
     var body: some Widget {
         WatchVluchtWidget()
     }

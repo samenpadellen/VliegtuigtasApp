@@ -13,7 +13,7 @@ struct VisionContentView: View {
                 HStack(spacing: 10) {
                     Text(airline.flagEmoji ?? "✈️")
                     Text(airline.name)
-                        .font(.system(size: 16, weight: .medium, design: .rounded))
+                        .font(.frutiger(size: 16, weight: .medium))
                 }
                 .tag(airline)
             }
@@ -86,10 +86,10 @@ private struct VisionAirlineDetail: View {
     private var header: some View {
         VStack(alignment: .leading, spacing: 4) {
             Text("Handbagageregels")
-                .font(.system(size: 28, weight: .bold, design: .rounded))
+                .font(.frutiger(size: 28, weight: .bold))
             if let date = airline.lastVerifiedDate {
                 Label("Geverifieerd op \(date)", systemImage: "checkmark.seal.fill")
-                    .font(.system(size: 13, design: .rounded))
+                    .font(.frutiger(size: 13))
                     .foregroundStyle(.secondary)
             }
         }
@@ -102,10 +102,10 @@ private struct VisionAirlineDetail: View {
                 HStack(alignment: .top, spacing: 16) {
                     VStack(alignment: .leading, spacing: 2) {
                         Text(variant.variantName)
-                            .font(.system(size: 15, weight: .bold, design: .rounded))
+                            .font(.frutiger(size: 15, weight: .bold))
                         if let kg = variant.maxWeightKg {
                             Text("max. \(Int(kg)) kg")
-                                .font(.system(size: 12, design: .rounded))
+                                .font(.frutiger(size: 12))
                                 .foregroundStyle(.secondary)
                         }
                     }
@@ -118,7 +118,7 @@ private struct VisionAirlineDetail: View {
                             Text("Groot: \(variant.largeDimString)")
                         }
                     }
-                    .font(.system(size: 13, weight: .semibold, design: .rounded))
+                    .font(.frutiger(size: 13, weight: .semibold))
                     .monospacedDigit()
                 }
                 .padding(16)
@@ -131,7 +131,7 @@ private struct VisionAirlineDetail: View {
     private var checkPanel: some View {
         VStack(alignment: .leading, spacing: 16) {
             Text("Check je koffer")
-                .font(.system(size: 18, weight: .bold, design: .rounded))
+                .font(.frutiger(size: 18, weight: .bold))
 
             dimSlider("Hoogte", value: $length, range: 20...90)
             dimSlider("Breedte", value: $width, range: 10...70)
@@ -189,11 +189,11 @@ private struct VisionAirlineDetail: View {
     ) -> some View {
         HStack(spacing: 16) {
             Text(label)
-                .font(.system(size: 14, weight: .semibold, design: .rounded))
+                .font(.frutiger(size: 14, weight: .semibold))
                 .frame(width: 80, alignment: .leading)
             Slider(value: value, in: range, step: step)
             Text("\(value.wrappedValue.formatted()) \(unit)")
-                .font(.system(size: 14, weight: .bold, design: .rounded))
+                .font(.frutiger(size: 14, weight: .bold))
                 .monospacedDigit()
                 .frame(width: 76, alignment: .trailing)
         }
@@ -206,9 +206,9 @@ private struct VisionAirlineDetail: View {
                 .foregroundStyle(result.verdict == .ok ? .green : .red)
             VStack(alignment: .leading, spacing: 2) {
                 Text(result.verdictTitle)
-                    .font(.system(size: 16, weight: .bold, design: .rounded))
+                    .font(.frutiger(size: 16, weight: .bold))
                 Text(result.verdictMessage)
-                    .font(.system(size: 13, design: .rounded))
+                    .font(.frutiger(size: 13))
                     .foregroundStyle(.secondary)
             }
         }

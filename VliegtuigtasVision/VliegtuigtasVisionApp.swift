@@ -5,6 +5,8 @@ struct VliegtuigtasVisionApp: App {
     @StateObject private var airlineStore = AirlineStore()
     @StateObject private var bagState = VisionBagState.shared
 
+    init() { AppFont.register() }
+
     var body: some Scene {
         // Hoofdvenster: maatschappijen, regels en de check
         WindowGroup {

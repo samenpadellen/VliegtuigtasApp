@@ -453,9 +453,9 @@ private struct SavedBagFitSnippet: View {
                     .foregroundStyle(fit.allowedInCabin ? Theme.green : Theme.red)
                 VStack(alignment: .leading, spacing: 1) {
                     Text(bagName)
-                        .font(.system(size: 15, weight: .bold, design: .rounded))
+                        .font(.frutiger(size: 15, weight: .bold))
                     Text(airlineName)
-                        .font(.system(size: 12, weight: .semibold, design: .rounded))
+                        .font(.frutiger(size: 12, weight: .semibold))
                         .foregroundStyle(Theme.navy)
                 }
                 Spacer()
@@ -481,7 +481,7 @@ private struct SavedBagFitSnippet: View {
                 .foregroundStyle(status == true ? Theme.green
                     : (status == false ? Theme.red : Theme.textSecondary))
             Text(label)
-                .font(.system(size: 11, weight: .medium, design: .rounded))
+                .font(.frutiger(size: 11, weight: .medium))
                 .foregroundStyle(.secondary)
         }
     }
@@ -499,12 +499,12 @@ private struct CheckResultSnippet: View {
 
             VStack(alignment: .leading, spacing: 3) {
                 Text(result.verdictTitle)
-                    .font(.system(size: 16, weight: .bold, design: .rounded))
+                    .font(.frutiger(size: 16, weight: .bold))
                 Text(result.verdictMessage)
-                    .font(.system(size: 13, design: .rounded))
+                    .font(.frutiger(size: 13))
                     .foregroundStyle(.secondary)
                 Text(airlineName)
-                    .font(.system(size: 12, weight: .semibold, design: .rounded))
+                    .font(.frutiger(size: 12, weight: .semibold))
                     .foregroundStyle(Theme.navy)
             }
             Spacer()
@@ -529,13 +529,13 @@ private struct AirlineRulesSnippet: View {
             HStack(spacing: 8) {
                 if let flag = airline.flagEmoji { Text(flag) }
                 Text(airline.name)
-                    .font(.system(size: 16, weight: .bold, design: .rounded))
+                    .font(.frutiger(size: 16, weight: .bold))
             }
 
             ForEach((airline.variants ?? []).prefix(3)) { variant in
                 VStack(alignment: .leading, spacing: 2) {
                     Text(variant.variantName)
-                        .font(.system(size: 12, weight: .semibold, design: .rounded))
+                        .font(.frutiger(size: 12, weight: .semibold))
                         .foregroundStyle(Theme.navy)
                     HStack(spacing: 12) {
                         if variant.smallLCm != nil {
@@ -548,7 +548,7 @@ private struct AirlineRulesSnippet: View {
                             Label("\(Int(kg)) kg", systemImage: "scalemass")
                         }
                     }
-                    .font(.system(size: 11, design: .rounded))
+                    .font(.frutiger(size: 11))
                     .foregroundStyle(.secondary)
                 }
             }

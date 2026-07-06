@@ -17,7 +17,7 @@ struct WatchMyBagView: View {
             Section {
                 Label {
                     Text("Maten worden gebruikt voor de pasindicatie per maatschappij.")
-                        .font(.footnote)
+                        .font(.frutiger(size: 13, relativeTo: .footnote))
                         .foregroundStyle(.secondary)
                 } icon: {
                     Image(systemName: "info.circle")
@@ -40,7 +40,7 @@ private struct DimensionStepper: View {
         Stepper(value: $value, in: range, step: step) {
             HStack {
                 Text(label)
-                    .font(.footnote)
+                    .font(.frutiger(size: 13, relativeTo: .footnote))
                 Spacer()
                 Text("\(value.clean) \(unit)")
                     .font(.footnote.weight(.semibold))

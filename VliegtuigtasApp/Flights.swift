@@ -201,7 +201,7 @@ struct MyFlightsSection: View {
                 showAddFlight = true
             } label: {
                 Label("Vlucht toevoegen", systemImage: "plus")
-                    .font(.system(size: 13, weight: .semibold, design: .rounded))
+                    .font(.frutiger(size: 13, weight: .semibold))
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 11)
                     .background(Theme.navy.opacity(0.07))
@@ -227,10 +227,10 @@ struct MyFlightsSection: View {
                 .foregroundStyle(Theme.sky)
                 .accessibilityHidden(true)
             Text("Nog geen vlucht opgeslagen")
-                .font(.system(size: 14, weight: .semibold, design: .rounded))
+                .font(.frutiger(size: 14, weight: .semibold))
                 .foregroundStyle(Theme.textPrimary)
             Text("Bewaar je vlucht en de aftelling tot vertrek verschijnt op je widget, smartwatch en lockscreen.")
-                .font(.system(size: 12, design: .rounded))
+                .font(.frutiger(size: 12))
                 .foregroundStyle(Theme.textSecondary)
                 .multilineTextAlignment(.center)
                 .fixedSize(horizontal: false, vertical: true)
@@ -257,10 +257,10 @@ private struct FlightRow: View {
             VStack(alignment: .leading, spacing: 2) {
                 HStack(spacing: 6) {
                     Text(flight.number)
-                        .font(.system(size: 15, weight: .bold, design: .rounded))
+                        .font(.frutiger(size: 15, weight: .bold))
                     if FlightsStore.shared.next?.id == flight.id {
                         Text("VOLGENDE")
-                            .font(.system(size: 8, weight: .black, design: .rounded))
+                            .font(.frutiger(size: 8, weight: .black))
                             .foregroundStyle(Theme.navy)
                             .padding(.horizontal, 6)
                             .padding(.vertical, 2)
@@ -269,13 +269,13 @@ private struct FlightRow: View {
                     }
                 }
                 Text(subtitle)
-                    .font(.system(size: 11, design: .rounded))
+                    .font(.frutiger(size: 11))
                     .foregroundStyle(Theme.textSecondary)
                     .lineLimit(1)
             }
             Spacer()
             Text(flight.countdownLabel)
-                .font(.system(size: 11, weight: .bold, design: .rounded))
+                .font(.frutiger(size: 11, weight: .bold))
                 .foregroundStyle(flight.isPast ? Theme.textSecondary : Theme.navy)
             Image(systemName: "chevron.right")
                 .font(.system(size: 12, weight: .semibold))
@@ -319,7 +319,7 @@ struct AddFlightSheet: View {
                 VStack(alignment: .leading, spacing: 16) {
                     VStack(alignment: .leading, spacing: 6) {
                         Text("Vluchtnummer")
-                            .font(.system(size: 12, weight: .semibold, design: .rounded))
+                            .font(.frutiger(size: 12, weight: .semibold))
                             .foregroundStyle(Theme.textSecondary)
                         HStack(spacing: 10) {
                             Image(systemName: "magnifyingglass")
@@ -330,7 +330,7 @@ struct AddFlightSheet: View {
                                 .textInputAutocapitalization(.characters)
                                 .submitLabel(.search)
                                 .onSubmit(lookupNow)
-                                .font(.system(size: 15, design: .rounded))
+                                .font(.frutiger(size: 15))
                             if flightStore.isLoading {
                                 ProgressView().tint(Theme.sky).scaleEffect(0.8)
                             }
@@ -341,7 +341,7 @@ struct AddFlightSheet: View {
                         // We zoeken vanzelf zodra je typt: geen "Zoek"-knop
                         // nodig, en de datum vullen we aan uit de match.
                         Text("Route, maatschappij en vertrekdatum worden automatisch opgehaald zodra we je vlucht herkennen.")
-                            .font(.system(size: 11, design: .rounded))
+                            .font(.frutiger(size: 11))
                             .foregroundStyle(Theme.textSecondary)
                     }
 
@@ -358,18 +358,18 @@ struct AddFlightSheet: View {
                     VStack(alignment: .leading, spacing: 6) {
                         HStack(spacing: 6) {
                             Text("Vertrek")
-                                .font(.system(size: 12, weight: .semibold, design: .rounded))
+                                .font(.frutiger(size: 12, weight: .semibold))
                                 .foregroundStyle(Theme.textSecondary)
                             if flightStore.result?.flightDate != nil {
                                 Label("Automatisch ingevuld", systemImage: "wand.and.stars")
-                                    .font(.system(size: 10, weight: .semibold, design: .rounded))
+                                    .font(.frutiger(size: 10, weight: .semibold))
                                     .foregroundStyle(Theme.green)
                             }
                         }
                         DatePicker("", selection: $departure, in: Date()..., displayedComponents: [.date, .hourAndMinute])
                             .labelsHidden()
                         Text("Tijd is een indicatie: pas 'm aan als je exacte vertrektijd afwijkt.")
-                            .font(.system(size: 10, design: .rounded))
+                            .font(.frutiger(size: 10))
                             .foregroundStyle(Theme.textSecondary)
                     }
 
@@ -379,7 +379,7 @@ struct AddFlightSheet: View {
                         HStack(spacing: 8) {
                             Image(systemName: saved ? "checkmark" : "plus.square.on.square")
                             Text(saved ? "Toegevoegd" : "Vlucht toevoegen")
-                                .font(.system(size: 16, weight: .semibold, design: .rounded))
+                                .font(.frutiger(size: 16, weight: .semibold))
                         }
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 15)
@@ -418,18 +418,18 @@ struct AddFlightSheet: View {
             }
             VStack(alignment: .leading, spacing: 1) {
                 Text(result.resolvedAirline?.name ?? result.rawAirlineName ?? "Onbekende maatschappij")
-                    .font(.system(size: 14, weight: .semibold, design: .rounded))
+                    .font(.frutiger(size: 14, weight: .semibold))
                 if let route = [result.departureIata, result.arrivalIata].compactMap({ $0 }).isEmpty ? nil
                     : "\(result.departureIata ?? "—") → \(result.arrivalIata ?? "—")" {
                     Text(route)
-                        .font(.system(size: 12, design: .rounded))
+                        .font(.frutiger(size: 12))
                         .foregroundStyle(Theme.textSecondary)
                 }
             }
             Spacer()
             if let status = result.statusLabel {
                 Text(status)
-                    .font(.system(size: 10, weight: .bold, design: .rounded))
+                    .font(.frutiger(size: 10, weight: .bold))
                     .foregroundStyle(Theme.sky)
                     .padding(.horizontal, 8)
                     .padding(.vertical, 4)
@@ -614,18 +614,18 @@ struct FlightDetailView: View {
 
                 VStack(spacing: 4) {
                     Text(flight.number)
-                        .font(.system(size: 26, weight: .bold, design: .rounded))
+                        .font(.frutiger(size: 26, weight: .bold))
                         .foregroundStyle(Theme.textPrimary)
                     if let airline = flight.airlineName {
                         Text(airline)
-                            .font(.system(size: 14, weight: .medium, design: .rounded))
+                            .font(.frutiger(size: 14, weight: .medium))
                             .foregroundStyle(Theme.textSecondary)
                     }
                 }
 
                 HStack(spacing: 8) {
                     Text(flight.countdownLabel)
-                        .font(.system(size: 12, weight: .bold, design: .rounded))
+                        .font(.frutiger(size: 12, weight: .bold))
                         .foregroundStyle(flight.isPast ? Theme.textSecondary : Theme.navy)
                         .padding(.horizontal, 10)
                         .padding(.vertical, 5)
@@ -634,7 +634,7 @@ struct FlightDetailView: View {
 
                     if let label = flight.statusLabel {
                         Text(label)
-                            .font(.system(size: 12, weight: .bold, design: .rounded))
+                            .font(.frutiger(size: 12, weight: .bold))
                             .foregroundStyle(flight.statusColor)
                             .padding(.horizontal, 10)
                             .padding(.vertical, 5)
@@ -665,7 +665,7 @@ struct FlightDetailView: View {
                     HStack(spacing: 8) {
                         AirlineLogo(airline: airline, size: 22)
                         Text("Bekijk bagageregels van \(airline.name)")
-                            .font(.system(size: 14, weight: .semibold, design: .rounded))
+                            .font(.frutiger(size: 14, weight: .semibold))
                         Spacer()
                         Image(systemName: "arrow.right")
                             .font(.system(size: 12, weight: .semibold))
@@ -690,7 +690,7 @@ struct FlightDetailView: View {
                         }
                         Text("Vernieuw status")
                     }
-                    .font(.system(size: 13, weight: .semibold, design: .rounded))
+                    .font(.frutiger(size: 13, weight: .semibold))
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 12)
                     .background(Theme.navy.opacity(0.07))
@@ -714,7 +714,7 @@ struct FlightDetailView: View {
             }
 
             Text("Vluchtinformatie is een indicatie. Controleer altijd de officiële status bij je maatschappij.")
-                .font(.system(size: 11, design: .rounded))
+                .font(.frutiger(size: 11))
                 .foregroundStyle(Theme.textSecondary)
                 .multilineTextAlignment(.center)
                 .frame(maxWidth: .infinity)
@@ -760,11 +760,11 @@ struct FlightDetailView: View {
                 .foregroundStyle(Theme.navy)
                 .frame(width: 20)
             Text(label)
-                .font(.system(size: 13, design: .rounded))
+                .font(.frutiger(size: 13))
                 .foregroundStyle(Theme.textSecondary)
             Spacer()
             Text(value)
-                .font(.system(size: 13, weight: .semibold, design: .rounded))
+                .font(.frutiger(size: 13, weight: .semibold))
                 .foregroundStyle(Theme.textPrimary)
         }
         .padding(.vertical, 12)
@@ -839,12 +839,12 @@ private struct FlightBoardingPassCard: View {
     private func endpoint(code: String?, airport: String?, alignment: HorizontalAlignment) -> some View {
         VStack(alignment: alignment, spacing: 2) {
             Text(code ?? "—")
-                .font(.system(size: 26, weight: .black, design: .rounded))
+                .font(.frutiger(size: 26, weight: .black))
                 .foregroundStyle(Theme.navy)
                 .kerning(1)
             if let airport {
                 Text(airport)
-                    .font(.system(size: 11, weight: .medium, design: .rounded))
+                    .font(.frutiger(size: 11, weight: .medium))
                     .foregroundStyle(Theme.textSecondary)
                     .lineLimit(2)
                     .multilineTextAlignment(alignment == .leading ? .leading : .trailing)

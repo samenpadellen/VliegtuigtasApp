@@ -26,10 +26,10 @@ private struct WatchMyBagPage: View {
                     .foregroundStyle(WatchTheme.yellow)
 
                 Text("\(Int(bag.length)) × \(Int(bag.width)) × \(Int(bag.depth))")
-                    .font(.system(size: 24, weight: .black, design: .rounded))
+                    .font(.frutiger(size: 24, weight: .black))
                     .monospacedDigit()
                 Text("cm · \(bag.weight.clean) kg")
-                    .font(.footnote)
+                    .font(.frutiger(size: 13, relativeTo: .footnote))
                     .foregroundStyle(.secondary)
 
                 NavigationLink {
@@ -62,7 +62,7 @@ private struct WatchAirlinesPage: View {
                 HStack {
                     ProgressView()
                     Text("Laden…")
-                        .font(.footnote)
+                        .font(.frutiger(size: 13, relativeTo: .footnote))
                         .foregroundStyle(.secondary)
                 }
             } else if let error = store.error, store.airlines.isEmpty {
@@ -70,7 +70,7 @@ private struct WatchAirlinesPage: View {
                     Text("Laden mislukt")
                         .font(.footnote.weight(.semibold))
                     Text(error)
-                        .font(.footnote)
+                        .font(.frutiger(size: 13, relativeTo: .footnote))
                         .foregroundStyle(.secondary)
                     Button("Opnieuw") {
                         Task { await store.load() }
@@ -119,7 +119,7 @@ private struct AirlineRow: View {
             HStack(spacing: 8) {
                 WatchAirlineLogo(airline: airline, height: 18)
                 Text(airline.name)
-                    .font(.body)
+                    .font(.frutiger(size: 17, relativeTo: .body))
                     .lineLimit(1)
             }
         }
@@ -146,7 +146,7 @@ struct WatchAirlineLogo: View {
             } else {
                 // Nette fallback zolang het logo laadt (of ontbreekt).
                 Text(airline.name.prefix(2).uppercased())
-                    .font(.system(size: height * 0.5, weight: .bold, design: .rounded))
+                    .font(.frutiger(size: height * 0.5, weight: .bold))
                     .foregroundStyle(WatchTheme.sky)
             }
         }

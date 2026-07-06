@@ -70,11 +70,11 @@ struct ProfileView: View {
                     .fill(Theme.navyGradient)
                     .frame(width: 76, height: 76)
                 Text(initials)
-                    .font(.system(size: 28, weight: .bold, design: .rounded))
+                    .font(.frutiger(size: 28, weight: .bold))
                     .foregroundStyle(.white)
             }
             Text(session.firstName.isEmpty ? "Reiziger" : session.firstName)
-                .font(.system(size: 20, weight: .bold, design: .rounded))
+                .font(.frutiger(size: 20, weight: .bold))
         }
         .padding(.top, 8)
     }
@@ -95,7 +95,7 @@ struct ProfileView: View {
                     .foregroundStyle(Theme.sky)
                     .frame(width: 20)
                 Text("Je gegevens, tasmaten en vlucht syncen via iCloud naar je andere Apple-apparaten. Er is geen apart account.")
-                    .font(.system(size: 11, design: .rounded))
+                    .font(.frutiger(size: 11))
                     .foregroundStyle(Theme.textSecondary)
                     .fixedSize(horizontal: false, vertical: true)
             }
@@ -113,11 +113,11 @@ struct ProfileView: View {
                 .foregroundStyle(Theme.navy)
                 .frame(width: 20)
             Text(label)
-                .font(.system(size: 13, design: .rounded))
+                .font(.frutiger(size: 13))
                 .foregroundStyle(Theme.textSecondary)
             Spacer()
             Text(value)
-                .font(.system(size: 13, weight: .semibold, design: .rounded))
+                .font(.frutiger(size: 13, weight: .semibold))
                 .foregroundStyle(Theme.textPrimary)
                 .lineLimit(1)
                 .truncationMode(.middle)
@@ -142,10 +142,10 @@ struct ProfileView: View {
                             .clipShape(RoundedRectangle(cornerRadius: 12))
                         VStack(alignment: .leading, spacing: 2) {
                             Text(bag.name)
-                                .font(.system(size: 15, weight: .bold, design: .rounded))
+                                .font(.frutiger(size: 15, weight: .bold))
                                 .foregroundStyle(Theme.textPrimary)
                             Text("\(bag.dimsLabel) · \(bag.weight.formatted()) kg")
-                                .font(.system(size: 12, design: .rounded))
+                                .font(.frutiger(size: 12))
                                 .monospacedDigit()
                                 .foregroundStyle(Theme.textSecondary)
                         }
@@ -167,7 +167,7 @@ struct ProfileView: View {
                     showNewBag = true
                 } label: {
                     Label("Toevoegen", systemImage: "plus")
-                        .font(.system(size: 13, weight: .semibold, design: .rounded))
+                        .font(.frutiger(size: 13, weight: .semibold))
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 11)
                         .background(Theme.navy.opacity(0.07))
@@ -181,7 +181,7 @@ struct ProfileView: View {
                         showBagsOverview = true
                     } label: {
                         Label("Past dit?", systemImage: "checkmark.shield.fill")
-                            .font(.system(size: 13, weight: .semibold, design: .rounded))
+                            .font(.frutiger(size: 13, weight: .semibold))
                             .frame(maxWidth: .infinity)
                             .padding(.vertical, 11)
                             .background(Theme.navyGradient)
@@ -254,10 +254,10 @@ struct ProfileView: View {
                 .frame(width: 20)
             VStack(alignment: .leading, spacing: 2) {
                 Text(title)
-                    .font(.system(size: 13, weight: .semibold, design: .rounded))
+                    .font(.frutiger(size: 13, weight: .semibold))
                     .foregroundStyle(available ? Theme.textPrimary : Theme.textSecondary)
                 Text(detail)
-                    .font(.system(size: 11, design: .rounded))
+                    .font(.frutiger(size: 11))
                     .foregroundStyle(available ? Theme.green : Theme.textSecondary)
             }
             Spacer()
@@ -272,7 +272,7 @@ struct ProfileView: View {
 
     private func sectionTitle(_ title: String) -> some View {
         Text(title)
-            .font(.system(size: 13, weight: .semibold, design: .rounded))
+            .font(.frutiger(size: 13, weight: .semibold))
             .foregroundStyle(Theme.textSecondary)
             .frame(maxWidth: .infinity, alignment: .leading)
     }
@@ -282,7 +282,7 @@ struct ProfileView: View {
             showLogoutConfirm = true
         } label: {
             Text("Uitloggen")
-                .font(.system(size: 15, weight: .semibold, design: .rounded))
+                .font(.frutiger(size: 15, weight: .semibold))
                 .foregroundStyle(Theme.red)
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 14)
@@ -314,10 +314,10 @@ struct ProfileView: View {
         } label: {
             VStack(spacing: 3) {
                 Text("Account & gegevens verwijderen")
-                    .font(.system(size: 14, weight: .semibold, design: .rounded))
+                    .font(.frutiger(size: 14, weight: .semibold))
                     .foregroundStyle(Theme.red)
                 Text("Verwijdert alles, ook uit iCloud en van onze server")
-                    .font(.system(size: 10, design: .rounded))
+                    .font(.frutiger(size: 10))
                     .foregroundStyle(Theme.textSecondary)
             }
             .frame(maxWidth: .infinity)
@@ -386,12 +386,12 @@ struct AccountRequiredView: View {
                         .background(.white.opacity(0.14))
                         .clipShape(RoundedRectangle(cornerRadius: 12))
                     Text(title)
-                        .font(.system(size: 18, weight: .bold, design: .rounded))
+                        .font(.frutiger(size: 18, weight: .bold))
                         .foregroundStyle(.white)
                 }
 
                 Text(reason)
-                    .font(.system(size: 13, design: .rounded))
+                    .font(.frutiger(size: 13))
                     .foregroundStyle(.white.opacity(0.85))
                     .lineSpacing(2)
                     .fixedSize(horizontal: false, vertical: true)
@@ -417,9 +417,9 @@ struct AccountRequiredView: View {
                         .foregroundStyle(Theme.green)
                         .transition(.scale.combined(with: .opacity))
                     Text("Welkom aan boord\(session.firstName.isEmpty ? "" : ", \(session.firstName)")!")
-                        .font(.system(size: 17, weight: .bold, design: .rounded))
+                        .font(.frutiger(size: 17, weight: .bold))
                     Text("Je profiel staat klaar.")
-                        .font(.system(size: 13, design: .rounded))
+                        .font(.frutiger(size: 13))
                         .foregroundStyle(Theme.textSecondary)
                 }
                 .frame(maxWidth: .infinity)
@@ -440,7 +440,7 @@ struct AccountRequiredView: View {
                     TextField("Voornaam", text: $name)
                         .textContentType(.givenName)
                         .autocorrectionDisabled()
-                        .font(.system(size: 15, design: .rounded))
+                        .font(.frutiger(size: 15))
                         .padding(13)
                         .background(Color(.secondarySystemGroupedBackground))
                         .clipShape(RoundedRectangle(cornerRadius: 12))
@@ -450,7 +450,7 @@ struct AccountRequiredView: View {
                         .keyboardType(.emailAddress)
                         .textInputAutocapitalization(.never)
                         .autocorrectionDisabled()
-                        .font(.system(size: 15, design: .rounded))
+                        .font(.frutiger(size: 15))
                         .padding(13)
                         .background(Color(.secondarySystemGroupedBackground))
                         .clipShape(RoundedRectangle(cornerRadius: 12))
@@ -482,7 +482,7 @@ struct AccountRequiredView: View {
                 } label: {
                     HStack(spacing: 8) {
                         Text("Maak gratis profiel")
-                            .font(.system(size: 16, weight: .semibold, design: .rounded))
+                            .font(.frutiger(size: 16, weight: .semibold))
                         Image(systemName: "arrow.right")
                             .font(.system(size: 13, weight: .semibold))
                     }
@@ -495,7 +495,7 @@ struct AccountRequiredView: View {
                 .buttonStyle(.plain)
 
                 Text("Verwijderen kan altijd via je profiel. Dan wissen we alles, ook uit iCloud en van onze server.")
-                    .font(.system(size: 10, design: .rounded))
+                    .font(.frutiger(size: 10))
                     .foregroundStyle(Theme.textSecondary)
                     .frame(maxWidth: .infinity, alignment: .leading)
             }
@@ -510,7 +510,7 @@ struct AccountRequiredView: View {
                 .foregroundStyle(Theme.yellow)
                 .padding(.top, 1)
             Text(text)
-                .font(.system(size: 12.5, weight: .medium, design: .rounded))
+                .font(.frutiger(size: 12.5, weight: .medium))
                 .foregroundStyle(.white.opacity(0.92))
                 .fixedSize(horizontal: false, vertical: true)
         }
