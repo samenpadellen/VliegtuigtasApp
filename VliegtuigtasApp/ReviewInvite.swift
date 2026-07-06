@@ -16,29 +16,30 @@ enum AppStoreInfo {
 
 // MARK: - Natuurlijk-moment prompt (StoreKit requestReview)
 
-/// Houdt bij hoe vaak een check is gelukt en beslist of we — op een logisch
-/// moment, zoals Apple aanraadt — de systeem-beoordelingspopup mogen tonen.
-/// Niet vaker dan bij een paar mijlpalen; het systeem beperkt het daarna zelf.
+/// Beslist of we — op een logisch moment, zoals Apple aanraadt — de
+/// systeem-beoordelingspopup mogen tonen. De popup verschijnt na een geslaagde
+/// check (de tas past), maar **hoogstens één keer per 3 maanden per gebruiker**.
+/// Het systeem beperkt het daarna zelf verder (max. 3×/jaar).
 enum ReviewPrompter {
     private static let countKey = "vt_successful_checks"
-    private static let lastPromptVersionKey = "vt_last_review_prompt_version"
+    private static let lastPromptTimeKey = "vt_last_review_prompt_time"
 
-    /// Registreert een geslaagde check en geeft terug of dit een goed moment
-    /// is om (één keer per app-versie) om een beoordeling te vragen.
+    /// Minimale tussenpoos tussen twee beoordelingsverzoeken: 3 maanden.
+    private static let minInterval: TimeInterval = 90 * 24 * 60 * 60
+
+    /// Registreert een geslaagde check en geeft terug of dit een goed moment is
+    /// om om een beoordeling te vragen. `true` de éérste keer dat een tas past,
+    /// daarna pas weer als het ≥ 3 maanden geleden is.
     @discardableResult
     static func registerSuccessAndShouldPrompt() -> Bool {
         let d = UserDefaults.standard
-        let count = d.integer(forKey: countKey) + 1
-        d.set(count, forKey: countKey)
+        d.set(d.integer(forKey: countKey) + 1, forKey: countKey)
 
-        // Meteen ná de éérste keer dat een tas écht past vragen — dat is het
-        // "gelukt!"-moment. Een latere mijlpaal vangt wie de eerste keer wegtikt.
-        guard count == 1 || count == 12 else { return false }
+        let now = Date().timeIntervalSince1970
+        let last = d.double(forKey: lastPromptTimeKey)   // 0 = nog nooit gevraagd
+        guard last == 0 || now - last >= minInterval else { return false }
 
-        // Hoogstens één keer per app-versie vragen.
-        let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "?"
-        guard d.string(forKey: lastPromptVersionKey) != version else { return false }
-        d.set(version, forKey: lastPromptVersionKey)
+        d.set(now, forKey: lastPromptTimeKey)
         return true
     }
 }
