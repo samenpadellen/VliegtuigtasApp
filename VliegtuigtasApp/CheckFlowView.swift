@@ -1502,6 +1502,7 @@ struct ResultStepView: View {
     // Sluit de resultaat-sheet (BaggageCheckView-variant) vóór het wisselen
     // van tab; in de tab-checker is dit een onschuldige no-op.
     @Environment(\.dismiss) private var dismissContainer
+    @Environment(\.requestReview) private var requestReview
     @State private var bags: [Bag] = []
     @State private var loadingBags = false
     @State private var bagsFailed = false
@@ -1564,10 +1565,23 @@ struct ResultStepView: View {
             .padding(.top, topInset + 16)
         }
         .task { await loadBags() }
+        .onAppear(perform: maybeAskForReview)
         .sheet(isPresented: $showFlightSheet) {
             FlightWidgetSheet(airline: airline)
                 .presentationDetents([.medium])
                 .presentationDragIndicator(.visible)
+        }
+    }
+
+    /// Vraagt op een natuurlijk moment om een beoordeling: alleen ná een
+    /// geslaagde check (de tas past) en pas bij een paar mijlpalen. Het
+    /// systeem beslist zelf of de popup daadwerkelijk verschijnt.
+    private func maybeAskForReview() {
+        guard isFit, ReviewPrompter.registerSuccessAndShouldPrompt() else { return }
+        Task {
+            // Even wachten zodat het "je tas past!"-moment eerst rustig landt.
+            try? await Task.sleep(for: .seconds(1.5))
+            requestReview()
         }
     }
 

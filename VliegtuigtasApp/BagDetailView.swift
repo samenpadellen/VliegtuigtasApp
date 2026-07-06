@@ -255,6 +255,7 @@ struct BagDetailView: View {
             ProductGalleryView(
                 imageUrls: images,
                 videoURL: d.localVideoURL,
+                title: d.name,
                 selection: galleryStartIndex
             )
         }

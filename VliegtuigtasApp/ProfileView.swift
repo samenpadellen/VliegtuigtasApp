@@ -35,6 +35,9 @@ struct ProfileView: View {
                     sectionTitle("Functies op dit toestel")
                     featuresCard
 
+                    sectionTitle("Beoordeel de app")
+                    ReviewInviteCard()
+
                     logoutButton
 
                     deleteAccountButton
