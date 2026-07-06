@@ -599,9 +599,16 @@ private struct LoyaltyCard: View {
                         .foregroundStyle(.white.opacity(0.55))
                         .kerning(2.2)
                     Spacer()
-                    Image(systemName: "creditcard")
-                        .font(.system(size: 13, weight: .light))
-                        .foregroundStyle(gold.opacity(0.8))
+                    // Duidelijk bij het aanbod zelf: dit is een partneraanbod.
+                    Text("PARTNERAANBOD")
+                        .font(.frutiger(size: 9, weight: .bold))
+                        .foregroundStyle(gold.opacity(0.9))
+                        .kerning(0.8)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 4)
+                        .overlay(
+                            Capsule().strokeBorder(gold.opacity(0.4), lineWidth: 1)
+                        )
                 }
 
                 Text(title)
