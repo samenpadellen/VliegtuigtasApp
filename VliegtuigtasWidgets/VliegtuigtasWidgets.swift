@@ -1091,8 +1091,9 @@ struct BagageRegelsWidget: Widget {
 
 @main
 struct VliegtuigtasWidgets: WidgetBundle {
-    init() { AppFont.register() }
-
+    // Fonts worden via UIAppFonts in de widget-Info.plist geregistreerd — de
+    // betrouwbare weg voor WidgetKit-extensies (runtime-registratie in de
+    // widget kon de rendering laten mislukken → witte widgets).
     var body: some Widget {
         VluchtCountdownWidget()
         BagageRegelsWidget()
