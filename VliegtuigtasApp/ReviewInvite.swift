@@ -31,9 +31,9 @@ enum ReviewPrompter {
         let count = d.integer(forKey: countKey) + 1
         d.set(count, forKey: countKey)
 
-        // Pas ná een paar succesvolle checks vragen — dan heeft iemand de app
-        // echt nuttig gevonden.
-        guard count == 3 || count == 12 else { return false }
+        // Meteen ná de éérste keer dat een tas écht past vragen — dat is het
+        // "gelukt!"-moment. Een latere mijlpaal vangt wie de eerste keer wegtikt.
+        guard count == 1 || count == 12 else { return false }
 
         // Hoogstens één keer per app-versie vragen.
         let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "?"

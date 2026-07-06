@@ -13,14 +13,21 @@ struct ProfileView: View {
     @State private var showBagsOverview = false
     @State private var showLogoutConfirm = false
     @State private var showDeleteConfirm = false
+    @State private var showEditProfile = false
 
     var body: some View {
         NavigationStack {
             ScrollView(showsIndicators: false) {
                 VStack(spacing: 18) {
-                    baggageTag
-
-                    personalStub
+                    Button {
+                        showEditProfile = true
+                    } label: {
+                        VStack(spacing: 18) {
+                            baggageTag
+                            personalStub
+                        }
+                    }
+                    .buttonStyle(.plain)
 
                     sectionTitle("Mijn tassen & koffers")
                     bagsSection
@@ -55,6 +62,16 @@ struct ProfileView: View {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button("Klaar") { dismiss() }
                 }
+                ToolbarItem(placement: .topBarLeading) {
+                    Button {
+                        showEditProfile = true
+                    } label: {
+                        Label("Bewerken", systemImage: "pencil")
+                    }
+                }
+            }
+            .sheet(isPresented: $showEditProfile) {
+                ProfileEditorSheet()
             }
         }
     }
@@ -174,10 +191,29 @@ struct ProfileView: View {
                     Label("iCLOUD SYNC", systemImage: "icloud.fill")
                         .printed(8, weight: .bold, soft: true).kerning(1)
                 }
+                TagField(label: "NAME", value: session.firstName.isEmpty ? "—" : session.firstName)
                 TagField(label: "E-MAIL", value: session.email.isEmpty ? "—" : session.email)
                 Text("Je gegevens, tasmaten en vlucht syncen via iCloud naar je andere Apple-apparaten — geen apart account.")
                     .printed(9, soft: true)
                     .fixedSize(horizontal: false, vertical: true)
+
+                // Bewerk-affordance: duidelijk dat het label aanpasbaar is.
+                HStack(spacing: 5) {
+                    Image(systemName: "pencil")
+                        .font(.system(size: 10, weight: .bold))
+                    Text(session.firstName.isEmpty && session.email.isEmpty
+                         ? "NAAM & E-MAIL INVULLEN"
+                         : "GEGEVENS BEWERKEN")
+                        .printed(9, weight: .bold).kerning(1)
+                }
+                .foregroundStyle(TagPalette.ink)
+                .padding(.horizontal, 12)
+                .padding(.vertical, 7)
+                .frame(maxWidth: .infinity)
+                .background(TagPalette.priority.opacity(0.18))
+                .overlay(RoundedRectangle(cornerRadius: 8).strokeBorder(TagPalette.priority.opacity(0.5), lineWidth: 1))
+                .clipShape(RoundedRectangle(cornerRadius: 8))
+                .padding(.top, 2)
             }
             .padding(14)
         }
@@ -418,6 +454,107 @@ struct ProfileView: View {
         } message: {
             Text("Dit verwijdert je naam, e-mail, tasmaten en opgeslagen vlucht van dit toestel, uit iCloud en van onze server. Dit kan niet ongedaan worden gemaakt.")
         }
+    }
+}
+
+// MARK: - Naam & e-mail bewerken
+
+/// Laat de gebruiker zijn naam en e-mail invullen of aanpassen. Slaat op via
+/// dezelfde weg als de onboarding (lokaal + iCloud), zodat widgets, Watch en
+/// andere apparaten meteen mee zijn.
+struct ProfileEditorSheet: View {
+    @ObservedObject private var session = UserSession.shared
+    @Environment(\.dismiss) private var dismiss
+
+    @State private var name = ""
+    @State private var email = ""
+    @State private var showError = false
+
+    private var isValid: Bool {
+        let n = name.trimmingCharacters(in: .whitespaces)
+        let e = email.trimmingCharacters(in: .whitespaces)
+        return !n.isEmpty && e.contains("@") && e.contains(".")
+    }
+
+    var body: some View {
+        NavigationStack {
+            ScrollView {
+                VStack(alignment: .leading, spacing: 18) {
+                    Text("Je gegevens reizen via iCloud mee naar je widget, Apple Watch en al je andere apparaten. Geen wachtwoord nodig.")
+                        .font(.frutiger(size: 13))
+                        .foregroundStyle(Theme.textSecondary)
+                        .fixedSize(horizontal: false, vertical: true)
+
+                    VStack(spacing: 10) {
+                        field(title: "Voornaam", text: $name, content: .givenName,
+                              keyboard: .default, autocaps: .words)
+                        field(title: "E-mailadres", text: $email, content: .emailAddress,
+                              keyboard: .emailAddress, autocaps: .never)
+                    }
+
+                    if showError {
+                        Label("Vul je voornaam en een geldig e-mailadres in",
+                              systemImage: "exclamationmark.circle.fill")
+                            .font(.frutiger(size: 12))
+                            .foregroundStyle(Theme.red)
+                    }
+
+                    Button(action: save) {
+                        Text("Opslaan")
+                            .font(.frutiger(size: 16, weight: .semibold))
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 15)
+                            .background(Theme.navyGradient)
+                            .foregroundStyle(.white)
+                            .clipShape(RoundedRectangle(cornerRadius: 14))
+                    }
+                    .buttonStyle(.plain)
+                }
+                .padding(18)
+            }
+            .background(Color(.systemGroupedBackground))
+            .navigationTitle("Mijn gegevens")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button("Annuleer") { dismiss() }
+                }
+            }
+        }
+        .onAppear {
+            name = session.firstName
+            email = session.email
+        }
+    }
+
+    private func field(
+        title: String, text: Binding<String>,
+        content: UITextContentType, keyboard: UIKeyboardType,
+        autocaps: TextInputAutocapitalization
+    ) -> some View {
+        TextField(title, text: text)
+            .textContentType(content)
+            .keyboardType(keyboard)
+            .textInputAutocapitalization(autocaps)
+            .autocorrectionDisabled()
+            .font(.frutiger(size: 15))
+            .padding(13)
+            .background(Color(.secondarySystemGroupedBackground))
+            .clipShape(RoundedRectangle(cornerRadius: 12))
+    }
+
+    private func save() {
+        guard isValid else {
+            showError = true
+            UINotificationFeedbackGenerator().notificationOccurred(.error)
+            return
+        }
+        session.completeOnboarding(
+            firstName: name.trimmingCharacters(in: .whitespaces),
+            email: email.trimmingCharacters(in: .whitespaces)
+        )
+        UINotificationFeedbackGenerator().notificationOccurred(.success)
+        dismiss()
     }
 }
 

@@ -8,8 +8,12 @@ import AVKit
 enum ProductMedia {
     /// Naam (zonder extensie) van een gebundelde video voor dit product, of nil.
     static func localVideoName(brand: String?, name: String) -> String? {
-        let haystack = "\(brand ?? "") \(name)".lowercased()
-        return haystack.contains("amice") ? "AmiceKoffer" : nil
+        // Spaties weg + kleine letters, zodat "Amice Travel", "AmiceTravel" en
+        // "amicetravel" allemaal matchen.
+        let haystack = "\(brand ?? "") \(name)"
+            .lowercased()
+            .replacingOccurrences(of: " ", with: "")
+        return haystack.contains("amicetravel") ? "AmiceKoffer" : nil
     }
 
     /// URL van de gebundelde video, als die bestaat.
