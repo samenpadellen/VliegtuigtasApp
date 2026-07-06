@@ -869,11 +869,19 @@ private struct FeaturedBagCard: View {
             }
             .frame(maxWidth: .infinity)
 
-            // — Rechts: productfoto vult het volledige paneel —
-            ZStack {
+            // — Rechts: productvideo (indien beschikbaar) of -foto —
+            ZStack(alignment: .bottomTrailing) {
                 Color.white
 
-                if bag?.imageUrl != nil {
+                if let videoURL = bag?.localVideoURL {
+                    LoopingVideoView(url: videoURL)
+                    // Subtiel filmpje-label zodat duidelijk is dat dit beweegt.
+                    Image(systemName: "play.circle.fill")
+                        .font(.system(size: 18))
+                        .foregroundStyle(.white)
+                        .shadow(color: .black.opacity(0.35), radius: 3, x: 0, y: 1)
+                        .padding(8)
+                } else if bag?.imageUrl != nil {
                     AuthorisedImage(urlString: bag?.imageUrl, fill: true)
                 } else {
                     Image(systemName: "bag.fill")

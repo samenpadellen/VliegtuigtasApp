@@ -59,6 +59,8 @@
 		APRT0001 /* AirportsInformationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = APRT1001 /* AirportsInformationView.swift */; };
 		APST0001 /* AirportsStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = APST1001 /* AirportsStore.swift */; };
 		TYPO_APP /* Typography.swift in Sources */ = {isa = PBXBuildFile; fileRef = TYPOREF1 /* Typography.swift */; };
+		PMEDIA01 /* ProductMedia.swift in Sources */ = {isa = PBXBuildFile; fileRef = PMEDIAR1 /* ProductMedia.swift */; };
+		AMICE01 /* AmiceKoffer.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = AMICER1 /* AmiceKoffer.mp4 */; };
 		TYPO_WID /* Typography.swift in Sources */ = {isa = PBXBuildFile; fileRef = TYPOREF1 /* Typography.swift */; };
 		TYPO_VIS /* Typography.swift in Sources */ = {isa = PBXBuildFile; fileRef = TYPOREF1 /* Typography.swift */; };
 		TYPO_CLP /* Typography.swift in Sources */ = {isa = PBXBuildFile; fileRef = TYPOREF1 /* Typography.swift */; };
@@ -250,6 +252,8 @@
 		APRT1001 /* AirportsInformationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AirportsInformationView.swift; sourceTree = "<group>"; };
 		APST1001 /* AirportsStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AirportsStore.swift; sourceTree = "<group>"; };
 		TYPOREF1 /* Typography.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Typography.swift; sourceTree = "<group>"; };
+		PMEDIAR1 /* ProductMedia.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductMedia.swift; sourceTree = "<group>"; };
+		AMICER1 /* AmiceKoffer.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = AmiceKoffer.mp4; sourceTree = "<group>"; };
 		FRUTREG1 /* Frutiger.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Frutiger.ttf; sourceTree = "<group>"; };
 		FRUTBLD1 /* Frutiger_bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Frutiger_bold.ttf; sourceTree = "<group>"; };
 		REMS1001 /* RemindersService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemindersService.swift; sourceTree = "<group>"; };
@@ -407,6 +411,8 @@
 				AI100001 /* AIAssistant.swift */,
 				AI100002 /* AIAssistantView.swift */,
 				TYPOREF1 /* Typography.swift */,
+				PMEDIAR1 /* ProductMedia.swift */,
+				AMICER1 /* AmiceKoffer.mp4 */,
 				FRUTREG1 /* Frutiger.ttf */,
 				FRUTBLD1 /* Frutiger_bold.ttf */,
 				APRT1001 /* AirportsInformationView.swift */,
@@ -691,6 +697,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				AMICE01 /* AmiceKoffer.mp4 in Resources */,
 				FRG_APP /* Frutiger.ttf in Resources */,
 				FBL_APP /* Frutiger_bold.ttf in Resources */,
 				AA000013 /* Assets.xcassets in Resources */,
@@ -754,6 +761,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				PMEDIA01 /* ProductMedia.swift in Sources */,
 				TYPO_APP /* Typography.swift in Sources */,
 				AA000001 /* VliegtuigtasApp.swift in Sources */,
 				AA000002 /* ContentView.swift in Sources */,

@@ -18,6 +18,9 @@ struct BagDetailView: View {
     @State private var detail: BagDetail?
     @State private var isLoading = true
     @State private var selectedImage = 0
+    // Volledige productgallerij (foto's groot bekijken + eventuele video).
+    @State private var showGallery = false
+    @State private var galleryStartIndex = 0
     // Beide airline-lijsten starten ingeklapt: de detailpagina blijft rustig
     // en de gebruiker vouwt open wat hij wil zien.
     @State private var acceptedExpanded = false
@@ -165,11 +168,12 @@ struct BagDetailView: View {
     private func heroPhoto(_ d: BagDetail) -> some View {
         let images = d.galleryImageUrls
         let heroHeight = bagDetailStatusBarHeight + 340
+        let hasVideo = d.localVideoURL != nil
 
         return ZStack(alignment: .bottom) {
             Color.white.frame(height: heroHeight)
 
-            if images.isEmpty {
+            if images.isEmpty && !hasVideo {
                 Image(systemName: "bag.fill")
                     .font(.system(size: 72, weight: .ultraLight))
                     .foregroundStyle(Theme.navy.opacity(0.10))
@@ -178,7 +182,7 @@ struct BagDetailView: View {
                     .frame(maxWidth: .infinity)
                     .frame(height: heroHeight)
                     .clipped()
-            } else {
+            } else if images.count > 1 {
                 // Meerdere shop-afbeeldingen: horizontaal veegbaar. Eigen
                 // stippen (hieronder) i.p.v. de systeem-index, zodat ze niet
                 // wegvallen achter het onderste verloop.
@@ -209,6 +213,32 @@ struct BagDetailView: View {
         }
         .frame(height: heroHeight)
         .clipped()
+        // Tik op de foto → volledige gallerij, op de huidige foto.
+        .contentShape(Rectangle())
+        .onTapGesture { openGallery(imageIndex: selectedImage, hasVideo: hasVideo) }
+        // "Bekijk productgallerij" + eventueel een video-play-knop, zodat
+        // duidelijk is dat je de foto's groot kunt bekijken.
+        .overlay(alignment: .topTrailing) {
+            if !images.isEmpty || hasVideo {
+                galleryButton(imageCount: images.count, hasVideo: hasVideo)
+                    .padding(.top, bagDetailStatusBarHeight + 10)
+                    .padding(.trailing, 20)
+            }
+        }
+        .overlay {
+            if hasVideo {
+                Button {
+                    openGallery(imageIndex: 0, hasVideo: hasVideo, startAtVideo: true)
+                } label: {
+                    Image(systemName: "play.circle.fill")
+                        .font(.system(size: 54))
+                        .foregroundStyle(.white.opacity(0.92))
+                        .shadow(color: .black.opacity(0.3), radius: 8, x: 0, y: 2)
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel("Video afspelen")
+            }
+        }
         // Automatisch doorbladeren: de task herstart bij élke wijziging van
         // selectedImage — dus ook na een handmatige veeg begint de teller
         // opnieuw, zodat een foto na interactie niet meteen doorspringt.
@@ -221,6 +251,44 @@ struct BagDetailView: View {
                 selectedImage = (selectedImage + 1) % images.count
             }
         }
+        .fullScreenCover(isPresented: $showGallery) {
+            ProductGalleryView(
+                imageUrls: images,
+                videoURL: d.localVideoURL,
+                selection: galleryStartIndex
+            )
+        }
+    }
+
+    /// Compacte "Bekijk productgallerij"-knop rechtsboven op de foto.
+    private func galleryButton(imageCount: Int, hasVideo: Bool) -> some View {
+        Button {
+            openGallery(imageIndex: selectedImage, hasVideo: hasVideo)
+        } label: {
+            HStack(spacing: 6) {
+                Image(systemName: hasVideo ? "play.rectangle.fill" : "arrow.up.left.and.arrow.down.right")
+                    .font(.system(size: 11, weight: .bold))
+                Text(hasVideo ? "Bekijk video & foto's" : "Bekijk foto's")
+                    .font(.frutiger(size: 12, weight: .semibold))
+            }
+            .foregroundStyle(Theme.navy)
+            .padding(.horizontal, 12)
+            .padding(.vertical, 8)
+            .background(.ultraThinMaterial, in: Capsule())
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel("Bekijk productgallerij")
+    }
+
+    /// Opent de gallerij op de juiste pagina (video staat vooraan als die er is).
+    private func openGallery(imageIndex: Int, hasVideo: Bool, startAtVideo: Bool = false) {
+        if startAtVideo {
+            galleryStartIndex = 0
+        } else {
+            galleryStartIndex = (hasVideo ? 1 : 0) + imageIndex
+        }
+        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+        showGallery = true
     }
 
     /// Stip-indicator voor de foto-carrousel — actieve stip breder in navy,
