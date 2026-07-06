@@ -1,5 +1,6 @@
 import SwiftUI
 import CoreText
+import CoreGraphics
 
 /// Centrale plek voor het app-lettertype. We gebruiken Frutiger als hoofdfont
 /// door de hele app, widgets en Live Activities heen — zakelijker en beter
@@ -12,10 +13,16 @@ enum AppFont {
     /// Registreert de meegeleverde Frutiger-bestanden in het huidige proces.
     /// Nodig omdat elk target (app + extensies) in een eigen proces draait;
     /// idempotent, dus meerdere keren aanroepen is onschadelijk.
+    ///
+    /// Bewust de CGFont-variant (`CTFontManagerRegisterGraphicsFont`): de
+    /// URL-variant bestaat niet op watchOS, deze werkt op álle platforms.
     static func register() {
         for file in ["Frutiger", "Frutiger_bold"] {
-            guard let url = Bundle.main.url(forResource: file, withExtension: "ttf") else { continue }
-            CTFontManagerRegisterFontsForURL(url as CFURL, .process, nil)
+            guard let url = Bundle.main.url(forResource: file, withExtension: "ttf"),
+                  let data = try? Data(contentsOf: url),
+                  let provider = CGDataProvider(data: data as CFData),
+                  let cgFont = CGFont(provider) else { continue }
+            CTFontManagerRegisterGraphicsFont(cgFont, nil)
         }
     }
 
