@@ -1,7 +1,7 @@
 (function () {
-  const API_BASE = "https://www.vliegtuigtas.com/api/public/v1";
+  const API_BASE = "https://vliegtuigtas.com/api/public/v1";
   const API_KEY = "lFkEQW18oyMrdMsbfNK1DtnDnoCcqwNSBRfMCXmszUgbAoLf";
-  const SHOP_URL = "https://www.vliegtuigtas.com/tassen";
+  const SHOP_URL = "https://vliegtuigtas.com/tassen";
   const AIRLINES_CACHE_KEY = "vt_airlines_cache";
   const AIRLINES_CACHE_TTL_MS = 5 * 60 * 1000;
   const LAST_AIRLINE_KEY = "vt_last_airline_slug";
