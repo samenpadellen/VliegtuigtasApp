@@ -54,7 +54,15 @@ final class LoopingPlayerUIView: UIView {
     private var looper: AVPlayerLooper?
 
     override class var layerClass: AnyClass { AVPlayerLayer.self }
-    private var playerLayer: AVPlayerLayer { layer as! AVPlayerLayer }
+    // `layerClass` hierboven garandeert dat UIKit hier een AVPlayerLayer
+    // aanmaakt; een `guard` i.p.v. `as!` geeft bij een schending een
+    // duidelijke diagnose i.p.v. een generieke crash.
+    private var playerLayer: AVPlayerLayer {
+        guard let playerLayer = layer as? AVPlayerLayer else {
+            fatalError("LoopingPlayerUIView.layerClass staat niet meer op AVPlayerLayer")
+        }
+        return playerLayer
+    }
 
     init(url: URL) {
         super.init(frame: .zero)
@@ -93,11 +101,14 @@ struct ProductGalleryView: View {
 
     var body: some View {
         ZStack {
-            // Zachte radiale achtergrond i.p.v. hard zwart — geeft diepte en
-            // laat de productfoto's mooier "zweven".
-            RadialGradient(
-                colors: [Color(white: 0.16), Color.black],
-                center: .center, startRadius: 40, endRadius: 600
+            // Licht in plaats van zwart. Productfoto's zijn vrijwel altijd op
+            // een witte achtergrond geschoten; op een donkere ondergrond werd
+            // zo'n foto een fel wit vierkant met harde zwarte balken eromheen.
+            // Op dit lichte vlak loopt de fotoachtergrond door in de galerij,
+            // precies zoals webshops en Apple's eigen productpagina's het doen.
+            LinearGradient(
+                colors: [Color(white: 0.99), Color(white: 0.93)],
+                startPoint: .top, endPoint: .bottom
             )
             .ignoresSafeArea()
 
@@ -122,7 +133,8 @@ struct ProductGalleryView: View {
             }
         }
         .statusBarHidden()
-        .preferredColorScheme(.dark)
+        // Lichte galerij, dus geen geforceerde donkere modus meer.
+        .preferredColorScheme(.light)
     }
 
     // MARK: - Chrome
@@ -134,13 +146,13 @@ struct ProductGalleryView: View {
                 if let title {
                     Text(title)
                         .font(.frutiger(size: 15, weight: .semibold))
-                        .foregroundStyle(.white)
+                        .foregroundStyle(Theme.textPrimary)
                         .lineLimit(1)
                 }
                 if pageCount > 1 {
                     Text("\(selection + 1) / \(pageCount)")
                         .font(.frutiger(size: 12, weight: .medium))
-                        .foregroundStyle(.white.opacity(0.6))
+                        .foregroundStyle(Theme.textSecondary)
                         .monospacedDigit()
                         .contentTransition(.numericText(value: Double(selection)))
                 }
@@ -152,9 +164,10 @@ struct ProductGalleryView: View {
             Button { dismiss() } label: {
                 Image(systemName: "xmark")
                     .font(.system(size: 15, weight: .bold))
-                    .foregroundStyle(.white)
+                    .foregroundStyle(Theme.ink)
                     .frame(width: 40, height: 40)
-                    .background(.ultraThinMaterial, in: Circle())
+                    .background(.white, in: Circle())
+                    .shadow(color: .black.opacity(0.10), radius: 6, x: 0, y: 2)
             }
             .accessibilityLabel("Sluit gallerij")
         }
@@ -169,7 +182,7 @@ struct ProductGalleryView: View {
             if !isVideoPage && !imageUrls.isEmpty {
                 Label("Knijp of dubbeltik om in te zoomen", systemImage: "arrow.up.left.and.arrow.down.right.magnifyingglass")
                     .font(.frutiger(size: 11, weight: .medium))
-                    .foregroundStyle(.white.opacity(0.55))
+                    .foregroundStyle(Theme.textSecondary)
             }
 
             if pageCount > 1 {
@@ -177,14 +190,16 @@ struct ProductGalleryView: View {
                     ForEach(0..<pageCount, id: \.self) { i in
                         let isVideoDot = hasVideo && i == 0
                         Group {
+                            // Donkere stipjes: op de lichte galerij waren witte
+                            // stipjes onzichtbaar.
                             if isVideoDot {
                                 Image(systemName: "play.fill")
                                     .font(.system(size: 7, weight: .black))
-                                    .foregroundStyle(i == selection ? .white : .white.opacity(0.4))
+                                    .foregroundStyle(i == selection ? Theme.ink : Theme.ink.opacity(0.30))
                                     .frame(width: 10, height: 10)
                             } else {
                                 Capsule()
-                                    .fill(i == selection ? Color.white : Color.white.opacity(0.35))
+                                    .fill(i == selection ? Theme.ink : Theme.ink.opacity(0.22))
                                     .frame(width: i == selection ? 20 : 7, height: 7)
                             }
                         }

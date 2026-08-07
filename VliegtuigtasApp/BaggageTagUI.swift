@@ -1,21 +1,17 @@
 import SwiftUI
 
-// MARK: - Bagagelabel-bouwstenen
+// MARK: - Bagagelabel-bouwstenen (moderne stijl)
 //
-// Visuele elementen om schermen eruit te laten zien als een geprint
-// luchthaven-bagagelabel: crèmekleurig thermisch papier, dot-matrix
-// (monospace) druk, een streepjescode, perforaties en een ophangoog.
+// Visuele taal geïnspireerd op een luchthavenbagagelabel/instapkaart, maar
+// met de kaart-esthetiek van de rest van de app: Frutiger-typografie, het
+// merk-navy/sky-verloop en systeemkleuren (donker-modus-proof) i.p.v. het
+// vorige "thermisch papier"-uiterlijk met dot-matrix-lettertype.
 
 enum TagPalette {
-    /// Warm, licht "thermisch papier" — bewust altijd licht (een label is een
-    /// fysiek wit kaartje), ook in dark mode.
-    static let paper = Color(red: 0.98, green: 0.97, blue: 0.93)
-    static let paperEdge = Color(red: 0.90, green: 0.88, blue: 0.83)
-    /// Bijna-zwarte inkt, iets zachter dan puur zwart voor een gedrukte look.
-    static let ink = Color(red: 0.11, green: 0.11, blue: 0.12)
-    static let inkSoft = Color(red: 0.44, green: 0.43, blue: 0.42)
-    /// Signaal-oranje van een PRIORITY-strook.
-    static let priority = Color(red: 0.95, green: 0.44, blue: 0.12)
+    static let ink = Theme.textPrimary
+    static let inkSoft = Theme.textSecondary
+    /// Statusaccent — hetzelfde geel als de "VOLGENDE"-badge elders in de app.
+    static let accent = Theme.yellow
 }
 
 /// Deterministische generator (xorshift64) uit een tekst-seed — zodat dezelfde
@@ -40,11 +36,13 @@ struct SeededGen {
 }
 
 /// Streepjescode: verticale balken met wisselende breedte, deterministisch uit
-/// de seed. Puur decoratief (geen scanbare code) maar overtuigend.
+/// de seed. Puur decoratief (geen scanbare code) maar overtuigend — dun en in
+/// het merk-navy, i.p.v. de zware zwarte thermische-printer-look van voorheen.
 struct Barcode: View {
     let seed: String
-    var height: CGFloat = 40
-    var barCount: Int = 48
+    var height: CGFloat = 32
+    var barCount: Int = 42
+    var tint: Color = Theme.navy
 
     private var widths: [CGFloat] {
         var g = SeededGen(seed)
@@ -55,10 +53,10 @@ struct Barcode: View {
         GeometryReader { geo in
             let ws = widths
             let total = ws.reduce(0, +)
-            HStack(spacing: 0) {
+            HStack(spacing: 1.5) {
                 ForEach(ws.indices, id: \.self) { i in
-                    Rectangle()
-                        .fill(i.isMultiple(of: 2) ? TagPalette.ink : Color.clear)
+                    Capsule()
+                        .fill(i.isMultiple(of: 2) ? tint.opacity(0.8) : Color.clear)
                         .frame(width: geo.size.width * ws[i] / total)
                 }
             }
@@ -68,29 +66,25 @@ struct Barcode: View {
     }
 }
 
-/// Verticale, gestippelde perforatie — de "scheurlijn" van een label.
+/// Rij kleine stipjes: de "perforatie" tussen twee delen van het label —
+/// dezelfde beeldtaal als de scheidingslijn op de vluchtkaart (Flights.swift).
 struct TagPerforation: View {
     var body: some View {
-        Rectangle()
-            .fill(TagPalette.paperEdge)
-            .frame(width: 1)
-            .overlay(
-                VLine().stroke(style: StrokeStyle(lineWidth: 1.4, dash: [3, 3]))
-                    .foregroundStyle(TagPalette.inkSoft.opacity(0.55))
-            )
+        GeometryReader { geo in
+            let spacing: CGFloat = 7
+            let count = max(Int(geo.size.width / spacing), 1)
+            HStack(spacing: spacing - 3) {
+                ForEach(0..<count, id: \.self) { _ in
+                    Circle().fill(TagPalette.inkSoft.opacity(0.22)).frame(width: 3, height: 3)
+                }
+            }
+        }
+        .frame(height: 3)
+        .accessibilityHidden(true)
     }
 }
 
-struct VLine: Shape {
-    func path(in rect: CGRect) -> Path {
-        var p = Path()
-        p.move(to: CGPoint(x: rect.midX, y: rect.minY))
-        p.addLine(to: CGPoint(x: rect.midX, y: rect.maxY))
-        return p
-    }
-}
-
-/// Horizontale gestippelde scheurlijn — adaptief (voor buiten het papier).
+/// Horizontale gestippelde scheurlijn — adaptief (voor buiten het label-kaartje).
 struct DashedRule: View {
     var body: some View {
         GeometryReader { g in
@@ -104,14 +98,15 @@ struct DashedRule: View {
     }
 }
 
-// MARK: - Gedrukte tekst (dot-matrix / monospace)
+// MARK: - Gedrukte tekst
 
 extension View {
-    /// Monospace "gedrukte" tekst in labelinkt — de dot-matrix-look van een
-    /// bagagelabel (bewust niet Frutiger; dit is thermisch geprint).
+    /// "Gedrukte" labeltekst in Frutiger — bewust hetzelfde lettertype als de
+    /// rest van de app (i.p.v. het vorige dot-matrix-monospace), zodat het
+    /// label bij de app past. Kerning + kleine kapitalen houden de label-look.
     func printed(_ size: CGFloat, weight: Font.Weight = .regular, soft: Bool = false) -> some View {
         self
-            .font(.system(size: size, weight: weight, design: .monospaced))
+            .font(.frutiger(size: size, weight: weight))
             .foregroundStyle(soft ? TagPalette.inkSoft : TagPalette.ink)
     }
 }
@@ -126,10 +121,10 @@ struct TagField: View {
     var body: some View {
         VStack(alignment: alignment, spacing: 2) {
             Text(label)
-                .printed(8, weight: .semibold, soft: true)
+                .printed(9, weight: .bold, soft: true)
                 .kerning(1)
             Text(value)
-                .printed(13, weight: .bold)
+                .printed(15, weight: .bold)
                 .lineLimit(1)
                 .minimumScaleFactor(0.7)
         }
@@ -137,22 +132,19 @@ struct TagField: View {
     }
 }
 
-// MARK: - Papieren label-omhulsel
+// MARK: - Label-omhulsel
 
-/// Geeft content het uiterlijk van een stuk labelpapier: crème vlak, dunne
-/// rand, lichte schaduw en (optioneel) een gekartelde onderrand.
+/// Geeft content het uiterlijk van een moderne labelkaart: systeemachtergrond
+/// (donker-modus-proof), afgeronde hoeken en een zachte schaduw i.p.v. het
+/// vorige crèmekleurige "thermisch papier".
 struct TagPaper<Content: View>: View {
-    var corner: CGFloat = 14
+    var corner: CGFloat = 20
     @ViewBuilder var content: Content
 
     var body: some View {
         content
-            .background(TagPalette.paper)
+            .background(Color(.secondarySystemGroupedBackground))
             .clipShape(RoundedRectangle(cornerRadius: corner))
-            .overlay(
-                RoundedRectangle(cornerRadius: corner)
-                    .strokeBorder(TagPalette.paperEdge, lineWidth: 1)
-            )
-            .shadow(color: .black.opacity(0.14), radius: 10, x: 0, y: 5)
+            .shadow(color: .black.opacity(0.08), radius: 14, x: 0, y: 6)
     }
 }

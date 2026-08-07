@@ -11,7 +11,7 @@ struct BaggageCheckView: View {
     @State private var length: Double = 55
     @State private var width:  Double = 40
     @State private var depth:  Double = 20
-    @State private var weight: Double = 10
+    @State private var weight: Double = 5.0
     @State private var showAirlinePicker = false
     @State private var showResult = false
 

@@ -5,6 +5,10 @@ final class APIClient: ObservableObject {
 
     // Paste je iOS API key hier, of zet VT_API_KEY in een Config.xcconfig
     private let apiKey = "lFkEQW18oyMrdMsbfNK1DtnDnoCcqwNSBRfMCXmszUgbAoLf"
+    /// Voor plekken buiten deze class die hetzelfde publieke client-token
+    /// nodig hebben (bijv. `ImageLoader` in SharedViews.swift, alleen voor
+    /// requests naar onze eigen API — nooit naar externe CDN's).
+    var publicClientKey: String { apiKey }
 
     // Apex-host: www redirect (302) naar apex en URLSession laat de
     // Authorization-header vallen bij cross-host redirects.
@@ -155,9 +159,11 @@ final class APIClient: ObservableObject {
 
     // MARK: - Endpoints
 
-    /// GET /airlines
-    func airlines() async throws -> [Airline] {
-        if let cached = airlinesCache, Date().timeIntervalSince(cached.at) < cacheTTL {
+    /// GET /airlines. `forceRefresh` negeert de in-memory cache — nodig voor
+    /// pull-to-refresh, waar een expliciete gebruikersactie altijd een echte
+    /// netwerkcall hoort te doen, ook binnen de cache-TTL.
+    func airlines(forceRefresh: Bool = false) async throws -> [Airline] {
+        if !forceRefresh, let cached = airlinesCache, Date().timeIntervalSince(cached.at) < cacheTTL {
             return cached.value
         }
         let data = try await getRaw("airlines")
@@ -176,14 +182,15 @@ final class APIClient: ObservableObject {
         return airline
     }
 
-    /// GET /bags?airline=ryanair&type=rugzak&max_price=120
-    func bags(airline: String? = nil, type: String? = nil, maxPrice: Int? = nil) async throws -> [Bag] {
+    /// GET /bags?airline=ryanair&type=rugzak&max_price=120. `forceRefresh`
+    /// negeert de in-memory cache — nodig voor pull-to-refresh.
+    func bags(airline: String? = nil, type: String? = nil, maxPrice: Int? = nil, forceRefresh: Bool = false) async throws -> [Bag] {
         var query: [String: String] = [:]
         if let a = airline  { query["airline"]   = a }
         if let t = type     { query["type"]      = t }
         if let p = maxPrice { query["max_price"] = "\(p)" }
         let cacheKey = "\(airline ?? "")|\(type ?? "")|\(maxPrice.map(String.init) ?? "")"
-        if let cached = bagsCache[cacheKey], Date().timeIntervalSince(cached.at) < cacheTTL {
+        if !forceRefresh, let cached = bagsCache[cacheKey], Date().timeIntervalSince(cached.at) < cacheTTL {
             return cached.value
         }
         let data = try await getRaw("bags", query: query)

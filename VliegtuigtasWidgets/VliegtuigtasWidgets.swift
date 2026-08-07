@@ -7,11 +7,16 @@ import AppIntents
 private enum WTheme {
     static let navy     = Color(red: 0.00, green: 0.19, blue: 0.53)
     static let navyDark = Color(red: 0.00, green: 0.12, blue: 0.38)
+    static let ink      = Color(red: 0.13, green: 0.15, blue: 0.19)
+    static let inkDark  = Color(red: 0.05, green: 0.06, blue: 0.09)
     static let sky      = Color(red: 0.00, green: 0.63, blue: 0.87)
-    static let yellow   = Color(red: 0.99, green: 0.80, blue: 0.10)
+    static let yellow   = Color(red: 1.00, green: 0.76, blue: 0.03)
 
     static let navyGradient = LinearGradient(
         colors: [navy, navyDark], startPoint: .topLeading, endPoint: .bottomTrailing
+    )
+    static let inkGradient = LinearGradient(
+        colors: [ink, inkDark], startPoint: .topLeading, endPoint: .bottomTrailing
     )
 }
 
@@ -239,6 +244,21 @@ private struct FlapTiles: View {
     }
 }
 
+/// Rond geel icoon-badge — herbruikbare accent zoals de icoon-cirkels in
+/// snelkoppelingen-apps, i.p.v. een kaal SF Symbol los op de achtergrond.
+private struct WidgetIconBadge: View {
+    let systemName: String
+    var size: CGFloat = 26
+
+    var body: some View {
+        Image(systemName: systemName)
+            .font(.system(size: size * 0.46, weight: .bold))
+            .foregroundStyle(WTheme.ink)
+            .frame(width: size, height: size)
+            .background(WTheme.yellow, in: Circle())
+    }
+}
+
 // MARK: - Widget views
 
 struct BagageWidgetView: View {
@@ -261,11 +281,9 @@ struct BagageWidgetView: View {
     // — Home screen: klein —
 
     private var smallView: some View {
-        VStack(alignment: .leading, spacing: 6) {
-            HStack(spacing: 5) {
-                Image(systemName: "bag.fill")
-                    .font(.system(size: 11, weight: .semibold))
-                    .foregroundStyle(WTheme.yellow)
+        VStack(alignment: .leading, spacing: 8) {
+            HStack(spacing: 7) {
+                WidgetIconBadge(systemName: "bag.fill", size: 22)
                 Text(entry.airlineName)
                     .font(.frutiger(size: 12, weight: .bold))
                     .foregroundStyle(.white)
@@ -288,17 +306,15 @@ struct BagageWidgetView: View {
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
-        .containerBackground(for: .widget) { WTheme.navyGradient }
+        .containerBackground(for: .widget) { WTheme.inkGradient }
     }
 
     // — Home screen: medium (cabine + klein item naast elkaar) —
 
     private var mediumView: some View {
         VStack(alignment: .leading, spacing: 10) {
-            HStack(spacing: 6) {
-                Image(systemName: "bag.fill")
-                    .font(.system(size: 12, weight: .semibold))
-                    .foregroundStyle(WTheme.yellow)
+            HStack(spacing: 8) {
+                WidgetIconBadge(systemName: "bag.fill", size: 24)
                 Text(entry.airlineName)
                     .font(.frutiger(size: 14, weight: .bold))
                     .foregroundStyle(.white)
@@ -325,7 +341,7 @@ struct BagageWidgetView: View {
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
-        .containerBackground(for: .widget) { WTheme.navyGradient }
+        .containerBackground(for: .widget) { WTheme.inkGradient }
     }
 
     private func dimBlock(icon: String, title: String, dims: String?, footnote: String?) -> some View {
@@ -586,9 +602,7 @@ struct VluchtWidgetView: View {
             Spacer(minLength: 0)
 
             if entry.hasUpcomingFlight {
-                Image(systemName: "airplane.departure")
-                    .font(.system(size: 16, weight: .semibold))
-                    .foregroundStyle(WTheme.yellow)
+                WidgetIconBadge(systemName: "airplane.departure", size: 24)
                 FlapTiles(text: entry.flapCountdown, size: 13)
                 if let flightLine {
                     Text(flightLine)
@@ -602,9 +616,7 @@ struct VluchtWidgetView: View {
                     .foregroundStyle(.white.opacity(0.6))
                     .lineLimit(2)
             } else {
-                Image(systemName: "airplane")
-                    .font(.system(size: 16, weight: .semibold))
-                    .foregroundStyle(WTheme.yellow)
+                WidgetIconBadge(systemName: "airplane", size: 24)
                 Text("Geen vlucht")
                     .font(.frutiger(size: 17, weight: .black))
                     .foregroundStyle(.white)
@@ -615,7 +627,7 @@ struct VluchtWidgetView: View {
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
-        .containerBackground(for: .widget) { WTheme.navyGradient }
+        .containerBackground(for: .widget) { WTheme.inkGradient }
     }
 
     // — Home screen: medium —
@@ -672,13 +684,11 @@ struct VluchtWidgetView: View {
                 }
                 .frame(width: 64, height: 64)
             } else {
-                Image(systemName: "airplane.departure")
-                    .font(.system(size: 32, weight: .semibold))
-                    .foregroundStyle(WTheme.yellow.opacity(0.8))
+                WidgetIconBadge(systemName: "airplane.departure", size: 44)
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
-        .containerBackground(for: .widget) { WTheme.navyGradient }
+        .containerBackground(for: .widget) { WTheme.inkGradient }
     }
 
     /// Voortgang van 30 dagen vóór vertrek (0) naar vertrekdag (1).
@@ -941,7 +951,7 @@ struct PurserPimWidgetView: View {
                 .minimumScaleFactor(0.85)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
-        .containerBackground(for: .widget) { WTheme.navyGradient }
+        .containerBackground(for: .widget) { WTheme.inkGradient }
     }
 
     // — Home screen: medium —
@@ -972,7 +982,7 @@ struct PurserPimWidgetView: View {
             .frame(maxWidth: .infinity, alignment: .leading)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
-        .containerBackground(for: .widget) { WTheme.navyGradient }
+        .containerBackground(for: .widget) { WTheme.inkGradient }
     }
 
     // — Lock screen —
@@ -1096,6 +1106,7 @@ struct VliegtuigtasWidgets: WidgetBundle {
     // widget kon de rendering laten mislukken → witte widgets).
     var body: some Widget {
         VluchtCountdownWidget()
+        TripCountdownWidget()
         BagageRegelsWidget()
         PurserPimWidget()
         #if !targetEnvironment(macCatalyst)

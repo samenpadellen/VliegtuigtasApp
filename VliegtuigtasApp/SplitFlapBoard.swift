@@ -186,6 +186,7 @@ struct SplitFlapText: View {
     private func runEasterEgg() async {
         guard !isAnimating, !showingEgg else { return }
         showingEgg = true
+        EasterEggStore.shared.discover(.shakeBoard)
         UINotificationFeedbackGenerator().notificationOccurred(.success)
         await animate(to: fit(easterEggLines), sound: true)
         try? await Task.sleep(nanoseconds: 2_200_000_000)

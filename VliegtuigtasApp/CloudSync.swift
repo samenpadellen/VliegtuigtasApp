@@ -27,6 +27,8 @@ final class CloudSync {
         static let email      = "vt_email"
         static let onboarded  = "vt_onboarded"
 
+        static let passportExpiry = "vt_passport_expiry"
+
         static let bagLength  = "vt_bag_length"
         static let bagWidth   = "vt_bag_width"
         static let bagDepth   = "vt_bag_depth"
@@ -45,7 +47,7 @@ final class CloudSync {
     /// Sync-domein met eigen tijdstempel in de cloud én lokaal
     /// ("welke cloud-versie heeft dit toestel al verwerkt?").
     private enum Domain: String, CaseIterable {
-        case user, bag, flight, bagList, flightList
+        case user, bag, flight, bagList, flightList, tripList, bucketList, passport
 
         var cloudStampKey: String { "vt_stamp_\(rawValue)" }
         var localStampKey: String { "vt_seen_stamp_\(rawValue)" }
@@ -212,6 +214,43 @@ final class CloudSync {
         stamp(.flightList)
     }
 
+    /// Volledige reizenlijst (JSON) — gesynct als één blob.
+    func pushTripList(_ data: Data) {
+        cloud.set(data, forKey: "vt_saved_trips")
+        stamp(.tripList)
+    }
+
+    func clearTripList() {
+        cloud.removeObject(forKey: "vt_saved_trips")
+        stamp(.tripList)
+    }
+
+    /// Volledige bucket list (JSON, iso2 → status) — gesynct als één blob.
+    func pushBucketList(_ data: Data) {
+        cloud.set(data, forKey: "vt_bucket_list")
+        stamp(.bucketList)
+    }
+
+    func clearBucketList() {
+        cloud.removeObject(forKey: "vt_bucket_list")
+        stamp(.bucketList)
+    }
+
+    /// Paspoort-vervaldatum — puur voor de "nog 6 maanden geldig"-check.
+    func pushPassportExpiry(_ date: Date?) {
+        if let date {
+            cloud.set(date.timeIntervalSince1970, forKey: Key.passportExpiry)
+        } else {
+            cloud.removeObject(forKey: Key.passportExpiry)
+        }
+        stamp(.passport)
+    }
+
+    func clearPassportExpiry() {
+        cloud.removeObject(forKey: Key.passportExpiry)
+        stamp(.passport)
+    }
+
     /// Uitloggen (zie pushUser): apart benoemd voor leesbaarheid op call sites.
     func clearUser() {
         pushUser(firstName: "", email: "", onboarded: false)
@@ -233,6 +272,9 @@ final class CloudSync {
         adoptBagDims()
         adoptBagList()
         adoptFlightList()
+        adoptTripList()
+        adoptBucketList()
+        adoptPassportExpiry()
         adoptFlight()
     }
 
@@ -254,6 +296,37 @@ final class CloudSync {
             }
         }
         markSeen(.flightList)
+    }
+
+    private func adoptTripList() {
+        guard cloudIsNewer(.tripList) else { return }
+        if let data = cloud.data(forKey: "vt_saved_trips") {
+            Task { @MainActor in
+                TripsStore.shared.adopt(data: data)
+            }
+        }
+        markSeen(.tripList)
+    }
+
+    private func adoptBucketList() {
+        guard cloudIsNewer(.bucketList) else { return }
+        if let data = cloud.data(forKey: "vt_bucket_list") {
+            Task { @MainActor in
+                BucketListStore.shared.adopt(data: data)
+            }
+        }
+        markSeen(.bucketList)
+    }
+
+    private func adoptPassportExpiry() {
+        guard cloudIsNewer(.passport) else { return }
+        if cloud.object(forKey: Key.passportExpiry) != nil {
+            let date = Date(timeIntervalSince1970: cloud.double(forKey: Key.passportExpiry))
+            Task { @MainActor in UserSession.shared.adoptPassportExpiry(date) }
+        } else {
+            Task { @MainActor in UserSession.shared.adoptPassportExpiry(nil) }
+        }
+        markSeen(.passport)
     }
 
     private func adoptUser() {

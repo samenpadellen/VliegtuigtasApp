@@ -79,7 +79,7 @@ struct ClipCheckView: View {
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(18)
-        .background(Theme.navyGradient)
+        .background(Theme.inkGradient)
         .clipShape(RoundedRectangle(cornerRadius: 20))
     }
 
@@ -114,7 +114,7 @@ struct ClipCheckView: View {
                         .foregroundStyle(.white)
                         .padding(.horizontal, 16)
                         .padding(.vertical, 10)
-                        .background(Theme.navyGradient)
+                        .background(Theme.inkGradient)
                         .clipShape(Capsule())
                 }
                 .buttonStyle(.plain)
@@ -145,7 +145,7 @@ struct ClipCheckView: View {
                                 .padding(.horizontal, 12)
                                 .padding(.vertical, 8)
                                 .background(selectedAirline?.id == airline.id
-                                    ? AnyShapeStyle(Theme.navyGradient)
+                                    ? AnyShapeStyle(Theme.inkGradient)
                                     : AnyShapeStyle(Color(.secondarySystemGroupedBackground)))
                                 .clipShape(Capsule())
                             }
@@ -244,7 +244,7 @@ struct ClipCheckView: View {
             }
             .frame(maxWidth: .infinity)
             .padding(.vertical, 16)
-            .background(selectedAirline == nil ? AnyShapeStyle(Color(.systemGray3)) : AnyShapeStyle(Theme.navyGradient))
+            .background(selectedAirline == nil ? AnyShapeStyle(Color(.systemGray3)) : AnyShapeStyle(Theme.inkGradient))
             .foregroundStyle(.white)
             .clipShape(RoundedRectangle(cornerRadius: 16))
         }

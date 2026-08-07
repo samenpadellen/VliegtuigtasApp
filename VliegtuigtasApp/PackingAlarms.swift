@@ -139,26 +139,142 @@ enum PackingAlarmScheduler {
     }
 }
 
+// MARK: - Pims alarmschema
+
+/// Laat Pim een voorbereidingsschema voorstellen op basis van de reis, en geeft
+/// dat terug als dagen-voor-vertrek. De gebruiker beslist: pas na "Neem over"
+/// verschuiven de datums, en daarna is elk moment nog los aan te passen.
+@available(iOS 26.0, *)
+private struct PimAlarmAdviesSheet: View {
+    let trip: Trip
+    let onApply: (AlarmAdvies) -> Void
+
+    @StateObject private var model = AlarmAdviesModel()
+    @Environment(\.dismiss) private var dismiss
+
+    var body: some View {
+        NavigationStack {
+            ScrollView {
+                VStack(alignment: .leading, spacing: 16) {
+                    if model.isLoading {
+                        VStack(spacing: 12) {
+                            ProgressView().tint(Theme.sky)
+                            Text("Pim bekijkt je reis…")
+                                .font(.frutiger(size: 13))
+                                .foregroundStyle(Theme.textSecondary)
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding(.top, 40)
+                    } else if let advies = model.advies {
+                        Text(advies.toelichting)
+                            .font(.frutiger(size: 14))
+                            .foregroundStyle(Theme.textPrimary)
+                            .fixedSize(horizontal: false, vertical: true)
+
+                        VStack(spacing: 0) {
+                            adviceRow("Nieuwe koffer kopen", days: advies.dagenVoorKoffer)
+                            Divider()
+                            adviceRow("Koffer controleren", days: advies.dagenVoorCheck)
+                            Divider()
+                            adviceRow("Inpakken", days: advies.dagenVoorInpakken)
+                        }
+                        .background(Color(.systemBackground))
+                        .clipShape(RoundedRectangle(cornerRadius: 14))
+
+                        Button {
+                            onApply(advies)
+                            dismiss()
+                        } label: {
+                            Text("Neem dit schema over")
+                                .font(.frutiger(size: 15, weight: .semibold))
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 14)
+                                .background(Theme.inkGradient)
+                                .foregroundStyle(.white)
+                                .clipShape(RoundedRectangle(cornerRadius: 14))
+                        }
+                        .buttonStyle(.plain)
+
+                        Text("Voorgesteld op je toestel met Apple Intelligence. Je kunt elk moment daarna nog aanpassen.")
+                            .font(.frutiger(size: 11))
+                            .foregroundStyle(Theme.textSecondary)
+                    } else if let error = model.error {
+                        Label(error, systemImage: "exclamationmark.circle.fill")
+                            .font(.system(size: 14))
+                            .foregroundStyle(Theme.red)
+                            .padding(.top, 30)
+                    }
+                }
+                .padding(16)
+            }
+            .background(Color(.systemGroupedBackground))
+            .navigationTitle("Pims schema")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("Sluit") { dismiss() }
+                }
+            }
+            .task {
+                await model.generate(
+                    days: trip.days,
+                    destination: trip.destination ?? trip.name,
+                    style: trip.style?.label,
+                    luggage: trip.luggageType.label
+                )
+            }
+        }
+    }
+
+    private func adviceRow(_ title: String, days: Int) -> some View {
+        HStack {
+            Text(title)
+                .font(.frutiger(size: 14, weight: .semibold))
+                .foregroundStyle(Theme.textPrimary)
+            Spacer()
+            Text(days == 1 ? "1 dag vooraf" : "\(days) dagen vooraf")
+                .font(.system(size: 12, weight: .bold, design: .monospaced))
+                .foregroundStyle(Theme.ink)
+                .padding(.horizontal, 9)
+                .padding(.vertical, 4)
+                .background(Theme.yellow, in: Capsule())
+        }
+        .padding(14)
+    }
+}
+
 // MARK: - Sheet
 
 /// Inpak-alarmen: vier reismomenten met een voorgestelde tijd (relatief aan
-/// je vlucht) die je per stuk aanpast en zet.
+/// je vlucht of, zonder vluchtnummer, aan je geplande reis) die je per stuk
+/// aanpast en zet.
 struct PackingAlarmsSheet: View {
     @Environment(\.dismiss) private var dismiss
 
     @State private var dates: [PackingAlarmKind: Date] = [:]
     @State private var setResults: [PackingAlarmKind: PackingAlarmScheduler.Result] = [:]
-    private let departure = SharedFlightStore.loadFlight()?.departure
+    @State private var showPimAdvies = false
+
+    /// Waar de voorgestelde tijden vandaan komen. Een opgeslagen vlucht is het
+    /// nauwkeurigst, maar heb je alleen een reis gepland (zonder vluchtnummer),
+    /// dan is de vertrekdatum van die reis veel bruikbaarder dan "morgen" —
+    /// tot 3.0.0 viel de sheet in dat geval terug op vandaag + 1 dag, waardoor
+    /// alle alarmen op de verkeerde week stonden.
+    private var referenceTrip: Trip? { TripsStore.shared.next }
+    private var departure: Date? {
+        SharedFlightStore.loadFlight()?.departure ?? referenceTrip?.startDate
+    }
 
     var body: some View {
         NavigationStack {
             ScrollView(showsIndicators: false) {
-                VStack(alignment: .leading, spacing: 12) {
-                    Text(departure != nil
-                         ? "Tijden zijn voorgesteld rond je vertrek. Pas aan en zet per moment een alarm."
-                         : "Geen vlucht opgeslagen: kies zelf de momenten. Sla je een vlucht op, dan stellen we de tijden voor.")
+                VStack(alignment: .leading, spacing: 18) {
+                    Text(introText)
                         .font(.frutiger(size: 13))
                         .foregroundStyle(Theme.textSecondary)
+                        .fixedSize(horizontal: false, vertical: true)
+
+                    pimAdviceButton
 
                     ForEach(PackingAlarmKind.allCases) { kind in
                         alarmRow(kind)
@@ -186,44 +302,123 @@ struct PackingAlarmsSheet: View {
         }
     }
 
-    private func alarmRow(_ kind: PackingAlarmKind) -> some View {
-        VStack(alignment: .leading, spacing: 10) {
-            HStack(spacing: 12) {
-                Image(systemName: kind.icon)
-                    .font(.system(size: 15, weight: .semibold))
-                    .foregroundStyle(Theme.navy)
-                    .frame(width: 38, height: 38)
-                    .background(Theme.skyLight)
-                    .clipShape(RoundedRectangle(cornerRadius: 11))
-                VStack(alignment: .leading, spacing: 1) {
-                    Text(kind.title)
-                        .font(.frutiger(size: 14, weight: .bold))
-                    Text(kind.subtitle)
-                        .font(.frutiger(size: 11))
+    /// Legt uit waar de voorgestelde tijden op gebaseerd zijn — vlucht, reis,
+    /// of niets van beide.
+    private var introText: String {
+        if SharedFlightStore.loadFlight()?.departure != nil {
+            return "Tijden zijn voorgesteld rond je opgeslagen vlucht. Pas aan en zet per moment een alarm."
+        }
+        if let trip = referenceTrip {
+            return "Geen vluchtnummer, dus we rekenen vanaf het vertrek van je reis \(trip.name). Pas aan en zet per moment een alarm."
+        }
+        return "Nog geen reis of vlucht opgeslagen: kies zelf de momenten. Plan je een reis, dan stellen we de tijden voor."
+    }
+
+    /// Pim stelt een schema voor dat past bij het soort reis: wintersport en
+    /// lange reizen vragen meer voorbereiding dan een weekendje weg. Alleen
+    /// zinvol als er een reis is om over te redeneren.
+    @ViewBuilder
+    private var pimAdviceButton: some View {
+        if #available(iOS 26.0, *), AIAvailability.isAvailable, let trip = referenceTrip {
+            Button {
+                UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                showPimAdvies = true
+            } label: {
+                HStack(spacing: 8) {
+                    PurserPimCap(size: 20)
+                    Text("Laat Pim een schema voorstellen")
+                        .font(.frutiger(size: 14, weight: .semibold))
+                    Spacer()
+                    Image(systemName: "chevron.right")
+                        .font(.system(size: 11, weight: .semibold))
                         .foregroundStyle(Theme.textSecondary)
                 }
-                Spacer()
+                .foregroundStyle(Theme.navy)
+                .padding(.vertical, 12)
+                .padding(.horizontal, 14)
+                .background(Theme.skyLight)
+                .clipShape(RoundedRectangle(cornerRadius: 14))
             }
+            .buttonStyle(.plain)
+            .sheet(isPresented: $showPimAdvies) {
+                PimAlarmAdviesSheet(trip: trip) { advies in
+                    applyPimAdvies(advies, trip: trip)
+                }
+                .presentationDetents([.medium])
+            }
+        }
+    }
 
-            HStack {
-                DatePicker(
-                    "",
-                    selection: binding(for: kind),
-                    in: Date()...,
-                    displayedComponents: [.date, .hourAndMinute]
-                )
-                .labelsHidden()
+    /// Zet Pims dagen-voor-vertrek om naar concrete datums op 19:00.
+    @available(iOS 26.0, *)
+    private func applyPimAdvies(_ advies: AlarmAdvies, trip: Trip) {
+        let calendar = Calendar.current
+        func date(daysBefore days: Int) -> Date {
+            let base = calendar.date(byAdding: .day, value: -days, to: trip.startDate) ?? .now
+            var comps = calendar.dateComponents([.year, .month, .day], from: max(base, .now))
+            comps.hour = 19
+            return calendar.date(from: comps) ?? .now.addingTimeInterval(3600)
+        }
+        dates[.buyBag]   = date(daysBefore: advies.dagenVoorKoffer)
+        dates[.checkBag] = date(daysBefore: advies.dagenVoorCheck)
+        dates[.pack]     = date(daysBefore: advies.dagenVoorInpakken)
+        dates[.dropOff]  = date(daysBefore: advies.dagenVoorInpakken)
+        UINotificationFeedbackGenerator().notificationOccurred(.success)
+    }
 
-                Spacer()
+    /// Rustige, zin-gedreven opzet ("Herinner me op ...") met veel lucht per
+    /// kaart, i.p.v. een compacte rij — elk moment krijgt zijn eigen adem.
+    private func alarmRow(_ kind: PackingAlarmKind) -> some View {
+        Card {
+            VStack(alignment: .leading, spacing: 16) {
+                HStack(spacing: 14) {
+                    ZStack {
+                        Circle().fill(Theme.yellow.opacity(0.18))
+                        Image(systemName: kind.icon)
+                            .font(.system(size: 19, weight: .semibold))
+                            .foregroundStyle(Theme.ink)
+                    }
+                    .frame(width: 50, height: 50)
+
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(kind.title)
+                            .font(.frutiger(size: 16, weight: .bold))
+                        Text(kind.subtitle)
+                            .font(.frutiger(size: 12))
+                            .foregroundStyle(Theme.textSecondary)
+                    }
+                    Spacer()
+                }
 
                 if let result = setResults[kind] {
-                    Label(
-                        result == .alarm ? "Alarm gezet" : "Herinnering gezet",
-                        systemImage: "checkmark.circle.fill"
-                    )
-                    .font(.frutiger(size: 12, weight: .semibold))
-                    .foregroundStyle(Theme.green)
+                    HStack(spacing: 8) {
+                        Image(systemName: "checkmark.circle.fill")
+                            .foregroundStyle(Theme.green)
+                        Text(result == .alarm ? "Alarm gezet" : "Herinnering gezet")
+                            .font(.frutiger(size: 14, weight: .semibold))
+                            .foregroundStyle(Theme.green)
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.vertical, 12)
+                    .padding(.horizontal, 14)
+                    .background(Theme.green.opacity(0.10))
+                    .clipShape(RoundedRectangle(cornerRadius: 12))
                 } else {
+                    HStack(spacing: 8) {
+                        Text("Herinner me op")
+                            .font(.frutiger(size: 14))
+                            .foregroundStyle(Theme.textSecondary)
+                        DatePicker(
+                            "",
+                            selection: binding(for: kind),
+                            in: Date()...,
+                            displayedComponents: [.date, .hourAndMinute]
+                        )
+                        .labelsHidden()
+                        .tint(Theme.navy)
+                        Spacer()
+                    }
+
                     Button {
                         let date = dates[kind] ?? kind.defaultDate(departure: departure)
                         Task {
@@ -235,20 +430,18 @@ struct PackingAlarmsSheet: View {
                         }
                     } label: {
                         Label("Zet alarm", systemImage: "alarm.fill")
-                            .font(.frutiger(size: 12, weight: .bold))
+                            .font(.frutiger(size: 14, weight: .bold))
                             .foregroundStyle(.white)
-                            .padding(.horizontal, 12)
-                            .padding(.vertical, 8)
-                            .background(Theme.navyGradient)
-                            .clipShape(Capsule())
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 12)
+                            .background(Theme.inkGradient)
+                            .clipShape(RoundedRectangle(cornerRadius: 12))
                     }
                     .buttonStyle(.plain)
                 }
             }
+            .padding(16)
         }
-        .padding(14)
-        .background(Color(.systemBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 16))
     }
 
     private func binding(for kind: PackingAlarmKind) -> Binding<Date> {

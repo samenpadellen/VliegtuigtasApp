@@ -24,10 +24,85 @@ struct ShopRequest: Equatable {
     let token: UUID
 }
 
+/// Alles wat onder "Meer" een vaste plek heeft. In 3.0.0 hingen deze schermen
+/// als losse sheets achter de Home-feed, waardoor ze in de praktijk
+/// onvindbaar waren; nu staan ze in één benoemde hub.
+enum MoreDestination: String, Identifiable, Hashable, CaseIterable {
+    case airports, euRules, customs, baggageIssues
+    case passport, bucketList, pim, guide
+    case profile
+
+    var id: String { rawValue }
+
+    var title: String {
+        switch self {
+        case .airports:      return "Luchthavens"
+        case .euRules:       return "EU-regels"
+        case .customs:       return "Douane"
+        case .baggageIssues: return "Bagageprobleem"
+        case .passport:      return "Reispaspoort"
+        case .bucketList:    return "Bucket list"
+        case .pim:           return "Purser Pim"
+        case .guide:         return "Wat mag mee?"
+        case .profile:       return "Mijn profiel"
+        }
+    }
+
+    var subtitle: String {
+        switch self {
+        case .airports:      return "Terminals en tips"
+        case .euRules:       return "Vloeistoffen en verboden"
+        case .customs:       return "Wat mag je meenemen?"
+        case .baggageIssues: return "Kwijt of beschadigd"
+        case .passport:      return "Jouw landen en stats"
+        case .bucketList:    return "Waar wil je heen?"
+        case .pim:           return "Vraag het de purser"
+        case .guide:         return "Complete bagagegids"
+        case .profile:       return "Gegevens en account"
+        }
+    }
+
+    var icon: String {
+        switch self {
+        case .airports:      return "building.2.fill"
+        case .euRules:       return "checklist"
+        case .customs:       return "shield.lefthalf.filled"
+        case .baggageIssues: return "exclamationmark.triangle.fill"
+        case .passport:      return "book.closed.fill"
+        case .bucketList:    return "globe.europe.africa.fill"
+        case .pim:           return "person.fill.questionmark"
+        case .guide:         return "bag.badge.questionmark"
+        case .profile:       return "person.crop.circle.fill"
+        }
+    }
+
+    /// Op reis / voor vertrek / over jou — bepaalt de groepering in de hub.
+    var group: MoreGroup {
+        switch self {
+        case .airports, .euRules, .customs, .baggageIssues: return .airport
+        case .guide:                                        return .airport
+        case .passport, .bucketList, .pim:                  return .travel
+        case .profile:                                      return .account
+        }
+    }
+}
+
+enum MoreGroup: String, CaseIterable {
+    case airport, travel, account
+
+    var title: String {
+        switch self {
+        case .airport: return "Luchthaven & regels"
+        case .travel:  return "Jouw reiswereld"
+        case .account: return "Account"
+        }
+    }
+}
+
 @MainActor
 final class AppNavigator: ObservableObject {
     enum Tab: Hashable {
-        case home, checker, airlines, shop
+        case home, check, trips, shop, more
     }
 
     @Published var selectedTab: Tab = .home
@@ -36,14 +111,21 @@ final class AppNavigator: ObservableObject {
     /// Token in plaats van Bool: verandert bij élke aanroep, ook als Home
     /// al vooraan stond, zodat de widget-deeplink altijd het gesprek opent.
     @Published var openPimChatToken: UUID?
+    /// Vraagt de Check-tab om de maatschappijenlijst te openen.
+    @Published var airlineListToken: UUID?
+    /// Vraagt de Meer-tab om direct één bestemming te openen.
+    @Published var moreDestination: MoreDestination?
 
     func openChecker(preselected airline: Airline?) {
         checkerRequest = CheckerRequest(airline: airline, token: UUID())
-        selectedTab = .checker
+        selectedTab = .check
     }
 
+    /// De maatschappijenlijst is geen eigen tab meer: regels opzoeken hoort
+    /// bij "Check", waar de tas-check zelf ook begint.
     func openAirlines() {
-        selectedTab = .airlines
+        airlineListToken = UUID()
+        selectedTab = .check
     }
 
     func openShop(airlineSlug: String? = nil) {
@@ -53,10 +135,16 @@ final class AppNavigator: ObservableObject {
         selectedTab = .shop
     }
 
-    /// Vanuit de Purser Pim-widget: naar Home en het gesprek openen.
+    /// Vanuit de Purser Pim-widget: Pim woont onder "Meer".
     func openPimChat() {
-        selectedTab = .home
+        selectedTab = .more
+        moreDestination = .pim
         openPimChatToken = UUID()
+    }
+
+    func openMore(_ destination: MoreDestination) {
+        selectedTab = .more
+        moreDestination = destination
     }
 }
 
@@ -71,7 +159,7 @@ struct ContentView: View {
 
     var body: some View {
         tabView
-            .tint(Theme.navy)
+            .tint(Theme.inkAccent)
             .environmentObject(nav)
             .environmentObject(airlineStore)
             .environmentObject(bagStore)
@@ -114,29 +202,190 @@ struct ContentView: View {
         }
     }
 
+    /// Vijf tabs, elk met een tekstlabel: alleen icoontjes lieten te veel aan
+    /// de fantasie over ("is dat schild nu de checker of de regels?").
     private var baseTabView: some View {
         TabView(selection: $nav.selectedTab) {
             HomeView()
-                .tabItem { Image(systemName: "house.fill") }
+                .tabItem { Label("Start", systemImage: "house.fill") }
                 .tag(AppNavigator.Tab.home)
 
-            NavigationStack {
-                CheckFlowView(request: nav.checkerRequest)
-            }
-            .tabItem { Image(systemName: "checkmark.shield.fill") }
-            .tag(AppNavigator.Tab.checker)
+            CheckTab()
+                .tabItem { Label("Check", systemImage: "checkmark.shield.fill") }
+                .tag(AppNavigator.Tab.check)
 
             NavigationStack {
-                AirlineListView()
+                TripsListView()
             }
-            .tabItem { Image(systemName: "airplane") }
-            .tag(AppNavigator.Tab.airlines)
+            .tabItem { Label("Reizen", systemImage: "suitcase.rolling.fill") }
+            .tag(AppNavigator.Tab.trips)
 
             NavigationStack {
                 BagsShopView()
             }
-            .tabItem { Image(systemName: "bag.fill") }
+            .tabItem { Label("Shop", systemImage: "bag.fill") }
             .tag(AppNavigator.Tab.shop)
+
+            MoreHubView()
+                .tabItem { Label("Meer", systemImage: "square.grid.2x2.fill") }
+                .tag(AppNavigator.Tab.more)
         }
+    }
+}
+
+// MARK: - Check-tab
+
+/// De Check-tab: de tas-check zelf is de root, met de maatschappijenlijst als
+/// vervolgstap voor wie alleen regels wil opzoeken.
+private struct CheckTab: View {
+    @EnvironmentObject private var nav: AppNavigator
+    @State private var airlineList: UUID?
+
+    var body: some View {
+        NavigationStack {
+            CheckFlowView(request: nav.checkerRequest)
+                .navigationDestination(item: $airlineList) { _ in
+                    AirlineListView()
+                }
+        }
+        .onChange(of: nav.airlineListToken) { _, token in
+            airlineList = token
+        }
+    }
+}
+
+// MARK: - Meer-hub
+
+/// Eén benoemde hub in plaats van tien sheets achter de Home-feed. Alles wat
+/// geen dagelijkse actie is — luchthaveninfo, regels, paspoort, profiel —
+/// staat hier als zichtbare tegel met een eigen label.
+struct MoreHubView: View {
+    @EnvironmentObject private var nav: AppNavigator
+    @EnvironmentObject private var airlineStore: AirlineStore
+    @State private var pushedBucketList = false
+
+    var body: some View {
+        NavigationStack {
+            ScrollView(showsIndicators: false) {
+                VStack(alignment: .leading, spacing: 22) {
+                    ForEach(MoreGroup.allCases, id: \.self) { group in
+                        VStack(alignment: .leading, spacing: 12) {
+                            SectionHeader(title: group.title)
+                            if group == .travel {
+                                BucketListPreviewCard { pushedBucketList = true }
+                            }
+                            LazyVGrid(
+                                columns: [GridItem(.adaptive(minimum: 150), spacing: 12)],
+                                spacing: 12
+                            ) {
+                                ForEach(MoreDestination.allCases.filter { $0.group == group }) { item in
+                                    MoreTile(item: item) { open(item) }
+                                }
+                            }
+                        }
+                    }
+                }
+                .frame(maxWidth: Theme.contentMaxWidth)
+                .frame(maxWidth: .infinity)
+                .padding(16)
+                .padding(.bottom, 40)
+            }
+            .background(Color(.systemGroupedBackground))
+            .navigationTitle("Meer")
+            // Bucket list is het enige scherm hier dat als push is ontworpen
+            // (geen eigen NavigationStack) — de rest opent als sheet, zoals
+            // die schermen zelf al gebouwd zijn.
+            .navigationDestination(isPresented: $pushedBucketList) {
+                BucketListView()
+            }
+        }
+        // Sheets hangen buiten de NavigationStack zodat ze het hele scherm
+        // vullen en niet meeschuiven met een push.
+        .sheet(item: sheetBinding) { destination in
+            sheetContent(for: destination)
+        }
+        .onChange(of: nav.moreDestination) { _, destination in
+            if destination == .bucketList { pushedBucketList = true }
+        }
+    }
+
+    /// De bucket list gaat via push, dus die filteren we uit de sheet-binding.
+    private var sheetBinding: Binding<MoreDestination?> {
+        Binding(
+            get: { nav.moreDestination == .bucketList ? nil : nav.moreDestination },
+            set: { nav.moreDestination = $0 }
+        )
+    }
+
+    private func open(_ item: MoreDestination) {
+        if item == .bucketList {
+            pushedBucketList = true
+        } else {
+            nav.moreDestination = item
+        }
+    }
+
+    @ViewBuilder
+    private func sheetContent(for destination: MoreDestination) -> some View {
+        switch destination {
+        case .airports:      AirportSelectionView()
+        case .euRules:       EURulesView()
+        case .customs:       CustomsInfoView()
+        case .baggageIssues: BaggageIssuesView()
+        case .guide:         BaggageGuideView()
+        case .passport:      TravelPassportView()
+        case .pim:
+            if #available(iOS 26.0, *) {
+                BagageAssistentView(airlines: airlineStore.airlines) { airline in
+                    nav.moreDestination = nil
+                    nav.openChecker(preselected: airline)
+                }
+            } else {
+                // Pim leunt op Apple Intelligence (iOS 26+); daarvoor is de
+                // bagagegids het bruikbare alternatief.
+                BaggageGuideView()
+            }
+        case .profile:       ProfileView()
+        case .bucketList:    EmptyView()   // via push, zie navigationDestination
+        }
+    }
+}
+
+/// Tegel in de Meer-hub: geel rond icoon op wit, met titel en één regel
+/// uitleg — zodat je zonder tikken weet wat erachter zit.
+private struct MoreTile: View {
+    let item: MoreDestination
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            VStack(alignment: .leading, spacing: 10) {
+                ZStack {
+                    Circle().fill(Theme.yellow)
+                    Image(systemName: item.icon)
+                        .font(.system(size: 17, weight: .bold))
+                        .foregroundStyle(Theme.ink)
+                }
+                .frame(width: 40, height: 40)
+
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(item.title)
+                        .font(.frutiger(size: 15, weight: .bold))
+                        .foregroundStyle(Theme.textPrimary)
+                    Text(item.subtitle)
+                        .font(.frutiger(size: 12))
+                        .foregroundStyle(Theme.textSecondary)
+                        .lineLimit(2)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(14)
+            .background(Color(.systemBackground))
+            .clipShape(RoundedRectangle(cornerRadius: 16))
+            .shadow(color: .black.opacity(0.06), radius: 8, x: 0, y: 2)
+        }
+        .buttonStyle(.pressableCard)
+        .accessibilityLabel("\(item.title). \(item.subtitle)")
     }
 }

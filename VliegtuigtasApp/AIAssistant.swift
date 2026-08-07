@@ -304,6 +304,14 @@ final class BagageAssistent: ObservableObject {
     private let session: LanguageModelSession
     private let airlines: [Airline]
 
+    private static let flightDateFormatter: DateFormatter = {
+        let f = DateFormatter()
+        f.locale = Locale(identifier: "nl_NL")
+        f.dateStyle = .medium
+        f.timeStyle = .short
+        return f
+    }()
+
     init(airlines: [Airline]) {
         self.airlines = airlines
 
@@ -319,14 +327,10 @@ final class BagageAssistent: ObservableObject {
             """
         }
         if let flight = SharedFlightStore.loadFlight() {
-            let fmt = DateFormatter()
-            fmt.locale = Locale(identifier: "nl_NL")
-            fmt.dateStyle = .medium
-            fmt.timeStyle = .short
             personalContext += """
             \nDe opgeslagen vlucht van de gebruiker: \(flight.number)\
             \(flight.airlineName.map { " met \($0)" } ?? "") op \
-            \(fmt.string(from: flight.departure)). Bij vragen over 'mijn vlucht' \
+            \(Self.flightDateFormatter.string(from: flight.departure)). Bij vragen over 'mijn vlucht' \
             gaat het hierover; gebruik die maatschappij als er geen andere wordt genoemd.
             """
         }
@@ -493,6 +497,183 @@ final class PakAdviesModel: ObservableObject {
             if let tip = response.content.tips.first {
                 PimTipCache.save(tip: tip, airlineName: airline.name)
             }
+        } catch {
+            self.error = "Kon geen advies genereren. Probeer het later opnieuw."
+        }
+        isLoading = false
+    }
+}
+
+// MARK: - Paklijst-suggesties voor één reis (guided generation)
+
+@available(iOS 26.0, *)
+@Generable
+struct PaklijstSuggesties: Equatable {
+    @Guide(description: "Losse spullen die deze reiziger waarschijnlijk vergeet, afgestemd op bestemming, duur en soort reis. Alleen korte itemnamen in het Nederlands, geen zinnen, geen hoeveelheden.", .count(6))
+    var items: [String]
+
+    @Guide(description: "Eén korte zin in het Nederlands waarom juist deze spullen bij deze reis horen")
+    var toelichting: String
+}
+
+@available(iOS 26.0, *)
+@MainActor
+final class PaklijstAdviesModel: ObservableObject {
+    @Published var suggesties: PaklijstSuggesties?
+    @Published var isLoading = false
+    @Published var error: String?
+
+    /// Genereert suggesties op basis van de reis én wat er al op de lijst
+    /// staat, zodat Pim niet herhaalt wat de gebruiker al heeft.
+    func generate(for trip: Trip) async {
+        guard suggesties == nil, !isLoading else { return }
+        isLoading = true
+        error = nil
+
+        let bestaand = trip.packingItems.map(\.name).joined(separator: ", ")
+        let bestemming = trip.destination ?? trip.name
+        let soort = trip.style?.label ?? "onbekend"
+
+        do {
+            let session = LanguageModelSession(
+                instructions: """
+                Je bent Purser Pim, de pak-assistent van Vliegtuigtas. Je noemt \
+                spullen die reizigers vaak vergeten, volledig in het Nederlands. \
+                Je antwoordt met korte itemnamen zoals op een paklijst — dus \
+                "Universele adapter", niet "Vergeet je adapter niet". Noem nooit \
+                iets dat al op de lijst staat.
+                """
+            )
+            let response = try await session.respond(
+                to: """
+                Reis naar \(bestemming), \(trip.days) dagen, soort reis: \(soort), \
+                bagage: \(trip.luggageType.label).
+
+                Deze spullen staan al op de lijst: \(bestaand.isEmpty ? "nog niets" : bestaand)
+
+                Noem zes spullen die hier nog aan ontbreken.
+                """,
+                generating: PaklijstSuggesties.self
+            )
+            suggesties = response.content
+        } catch {
+            self.error = "Kon geen suggesties genereren. Probeer het later opnieuw."
+        }
+        isLoading = false
+    }
+}
+
+// MARK: - Eigen reistype door Pim (guided generation)
+
+@available(iOS 26.0, *)
+@Generable
+struct EigenReisstijl: Equatable {
+    @Guide(description: "Korte naam voor dit soort reis in het Nederlands, maximaal drie woorden, zoals 'Duikreis' of 'Roadtrip met kinderen'")
+    var naam: String
+
+    @Guide(description: "Eén korte zin in het Nederlands die dit soort reis typeert")
+    var tagline: String
+
+    @Guide(description: "Spullen die je juist voor dít soort reis meeneemt en die niet op een standaard paklijst staan. Alleen korte itemnamen in het Nederlands, geen zinnen.", .count(6))
+    var items: [String]
+}
+
+@available(iOS 26.0, *)
+@MainActor
+final class EigenReisstijlModel: ObservableObject {
+    @Published var stijl: EigenReisstijl?
+    @Published var isLoading = false
+    @Published var error: String?
+
+    /// Zet een vrije omschrijving ("duiken op de Malediven", "fietsvakantie met
+    /// de kinderen") om in een reistype met bijpassende spullen.
+    func generate(from description: String) async {
+        let prompt = description.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !prompt.isEmpty, !isLoading else { return }
+        isLoading = true
+        error = nil
+        stijl = nil
+        do {
+            let session = LanguageModelSession(
+                instructions: """
+                Je bent Purser Pim, de pak-assistent van Vliegtuigtas. Je maakt \
+                van de omschrijving van een reiziger een reistype met een korte \
+                naam en de spullen die juist bij dát soort reis horen. Alles in \
+                het Nederlands. Noem geen vanzelfsprekendheden als paspoort, \
+                telefoon of ondergoed — die staan al op elke paklijst.
+                """
+            )
+            let response = try await session.respond(
+                to: "Wat voor reis is dit, en wat neem je er speciaal voor mee? Omschrijving: \(prompt)",
+                generating: EigenReisstijl.self
+            )
+            stijl = response.content
+        } catch {
+            self.error = "Kon dit reistype niet maken. Probeer het anders te omschrijven."
+        }
+        isLoading = false
+    }
+
+    func reset() {
+        stijl = nil
+        error = nil
+    }
+}
+
+// MARK: - Alarmadvies zonder vluchtnummer (guided generation)
+
+@available(iOS 26.0, *)
+@Generable
+struct AlarmAdvies: Equatable {
+    @Guide(description: "Aantal dagen vóór vertrek om een nieuwe koffer te kopen, tussen 7 en 30")
+    var dagenVoorKoffer: Int
+
+    @Guide(description: "Aantal dagen vóór vertrek om te controleren of de koffer past, tussen 2 en 14")
+    var dagenVoorCheck: Int
+
+    @Guide(description: "Aantal dagen vóór vertrek om in te pakken, tussen 1 en 5")
+    var dagenVoorInpakken: Int
+
+    @Guide(description: "Eén korte zin in het Nederlands die uitlegt waarom dit schema bij deze reis past")
+    var toelichting: String
+}
+
+@available(iOS 26.0, *)
+@MainActor
+final class AlarmAdviesModel: ObservableObject {
+    @Published var advies: AlarmAdvies?
+    @Published var isLoading = false
+    @Published var error: String?
+
+    func generate(days: Int, destination: String?, style: String?, luggage: String) async {
+        guard advies == nil, !isLoading else { return }
+        isLoading = true
+        error = nil
+        do {
+            let session = LanguageModelSession(
+                instructions: """
+                Je bent Purser Pim van Vliegtuigtas. Je stelt een realistisch \
+                schema voor om op tijd klaar te zijn voor vertrek, in het \
+                Nederlands. Houd rekening met het soort reis: wintersport en \
+                lange reizen vragen meer voorbereiding dan een weekendje weg.
+                """
+            )
+            let response = try await session.respond(
+                to: """
+                Reis van \(days) dagen naar \(destination ?? "onbekende bestemming"), \
+                soort reis: \(style ?? "onbekend"), bagage: \(luggage).
+                Wanneer moet deze reiziger elk voorbereidingsmoment inplannen?
+                """,
+                generating: AlarmAdvies.self
+            )
+            // Het model kan buiten de gevraagde marges vallen; hier begrenzen we
+            // dat, zodat een uitschieter nooit een onzinnig alarm oplevert.
+            advies = AlarmAdvies(
+                dagenVoorKoffer: min(max(response.content.dagenVoorKoffer, 7), 30),
+                dagenVoorCheck: min(max(response.content.dagenVoorCheck, 2), 14),
+                dagenVoorInpakken: min(max(response.content.dagenVoorInpakken, 1), 5),
+                toelichting: response.content.toelichting
+            )
         } catch {
             self.error = "Kon geen advies genereren. Probeer het later opnieuw."
         }

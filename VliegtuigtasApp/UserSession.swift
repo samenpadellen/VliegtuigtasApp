@@ -1,6 +1,7 @@
 import Foundation
 import Combine
 import WidgetKit
+import AuthenticationServices
 
 /// Deelt de opgeslagen vlucht en voornaam met de widgets via de App Group,
 /// zodat de vlucht-aftelwidget buiten het app-proces bij deze data kan.
@@ -139,6 +140,10 @@ final class UserSession: ObservableObject {
     @Published private(set) var firstName: String = ""
     @Published private(set) var email: String = ""
     @Published private(set) var isOnboarded: Bool = false
+    /// Easteregg: gezet zodra de streepjescode-stempel op het profiellabel is
+    /// geactiveerd (5× snel tikken). Toont daarna een "APPROVED"-datum in het
+    /// label als stille herinnering — zie ProfileView.handleBarcodeTap().
+    @Published private(set) var barcodeApprovalDate: Date?
 
     /// Accountgebonden features (vluchtopslag, reminders, Purser Pim) vereisen
     /// een profiel: die data wordt aan het profiel gekoppeld, via iCloud
@@ -152,13 +157,74 @@ final class UserSession: ObservableObject {
         static let email      = "vt_email"
         static let isOnboarded = "vt_onboarded"
         static let sessionId  = "vt_session_id"
+        static let barcodeApprovalDate = "vt_barcode_approval_date"
+        static let passportExpiry = "vt_passport_expiry"
     }
+
+    /// Stabiele Apple-gebruikers-ID, in de Keychain i.p.v. UserDefaults —
+    /// overleeft een herinstallatie, zoals Apple voor Sign in with Apple adviseert.
+    private static let appleUserIdKey = "vt_apple_user_id"
+    var appleUserId: String? { Keychain.get(Self.appleUserIdKey) }
+    var isSignedInWithApple: Bool { appleUserId != nil }
+
+    /// Optioneel, eenmalig ingevuld in het profiel — gebruikt om te
+    /// waarschuwen als een geplande reis binnen de gangbare "paspoort moet
+    /// nog 6 maanden geldig zijn"-marge valt.
+    @Published private(set) var passportExpiry: Date?
 
     private init() {
         firstName   = defaults.string(forKey: Key.firstName) ?? ""
         email       = defaults.string(forKey: Key.email) ?? ""
         isOnboarded = defaults.bool(forKey: Key.isOnboarded)
+        if defaults.object(forKey: Key.barcodeApprovalDate) != nil {
+            barcodeApprovalDate = Date(timeIntervalSince1970: defaults.double(forKey: Key.barcodeApprovalDate))
+        }
+        if defaults.object(forKey: Key.passportExpiry) != nil {
+            passportExpiry = Date(timeIntervalSince1970: defaults.double(forKey: Key.passportExpiry))
+        }
         SharedFlightStore.syncFirstName(firstName)
+    }
+
+    /// Vervaldatum bijwerken (of wissen met nil) — synct via een eigen
+    /// CloudSync-domein, los van pushUser zodat die aanroep niet hoeft te
+    /// veranderen.
+    func setPassportExpiry(_ date: Date?) {
+        passportExpiry = date
+        if let date {
+            defaults.set(date.timeIntervalSince1970, forKey: Key.passportExpiry)
+        } else {
+            defaults.removeObject(forKey: Key.passportExpiry)
+        }
+        CloudSync.shared.pushPassportExpiry(date)
+    }
+
+    /// Vanuit iCloud overgenomen — alleen lokaal schrijven.
+    func adoptPassportExpiry(_ date: Date?) {
+        passportExpiry = date
+        if let date {
+            defaults.set(date.timeIntervalSince1970, forKey: Key.passportExpiry)
+        } else {
+            defaults.removeObject(forKey: Key.passportExpiry)
+        }
+    }
+
+    /// Nil = geen vervaldatum bekend. Anders: moet nog `marginMonths` geldig
+    /// zijn ná de vertrekdatum — de gangbare regel bij veel bestemmingen.
+    func isPassportValid(forTripStarting start: Date, marginMonths: Int = 6) -> Bool? {
+        guard let passportExpiry else { return nil }
+        guard let requiredValidUntil = Calendar.current.date(byAdding: .month, value: marginMonths, to: start) else {
+            return true
+        }
+        return passportExpiry >= requiredValidUntil
+    }
+
+    /// Easteregg: de streepjescode-stempel op het profiel is geactiveerd.
+    /// Blijft bewaard tot uitloggen/accountverwijdering, zodat het
+    /// "APPROVED"-veld in het label zichtbaar blijft na de stempelanimatie.
+    func markBarcodeApproved() {
+        let now = Date()
+        barcodeApprovalDate = now
+        defaults.set(now.timeIntervalSince1970, forKey: Key.barcodeApprovalDate)
     }
 
     /// Called when the user completes onboarding.
@@ -176,6 +242,43 @@ final class UserSession: ObservableObject {
         // Sync to API
         APIClient.shared.saveLead(firstName: firstName, email: email)
         APIClient.shared.sendEvent("onboarding_complete", path: "/onboarding")
+    }
+
+    /// Sign in with Apple: sneller en betrouwbaarder dan zelf typen — Apple
+    /// levert een geverifieerde naam/e-mail (alléén bij de allereerste
+    /// autorisatie ooit voor dit Apple-ID + deze app; latere keren zijn beide
+    /// nil, vandaar de fallback naar wat al bekend is) en een stabiele
+    /// gebruikers-ID die we in de Keychain bewaren.
+    func completeWithApple(userId: String, firstName: String?, email: String?) {
+        Keychain.set(userId, for: Self.appleUserIdKey)
+
+        let resolvedFirstName = firstName ?? self.firstName
+        let resolvedEmail = email ?? self.email
+        self.firstName   = resolvedFirstName
+        self.email       = resolvedEmail
+        self.isOnboarded = true
+
+        defaults.set(resolvedFirstName, forKey: Key.firstName)
+        defaults.set(resolvedEmail,     forKey: Key.email)
+        defaults.set(true,              forKey: Key.isOnboarded)
+        SharedFlightStore.syncFirstName(resolvedFirstName)
+        CloudSync.shared.pushUser(firstName: resolvedFirstName, email: resolvedEmail, onboarded: true)
+
+        APIClient.shared.saveLead(firstName: resolvedFirstName, email: resolvedEmail)
+        APIClient.shared.sendEvent("onboarding_complete_apple", path: "/onboarding")
+    }
+
+    /// Bij elke appstart: check of de Sign in with Apple-koppeling nog geldig
+    /// is (in te trekken via Instellingen > Apple ID > Sign in with Apple).
+    /// Zo niet, lokaal uitloggen — Apple heeft geen API om dit vanuit de app
+    /// zelf te forceren, alleen om de eigen lokale staat op te ruimen.
+    func refreshAppleCredentialState() {
+        guard let userId = appleUserId else { return }
+        ASAuthorizationAppleIDProvider().getCredentialState(forUserID: userId) { state, _ in
+            if state == .revoked || state == .notFound {
+                DispatchQueue.main.async { self.reset() }
+            }
+        }
     }
 
     /// Doorgaan zonder gegevens: de volledige app werkt zonder account
@@ -205,7 +308,8 @@ final class UserSession: ObservableObject {
         firstName   = ""
         email       = ""
         isOnboarded = false
-        [Key.firstName, Key.email, Key.isOnboarded].forEach { defaults.removeObject(forKey: $0) }
+        barcodeApprovalDate = nil
+        [Key.firstName, Key.email, Key.isOnboarded, Key.barcodeApprovalDate].forEach { defaults.removeObject(forKey: $0) }
     }
 
     /// Stable session ID per install (used for analytics).
@@ -221,7 +325,10 @@ final class UserSession: ObservableObject {
         firstName   = ""
         email       = ""
         isOnboarded = false
-        [Key.firstName, Key.email, Key.isOnboarded].forEach { defaults.removeObject(forKey: $0) }
+        passportExpiry = nil
+        [Key.firstName, Key.email, Key.isOnboarded, Key.passportExpiry].forEach { defaults.removeObject(forKey: $0) }
+        Keychain.remove(Self.appleUserIdKey)
         CloudSync.shared.clearUser()
+        CloudSync.shared.clearPassportExpiry()
     }
 }

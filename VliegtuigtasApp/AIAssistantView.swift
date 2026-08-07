@@ -230,7 +230,7 @@ struct BagageAssistentView: View {
                     .foregroundStyle(.white)
                     .padding(.horizontal, 14)
                     .padding(.vertical, 10)
-                    .background(Theme.navyGradient)
+                    .background(Theme.inkGradient)
                     .clipShape(Capsule())
                 }
                 .buttonStyle(.plain)
@@ -410,7 +410,7 @@ private struct ChatBubble: View {
                 .padding(.vertical, 10)
                 .background(
                     message.role == .user
-                        ? AnyShapeStyle(Theme.navyGradient)
+                        ? AnyShapeStyle(Theme.inkGradient)
                         : AnyShapeStyle(Color(.systemBackground))
                 )
                 .clipShape(RoundedRectangle(cornerRadius: 16))

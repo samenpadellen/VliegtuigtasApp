@@ -251,6 +251,17 @@ private struct NamePage: View {
                         .foregroundStyle(.white.opacity(0.75))
                 }
 
+                AppleSignInButton()
+
+                HStack(spacing: 10) {
+                    Rectangle().fill(.white.opacity(0.2)).frame(height: 1)
+                    Text("of vul je naam handmatig in")
+                        .font(.frutiger(size: 11, weight: .medium))
+                        .foregroundStyle(.white.opacity(0.6))
+                        .fixedSize()
+                    Rectangle().fill(.white.opacity(0.2)).frame(height: 1)
+                }
+
                 DarkInputField(
                     icon: "person.fill",
                     placeholder: "bijv. Emma of Luca",
@@ -336,6 +347,8 @@ private struct EmailPage: View {
                 .disabled(isSending)
 
                 OnboardBackButton(action: onBack)
+
+                ReferralCodeEntryField()
 
                 Text("We delen je gegevens nooit met derden.")
                     .font(.frutiger(size: 11))
@@ -572,7 +585,7 @@ private struct OnboardButton: View {
             }
             .frame(maxWidth: .infinity)
             .padding(.vertical, 17)
-            .background(Theme.navyGradient)
+            .background(Theme.inkGradient)
             .foregroundStyle(.white)
             .clipShape(RoundedRectangle(cornerRadius: 16))
             .shadow(color: Theme.navy.opacity(0.35), radius: 12, x: 0, y: 5)

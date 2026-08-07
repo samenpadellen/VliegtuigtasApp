@@ -1,5 +1,11 @@
 import SwiftUI
 import StoreKit
+// `@Environment(\.requestReview)` leeft in dit private submodule; op Mac
+// Catalyst wordt het niet altijd automatisch meegeëxporteerd door
+// `import StoreKit`, wat een build error geeft zonder deze expliciete import.
+#if canImport(_StoreKit_SwiftUI)
+import _StoreKit_SwiftUI
+#endif
 
 // MARK: - Flow state
 
@@ -19,11 +25,12 @@ struct CheckFlowView: View {
     @StateObject private var checkStore = CheckStore()
 
     @State private var step: CheckStep = .airline
+    @State private var showGuide = false
     @State private var selectedAirline: Airline?
     @State private var length: Double = 55
     @State private var width:  Double = 40
     @State private var depth:  Double = 20
-    @State private var weight: Double = 10
+    @State private var weight: Double = 5.0
 
     @Environment(\.dismiss) private var dismiss
 
@@ -40,7 +47,9 @@ struct CheckFlowView: View {
                         selected: selectedAirline,
                         // De checker is een tab-root: dismiss() deed hier
                         // niets. "Terug" betekent: naar de Home-tab.
-                        onDismiss: { nav.selectedTab = .home }
+                        onDismiss: { nav.selectedTab = .home },
+                        onShowAllAirlines: { nav.openAirlines() },
+                        onShowGuide: { showGuide = true }
                     ) { airline in
                         let g = UIImpactFeedbackGenerator(style: .rigid)
                         g.impactOccurred(intensity: 0.85)
@@ -106,6 +115,9 @@ struct CheckFlowView: View {
             }
         }
         .navigationBarHidden(true)
+        .sheet(isPresented: $showGuide) {
+            BaggageGuideView()
+        }
         // De checker schaalt volledig mee met Dynamic Type, met een bovengrens
         // zodat de compactere rijen (sliders, pillen) ook bij grote letters
         // leesbaar en heel blijven.
@@ -306,7 +318,7 @@ private struct FlightWidgetSheet: View {
                 }
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 15)
-                .background(saved ? AnyShapeStyle(Theme.green) : AnyShapeStyle(Theme.navyGradient))
+                .background(saved ? AnyShapeStyle(Theme.green) : AnyShapeStyle(Theme.inkGradient))
                 .foregroundStyle(.white)
                 .clipShape(RoundedRectangle(cornerRadius: 16))
             }
@@ -398,6 +410,9 @@ private struct AirlineStepView: View {
     let isLoading: Bool
     let selected: Airline?
     let onDismiss: () -> Void
+    /// Alleen regels opzoeken, zonder een check te doen.
+    let onShowAllAirlines: () -> Void
+    let onShowGuide: () -> Void
     let onSelect: (Airline) -> Void
 
     @State private var search = ""
@@ -470,6 +485,7 @@ private struct AirlineStepView: View {
                     } else {
                         popularSection
                         allAirlinesSection
+                        quickLinksFooter
                     }
                 }
             }
@@ -500,7 +516,7 @@ private struct AirlineStepView: View {
                     .font(.system(size: 16, weight: .medium))
                     .foregroundStyle(activeFilterCount > 0 ? .white : Theme.textPrimary)
                     .frame(width: 48, height: 48)
-                    .background(activeFilterCount > 0 ? AnyShapeStyle(Theme.navyGradient) : AnyShapeStyle(Color(.systemBackground)))
+                    .background(activeFilterCount > 0 ? AnyShapeStyle(Theme.inkGradient) : AnyShapeStyle(Color(.systemBackground)))
                     .clipShape(RoundedRectangle(cornerRadius: 14))
                     .shadow(color: .black.opacity(0.07), radius: 8, x: 0, y: 2)
 
@@ -662,6 +678,63 @@ private struct AirlineStepView: View {
             .padding(.horizontal, 20)
             .padding(.bottom, 40)
         }
+    }
+
+    // MARK: - Vaste ingangen onderaan stap 1
+
+    /// Twee zichtbare uitwegen voor wie niet komt om te checken maar om op te
+    /// zoeken: de volledige maatschappijenlijst en de bagagegids. Die hingen
+    /// eerder als kaartjes in de Home-feed en waren daar niet te vinden.
+    private var quickLinksFooter: some View {
+        VStack(spacing: 10) {
+            quickLink(
+                icon: "list.bullet.rectangle.portrait.fill",
+                title: "Alle maatschappijen & regels",
+                subtitle: "Bekijk de regels zonder te checken",
+                action: onShowAllAirlines
+            )
+            quickLink(
+                icon: "bag.badge.questionmark",
+                title: "Wat mag mee?",
+                subtitle: "De complete bagagegids",
+                action: onShowGuide
+            )
+        }
+        .padding(.horizontal, 20)
+        .padding(.bottom, 40)
+    }
+
+    private func quickLink(
+        icon: String, title: String, subtitle: String, action: @escaping () -> Void
+    ) -> some View {
+        Button(action: action) {
+            HStack(spacing: 12) {
+                ZStack {
+                    Circle().fill(Theme.yellow)
+                    Image(systemName: icon)
+                        .font(.system(size: 15, weight: .bold))
+                        .foregroundStyle(Theme.ink)
+                }
+                .frame(width: 38, height: 38)
+
+                VStack(alignment: .leading, spacing: 1) {
+                    Text(title)
+                        .font(.frutiger(size: 14, weight: .bold))
+                        .foregroundStyle(Theme.textPrimary)
+                    Text(subtitle)
+                        .font(.frutiger(size: 12))
+                        .foregroundStyle(Theme.textSecondary)
+                }
+                Spacer()
+                Image(systemName: "chevron.right")
+                    .font(.system(size: 12, weight: .semibold))
+                    .foregroundStyle(Theme.textSecondary)
+            }
+            .padding(14)
+            .background(Color(.systemBackground))
+            .clipShape(RoundedRectangle(cornerRadius: 14))
+        }
+        .buttonStyle(.pressableCard)
     }
 
     // MARK: - Search results
@@ -1039,7 +1112,7 @@ private struct DimensionsStepView: View {
                         .padding(.vertical, 17)
                         .background(isChecking
                             ? AnyShapeStyle(Theme.navy.opacity(0.5))
-                            : AnyShapeStyle(Theme.navyGradient))
+                            : AnyShapeStyle(Theme.inkGradient))
                         .foregroundStyle(.white)
                         .clipShape(RoundedRectangle(cornerRadius: 16))
                         .shadow(color: Theme.navy.opacity(0.30), radius: 10, x: 0, y: 4)
@@ -1500,6 +1573,7 @@ struct ResultStepView: View {
 
     @EnvironmentObject private var nav: AppNavigator
     @ObservedObject private var session = UserSession.shared
+    @ObservedObject private var journey = JourneyManager.shared
     // Sluit de resultaat-sheet (BaggageCheckView-variant) vóór het wisselen
     // van tab; in de tab-checker is dit een onschuldige no-op.
     @Environment(\.dismiss) private var dismissContainer
@@ -1572,13 +1646,22 @@ struct ResultStepView: View {
                 .presentationDetents([.medium])
                 .presentationDragIndicator(.visible)
         }
+        .fullScreenCover(isPresented: $journey.showFirstCheckCelebration) {
+            FirstCheckCelebrationView(onPlanTrip: { nav.selectedTab = .trips })
+        }
     }
 
-    /// Vraagt op een natuurlijk moment om een beoordeling: alleen ná een
-    /// geslaagde check (de tas past) en pas bij een paar mijlpalen. Het
-    /// systeem beslist zelf of de popup daadwerkelijk verschijnt.
+    /// Verwerkt een geslaagde check: telt 'm mee voor de journey, viert de
+    /// állereerste keer (aha-moment) en vraagt anders — op een natuurlijk
+    /// moment, hoogstens 1×/3 maanden — om een beoordeling.
     private func maybeAskForReview() {
-        guard isFit, ReviewPrompter.registerSuccessAndShouldPrompt() else { return }
+        guard isFit else { return }
+        ReviewPrompter.recordSuccess()
+        JourneyManager.shared.registerSuccessfulCheck()
+        // Bij de eerste geslaagde check alleen vieren; de review-vraag bewaren
+        // we voor een latere keer zodat de twee elkaar niet overlappen.
+        if journey.showFirstCheckCelebration { return }
+        guard ReviewPrompter.shouldPrompt() else { return }
         Task {
             // Even wachten zodat het "je tas past!"-moment eerst rustig landt.
             try? await Task.sleep(for: .seconds(1.5))
@@ -1750,7 +1833,7 @@ struct ResultStepView: View {
             }
             .frame(maxWidth: .infinity)
             .padding(.vertical, 15)
-            .background(Theme.navyGradient)
+            .background(Theme.inkGradient)
             .foregroundStyle(.white)
             .clipShape(RoundedRectangle(cornerRadius: 14))
         }

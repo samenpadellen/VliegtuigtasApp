@@ -183,7 +183,7 @@ struct BaggageGuideView: View {
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(18)
-        .background(Theme.navyGradient)
+        .background(Theme.inkGradient)
         .clipShape(RoundedRectangle(cornerRadius: 20))
     }
 

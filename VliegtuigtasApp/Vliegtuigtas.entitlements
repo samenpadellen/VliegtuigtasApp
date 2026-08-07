@@ -10,5 +10,13 @@
 	     dezelfde iCloud key-value store en heeft een andere bundle-id. -->
 	<key>com.apple.developer.ubiquity-kvstore-identifier</key>
 	<string>$(TeamIdentifierPrefix)com.vliegtuigtas.app</string>
+	<key>com.apple.developer.weatherkit</key>
+	<true/>
+	<key>com.apple.developer.carplay-driving-task</key>
+	<true/>
+	<key>com.apple.developer.applesignin</key>
+	<array>
+		<string>Default</string>
+	</array>
 </dict>
 </plist>

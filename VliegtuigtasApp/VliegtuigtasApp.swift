@@ -13,6 +13,7 @@ extension UINavigationController {
 @main
 struct VliegtuigtasApp: App {
     @StateObject private var session = UserSession.shared
+    @Environment(\.scenePhase) private var scenePhase
 
     // Gehouden als property zodat ARC de player niet meteen dealloct
     private let soundPlayer = StartupSoundPlayer()
@@ -35,9 +36,22 @@ struct VliegtuigtasApp: App {
                     // iCloud key-value sync: profiel, tasmaten en vlucht
                     // reizen mee tussen apparaten, zonder account.
                     CloudSync.shared.start()
+                    // Check of een eventuele Sign in with Apple-koppeling nog
+                    // geldig is (kan zijn ingetrokken via Instellingen).
+                    session.refreshAppleCredentialState()
                     // Slimme notificaties: inactiviteit + schoolvakanties
                     // (stille provisional-toestemming, geen popup).
                     NotificationPlanner.refresh()
+                    // Vluchtgegevens actueel houden zonder dat de gebruiker
+                    // hoeft te verversen — de wacht bepaalt zelf wat eraan toe
+                    // is, dus dit is goedkoop om bij elke start aan te roepen.
+                    Task { await FlightWatcher.refreshDueFlights() }
+                }
+                // Ook bij terugkeren uit de achtergrond: je opent de app juist
+                // op het vliegveld, en dán wil je de actuele gate zien.
+                .onChange(of: scenePhase) { _, phase in
+                    guard phase == .active else { return }
+                    Task { await FlightWatcher.refreshDueFlights() }
                 }
         }
     }

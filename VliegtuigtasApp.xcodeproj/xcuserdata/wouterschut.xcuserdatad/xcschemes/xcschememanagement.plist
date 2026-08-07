@@ -7,7 +7,7 @@
 		<key>Vliegtuigtas Clip.xcscheme_^#shared#^_</key>
 		<dict>
 			<key>orderHint</key>
-			<integer>5</integer>
+			<integer>4</integer>
 		</dict>
 		<key>Vliegtuigtas Vision.xcscheme_^#shared#^_</key>
 		<dict>
@@ -17,7 +17,7 @@
 		<key>Vliegtuigtas Watch Widgets.xcscheme_^#shared#^_</key>
 		<dict>
 			<key>orderHint</key>
-			<integer>4</integer>
+			<integer>5</integer>
 		</dict>
 		<key>Vliegtuigtas Watch.xcscheme_^#shared#^_</key>
 		<dict>

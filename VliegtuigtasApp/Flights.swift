@@ -1,4 +1,6 @@
 import SwiftUI
+import MapKit
+import UserNotifications
 
 // MARK: - Model
 
@@ -19,7 +21,72 @@ struct SavedFlightRecord: Identifiable, Codable, Equatable {
     var flightDate: String?      // ruwe datumstring uit de lookup, bijv. "2026-07-02"
     var status: String?          // scheduled | active | landed | cancelled | incident | diverted | delayed
 
+    // Verrijkt via AviationstackClient (rechtstreeks, náást de backend-lookup
+    // hierboven) — allemaal optioneel, dus bestaande opgeslagen vluchten
+    // decoderen gewoon met deze velden op nil.
+    var departureTerminal: String?
+    var departureGate: String?
+    var departureDelayMinutes: Int?
+    var departureScheduled: Date?
+    var departureEstimated: Date?
+    var departureActual: Date?
+    var arrivalTerminal: String?
+    var arrivalGate: String?
+    var arrivalBaggage: String?
+    var arrivalDelayMinutes: Int?
+    var arrivalScheduled: Date?
+    var arrivalEstimated: Date?
+    var arrivalActual: Date?
+    var aircraftRegistration: String?
+    var aircraftIcao24: String?
+    var liveLatitude: Double?
+    var liveLongitude: Double?
+    var liveAltitude: Double?
+    var liveSpeedKmh: Double?
+    var liveDirection: Double?
+    /// Eén keer opgehaald van Unsplash bij het opslaan — zelfde patroon als
+    /// Trip.photoUrl, nooit automatisch ververst.
+    var photoUrl: String?
+    var photoAuthorName: String?
+    var photoAuthorUrl: String?
+    /// Wanneer de vluchtgegevens voor het laatst bij de bron zijn opgehaald.
+    /// Optioneel, dus bestaande opgeslagen vluchten decoderen gewoon met nil.
+    var lastRefreshed: Date?
+
     var hasRoute: Bool { departureIata != nil && arrivalIata != nil }
+
+    var hasLivePosition: Bool { liveLatitude != nil && liveLongitude != nil }
+
+    /// Vult dit record aan met de rijke Aviationstack-velden — bestaande
+    /// velden (route, ICAO, status van het backend) blijven staan; hier komt
+    /// alleen bij wat het backend niet doorgeeft.
+    mutating func applyRichData(_ flight: AviationstackClient.AviationstackFlight) {
+        departureTerminal = flight.departure?.terminal ?? departureTerminal
+        departureGate = flight.departure?.gate ?? departureGate
+        departureDelayMinutes = flight.departure?.delay ?? departureDelayMinutes
+        departureScheduled = AviationstackClient.date(from: flight.departure?.scheduled) ?? departureScheduled
+        departureEstimated = AviationstackClient.date(from: flight.departure?.estimated) ?? departureEstimated
+        departureActual = AviationstackClient.date(from: flight.departure?.actual) ?? departureActual
+        arrivalTerminal = flight.arrival?.terminal ?? arrivalTerminal
+        arrivalGate = flight.arrival?.gate ?? arrivalGate
+        arrivalBaggage = flight.arrival?.baggage ?? arrivalBaggage
+        arrivalDelayMinutes = flight.arrival?.delay ?? arrivalDelayMinutes
+        arrivalScheduled = AviationstackClient.date(from: flight.arrival?.scheduled) ?? arrivalScheduled
+        arrivalEstimated = AviationstackClient.date(from: flight.arrival?.estimated) ?? arrivalEstimated
+        arrivalActual = AviationstackClient.date(from: flight.arrival?.actual) ?? arrivalActual
+        aircraftRegistration = flight.aircraft?.registration ?? aircraftRegistration
+        aircraftIcao24 = flight.aircraft?.icao24 ?? aircraftIcao24
+        if let live = flight.live, live.isGround != true {
+            liveLatitude = live.latitude
+            liveLongitude = live.longitude
+            liveAltitude = live.altitude
+            liveSpeedKmh = live.speedHorizontal
+            liveDirection = live.direction
+        } else {
+            liveLatitude = nil
+            liveLongitude = nil
+        }
+    }
 
     var routeLabel: String? {
         guard let dep = departureIata, let arr = arrivalIata else { return nil }
@@ -65,6 +132,151 @@ struct SavedFlightRecord: Identifiable, Codable, Equatable {
         case 0:  return "Vandaag"
         case 1:  return "Morgen"
         default: return "Over \(daysUntilDeparture) dagen"
+        }
+    }
+}
+
+// MARK: - Vluchtwacht: automatisch verversen + melden bij wijzigingen
+
+/// Houdt opgeslagen vluchten zelf actueel en waarschuwt bij een gatewijziging,
+/// vertraging of annulering — zonder dat de gebruiker ergens hoeft te trekken
+/// om te verversen.
+///
+/// Het verversritme loopt mee met de urgentie, en dat is hier niet alleen
+/// netjes maar ook nodig: Aviationstack heeft een beperkt maandquotum. Een
+/// vlucht over drie weken hoeft niet elk half uur opnieuw opgehaald te worden;
+/// een vlucht over twee uur wel.
+@MainActor
+enum FlightWatcher {
+    /// Buiten dit venster laten we een vlucht met rust.
+    private static let horizon: TimeInterval = 48 * 3600
+
+    /// Minimale tijd tussen twee verversingen van dezelfde vlucht.
+    private static func minimumInterval(untilDeparture seconds: TimeInterval) -> TimeInterval {
+        switch seconds {
+        case ..<(6 * 3600):   return 30 * 60      // laatste 6 uur: elk half uur
+        case ..<(24 * 3600):  return 2 * 3600     // vandaag/morgen: elke 2 uur
+        default:              return 6 * 3600     // verder weg: elke 6 uur
+        }
+    }
+
+    private static func isDue(_ flight: SavedFlightRecord, now: Date) -> Bool {
+        let untilDeparture = flight.departure.timeIntervalSince(now)
+        // Alleen vluchten die nog moeten vertrekken en binnen het venster
+        // vallen. Net vertrokken vluchten volgen we nog kort, zodat een
+        // aankomst-bagageband nog kan binnenkomen.
+        guard untilDeparture > -(6 * 3600), untilDeparture < horizon else { return false }
+        guard let last = flight.lastRefreshed else { return true }
+        return now.timeIntervalSince(last) >= minimumInterval(untilDeparture: untilDeparture)
+    }
+
+    /// Ververst alle vluchten die eraan toe zijn. Veilig om vaak aan te roepen:
+    /// zonder werk doet dit niets.
+    static func refreshDueFlights() async {
+        let now = Date()
+        let due = FlightsStore.shared.flights.filter { isDue($0, now: now) }
+        guard !due.isEmpty else { return }
+
+        for flight in due {
+            guard let rich = await AviationstackClient.lookup(
+                iata: flight.number, near: flight.departure
+            ) else {
+                // Mislukte poging ook stempelen, anders blijven we het bij elke
+                // app-start opnieuw proberen en loopt het quotum leeg.
+                if var current = FlightsStore.shared.flights.first(where: { $0.id == flight.id }) {
+                    current.lastRefreshed = now
+                    FlightsStore.shared.upsert(current)
+                }
+                continue
+            }
+
+            guard var updated = FlightsStore.shared.flights.first(where: { $0.id == flight.id }) else { continue }
+            let before = updated
+            updated.applyRichData(rich)
+            updated.status = rich.flightStatus ?? updated.status
+            updated.lastRefreshed = now
+            FlightsStore.shared.upsert(updated)
+            notifyChanges(from: before, to: updated)
+        }
+    }
+
+    // MARK: - Melden wat er veranderd is
+
+    /// Alleen echte, voor de reiziger relevante wijzigingen melden. Geen melding
+    /// bij het vullen van een veld dat eerst simpelweg onbekend was (behalve de
+    /// bagageband, want die wíl je juist weten zodra hij bekend is).
+    private static func notifyChanges(from old: SavedFlightRecord, to new: SavedFlightRecord) {
+        let flightName = new.number
+
+        if let newGate = new.departureGate, newGate != old.departureGate, old.departureGate != nil {
+            notify(
+                id: "vt_gate_\(new.id)_\(newGate)",
+                title: "Gate gewijzigd · \(flightName)",
+                body: "Je vertrekt nu van gate \(newGate)\(new.departureTerminal.map { " (terminal \($0))" } ?? "")."
+            )
+        }
+
+        if let newTerminal = new.departureTerminal,
+           newTerminal != old.departureTerminal, old.departureTerminal != nil {
+            notify(
+                id: "vt_terminal_\(new.id)_\(newTerminal)",
+                title: "Terminal gewijzigd · \(flightName)",
+                body: "Je vertrekt nu vanaf terminal \(newTerminal)."
+            )
+        }
+
+        // Vertraging pas melden vanaf 10 minuten, en alleen als hij toeneemt —
+        // anders krijg je een melding bij elke minuut ruis.
+        let oldDelay = old.departureDelayMinutes ?? 0
+        let newDelay = new.departureDelayMinutes ?? 0
+        if newDelay >= 10, newDelay - oldDelay >= 10 {
+            notify(
+                id: "vt_delay_\(new.id)_\(newDelay)",
+                title: "Vertraging · \(flightName)",
+                body: "Je vlucht vertrekt ongeveer \(newDelay) minuten later dan gepland."
+            )
+        }
+
+        if new.status != old.status, let status = new.status {
+            switch status {
+            case "cancelled":
+                notify(id: "vt_status_\(new.id)_cancelled",
+                       title: "Vlucht geannuleerd · \(flightName)",
+                       body: "Neem contact op met je maatschappij voor een alternatief.")
+            case "diverted":
+                notify(id: "vt_status_\(new.id)_diverted",
+                       title: "Vlucht omgeleid · \(flightName)",
+                       body: "Je vlucht gaat naar een andere bestemming dan gepland.")
+            default:
+                break
+            }
+        }
+
+        if let belt = new.arrivalBaggage, belt != old.arrivalBaggage {
+            notify(
+                id: "vt_belt_\(new.id)_\(belt)",
+                title: "Bagageband bekend · \(flightName)",
+                body: "Je koffers komen op band \(belt)."
+            )
+        }
+    }
+
+    /// Directe melding (geen planning): dit gaat over iets dat nú is veranderd.
+    /// Dezelfde provisional-toestemming als NotificationPlanner, dus geen
+    /// popup op een ongelegen moment.
+    private static func notify(id: String, title: String, body: String) {
+        let center = UNUserNotificationCenter.current()
+        center.requestAuthorization(options: [.alert, .sound, .provisional]) { granted, _ in
+            guard granted else { return }
+            let content = UNMutableNotificationContent()
+            content.title = title
+            content.body = body
+            content.sound = .default
+            center.add(UNNotificationRequest(
+                identifier: id,
+                content: content,
+                trigger: UNTimeIntervalNotificationTrigger(timeInterval: 1, repeats: false)
+            ))
         }
     }
 }
@@ -249,11 +461,16 @@ private struct FlightRow: View {
             ZStack {
                 RoundedRectangle(cornerRadius: 12)
                     .fill(flight.isPast ? Theme.textSecondary.opacity(0.10) : Theme.sky.opacity(0.12))
-                    .frame(width: 44, height: 44)
-                Image(systemName: "airplane.departure")
-                    .font(.system(size: 17))
-                    .foregroundStyle(flight.isPast ? Theme.textSecondary : Theme.sky)
+                if let photoUrl = flight.photoUrl {
+                    AuthorisedImage(urlString: photoUrl, fill: true)
+                } else {
+                    Image(systemName: "airplane.departure")
+                        .font(.system(size: 17))
+                        .foregroundStyle(flight.isPast ? Theme.textSecondary : Theme.sky)
+                }
             }
+            .frame(width: 44, height: 44)
+            .clipShape(RoundedRectangle(cornerRadius: 12))
             VStack(alignment: .leading, spacing: 2) {
                 HStack(spacing: 6) {
                     Text(flight.number)
@@ -288,15 +505,19 @@ private struct FlightRow: View {
         .contentShape(RoundedRectangle(cornerRadius: 14))
     }
 
+    private static let dateFormatter: DateFormatter = {
+        let f = DateFormatter()
+        f.locale = Locale(identifier: "nl_NL")
+        f.dateStyle = .medium
+        f.timeStyle = .short
+        return f
+    }()
+
     private var subtitle: String {
-        let fmt = DateFormatter()
-        fmt.locale = Locale(identifier: "nl_NL")
-        fmt.dateStyle = .medium
-        fmt.timeStyle = .short
         var parts: [String] = []
         if let route = flight.routeLabel { parts.append(route) }
         else if let airline = flight.airlineName { parts.append(airline) }
-        parts.append(fmt.string(from: flight.departure))
+        parts.append(Self.dateFormatter.string(from: flight.departure))
         return parts.joined(separator: " · ")
     }
 }
@@ -309,7 +530,13 @@ struct AddFlightSheet: View {
     @Environment(\.dismiss) private var dismiss
     @StateObject private var flightStore = FlightStore()
     @State private var number = ""
-    @State private var departure = Calendar.current.date(byAdding: .day, value: 1, to: .now) ?? .now
+    // Standaard: morgen om 12:00 (een neutrale reistijd), niet "morgen om de
+    // huidige klok-tijd" — dat laatste liet het net lijken alsof de app de
+    // huidige tijd invulde.
+    @State private var departure: Date = {
+        let base = Calendar.current.date(byAdding: .day, value: 1, to: .now) ?? .now
+        return Calendar.current.date(bySettingHour: 12, minute: 0, second: 0, of: base) ?? base
+    }()
     @State private var saved = false
     @State private var searchTask: Task<Void, Never>?
 
@@ -360,15 +587,15 @@ struct AddFlightSheet: View {
                             Text("Vertrek")
                                 .font(.frutiger(size: 12, weight: .semibold))
                                 .foregroundStyle(Theme.textSecondary)
-                            if flightStore.result?.flightDate != nil {
-                                Label("Automatisch ingevuld", systemImage: "wand.and.stars")
+                            if flightStore.result != nil {
+                                Label("Exacte tijd ingevuld", systemImage: "wand.and.stars")
                                     .font(.frutiger(size: 10, weight: .semibold))
                                     .foregroundStyle(Theme.green)
                             }
                         }
                         DatePicker("", selection: $departure, in: Date()..., displayedComponents: [.date, .hourAndMinute])
                             .labelsHidden()
-                        Text("Tijd is een indicatie: pas 'm aan als je exacte vertrektijd afwijkt.")
+                        Text("De exacte vertrektijd wordt automatisch opgehaald. Pas 'm aan als je afwijkt.")
                             .font(.frutiger(size: 10))
                             .foregroundStyle(Theme.textSecondary)
                     }
@@ -383,7 +610,7 @@ struct AddFlightSheet: View {
                         }
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 15)
-                        .background(saved ? AnyShapeStyle(Theme.green) : AnyShapeStyle(Theme.navyGradient))
+                        .background(saved ? AnyShapeStyle(Theme.green) : AnyShapeStyle(Theme.inkGradient))
                         .foregroundStyle(.white)
                         .clipShape(RoundedRectangle(cornerRadius: 14))
                     }
@@ -446,7 +673,10 @@ struct AddFlightSheet: View {
         searchTask?.cancel()
         let t = number.trimmingCharacters(in: .whitespaces)
         guard !t.isEmpty else { return }
-        Task { await flightStore.lookup(t) }
+        Task {
+            await flightStore.lookup(t)
+            await applyRichDeparture(iata: flightStore.result?.flightNumber ?? t)
+        }
     }
 
     /// Zoekt vanzelf, kort na het typen — geen "Zoek"-knop nodig. Te korte
@@ -463,27 +693,73 @@ struct AddFlightSheet: View {
             try? await Task.sleep(nanoseconds: 450_000_000)
             guard !Task.isCancelled else { return }
             await flightStore.lookup(trimmed)
+            guard !Task.isCancelled else { return }
+            await applyRichDeparture(iata: flightStore.result?.flightNumber ?? trimmed)
         }
     }
 
-    /// Vult de vertrekdatum aan uit de match — de dag komt uit de lookup,
-    /// het tijdstip (niet beschikbaar via de API) blijft wat er al stond
-    /// staan, of de standaardtijd als dit de eerste match is.
+    /// Vult het exacte vertrek-tíjdstip in via Aviationstack (Pro). Een
+    /// vluchtnummer vertrekt elke dag op dezelfde klok-tijd, dus we plakken
+    /// alléén die tijd op de door de gebruiker gekozen reisdatum — de datum
+    /// blijft van de gebruiker (Aviationstack free kent alleen de occurrence
+    /// van vandaag, dus de datum daaruit overnemen zou juist fout zijn).
+    ///
+    /// Haalt de exacte vertrektijd op bij Aviationstack. Let op: dat quotum is
+    /// beperkt (100/maand op het gratis plan) en werd eerder afgeschermd met
+    /// Pro; nu iedereen erbij kan, is dit de plek om te bewaken als het
+    /// quotum knelt.
+    private func applyRichDeparture(iata: String) async {
+        guard let rich = await AviationstackClient.lookup(iata: iata, near: departure),
+              let scheduledISO = rich.departure?.scheduled,
+              let (hour, minute) = Self.wallClockTime(fromISO: scheduledISO)
+        else { return }
+        let cal = Calendar.current
+        var comps = cal.dateComponents([.year, .month, .day], from: departure)
+        comps.hour = hour
+        comps.minute = minute
+        guard let combined = cal.date(from: comps) else { return }
+        // Clamp naar "nu" zodat de DatePicker (ondergrens Date()...) een
+        // net-verstreken tijdstip niet stilletjes terugklemt.
+        withAnimation(.spring(response: 0.3)) { departure = max(combined, .now) }
+    }
+
+    /// Leest het wall-clock-tijdstip ("...T14:20:00...") rechtstreeks uit de
+    /// ISO-string i.p.v. uit een geparste Date: Aviationstack drukt lokale
+    /// vertrektijden soms met een +00:00-offset uit, waardoor het uur zou
+    /// verschuiven als je 'm eerst naar een absolute Date converteert.
+    private static func wallClockTime(fromISO iso: String) -> (hour: Int, minute: Int)? {
+        guard let tIndex = iso.firstIndex(of: "T") else { return nil }
+        let timePart = iso[iso.index(after: tIndex)...].prefix(5)   // "14:20"
+        let parts = timePart.split(separator: ":")
+        guard parts.count == 2, let h = Int(parts[0]), let m = Int(parts[1]),
+              (0..<24).contains(h), (0..<60).contains(m) else { return nil }
+        return (h, m)
+    }
+
+    private static let isoDateFormatter: ISO8601DateFormatter = {
+        let f = ISO8601DateFormatter()
+        f.formatOptions = [.withFullDate]
+        return f
+    }()
+
+    /// Backend-`flight_date` alléén vooruit toepassen. De backend (die
+    /// Aviationstack server-side gebruikt) geeft voor een dagelijks
+    /// vluchtnummer de occurrence van vandáág terug — niet de reisdatum die de
+    /// gebruiker bedoelt. Vroeger klemde deze functie de picker daardoor naar
+    /// "vandaag" (de kern van de gemelde bug). Nu verschuiven we de datum
+    /// alleen als de lookup een látere dag kent dan de al gekozen datum; een
+    /// gelijke of eerdere dag negeren we, zodat de gekozen reisdatum blijft
+    /// staan.
     private func applyLookedUpDate(_ raw: String?) {
-        guard let raw else { return }
-        let iso = ISO8601DateFormatter()
-        iso.formatOptions = [.withFullDate]
-        guard let parsed = iso.date(from: raw) else { return }
+        guard let raw, let parsed = Self.isoDateFormatter.date(from: raw) else { return }
         let cal = Calendar.current
         var comps = cal.dateComponents([.year, .month, .day], from: parsed)
         let time = cal.dateComponents([.hour, .minute], from: departure)
         comps.hour = time.hour
         comps.minute = time.minute
-        // Een looked-up datum in het verleden (herhalend vluchtnummer, andere
-        // dag) negeren we: dan weet de gebruiker het zelf beter dan de API.
-        if let combined = cal.date(from: comps), combined > .now {
-            withAnimation(.spring(response: 0.3)) { departure = combined }
-        }
+        guard let combined = cal.date(from: comps) else { return }
+        guard cal.startOfDay(for: combined) > cal.startOfDay(for: departure) else { return }
+        withAnimation(.spring(response: 0.3)) { departure = max(combined, .now) }
     }
 
     private func save() {
@@ -507,6 +783,32 @@ struct AddFlightSheet: View {
         UINotificationFeedbackGenerator().notificationOccurred(.success)
         withAnimation(.spring(response: 0.3)) { saved = true }
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.9) { dismiss() }
+
+        // Verrijking op de achtergrond — de "toegevoegd"-animatie hoeft hier
+        // niet op te wachten, zelfde fire-and-forget-patroon als de
+        // Unsplash-tripfoto in TripWizardView.createTrip().
+        let flightId = flight.id
+        let iata = flight.number
+        let targetDate = flight.departure
+        let photoQuery = flight.arrivalAirport ?? flight.airlineName
+        Task { @MainActor in
+            if let rich = await AviationstackClient.lookup(iata: iata, near: targetDate) {
+                guard var updated = FlightsStore.shared.flights.first(where: { $0.id == flightId }) else { return }
+                updated.applyRichData(rich)
+                updated.lastRefreshed = Date()
+                FlightsStore.shared.upsert(updated)
+            }
+        }
+        if let photoQuery {
+            Task { @MainActor in
+                guard let photo = await UnsplashClient.searchPhoto(query: photoQuery) else { return }
+                guard var updated = FlightsStore.shared.flights.first(where: { $0.id == flightId }) else { return }
+                updated.photoUrl = photo.regularUrl
+                updated.photoAuthorName = photo.authorName
+                updated.photoAuthorUrl = photo.authorProfileUrl
+                FlightsStore.shared.upsert(updated)
+            }
+        }
     }
 }
 
@@ -547,6 +849,10 @@ struct FlightDetailView: View {
                     ScrollView(showsIndicators: false) {
                         VStack(spacing: 0) {
                             hero(flight)
+                                // Bij het openen van een vlucht meteen kijken of
+                                // er nieuwe gate-/vertragingsinfo is. De wacht
+                                // throttelt zelf, dus dit is niet duur.
+                                .task { await FlightWatcher.refreshDueFlights() }
                             content(flight)
                                 .padding(.horizontal, 16)
                                 .padding(.top, 20)
@@ -585,11 +891,37 @@ struct FlightDetailView: View {
 
     private func hero(_ flight: SavedFlightRecord) -> some View {
         ZStack(alignment: .bottom) {
-            LinearGradient(
-                colors: [accent.opacity(0.18), Color(.systemGroupedBackground)],
-                startPoint: .top, endPoint: .bottom
-            )
-            .frame(height: 230 + flightDetailStatusBarHeight)
+            if let photoUrl = flight.photoUrl {
+                AuthorisedImage(urlString: photoUrl, fill: true)
+                    .frame(height: 230 + flightDetailStatusBarHeight)
+                    .clipped()
+                    .overlay(
+                        LinearGradient(
+                            colors: [.clear, Color(.systemGroupedBackground)],
+                            startPoint: .center, endPoint: .bottom
+                        )
+                    )
+            } else {
+                LinearGradient(
+                    colors: [accent.opacity(0.18), Color(.systemGroupedBackground)],
+                    startPoint: .top, endPoint: .bottom
+                )
+                .frame(height: 230 + flightDetailStatusBarHeight)
+            }
+
+            if let authorName = flight.photoAuthorName,
+               let authorUrl = flight.photoAuthorUrl.flatMap({ URL(string: $0 + "?utm_source=vliegtuigtas&utm_medium=referral") }) {
+                Link("Foto: \(authorName) / Unsplash", destination: authorUrl)
+                    .font(.frutiger(size: 9, weight: .semibold))
+                    .foregroundStyle(.white.opacity(0.85))
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 4)
+                    .background(.black.opacity(0.25), in: Capsule())
+                    .padding(10)
+                    .frame(maxWidth: .infinity, alignment: .trailing)
+                    .frame(maxHeight: .infinity, alignment: .top)
+                    .padding(.top, flightDetailStatusBarHeight + 4)
+            }
 
             VStack(spacing: 14) {
                 ZStack {
@@ -654,6 +986,21 @@ struct FlightDetailView: View {
         VStack(spacing: 16) {
             if flight.hasRoute {
                 FlightBoardingPassCard(flight: flight)
+                FlightStatusTimeline(flight: flight)
+                if flight.hasLivePosition {
+                    LiveFlightMapCard(flight: flight)
+                }
+                if flight.aircraftRegistration != nil || flight.aircraftIcao24 != nil {
+                    AircraftInfoChip(flight: flight)
+                }
+                // Aankomstdag: de exacte arrivalScheduled uit Aviationstack als
+                // die bekend is; anders de (door de gebruiker gekozen)
+                // vertrekdatum als benadering van de aankomstdag.
+                DestinationWeatherCard(
+                    airportName: flight.arrivalAirport,
+                    iata: flight.arrivalIata,
+                    arrivalDate: flight.arrivalScheduled ?? flight.departure
+                )
             }
 
             detailsCard(flight)
@@ -739,14 +1086,6 @@ struct FlightDetailView: View {
                 Divider().padding(.leading, 44)
                 detailRow(icon: "number", label: "ICAO-code", value: icao)
             }
-            if let raw = flight.flightDate {
-                Divider().padding(.leading, 44)
-                detailRow(icon: "airplane.circle", label: "Vluchtdatum (API)", value: raw)
-            }
-            if let status = flight.status {
-                Divider().padding(.leading, 44)
-                detailRow(icon: "dot.radiowaves.left.and.right", label: "Ruwe status", value: status)
-            }
         }
         .padding(.horizontal, 16)
         .background(Color(.systemBackground))
@@ -770,12 +1109,16 @@ struct FlightDetailView: View {
         .padding(.vertical, 12)
     }
 
+    private static let departureFormatter: DateFormatter = {
+        let f = DateFormatter()
+        f.locale = Locale(identifier: "nl_NL")
+        f.dateStyle = .medium
+        f.timeStyle = .short
+        return f
+    }()
+
     private func formattedDeparture(_ date: Date) -> String {
-        let fmt = DateFormatter()
-        fmt.locale = Locale(identifier: "nl_NL")
-        fmt.dateStyle = .medium
-        fmt.timeStyle = .short
-        return fmt.string(from: date)
+        Self.departureFormatter.string(from: date)
     }
 
     private func refreshStatus(_ flight: SavedFlightRecord) {
@@ -793,6 +1136,11 @@ struct FlightDetailView: View {
                 updated.arrivalAirport = result.arrivalAirport ?? updated.arrivalAirport
                 updated.flightDate = result.flightDate ?? updated.flightDate
                 updated.status = result.status ?? updated.status
+                if let rich = await AviationstackClient.lookup(iata: flight.number, near: flight.departure) {
+                    updated.applyRichData(rich)
+                }
+                // Stempelen, zodat de vluchtwacht niet meteen opnieuw ophaalt.
+                updated.lastRefreshed = Date()
                 store.upsert(updated)
                 UINotificationFeedbackGenerator().notificationOccurred(.success)
             } else {
@@ -810,8 +1158,13 @@ private struct FlightBoardingPassCard: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            HStack(alignment: .center, spacing: 12) {
-                endpoint(code: flight.departureIata, airport: flight.departureAirport, alignment: .leading)
+            HStack(alignment: .top, spacing: 12) {
+                endpoint(
+                    code: flight.departureIata, airport: flight.departureAirport, alignment: .leading,
+                    terminal: flight.departureTerminal, gate: flight.departureGate,
+                    scheduled: flight.departureScheduled, actualOrEstimated: flight.departureActual ?? flight.departureEstimated,
+                    delayMinutes: flight.departureDelayMinutes
+                )
                 VStack(spacing: 3) {
                     Image(systemName: "airplane")
                         .font(.system(size: 15, weight: .semibold))
@@ -819,13 +1172,70 @@ private struct FlightBoardingPassCard: View {
                     perforatedLine
                 }
                 .frame(maxWidth: .infinity)
-                endpoint(code: flight.arrivalIata, airport: flight.arrivalAirport, alignment: .trailing)
+                .padding(.top, 4)
+                endpoint(
+                    code: flight.arrivalIata, airport: flight.arrivalAirport, alignment: .trailing,
+                    terminal: flight.arrivalTerminal, gate: flight.arrivalGate,
+                    scheduled: flight.arrivalScheduled, actualOrEstimated: flight.arrivalActual ?? flight.arrivalEstimated,
+                    delayMinutes: flight.arrivalDelayMinutes
+                )
             }
             .padding(18)
+
+            // Aftelstrip onderaan de kaart, zoals luchthaven-apps die tonen:
+            // één regel die zegt hoeveel tijd je nog hebt, plus de bagageband
+            // zodra die bekend is.
+            if let strip = countdownStrip {
+                HStack(spacing: 8) {
+                    Image(systemName: strip.icon)
+                        .font(.system(size: 12, weight: .bold))
+                        .foregroundStyle(Theme.navy)
+                    Text(strip.text)
+                        .font(.frutiger(size: 13, weight: .semibold))
+                        .foregroundStyle(Theme.textPrimary)
+                    Spacer(minLength: 0)
+                    if let belt = flight.arrivalBaggage {
+                        HStack(spacing: 4) {
+                            Text("Band")
+                                .font(.frutiger(size: 10))
+                                .foregroundStyle(Theme.textSecondary)
+                            Text(belt)
+                                .font(.system(size: 11, weight: .black, design: .monospaced))
+                                .foregroundStyle(Theme.ink)
+                                .padding(.horizontal, 6)
+                                .padding(.vertical, 2)
+                                .background(Theme.yellow, in: RoundedRectangle(cornerRadius: 4))
+                        }
+                    }
+                }
+                .padding(.horizontal, 18)
+                .padding(.vertical, 12)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .background(Theme.skyLight)
+            }
         }
         .background(Color(.systemBackground))
         .clipShape(RoundedRectangle(cornerRadius: 18))
         .shadow(color: .black.opacity(0.05), radius: 8, x: 0, y: 3)
+    }
+
+    /// "4u 3m voor vertrek" — of de fase waarin de vlucht zit als vertrek al
+    /// geweest is.
+    private var countdownStrip: (icon: String, text: String)? {
+        let interval = flight.departure.timeIntervalSinceNow
+        if interval > 0 {
+            let hours = Int(interval) / 3600
+            let minutes = (Int(interval) % 3600) / 60
+            if hours >= 24 {
+                let days = hours / 24
+                return ("clock", days == 1 ? "Morgen vertrek" : "Nog \(days) dagen tot vertrek")
+            }
+            return ("clock", hours > 0 ? "\(hours)u \(minutes)m voor vertrek" : "\(minutes)m voor vertrek")
+        }
+        if let label = flight.statusLabel {
+            return ("airplane", label)
+        }
+        return ("airplane", "Vertrokken")
     }
 
     private var perforatedLine: some View {
@@ -836,20 +1246,244 @@ private struct FlightBoardingPassCard: View {
         }
     }
 
-    private func endpoint(code: String?, airport: String?, alignment: HorizontalAlignment) -> some View {
-        VStack(alignment: alignment, spacing: 2) {
-            Text(code ?? "—")
-                .font(.frutiger(size: 26, weight: .black))
-                .foregroundStyle(Theme.navy)
-                .kerning(1)
-            if let airport {
-                Text(airport)
-                    .font(.frutiger(size: 11, weight: .medium))
-                    .foregroundStyle(Theme.textSecondary)
-                    .lineLimit(2)
-                    .multilineTextAlignment(alignment == .leading ? .leading : .trailing)
+    private static let timeFormatter: DateFormatter = {
+        let f = DateFormatter()
+        f.locale = Locale(identifier: "nl_NL")
+        f.timeStyle = .short
+        return f
+    }()
+
+    private func endpoint(
+        code: String?, airport: String?, alignment: HorizontalAlignment,
+        terminal: String?, gate: String?,
+        scheduled: Date?, actualOrEstimated: Date?, delayMinutes: Int?
+    ) -> some View {
+        // Opbouw zoals professionele luchthaven-apps die aanhouden: de plaats
+        // klein bovenaan, de tíjd als blikvanger, daaronder de status, en pas
+        // dan de praktische velden. Wie naar zijn vlucht kijkt wil eerst weten
+        // hoe laat en of het op tijd is — niet welke IATA-code erbij hoort.
+        let delayed = (delayMinutes ?? 0) > 0
+        return VStack(alignment: alignment, spacing: 5) {
+            HStack(spacing: 5) {
+                if let airport {
+                    Text(airport)
+                        .font(.frutiger(size: 11, weight: .medium))
+                        .foregroundStyle(Theme.textSecondary)
+                        .lineLimit(1)
+                }
+                if let code {
+                    Text(code)
+                        .font(.system(size: 10, weight: .black, design: .monospaced))
+                        .foregroundStyle(Theme.textSecondary)
+                }
+            }
+
+            if let scheduled {
+                HStack(alignment: .firstTextBaseline, spacing: 6) {
+                    Text(Self.timeFormatter.string(from: delayed ? (actualOrEstimated ?? scheduled) : scheduled))
+                        .font(.system(size: 26, weight: .black))
+                        .monospacedDigit()
+                        .foregroundStyle(Theme.textPrimary)
+                    if delayed, actualOrEstimated != nil {
+                        Text(Self.timeFormatter.string(from: scheduled))
+                            .font(.frutiger(size: 12, weight: .semibold))
+                            .strikethrough()
+                            .foregroundStyle(Theme.textSecondary)
+                    }
+                }
+            } else {
+                Text(code ?? "—")
+                    .font(.system(size: 26, weight: .black))
+                    .foregroundStyle(Theme.textPrimary)
+            }
+
+            // Statuspil, zoals het groene "Op tijd" op een vertrekbord.
+            if scheduled != nil {
+                StatusPill(
+                    text: delayed ? "+\(delayMinutes ?? 0) min" : "Op tijd",
+                    tone: delayed ? .negative : .positive
+                )
+            }
+
+            // Praktische velden onder elkaar met een label ervoor — de gate
+            // krijgt een geel pilletje omdat dat het getal is waar je op de
+            // luchthaven naar zoekt.
+            if let terminal {
+                FactLine(label: "Terminal", value: terminal, alignment: alignment)
+            }
+            if let gate {
+                FactLine(label: "Gate", value: gate, highlighted: true, alignment: alignment)
             }
         }
         .frame(maxWidth: .infinity, alignment: alignment == .leading ? .leading : .trailing)
+    }
+
+}
+
+// MARK: - Status-tijdlijn
+
+/// Horizontale voortgangsbalk door de vier vluchtfases — vervangt de kale
+/// "ruwe status"-tekst met iets dat in één oogopslag te lezen is.
+private struct FlightStatusTimeline: View {
+    let flight: SavedFlightRecord
+
+    private enum Phase: Int, CaseIterable {
+        case scheduled, departed, inAir, landed
+
+        var label: String {
+            switch self {
+            case .scheduled: return "Gepland"
+            case .departed:  return "Vertrokken"
+            case .inAir:     return "In de lucht"
+            case .landed:    return "Geland"
+            }
+        }
+
+        var icon: String {
+            switch self {
+            case .scheduled: return "clock"
+            case .departed:  return "airplane.departure"
+            case .inAir:     return "airplane"
+            case .landed:    return "airplane.arrival"
+            }
+        }
+    }
+
+    /// Aviationstack kent geen apart "departed"-fase (alleen scheduled/
+    /// active/landed/...) — bij "active" tonen we 'm als voorbij vertrokken
+    /// én onderweg, dus de balk vult tot en met "In de lucht".
+    private var currentPhase: Phase {
+        switch flight.status {
+        case "active":    return .inAir
+        case "landed":    return .landed
+        default:          return .scheduled
+        }
+    }
+
+    private var isProblematic: Bool {
+        ["cancelled", "incident", "diverted"].contains(flight.status)
+    }
+
+    var body: some View {
+        VStack(spacing: 10) {
+            if isProblematic, let label = flight.statusLabel {
+                Label(label, systemImage: "exclamationmark.triangle.fill")
+                    .font(.frutiger(size: 13, weight: .semibold))
+                    .foregroundStyle(Theme.red)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+            } else {
+                HStack(spacing: 0) {
+                    ForEach(Phase.allCases, id: \.rawValue) { phase in
+                        phaseView(phase)
+                        if phase != Phase.allCases.last {
+                            Rectangle()
+                                .fill(phase.rawValue < currentPhase.rawValue ? Theme.navy : Theme.textSecondary.opacity(0.2))
+                                .frame(height: 2)
+                        }
+                    }
+                }
+            }
+        }
+        .padding(16)
+        .background(Color(.systemBackground))
+        .clipShape(RoundedRectangle(cornerRadius: 16))
+    }
+
+    private func phaseView(_ phase: Phase) -> some View {
+        let reached = phase.rawValue <= currentPhase.rawValue
+        return VStack(spacing: 4) {
+            ZStack {
+                Circle()
+                    .fill(reached ? Theme.navy : Theme.textSecondary.opacity(0.15))
+                    .frame(width: 26, height: 26)
+                Image(systemName: phase.icon)
+                    .font(.system(size: 11, weight: .semibold))
+                    .foregroundStyle(reached ? .white : Theme.textSecondary)
+            }
+            Text(phase.label)
+                .font(.frutiger(size: 9, weight: .semibold))
+                .foregroundStyle(reached ? Theme.textPrimary : Theme.textSecondary)
+                .lineLimit(1)
+                .minimumScaleFactor(0.8)
+        }
+    }
+}
+
+// MARK: - Vliegtuiginfo
+
+private struct AircraftInfoChip: View {
+    let flight: SavedFlightRecord
+
+    var body: some View {
+        HStack(spacing: 10) {
+            Image(systemName: "airplane.circle.fill")
+                .font(.system(size: 20))
+                .foregroundStyle(Theme.sky)
+            VStack(alignment: .leading, spacing: 1) {
+                Text("Vliegtuig")
+                    .font(.frutiger(size: 11))
+                    .foregroundStyle(Theme.textSecondary)
+                Text([flight.aircraftRegistration, flight.aircraftIcao24].compactMap { $0 }.joined(separator: " · "))
+                    .font(.frutiger(size: 13, weight: .semibold))
+                    .foregroundStyle(Theme.textPrimary)
+            }
+            Spacer()
+        }
+        .padding(14)
+        .background(Color(.systemBackground))
+        .clipShape(RoundedRectangle(cornerRadius: 14))
+    }
+}
+
+// MARK: - Live positie
+
+/// Compact, niet-interactief kaartje met de actuele positie — alleen
+/// zichtbaar bij een vlucht die nu in de lucht is. Het "wow"-element dat een
+/// vlucht-tracker modern maakt.
+private struct LiveFlightMapCard: View {
+    let flight: SavedFlightRecord
+
+    private var coordinate: CLLocationCoordinate2D? {
+        guard let lat = flight.liveLatitude, let lon = flight.liveLongitude else { return nil }
+        return CLLocationCoordinate2D(latitude: lat, longitude: lon)
+    }
+
+    var body: some View {
+        if let coordinate {
+            VStack(alignment: .leading, spacing: 0) {
+                Map(initialPosition: .region(
+                    MKCoordinateRegion(center: coordinate, span: MKCoordinateSpan(latitudeDelta: 4, longitudeDelta: 4))
+                )) {
+                    Annotation("", coordinate: coordinate) {
+                        Image(systemName: "airplane")
+                            .font(.system(size: 18, weight: .bold))
+                            .foregroundStyle(.white)
+                            .padding(8)
+                            .background(Theme.navy, in: Circle())
+                            .rotationEffect(.degrees((flight.liveDirection ?? 0) - 90))
+                    }
+                }
+                .disabled(true)
+                .frame(height: 160)
+
+                HStack(spacing: 16) {
+                    Label("Live", systemImage: "dot.radiowaves.left.and.right")
+                        .font(.frutiger(size: 11, weight: .bold))
+                        .foregroundStyle(Theme.green)
+                    if let altitude = flight.liveAltitude {
+                        Text("\(Int(altitude.rounded())) m hoogte")
+                    }
+                    if let speed = flight.liveSpeedKmh {
+                        Text("\(Int(speed.rounded())) km/u")
+                    }
+                    Spacer()
+                }
+                .font(.frutiger(size: 11, weight: .semibold))
+                .foregroundStyle(Theme.textSecondary)
+                .padding(12)
+            }
+            .background(Color(.systemBackground))
+            .clipShape(RoundedRectangle(cornerRadius: 16))
+        }
     }
 }

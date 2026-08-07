@@ -8,15 +8,28 @@ final class AirlineStore: ObservableObject {
 
     func load() async {
         guard airlines.isEmpty else { return }
+        await fetch(forceRefresh: false)
+    }
+
+    /// Voor pull-to-refresh: haalt altijd verse data op — ook als de
+    /// catalogus al gevuld was en ook binnen de cache-TTL van `APIClient` —
+    /// anders lijkt "verversen" iets te doen zonder ooit echt een nieuwe
+    /// call te maken. `fetch()` wijzigt `airlines` alleen bij succes, dus
+    /// een mislukte refresh klapt het scherm niet leeg.
+    func reload() async {
+        await fetch(forceRefresh: true)
+    }
+
+    private func fetch(forceRefresh: Bool) async {
         // Instant: laatste catalogus van schijf zodat de UI direct vult
         // (ook offline); het netwerk ververst er stil achteraan.
-        if let cached = APIClient.shared.airlinesFromDisk(), !cached.isEmpty {
+        if airlines.isEmpty, let cached = APIClient.shared.airlinesFromDisk(), !cached.isEmpty {
             airlines = cached
         }
         isLoading = airlines.isEmpty
         error = nil
         do {
-            airlines = try await APIClient.shared.airlines()
+            airlines = try await APIClient.shared.airlines(forceRefresh: forceRefresh)
             // Niet in de App Clip: die bevat geen App Intents-laag.
             #if os(iOS) && !APPCLIP
             // Spotlight-index + Siri-zinnen met maatschappijnamen bijwerken.
@@ -73,20 +86,25 @@ final class BagStore: ObservableObject {
 
     func loadIfNeeded() async {
         guard bags.isEmpty else { return }
+        await fetch(forceRefresh: false)
+    }
+
+    /// Voor pull-to-refresh: haalt altijd verse data op — ook binnen de
+    /// cache-TTL van `APIClient`. Bij een mislukte fetch behouden we de
+    /// bestaande producten i.p.v. het scherm leeg te maken.
+    func reload() async {
+        await fetch(forceRefresh: true)
+    }
+
+    private func fetch(forceRefresh: Bool) async {
         // Instant van schijf; netwerk ververst erna.
-        if let cached = APIClient.shared.bagsFromDisk(), !cached.isEmpty {
+        if bags.isEmpty, let cached = APIClient.shared.bagsFromDisk(), !cached.isEmpty {
             bags = cached
         }
         isLoading = bags.isEmpty
-        if let fresh = try? await APIClient.shared.bags() {
+        if let fresh = try? await APIClient.shared.bags(forceRefresh: forceRefresh) {
             bags = fresh
         }
-        isLoading = false
-    }
-
-    func reload() async {
-        isLoading = true
-        bags = (try? await APIClient.shared.bags()) ?? []
         isLoading = false
     }
 }

@@ -15,6 +15,12 @@ struct ProfileView: View {
     @State private var showDeleteConfirm = false
     @State private var showEditProfile = false
 
+    // Easteregg: 5× snel op de streepjescode tikken → inspectiestempel van
+    // Purser Pim. Zusje van de schud-easteregg op het klapperbord (Home).
+    @State private var barcodeTapCount = 0
+    @State private var lastBarcodeTap = Date.distantPast
+    @State private var showStamp = false
+
     var body: some View {
         NavigationStack {
             ScrollView(showsIndicators: false) {
@@ -22,18 +28,15 @@ struct ProfileView: View {
                     Button {
                         showEditProfile = true
                     } label: {
-                        VStack(spacing: 18) {
-                            baggageTag
-                            personalStub
-                        }
+                        baggageTag
                     }
                     .buttonStyle(.plain)
 
                     sectionTitle("Mijn tassen & koffers")
                     bagsSection
 
-                    sectionTitle("Mijn vluchten")
-                    MyFlightsSection()
+                    // "Mijn vluchten" staat sinds 3.0.0 in de Reizen-tab: een
+                    // reisfunctie hoort niet tussen de accountinstellingen.
 
                     #if !targetEnvironment(macCatalyst)
                     sectionTitle("App-icoon")
@@ -45,6 +48,12 @@ struct ProfileView: View {
 
                     sectionTitle("Beoordeel de app")
                     ReviewInviteCard()
+
+                    sectionTitle("Deel Vliegtuigtas")
+                    InviteByContactCard()
+
+                    sectionTitle("Account")
+                    accountMethodRow
 
                     logoutButton
 
@@ -98,77 +107,116 @@ struct ProfileView: View {
         var g = SeededGen(tagSeed)
         return String(format: "0%03d %06d", g.int(100...999), g.int(0...999_999))
     }
-    private var tagDate: String {
+    /// Gedeeld en gecachet i.p.v. per render een nieuwe `DateFormatter()`
+    /// aan te maken (die instantiatie is relatief kostbaar).
+    private static let tagDateFormatter: DateFormatter = {
         let f = DateFormatter()
         f.locale = Locale(identifier: "en_US")
         f.dateFormat = "dd MMM"
-        return f.string(from: nextFlight?.departure ?? Date()).uppercased()
+        return f
+    }()
+    private var tagDate: String {
+        Self.tagDateFormatter.string(from: nextFlight?.departure ?? Date()).uppercased()
+    }
+    /// Easteregg: "—" tot je de streepjescode-stempel activeert, daarna de
+    /// datum waarop dat gebeurde — een minuscuul hintje dat pas betekenis
+    /// krijgt zodra je de stempel al eens gevonden hebt.
+    private var approvedValue: String {
+        guard let date = session.barcodeApprovalDate else { return "—" }
+        return Self.tagDateFormatter.string(from: date).uppercased()
     }
 
     private var baggageTag: some View {
-        TagPaper(corner: 16) {
+        TagPaper(corner: 22) {
             VStack(spacing: 0) {
-                // Navy kop met ophangoog + wordmark
-                HStack(spacing: 12) {
-                    punchHole
-                    Text("VLIEGTUIGTAS")
-                        .font(.frutiger(size: 13, weight: .bold))
-                        .kerning(2)
-                        .foregroundStyle(.white)
-                    Spacer()
-                    Image(systemName: "airplane")
-                        .font(.system(size: 13, weight: .bold))
-                        .foregroundStyle(.white.opacity(0.9))
-                }
-                .padding(.horizontal, 16)
-                .padding(.vertical, 12)
-                .background(Theme.navy)
-
-                // Signaalstrook
-                HStack {
-                    Text(nextFlight != nil ? "PRIORITY" : "PASSAGIER")
-                        .printed(9, weight: .bold).foregroundStyle(.white).kerning(1)
-                    Spacer()
-                    Text("SEQ \(seqNumber)")
-                        .printed(9, weight: .bold).foregroundStyle(.white).kerning(1)
-                }
-                .padding(.horizontal, 16)
-                .padding(.vertical, 5)
-                .background(TagPalette.priority)
-
-                // Gedrukte body
-                VStack(alignment: .leading, spacing: 14) {
-                    VStack(alignment: .leading, spacing: 3) {
-                        Text("PASSENGER NAME")
-                            .printed(8, weight: .semibold, soft: true).kerning(1)
-                        Text(passengerName)
-                            .printed(24, weight: .bold)
-                            .minimumScaleFactor(0.5).lineLimit(1)
-                    }
-
-                    HStack(alignment: .top, spacing: 10) {
-                        TagField(label: "FROM", value: fromCode)
-                        Image(systemName: "arrow.right")
-                            .font(.system(size: 11, weight: .bold))
-                            .foregroundStyle(TagPalette.inkSoft)
-                            .padding(.top, 11)
-                        TagField(label: "TO", value: toCode)
-                        TagField(label: "FLIGHT", value: nextFlight?.number.uppercased() ?? "—")
-                        TagField(label: "PCS", value: "\(bagCollection.bags.count)", alignment: .trailing)
-                    }
-
-                    Rectangle().fill(TagPalette.paperEdge).frame(height: 1)
-
-                    Barcode(seed: tagSeed, height: 46)
-                    HStack {
-                        Text(tagNumber).printed(13, weight: .bold).kerning(1.5)
-                        Spacer()
-                        Text(tagDate).printed(11, weight: .semibold, soft: true)
-                    }
-                }
-                .padding(16)
+                tagHeader
+                tagBody
+                TagPerforation()
+                    .padding(.horizontal, 18)
+                personalStubContent
             }
         }
+        .overlay {
+            if showStamp { pimStamp.transition(.asymmetric(
+                insertion: .scale(scale: 1.6).combined(with: .opacity),
+                removal: .opacity
+            )) }
+        }
+    }
+
+    // MARK: - Easteregg: inspectiestempel
+
+    /// 5× snel tikken op de streepjescode → Purser Pim "keurt" je label goed.
+    /// Trager dan 1,2s tussen tikken telt niet mee, zodat toevallig dubbeltikken
+    /// het niet per ongeluk triggert.
+    private func handleBarcodeTap() {
+        let now = Date()
+        if now.timeIntervalSince(lastBarcodeTap) > 1.2 { barcodeTapCount = 0 }
+        lastBarcodeTap = now
+        barcodeTapCount += 1
+        guard barcodeTapCount >= 5 else { return }
+        barcodeTapCount = 0
+        guard !showStamp else { return }
+        session.markBarcodeApproved()
+        EasterEggStore.shared.discover(.barcodeStamp)
+        UINotificationFeedbackGenerator().notificationOccurred(.success)
+        withAnimation(.spring(response: 0.35, dampingFraction: 0.55)) { showStamp = true }
+        Task {
+            try? await Task.sleep(nanoseconds: 2_400_000_000)
+            withAnimation(.easeOut(duration: 0.35)) { showStamp = false }
+        }
+    }
+
+    /// Rubberstempel-look: scheve rode ring met "GOEDGEKEURD" + Pim's naam,
+    /// zoals een inspectiestempel op een echt bagagelabel.
+    private var pimStamp: some View {
+        VStack(spacing: 3) {
+            Text("GOEDGEKEURD")
+                .font(.frutiger(size: 15, weight: .black))
+                .kerning(1.5)
+            Text("★ PURSER PIM ★")
+                .font(.frutiger(size: 9, weight: .bold))
+                .kerning(1.5)
+        }
+        .foregroundStyle(Theme.red)
+        .padding(.horizontal, 18)
+        .padding(.vertical, 12)
+        .overlay(
+            RoundedRectangle(cornerRadius: 12)
+                .strokeBorder(Theme.red, lineWidth: 2.5)
+        )
+        .background(Color(.systemBackground).opacity(0.001)) // houdt hit-testing/animatie soepel
+        .rotationEffect(.degrees(-10))
+        .allowsHitTesting(false)
+        .accessibilityHidden(true)
+    }
+
+    /// Navy/sky-verloop kop met ophangoog, wordmark en een compacte
+    /// statuspil (i.p.v. de vorige zware, volle-breedte kleurstrook).
+    private var tagHeader: some View {
+        HStack(spacing: 12) {
+            punchHole
+            Text("VLIEGTUIGTAS")
+                .font(.frutiger(size: 13, weight: .bold))
+                .kerning(2)
+                .foregroundStyle(.white)
+            Spacer()
+            HStack(spacing: 5) {
+                Text(nextFlight != nil ? "PRIORITY" : "PASSAGIER")
+                    .kerning(0.6)
+                Text("· SEQ \(seqNumber)")
+                    .opacity(0.85)
+            }
+            .font(.frutiger(size: 9, weight: .bold))
+            .foregroundStyle(Theme.navy)
+            .padding(.horizontal, 10)
+            .padding(.vertical, 5)
+            .background(TagPalette.accent)
+            .clipShape(Capsule())
+        }
+        .padding(.horizontal, 18)
+        .padding(.vertical, 14)
+        .background(Theme.inkGradient)
     }
 
     /// Het gereinforceerde ophangoog van het label.
@@ -179,44 +227,107 @@ struct ProfileView: View {
             .overlay(Circle().fill(Theme.navyDark).frame(width: 7, height: 7))
     }
 
-    // MARK: - PAX-strook (persoonsgegevens als afscheurstrook)
+    private var tagBody: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            VStack(alignment: .leading, spacing: 3) {
+                Text("PASSAGIER")
+                    .printed(9, weight: .bold, soft: true).kerning(1)
+                Text(passengerName)
+                    .printed(26, weight: .bold)
+                    .minimumScaleFactor(0.5).lineLimit(1)
+            }
 
-    private var personalStub: some View {
-        TagPaper(corner: 12) {
-            VStack(alignment: .leading, spacing: 10) {
+            HStack(alignment: .top, spacing: 10) {
+                TagField(label: "FROM", value: fromCode)
+                Image(systemName: "airplane")
+                    .font(.system(size: 12, weight: .semibold))
+                    .foregroundStyle(Theme.sky)
+                    .padding(.top, 12)
+                TagField(label: "TO", value: toCode)
+                TagField(label: "FLIGHT", value: nextFlight?.number.uppercased() ?? "—")
+            }
+            HStack(alignment: .top, spacing: 10) {
+                TagField(label: "PCS", value: "\(bagCollection.bags.count)")
+                // "APPROVED" staat er standaard al, leeg — pas nadat je de
+                // streepjescode-stempel hebt gevonden verschijnt hier een
+                // datum. Een minuscuul hintje voor wie goed kijkt.
+                TagField(label: "APPROVED", value: approvedValue)
+                Spacer()
+            }
+
+            VStack(spacing: 10) {
+                Barcode(seed: tagSeed, height: 30)
+                    .overlay(alignment: .trailing) {
+                        // Blijvend vinkje na de stempel: teken dat dit label
+                        // ooit is "goedgekeurd", ook nadat de stempelanimatie
+                        // allang is weggefade.
+                        if session.barcodeApprovalDate != nil {
+                            Image(systemName: "checkmark.seal.fill")
+                                .font(.system(size: 14))
+                                .foregroundStyle(Theme.green)
+                                .padding(.leading, 8)
+                                .background(Color(.secondarySystemGroupedBackground))
+                                .accessibilityHidden(true)
+                        }
+                    }
+                    .contentShape(Rectangle())
+                    // `highPriorityGesture` i.p.v. `onTapGesture`: het hele
+                    // label zit al in een Button (tik = bewerken). Zonder
+                    // prioriteit zou die Button de tik onderscheppen vóórdat
+                    // de tikteller ooit 5 haalt.
+                    .highPriorityGesture(TapGesture().onEnded(handleBarcodeTap))
                 HStack {
-                    Text("PAX RECEIPT")
-                        .printed(8, weight: .bold, soft: true).kerning(1.5)
+                    Text(tagNumber).printed(13, weight: .bold).kerning(1)
                     Spacer()
+                    Text(tagDate).printed(11, weight: .semibold, soft: true)
+                }
+            }
+        }
+        .padding(18)
+    }
+
+    // MARK: - PAX-strook (persoonsgegevens onder de perforatie)
+
+    private var personalStubContent: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack {
+                Text("PAX RECEIPT")
+                    .printed(8, weight: .bold, soft: true).kerning(1.5)
+                Spacer()
+                if session.isSignedInWithApple {
+                    Label("APPLE ID", systemImage: "person.badge.key.fill")
+                        .printed(8, weight: .bold, soft: true).kerning(1)
+                } else {
                     Label("iCLOUD SYNC", systemImage: "icloud.fill")
                         .printed(8, weight: .bold, soft: true).kerning(1)
                 }
-                TagField(label: "NAME", value: session.firstName.isEmpty ? "—" : session.firstName)
-                TagField(label: "E-MAIL", value: session.email.isEmpty ? "—" : session.email)
-                Text("Je gegevens, tasmaten en vlucht syncen via iCloud naar je andere Apple-apparaten — geen apart account.")
-                    .printed(9, soft: true)
-                    .fixedSize(horizontal: false, vertical: true)
-
-                // Bewerk-affordance: duidelijk dat het label aanpasbaar is.
-                HStack(spacing: 5) {
-                    Image(systemName: "pencil")
-                        .font(.system(size: 10, weight: .bold))
-                    Text(session.firstName.isEmpty && session.email.isEmpty
-                         ? "NAAM & E-MAIL INVULLEN"
-                         : "GEGEVENS BEWERKEN")
-                        .printed(9, weight: .bold).kerning(1)
-                }
-                .foregroundStyle(TagPalette.ink)
-                .padding(.horizontal, 12)
-                .padding(.vertical, 7)
-                .frame(maxWidth: .infinity)
-                .background(TagPalette.priority.opacity(0.18))
-                .overlay(RoundedRectangle(cornerRadius: 8).strokeBorder(TagPalette.priority.opacity(0.5), lineWidth: 1))
-                .clipShape(RoundedRectangle(cornerRadius: 8))
-                .padding(.top, 2)
             }
-            .padding(14)
+            TagField(label: "NAME", value: session.firstName.isEmpty ? "—" : session.firstName)
+            TagField(label: "E-MAIL", value: session.email.isEmpty ? "—" : session.email)
+            Text(session.isSignedInWithApple
+                 ? "Ingelogd met Apple. Je gegevens, tasmaten en vlucht syncen ook via iCloud naar je andere Apple-apparaten."
+                 : "Je gegevens, tasmaten en vlucht syncen via iCloud naar je andere Apple-apparaten — geen apart wachtwoord nodig.")
+                .printed(9, soft: true)
+                .fixedSize(horizontal: false, vertical: true)
+
+            // Bewerk-affordance: duidelijk dat het label aanpasbaar is.
+            HStack(spacing: 5) {
+                Image(systemName: "pencil")
+                    .font(.system(size: 10, weight: .bold))
+                Text(session.firstName.isEmpty && session.email.isEmpty
+                     ? "NAAM & E-MAIL INVULLEN"
+                     : "GEGEVENS BEWERKEN")
+                    .printed(9, weight: .bold).kerning(1)
+            }
+            .foregroundStyle(Theme.navy)
+            .padding(.horizontal, 12)
+            .padding(.vertical, 7)
+            .frame(maxWidth: .infinity)
+            .background(Theme.sky.opacity(0.12))
+            .clipShape(RoundedRectangle(cornerRadius: 10))
+            .padding(.top, 2)
         }
+        .padding(18)
     }
 
     // MARK: - Mijn tassen & koffers
@@ -278,7 +389,7 @@ struct ProfileView: View {
                             .font(.frutiger(size: 13, weight: .semibold))
                             .frame(maxWidth: .infinity)
                             .padding(.vertical, 11)
-                            .background(Theme.navyGradient)
+                            .background(Theme.inkGradient)
                             .foregroundStyle(.white)
                             .clipShape(RoundedRectangle(cornerRadius: 12))
                     }
@@ -381,6 +492,31 @@ struct ProfileView: View {
         .padding(.top, 4)
     }
 
+    /// Laat zien hoe je bent ingelogd — via Sign in with Apple of met een
+    /// zelf ingevuld profiel — zodat de accountsectie duidelijk maakt wat er
+    /// aan je gegevens hangt.
+    private var accountMethodRow: some View {
+        HStack(spacing: 12) {
+            Image(systemName: session.isSignedInWithApple ? "apple.logo" : "person.crop.circle.fill")
+                .font(.system(size: 18))
+                .foregroundStyle(Theme.navy)
+                .frame(width: 24)
+            VStack(alignment: .leading, spacing: 2) {
+                Text(session.isSignedInWithApple ? "Ingelogd met Apple" : "Profiel op dit toestel")
+                    .font(.frutiger(size: 14, weight: .semibold))
+                    .foregroundStyle(Theme.textPrimary)
+                Text(session.email.isEmpty ? "Naam en e-mail zijn optioneel" : session.email)
+                    .font(.frutiger(size: 11))
+                    .foregroundStyle(Theme.textSecondary)
+                    .lineLimit(1)
+            }
+            Spacer()
+        }
+        .padding(14)
+        .background(Color(.systemBackground))
+        .clipShape(RoundedRectangle(cornerRadius: 14))
+    }
+
     private var logoutButton: some View {
         Button {
             showLogoutConfirm = true
@@ -469,6 +605,8 @@ struct ProfileEditorSheet: View {
     @State private var name = ""
     @State private var email = ""
     @State private var showError = false
+    @State private var hasPassportDate = false
+    @State private var passportDate = Calendar.current.date(byAdding: .year, value: 5, to: .now) ?? .now
 
     private var isValid: Bool {
         let n = name.trimmingCharacters(in: .whitespaces)
@@ -499,12 +637,31 @@ struct ProfileEditorSheet: View {
                             .foregroundStyle(Theme.red)
                     }
 
+                    VStack(alignment: .leading, spacing: 10) {
+                        Toggle(isOn: $hasPassportDate.animation()) {
+                            Text("Paspoort vervaldatum bewaren")
+                                .font(.frutiger(size: 14, weight: .semibold))
+                        }
+                        .tint(Theme.navy)
+                        if hasPassportDate {
+                            DatePicker("Vervaldatum", selection: $passportDate, displayedComponents: .date)
+                                .font(.frutiger(size: 14))
+                            Text("Zo waarschuwen we je als een geplande reis binnen de gangbare 6-maanden-geldigheidsregel valt.")
+                                .font(.frutiger(size: 11))
+                                .foregroundStyle(Theme.textSecondary)
+                                .fixedSize(horizontal: false, vertical: true)
+                        }
+                    }
+                    .padding(14)
+                    .background(Color(.secondarySystemGroupedBackground))
+                    .clipShape(RoundedRectangle(cornerRadius: 12))
+
                     Button(action: save) {
                         Text("Opslaan")
                             .font(.frutiger(size: 16, weight: .semibold))
                             .frame(maxWidth: .infinity)
                             .padding(.vertical, 15)
-                            .background(Theme.navyGradient)
+                            .background(Theme.inkGradient)
                             .foregroundStyle(.white)
                             .clipShape(RoundedRectangle(cornerRadius: 14))
                     }
@@ -524,6 +681,10 @@ struct ProfileEditorSheet: View {
         .onAppear {
             name = session.firstName
             email = session.email
+            if let expiry = session.passportExpiry {
+                hasPassportDate = true
+                passportDate = expiry
+            }
         }
     }
 
@@ -553,6 +714,7 @@ struct ProfileEditorSheet: View {
             firstName: name.trimmingCharacters(in: .whitespaces),
             email: email.trimmingCharacters(in: .whitespaces)
         )
+        session.setPassportExpiry(hasPassportDate ? passportDate : nil)
         UINotificationFeedbackGenerator().notificationOccurred(.success)
         dismiss()
     }
@@ -611,7 +773,7 @@ struct AccountRequiredView: View {
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(18)
-            .background(Theme.navyGradient)
+            .background(Theme.inkGradient)
 
             // Formulier op wit: twee velden en klaar. Na aanmaken: duidelijke
             // succes-state, daarna gaat de flow automatisch verder.
@@ -641,6 +803,22 @@ struct AccountRequiredView: View {
 
     private var formSection: some View {
             VStack(spacing: 12) {
+                AppleSignInButton(style: .black) {
+                    withAnimation { completed = true }
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                        onCompleted?()
+                    }
+                }
+
+                HStack(spacing: 10) {
+                    Rectangle().fill(Theme.textSecondary.opacity(0.2)).frame(height: 1)
+                    Text("of handmatig")
+                        .font(.frutiger(size: 11, weight: .medium))
+                        .foregroundStyle(Theme.textSecondary)
+                        .fixedSize()
+                    Rectangle().fill(Theme.textSecondary.opacity(0.2)).frame(height: 1)
+                }
+
                 VStack(spacing: 10) {
                     TextField("Voornaam", text: $name)
                         .textContentType(.givenName)
@@ -693,7 +871,7 @@ struct AccountRequiredView: View {
                     }
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 15)
-                    .background(Theme.navyGradient)
+                    .background(Theme.inkGradient)
                     .foregroundStyle(.white)
                     .clipShape(RoundedRectangle(cornerRadius: 14))
                 }

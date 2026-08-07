@@ -205,12 +205,16 @@ struct WatchVluchtWidget: Widget {
         }
         .configurationDisplayName("Vluchtaftelling")
         .description("Telt op je wijzerplaat af naar je opgeslagen vlucht.")
-        .supportedFamilies([
-            .accessoryCircular,
-            .accessoryCorner,
-            .accessoryInline,
-            .accessoryRectangular
-        ])
+        // accessoryCorner bestaat alleen op watchOS. Zonder deze guard
+        // compileert dit bestand niet als het (bijvoorbeeld bij het bouwen van
+        // alleen de iOS-app) tegen de iOS-SDK wordt gehaald.
+        .supportedFamilies({
+            #if os(watchOS)
+            return [.accessoryCircular, .accessoryCorner, .accessoryInline, .accessoryRectangular]
+            #else
+            return [.accessoryCircular, .accessoryInline, .accessoryRectangular]
+            #endif
+        }())
     }
 }
 

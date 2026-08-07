@@ -4,6 +4,14 @@
 <dict>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
+	<!-- Launchscreen in dezelfde bijna-zwarte kleur als SplashView. Zonder dit
+	     toonde iOS eerst een wit vlak en sprong het beeld daarna naar het
+	     donkere startscherm: een zichtbare witte flits bij elke koude start. -->
+	<key>UILaunchScreen</key>
+	<dict>
+		<key>UIColorName</key>
+		<string>LaunchBackground</string>
+	</dict>
 	<key>NSAlarmKitUsageDescription</key>
 	<string>Alarmen herinneren je op tijd aan het controleren, inpakken of afgeven van je koffer.</string>
 	<key>UIApplicationSceneManifest</key>
@@ -23,6 +31,8 @@
 			</array>
 		</dict>
 	</dict>
+	<key>NSFaceIDUsageDescription</key>
+	<string>Face ID beschermt je verborgen reizen, zodat niemand anders ze ziet als hij je telefoon vasthoudt.</string>
 	<key>NSCameraUsageDescription</key>
 	<string>De camera wordt gebruikt om je tas op te meten met AR, zodat je direct kunt checken of hij als handbagage past.</string>
 	<key>UIAppFonts</key>

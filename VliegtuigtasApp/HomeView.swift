@@ -16,7 +16,13 @@ struct HomeView: View {
     @EnvironmentObject private var airlineStore: AirlineStore
     @EnvironmentObject private var bagStore: BagStore
     @StateObject private var flightStore = FlightStore()
+    @ObservedObject private var tripsStore = TripsStore.shared
+    @ObservedObject private var flightsStore = FlightsStore.shared
+    @ObservedObject private var bagCollection = BagCollectionStore.shared
+    @ObservedObject private var journey = JourneyManager.shared
+    @ObservedObject private var bucketStore = BucketListStore.shared
 
+    @State private var showAddFlight = false
     @State private var flightNumber = ""
     @State private var departureDate = Date()
     @State private var flightSaved = false
@@ -28,17 +34,14 @@ struct HomeView: View {
     // geneste ScrollViews waren op iPadOS onbetrouwbaar (dode tikken).
     @State private var selectedAirline: Airline?
     @State private var selectedBagId: String?
+    @State private var selectedTripId: UUID?
     @Namespace private var zoomNamespace
 
-    // Airport & rules information
-    @State private var showEURules = false
-    @State private var showCustomsInfo = false
-    @State private var showBaggageIssues = false
-    @State private var showAirportSelection = false
-    @State private var showBaggageGuide = false
+    // Luchthaveninfo, EU-regels, douane, bagageproblemen, bagagegids en
+    // inpak-alarmen hingen hier als losse sheets. Ze staan nu in de Meer-hub
+    // en de Reizen-tab, waar ze een eigen label en vaste plek hebben.
     @State private var showBagsOverview = false
-    @State private var showPackingAlarms = false
-    @State private var showReminderSheet = false
+    @State private var showFarewell = false
 
     var body: some View {
         NavigationStack {
@@ -46,27 +49,50 @@ struct HomeView: View {
                 VStack(spacing: 0) {
                     heroSection
                     VStack(spacing: 20) {
-                        // De hele feed lost één probleem op: nooit meer voor
-                        // verrassingen bij de gate. Eerst checken (vlucht,
-                        // maatschappij), dan alles wat een verrassing kán geven,
-                        // en pas onderaan — als een tas níét past — de suggesties.
-                        flightLookupCard
-                        airlineGridSection
-                        preventSurprisesSection
-                        howItWorksSection
-                        if #available(iOS 26.0, *) {
-                            AIAssistentHomeCard()
+                        // Home is een geschetste luchthaven: vertrekbord,
+                        // route door de terminal, gate-bordjes met tips en een
+                        // instapkaart met je statistieken. Alles wat hier
+                        // eerder als losse feed-kaart stond (maatschappijen,
+                        // shop, luchthaveninfo) heeft nu een eigen tab of
+                        // staat in de Meer-hub.
+                        // Één leidende kaart, en nooit twee dingen die hetzelfde
+                        // zeggen:
+                        // • reis/vlucht op komst → bord + reisklaar-kaart
+                        // • niets gepland, wél alles ingericht → volgende actie
+                        // • nog niet ingericht → niets; de terminal-route
+                        //   hieronder is dan zélf de volgende actie
+                        if hasUpcoming {
+                            departureBoard
+                            NextTripCard(
+                                onOpenTrip: { selectedTripId = $0 },
+                                onAddBag: { showBagsOverview = true }
+                            )
+                        } else if journey.isFullyActivated {
+                            NextBestActionCard(
+                                onAddBag: { showBagsOverview = true },
+                                onPlanTrip: { nav.selectedTab = .trips },
+                                onOpenBucketList: { nav.openMore(.bucketList) },
+                                onCheckBag: { nav.openChecker(preselected: nil) }
+                            )
                         }
-                        shopCarouselSection
-                        #if !targetEnvironment(macCatalyst)
-                        // Instellingen > Safari > Extensies bestaat niet op de Mac.
-                        safariExtensionTip
-                        #endif
+
+                        TerminalRouteStrip(
+                            onAddBag: { showBagsOverview = true },
+                            onCheckBag: { nav.openChecker(preselected: nil) },
+                            onAddFlight: { showAddFlight = true },
+                            onPlanTrip: { nav.selectedTab = .trips }
+                        )
+
+                        GateTipsRow(tips: gateTips)
+
+                        BoardingPassStats()
                     }
                     .frame(maxWidth: contentMaxWidth)
                     .padding(.horizontal, 16)
                     .padding(.top, 24)
-                    .padding(.bottom, 48)
+                    // Ruim genoeg om onder de zwevende tabbalk uit te scrollen;
+                    // met 48pt bleef de onderste kaart er half achter hangen.
+                    .padding(.bottom, 110)
                 }
             }
             .background(Color(.systemGroupedBackground))
@@ -78,8 +104,17 @@ struct HomeView: View {
             .navigationDestination(item: $selectedBagId) { bagId in
                 BagDetailView(bagId: bagId)
             }
+            .navigationDestination(item: $selectedTripId) { tripId in
+                TripDetailView(tripId: tripId)
+            }
             .sheet(isPresented: $showProfile) {
                 ProfileView()
+            }
+            .sheet(isPresented: $showBagsOverview) {
+                MyBagsOverviewView()
+            }
+            .sheet(isPresented: $showAddFlight) {
+                AddFlightSheet()
             }
             .sheet(isPresented: $showAccountForFlight) {
                 ScrollView {
@@ -108,6 +143,160 @@ struct HomeView: View {
                 APIClient.shared.sendEvent("page_view", path: "/home")
             }
         }
+    }
+
+    // MARK: - Vertrekbord
+
+    private var hasUpcoming: Bool { tripsStore.next != nil || flightsStore.next != nil }
+
+    /// Bestemming voor het klapperbord. Het bord kent alleen A–Z, cijfers en
+    /// een paar tekens, dus accenten worden platgeslagen en de rest gefilterd —
+    /// anders komt er een vreemd teken op een klepje terecht.
+    private var boardDestination: String {
+        let raw = tripsStore.next?.destination
+            ?? tripsStore.next?.name
+            ?? flightsStore.next?.routeLabel
+            ?? flightsStore.next?.number
+            ?? "ONBEKEND"
+        // De pijl uit "NRN → GRO" zit niet in de tekenset van het bord en werd
+        // daardoor een gat van lege klepjes. Een midden-punt kán het bord wel
+        // tonen, dus die zetten we ervoor in de plaats.
+        let normalised = raw
+            .replacingOccurrences(of: "→", with: "·")
+            .replacingOccurrences(of: "->", with: "·")
+        let folded = normalised.uppercased().folding(options: .diacriticInsensitive, locale: nil)
+        let allowed = Set(" ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789?!.-·")
+        let cleaned = String(folded.map { allowed.contains($0) ? $0 : " " })
+        // Dubbele spaties samenvouwen, zodat er nooit een rij lege klepjes
+        // midden in de tekst overblijft.
+        let collapsed = cleaned.split(separator: " ", omittingEmptySubsequences: true).joined(separator: " ")
+        return String(collapsed.prefix(12))
+    }
+
+    private var boardCountdown: String {
+        tripsStore.next?.countdownLabel ?? flightsStore.next?.countdownLabel ?? "—"
+    }
+
+    /// Zwart vertrekbord bovenaan: bestemming klappert in beeld, met vertrek en
+    /// status ernaast — zoals het bord in een vertrekhal.
+    private var departureBoard: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack {
+                Text("VERTREK")
+                    .font(.system(size: 11, weight: .black, design: .monospaced))
+                    .foregroundStyle(.white.opacity(0.55))
+                    .kerning(1.2)
+                Spacer()
+                Text(boardCountdown.uppercased())
+                    .font(.system(size: 10, weight: .black, design: .monospaced))
+                    .foregroundStyle(Theme.ink)
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 3)
+                    .background(Theme.yellow, in: Capsule())
+            }
+
+            SplitFlapText(boardDestination, size: 19)
+
+            HStack(spacing: 6) {
+                Image(systemName: "arrow.right.circle.fill")
+                    .font(.system(size: 11, weight: .bold))
+                    .foregroundStyle(Theme.yellow)
+                Text(tripsStore.next != nil ? "Jouw volgende reis" : "Jouw volgende vlucht")
+                    .font(.frutiger(size: 12, weight: .semibold))
+                    .foregroundStyle(.white.opacity(0.7))
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(16)
+        .background(Theme.inkGradient)
+        .clipShape(RoundedRectangle(cornerRadius: 18))
+        // Easter egg: bord lang vasthouden → afscheidsgroet over het bord.
+        .overlay {
+            if showFarewell {
+                VStack(spacing: 4) {
+                    Image(systemName: "hand.wave.fill")
+                        .font(.system(size: 26, weight: .bold))
+                    Text("GOEDE REIS!")
+                        .font(.system(size: 17, weight: .black, design: .monospaced))
+                        .kerning(1.5)
+                }
+                .foregroundStyle(Theme.ink)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .background(Theme.yellow)
+                .clipShape(RoundedRectangle(cornerRadius: 18))
+                .transition(.scale(scale: 0.85).combined(with: .opacity))
+            }
+        }
+        .onLongPressGesture(minimumDuration: 0.9) {
+            guard !showFarewell else { return }
+            EasterEggStore.shared.discover(.boardFarewell)
+            UINotificationFeedbackGenerator().notificationOccurred(.success)
+            withAnimation(.spring(response: 0.35, dampingFraction: 0.6)) { showFarewell = true }
+            Task {
+                try? await Task.sleep(nanoseconds: 1_900_000_000)
+                withAnimation(.easeOut(duration: 0.35)) { showFarewell = false }
+            }
+        }
+    }
+
+    // MARK: - Gate-tips
+
+    /// Tips om meer uit de app te halen. Elke tip staat er alleen zolang de
+    /// bijbehorende actie nog niet gedaan is — behalve de "leer de app"-tips
+    /// (widget, Pim, alarm), die niet meetbaar zijn en dus weg te klikken zijn.
+    /// Bewust géén tips voor dingen die de terminal-route al vraagt (tas, check,
+    /// vlucht, reis). Anders staat dezelfde vraag twee keer op één scherm: als
+    /// halte in de route én als gele knop in een tip. De route is de baas over
+    /// die vier stappen; de tips gaan over alles daarbuiten.
+    private var gateTips: [GateTip] {
+        var tips: [GateTip] = []
+
+        if session.passportExpiry == nil {
+            tips.append(GateTip(
+                id: "passport", gate: "A3",
+                title: "Vul je paspoortdatum in",
+                body: "We waarschuwen je als hij te kort geldig is.",
+                actionTitle: "Naar profiel",
+                action: { showProfile = true }
+            ))
+        }
+
+        if bucketStore.visitedCount == 0 {
+            tips.append(GateTip(
+                id: "bucket", gate: "C1",
+                title: "Vul je bucket list",
+                body: "Vink landen af en zie je paspoort vollopen.",
+                actionTitle: "Bucket list",
+                action: { nav.openMore(.bucketList) }
+            ))
+        }
+
+        tips.append(GateTip(
+            id: "widget", gate: "B1",
+            title: "Zet de aftelling op je beginscherm",
+            body: "Beginscherm ingedrukt houden, tik op + en zoek Vliegtuigtas.",
+            actionTitle: nil, action: nil
+        ))
+
+        if #available(iOS 26.0, *) {
+            tips.append(GateTip(
+                id: "pim", gate: "B3",
+                title: "Laat Purser Pim meedenken",
+                body: "Vraag wat mee mag bij jouw maatschappij.",
+                actionTitle: "Vraag het Pim",
+                action: { nav.openMore(.pim) }
+            ))
+        }
+
+        tips.append(GateTip(
+            id: "alarm", gate: "B4",
+            title: "Zet een inpak-alarm",
+            body: "Word op tijd herinnerd — ook in stille modus.",
+            actionTitle: "Naar Reizen",
+            action: { nav.selectedTab = .trips }
+        ))
+
+        return tips
     }
 
     // MARK: - Hero
@@ -225,485 +414,13 @@ struct HomeView: View {
             .frame(maxWidth: contentMaxWidth)
             .padding(.horizontal, 20)
             .padding(.bottom, 28)
+            // De hero heeft een vaste hoogte, en het klapperbord schaalt niet
+            // mee met Dynamic Type. Zonder deze grens liep de tekst bij de
+            // grootste letterinstellingen dwars door de merkregel bovenaan.
+            .dynamicTypeSize(...DynamicTypeSize.xxLarge)
         }
     }
 
-    // MARK: - Flight lookup
-
-    private var flightLookupCard: some View {
-        VStack(alignment: .leading, spacing: 14) {
-            HStack(spacing: 8) {
-                Image(systemName: "airplane.departure")
-                    .font(.system(size: 14, weight: .semibold))
-                    .foregroundStyle(Theme.navy)
-                Text("Vluchtnummer opzoeken")
-                    .font(.frutiger(size: 15, weight: .bold))
-                    .foregroundStyle(Theme.textPrimary)
-            }
-
-            HStack(spacing: 10) {
-                Image(systemName: "magnifyingglass")
-                    .foregroundStyle(Theme.textSecondary)
-                    .font(.system(size: 15))
-
-                TextField("bijv. KL1234 of FR7542", text: $flightNumber)
-                    .autocorrectionDisabled()
-                    .textInputAutocapitalization(.characters)
-                    .submitLabel(.search)
-                    .onSubmit { lookupFlight() }
-                    .font(.frutiger(size: 15))
-
-                if flightStore.isLoading {
-                    ProgressView().tint(Theme.sky).scaleEffect(0.8)
-                }
-            }
-            .padding(.horizontal, 14)
-            .padding(.vertical, 13)
-            .background(Color(.secondarySystemGroupedBackground))
-            .clipShape(RoundedRectangle(cornerRadius: 14))
-            .onChange(of: flightNumber) { _, newValue in
-                scheduleFlightAutoLookup(for: newValue)
-            }
-            .onChange(of: flightStore.result?.flightDate) { _, newDate in
-                applyLookedUpDepartureDate(newDate)
-            }
-
-            if let result = flightStore.result {
-                if let airline = result.resolvedAirline {
-                    VStack(spacing: 0) {
-                        HStack(spacing: 10) {
-                            if airline.bestLogoUrl != nil {
-                                AuthorisedImage(urlString: airline.bestLogoUrl)
-                                    .frame(width: 28, height: 20)
-                            } else {
-                                Image(systemName: "checkmark.circle.fill").foregroundStyle(Theme.green)
-                            }
-                            Text(airline.name)
-                                .font(.frutiger(size: 14, weight: .semibold))
-                            if let status = result.statusLabel {
-                                FlightStatusChip(status: status, rawStatus: result.status)
-                            }
-                            Spacer()
-                            Button {
-                                nav.openChecker(preselected: airline)
-                            } label: {
-                                HStack(spacing: 4) {
-                                    Text("Check nu")
-                                        .font(.system(size: 13, weight: .semibold))
-                                    Image(systemName: "arrow.right")
-                                        .font(.system(size: 11, weight: .semibold))
-                                }
-                                .foregroundStyle(Theme.navy)
-                            }
-                        }
-                        .padding(12)
-
-                        if result.hasRoute {
-                            Divider().padding(.horizontal, 12)
-                            FlightRouteRow(result: result)
-                                .padding(.horizontal, 12)
-                                .padding(.vertical, 10)
-                        }
-
-                        Divider().padding(.horizontal, 12)
-
-                        // Bewaar de vlucht in je vluchtenlijst (zie profiel).
-                        // Twee rijen: de datum+tijd-picker en de knop passen
-                        // niet comfortabel samen op één regel.
-                        VStack(spacing: 10) {
-                            HStack(spacing: 8) {
-                                Image(systemName: "calendar")
-                                    .font(.system(size: 13))
-                                    .foregroundStyle(Theme.navy)
-                                Text("Vertrek")
-                                    .font(.frutiger(size: 12, weight: .medium))
-                                    .foregroundStyle(Theme.textSecondary)
-                                if flightStore.result?.flightDate != nil {
-                                    Label("Automatisch ingevuld", systemImage: "wand.and.stars")
-                                        .font(.frutiger(size: 9, weight: .semibold))
-                                        .foregroundStyle(Theme.green)
-                                }
-                                Spacer()
-                                DatePicker("", selection: $departureDate, in: Date()..., displayedComponents: [.date, .hourAndMinute])
-                                    .labelsHidden()
-                            }
-
-                            Button {
-                                // Accountgebonden: de vlucht wordt aan je
-                                // profiel gekoppeld en via iCloud gesynct
-                                // naar widget, Watch en andere apparaten.
-                                guard session.hasAccount else {
-                                    showAccountForFlight = true
-                                    return
-                                }
-                                savePendingFlight()
-                            } label: {
-                                HStack(spacing: 6) {
-                                    Image(systemName: flightSaved ? "checkmark" : "plus.square.on.square")
-                                        .font(.system(size: 12, weight: .bold))
-                                    Text(flightSaved ? "Vlucht opgeslagen" : "Vlucht opslaan")
-                                        .font(.frutiger(size: 13, weight: .semibold))
-                                }
-                                .frame(maxWidth: .infinity)
-                                .padding(.vertical, 11)
-                                .foregroundStyle(flightSaved ? Theme.green : .white)
-                                .background(flightSaved
-                                    ? AnyShapeStyle(Theme.green.opacity(0.15))
-                                    : AnyShapeStyle(Theme.navyGradient))
-                                .clipShape(RoundedRectangle(cornerRadius: 12))
-                            }
-                            .buttonStyle(.plain)
-                        }
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 10)
-                    }
-                    .background(Theme.green.opacity(0.08))
-                    .clipShape(RoundedRectangle(cornerRadius: 12))
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 12)
-                            .strokeBorder(Theme.green.opacity(0.2), lineWidth: 1)
-                    )
-                } else if let name = result.rawAirlineName {
-                    VStack(spacing: 0) {
-                        HStack(spacing: 10) {
-                            Image(systemName: "info.circle.fill").foregroundStyle(Theme.yellow)
-                            VStack(alignment: .leading, spacing: 1) {
-                                Text(name)
-                                    .font(.frutiger(size: 14, weight: .semibold))
-                                Text("Niet in onze database, kies handmatig")
-                                    .font(.system(size: 11))
-                                    .foregroundStyle(Theme.textSecondary)
-                            }
-                            if let status = result.statusLabel {
-                                FlightStatusChip(status: status, rawStatus: result.status)
-                            }
-                            Spacer()
-                            Button {
-                                nav.openChecker(preselected: nil)
-                            } label: {
-                                HStack(spacing: 4) {
-                                    Text("Kies")
-                                        .font(.system(size: 13, weight: .semibold))
-                                    Image(systemName: "arrow.right")
-                                        .font(.system(size: 11, weight: .semibold))
-                                }
-                                .foregroundStyle(Theme.navy)
-                            }
-                        }
-                        .padding(12)
-
-                        if result.hasRoute {
-                            Divider().padding(.horizontal, 12)
-                            FlightRouteRow(result: result)
-                                .padding(.horizontal, 12)
-                                .padding(.vertical, 10)
-                        }
-                    }
-                    .background(Theme.yellow.opacity(0.08))
-                    .clipShape(RoundedRectangle(cornerRadius: 12))
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 12)
-                            .strokeBorder(Theme.yellow.opacity(0.25), lineWidth: 1)
-                    )
-                }
-            }
-
-            if let err = flightStore.error {
-                Label(err, systemImage: "exclamationmark.circle.fill")
-                    .font(.system(size: 13))
-                    .foregroundStyle(Theme.red)
-            }
-        }
-        .padding(18)
-        .background(Color(.systemBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 20))
-        .shadow(color: .black.opacity(0.06), radius: 12, x: 0, y: 4)
-    }
-
-    // MARK: - Airline grid (3 × 1, meestgebruikte maatschappijen)
-
-    private var airlineGridSection: some View {
-        VStack(spacing: 14) {
-            HStack {
-                Text("Populaire maatschappijen")
-                    .font(.frutiger(size: 18, weight: .bold))
-                    .foregroundStyle(Theme.textPrimary)
-                Spacer()
-                Button { nav.openAirlines() } label: {
-                    HStack(spacing: 4) {
-                        Text("Bekijk alle")
-                            .font(.system(size: 13, weight: .semibold))
-                        Image(systemName: "arrow.right")
-                            .font(.system(size: 11, weight: .semibold))
-                    }
-                    .foregroundStyle(Theme.navy)
-                    // Ruimer raakvlak dan alleen de tekst zelf
-                    .padding(.vertical, 8)
-                    .padding(.leading, 12)
-                    .contentShape(Rectangle())
-                }
-                .buttonStyle(.plain)
-            }
-
-            if airlineStore.isLoading && airlineStore.airlines.isEmpty {
-                HStack(spacing: 10) {
-                    ForEach(0..<3, id: \.self) { _ in
-                        RoundedRectangle(cornerRadius: 18)
-                            .fill(Color(.systemBackground))
-                            .frame(width: 118, height: 106)
-                            .shadow(color: .black.opacity(0.05), radius: 6, x: 0, y: 2)
-                    }
-                    Spacer()
-                }
-            } else {
-                // Carrousel die direct naar de detailpagina pusht, met dezelfde
-                // zoom-overgang als de maatschappijenpagina. Geen cross-tab
-                // handoff meer: dat was de bron van de haperende tikken.
-                ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(spacing: 10) {
-                        ForEach(airlineStore.airlines.prefix(10)) { airline in
-                            Button {
-                                UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                                selectedAirline = airline
-                            } label: {
-                                AirlineCard(airline: airline)
-                            }
-                            .buttonStyle(.plain)
-                        }
-                    }
-                    .padding(.horizontal, 16)
-                    .padding(.vertical, 4)
-                }
-                .padding(.horizontal, -16)
-            }
-        }
-    }
-
-    // MARK: - Shop carousel
-
-    private var shopCarouselSection: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            // Rustige koptekst i.p.v. een salesy fotobanner: de shop is hier de
-            // oplossing als je tas níét past, niet de hoofdmoot van de app.
-            HStack(alignment: .firstTextBaseline) {
-                VStack(alignment: .leading, spacing: 2) {
-                    Text("Past je tas niet? Deze wél")
-                        .font(.frutiger(size: 16, weight: .bold))
-                        .foregroundStyle(Theme.textPrimary)
-                    Text("Cabinegoedgekeurde tassen — geen bijbetalen aan de gate.")
-                        .font(.frutiger(size: 12))
-                        .foregroundStyle(Theme.textSecondary)
-                }
-                Spacer()
-                Button { nav.openShop() } label: {
-                    HStack(spacing: 3) {
-                        Text("Alle")
-                            .font(.frutiger(size: 13, weight: .semibold))
-                        Image(systemName: "arrow.right")
-                            .font(.system(size: 10, weight: .semibold))
-                    }
-                    .foregroundStyle(Theme.navy)
-                }
-                .buttonStyle(.plain)
-            }
-
-            // Edge-to-edge scroll (compenseer de 16pt parent padding)
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(alignment: .top, spacing: 12) {
-                    if bagStore.isLoading && bagStore.bags.isEmpty {
-                        ForEach(0..<5, id: \.self) { _ in ShopCarouselSkeletonCard() }
-                    } else {
-                        ForEach(bagStore.bags.prefix(8)) { bag in
-                            Button {
-                                UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                                selectedBagId = bag.id
-                            } label: {
-                                ShopCarouselCard(bag: bag)
-                            }
-                            .buttonStyle(.plain)
-                        }
-                        if !bagStore.bags.isEmpty {
-                            ViewAllShopCard { nav.openShop() }
-                        }
-                    }
-                }
-                .padding(.horizontal, 16)
-                .padding(.vertical, 4)
-            }
-            .padding(.horizontal, -16)
-        }
-    }
-
-    // MARK: - How it works
-
-    private var howItWorksSection: some View {
-        ZStack(alignment: .topLeading) {
-            // Foto achtergrond
-            Image("PhotoOverheadOpen")
-                .resizable()
-                .scaledToFill()
-                .frame(maxWidth: .infinity)
-                .frame(height: 260)
-                .clipped()
-                .clipShape(RoundedRectangle(cornerRadius: 22))
-                .allowsHitTesting(false)
-
-            // Donkere overlay
-            LinearGradient(
-                colors: [Theme.navy.opacity(0.88), Theme.navy.opacity(0.55)],
-                startPoint: .bottom, endPoint: .top
-            )
-            .clipShape(RoundedRectangle(cornerRadius: 22))
-            .allowsHitTesting(false)
-
-            VStack(alignment: .leading, spacing: 16) {
-                Text("Hoe werkt het?")
-                    .font(.frutiger(size: 18, weight: .bold))
-                    .foregroundStyle(.white)
-
-                VStack(spacing: 12) {
-                    PhotoStepRow(number: "1", icon: "airplane.departure",
-                                 title: "Kies je maatschappij",
-                                 description: "Of zoek via vluchtnummer.")
-                    PhotoStepRow(number: "2", icon: "ruler",
-                                 title: "Vul je tasmaten in",
-                                 description: "Lengte, breedte, hoogte en gewicht.")
-                    PhotoStepRow(number: "3", icon: "checkmark.shield.fill",
-                                 title: "Direct resultaat",
-                                 description: "Past het niet? We adviseren de juiste tas.")
-                }
-            }
-            .padding(20)
-        }
-    }
-
-    // MARK: - Voorkom verrassingen bij de gate
-
-    /// De kern van de app in één blok: alles wat je vóór vertrek regelt zodat
-    /// je bij de gate niet voor verrassingen (of bijbetalen) komt te staan.
-    private var preventSurprisesSection: some View {
-        VStack(alignment: .leading, spacing: 14) {
-            VStack(alignment: .leading, spacing: 3) {
-                Text("Voorkom verrassingen bij de gate")
-                    .font(.frutiger(size: 18, weight: .bold))
-                    .foregroundStyle(Theme.textPrimary)
-                Text("Regel het thuis, dan sta je nergens voor bij het instappen.")
-                    .font(.frutiger(size: 13))
-                    .foregroundStyle(Theme.textSecondary)
-            }
-
-            LazyVGrid(columns: [GridItem(.flexible(), spacing: 10), GridItem(.flexible(), spacing: 10)], spacing: 10) {
-                QuickActionCard(
-                    icon: "checkmark.shield.fill",
-                    title: "Check je tas",
-                    subtitle: "Past hij in de cabine?"
-                ) {
-                    nav.openChecker(preselected: nil)
-                }
-                QuickActionCard(
-                    icon: "suitcase.rolling.fill",
-                    title: "Passen mijn tassen?",
-                    subtitle: "Al je tassen langs de regels"
-                ) {
-                    showBagsOverview = true
-                }
-                QuickActionCard(
-                    icon: "checkmark.seal.fill",
-                    title: "Wat mag mee?",
-                    subtitle: "Vloeistoffen, powerbanks & meer"
-                ) {
-                    showEURules = true
-                }
-                QuickActionCard(
-                    icon: "airplane.circle.fill",
-                    title: "Luchthavens",
-                    subtitle: "Security & tips per vliegveld"
-                ) {
-                    showAirportSelection = true
-                }
-                QuickActionCard(
-                    icon: "eurosign.circle.fill",
-                    title: "Douane info",
-                    subtitle: "Belastingvrij importeren"
-                ) {
-                    showCustomsInfo = true
-                }
-                QuickActionCard(
-                    icon: "bell.badge.fill",
-                    title: "Bagage kwijt?",
-                    subtitle: "Je rechten & procedure"
-                ) {
-                    showBaggageIssues = true
-                }
-            }
-        }
-        .sheet(isPresented: $showBaggageGuide) {
-            BaggageGuideView()
-        }
-        .sheet(isPresented: $showBagsOverview) {
-            MyBagsOverviewView()
-        }
-        .sheet(isPresented: $showPackingAlarms) {
-            PackingAlarmsSheet()
-        }
-        .sheet(isPresented: $showReminderSheet) {
-            DepartureReminderSheet()
-                .presentationDetents([.medium])
-                .presentationDragIndicator(.visible)
-        }
-        .sheet(isPresented: $showEURules) {
-            EURulesView()
-                .presentationDragIndicator(.visible)
-        }
-        .sheet(isPresented: $showCustomsInfo) {
-            CustomsInfoView()
-                .presentationDragIndicator(.visible)
-        }
-        .sheet(isPresented: $showBaggageIssues) {
-            BaggageIssuesView()
-                .presentationDragIndicator(.visible)
-        }
-        .sheet(isPresented: $showAirportSelection) {
-            AirportSelectionView()
-                .presentationDragIndicator(.visible)
-        }
-    }
-
-    private var safariExtensionTip: some View {
-        Button {
-            if let url = URL(string: UIApplication.openSettingsURLString) {
-                UIApplication.shared.open(url)
-            }
-        } label: {
-            HStack(spacing: 14) {
-                ZStack {
-                    Circle().fill(Theme.skyLight).frame(width: 44, height: 44)
-                    Image(systemName: "safari.fill")
-                        .font(.system(size: 18, weight: .medium))
-                        .foregroundStyle(Theme.sky)
-                }
-
-                VStack(alignment: .leading, spacing: 2) {
-                    Text("Check tassen tijdens het shoppen")
-                        .font(.frutiger(size: 14, weight: .semibold))
-                        .foregroundStyle(Theme.textPrimary)
-                    Text("Zet de Vliegtuigtas-extensie aan in Instellingen > Safari > Extensies.")
-                        .font(.caption1)
-                        .foregroundStyle(Theme.textSecondary)
-                }
-
-                Spacer()
-                Image(systemName: "chevron.right")
-                    .font(.system(size: 13, weight: .semibold))
-                    .foregroundStyle(Theme.textSecondary)
-            }
-            .padding(14)
-            .background(Color(.systemBackground))
-            .clipShape(RoundedRectangle(cornerRadius: 18))
-            .shadow(color: .black.opacity(0.05), radius: 8, x: 0, y: 3)
-        }
-        .buttonStyle(.plain)
-    }
 
     /// Slaat de opgezochte vlucht op — inclusief alle route-info uit de
     /// lookup — als een nieuwe vlucht in je vluchtenlijst. De eerstvolgende
@@ -754,147 +471,659 @@ struct HomeView: View {
         }
     }
 
+    /// Gedeeld en gecachet i.p.v. per aanroep een nieuwe formatter te maken.
+    private static let isoDateFormatter: ISO8601DateFormatter = {
+        let f = ISO8601DateFormatter()
+        f.formatOptions = [.withFullDate]
+        return f
+    }()
+
     /// Vult de vertrekdatum aan uit de match; het tijdstip (niet in de API)
     /// blijft staan wat er al stond. Een datum in het verleden negeren we.
     private func applyLookedUpDepartureDate(_ raw: String?) {
         guard let raw else { return }
-        let iso = ISO8601DateFormatter()
-        iso.formatOptions = [.withFullDate]
-        guard let parsed = iso.date(from: raw) else { return }
+        guard let parsed = Self.isoDateFormatter.date(from: raw) else { return }
         let cal = Calendar.current
         var comps = cal.dateComponents([.year, .month, .day], from: parsed)
         let time = cal.dateComponents([.hour, .minute], from: departureDate)
         comps.hour = time.hour
         comps.minute = time.minute
-        if let combined = cal.date(from: comps), combined > .now {
-            withAnimation(.spring(response: 0.3)) { departureDate = combined }
-        }
+        guard let combined = cal.date(from: comps) else { return }
+        // Een looked-up dag die al voorbij is (herhalend vluchtnummer, andere
+        // dag) negeren we; op dagniveau vergelijken i.p.v. exacte timestamp
+        // (zelfde reden als AddFlightSheet in Flights.swift).
+        guard cal.startOfDay(for: combined) >= cal.startOfDay(for: .now) else { return }
+        // Tijdstip komt niet uit de API; als het restant-tijdstip al voorbij
+        // is (vandaag vertrekkende vlucht), zou de DatePicker (`in: Date()...`)
+        // onze update anders stilletjes terugklemmen naar "nu".
+        let finalDate = max(combined, .now)
+        withAnimation(.spring(response: 0.3)) { departureDate = finalDate }
     }
 }
 
-// MARK: - Vluchtroute & status
 
-/// Boardingpass-achtige routeregel: IATA-codes groot, luchthavens klein,
-/// vliegtuigje ertussen. Alle info komt live uit de flight-lookup.
-private struct FlightRouteRow: View {
-    let result: FlightLookupResponse
+// MARK: - Volgende reis-kaart
+
+/// Eén samenhangende kaart i.p.v. losse stukjes: vlucht/reis-countdown,
+/// paklijst-voortgang en tas-fit voor je eerstvolgende reis, op één plek.
+/// `myTripsSection` (alle reizen) en `flightLookupCard` (een nieuwe vlucht
+/// opzoeken) blijven ernaast bestaan — dit is puur de "sta ik klaar?"-status.
+// MARK: - Terminal-beeldtaal
+//
+// Home is een geschetste luchthaven: een vertrekbord bovenaan, een route door
+// de terminal (check-in → scan → gate → boarding) en gate-bordjes met tips.
+// De beeldtaal is die van echte luchthavensignage — zwart bord, geel accent,
+// gate-codes — en hergebruikt het klapperbord en de bagagelabel-bouwstenen
+// die de app al had.
+
+/// Onthoudt welke gate-tips zijn weggeklikt, zodat een tip niet blijft
+/// terugkomen nadat je hem hebt gezien.
+@MainActor
+final class HomeTipsStore: ObservableObject {
+    static let shared = HomeTipsStore()
+    private let key = "vt_dismissed_home_tips"
+    @Published private(set) var dismissed: Set<String>
+
+    private init() {
+        dismissed = Set(UserDefaults.standard.stringArray(forKey: key) ?? [])
+    }
+
+    func dismiss(_ id: String) {
+        dismissed.insert(id)
+        UserDefaults.standard.set(Array(dismissed), forKey: key)
+    }
+}
+
+/// Geel gate-plaatje met code, zoals de bordjes boven een gate.
+private struct GateBadge: View {
+    let code: String
+    /// Inactieve bordjes krijgen een eigen grijze stijl in plaats van geel met
+    /// verlaagde opacity: dat laatste werd in donkere modus een vuile olijfkleur.
+    var active: Bool = true
 
     var body: some View {
-        HStack(alignment: .center, spacing: 12) {
-            endpoint(code: result.departureIata, airport: result.departureAirport, alignment: .leading)
-
-            VStack(spacing: 2) {
-                Image(systemName: "airplane")
-                    .font(.system(size: 13, weight: .semibold))
-                    .foregroundStyle(Theme.sky)
-                if let date = formattedDate {
-                    Text(date)
-                        .font(.frutiger(size: 9, weight: .medium))
-                        .foregroundStyle(Theme.textSecondary)
-                }
-            }
-            .frame(maxWidth: .infinity)
-
-            endpoint(code: result.arrivalIata, airport: result.arrivalAirport, alignment: .trailing)
-        }
-    }
-
-    private func endpoint(code: String?, airport: String?, alignment: HorizontalAlignment) -> some View {
-        VStack(alignment: alignment, spacing: 1) {
-            Text(code ?? "—")
-                .font(.frutiger(size: 22, weight: .black))
-                .foregroundStyle(Theme.navy)
-                .kerning(1)
-            if let airport {
-                Text(airport)
-                    .font(.frutiger(size: 10, weight: .medium))
-                    .foregroundStyle(Theme.textSecondary)
-                    .lineLimit(1)
-            }
-        }
-    }
-
-    private var formattedDate: String? {
-        guard let raw = result.flightDate else { return nil }
-        let iso = ISO8601DateFormatter()
-        iso.formatOptions = [.withFullDate]
-        guard let date = iso.date(from: raw) else { return raw }
-        let fmt = DateFormatter()
-        fmt.locale = Locale(identifier: "nl_NL")
-        fmt.dateFormat = "d MMM"
-        return fmt.string(from: date)
+        Text(code)
+            .font(.system(size: 10, weight: .black, design: .monospaced))
+            .foregroundStyle(active ? Theme.ink : Theme.textSecondary)
+            .padding(.horizontal, 7)
+            .padding(.vertical, 3)
+            .background(
+                active ? AnyShapeStyle(Theme.yellow) : AnyShapeStyle(Color(.tertiarySystemFill)),
+                in: RoundedRectangle(cornerRadius: 5)
+            )
     }
 }
 
-private struct FlightStatusChip: View {
-    let status: String
-    let rawStatus: String?
-
-    private var color: Color {
-        switch rawStatus {
-        case "active":                                       return Theme.green
-        case "landed":                                       return Theme.textSecondary
-        case "cancelled", "incident", "diverted", "delayed": return Theme.red
-        default:                                             return Theme.sky
-        }
-    }
-
-    var body: some View {
-        Text(status)
-            .font(.frutiger(size: 10, weight: .bold))
-            .foregroundStyle(color)
-            .padding(.horizontal, 8)
-            .padding(.vertical, 4)
-            .background(color.opacity(0.12))
-            .clipShape(Capsule())
-    }
-}
-
-// MARK: - Handige actie-kaart
-
-private struct QuickActionCard: View {
-    let icon: String
+/// Eén halte op de route door de terminal.
+private struct TerminalStop: Identifiable {
+    let id: String
+    let gate: String
     let title: String
-    let subtitle: String
+    let icon: String
+    let done: Bool
     let action: () -> Void
+}
 
-    // Eén rustige accentkleur voor álle acties (het merk-navy), zodat het
-    // raster kalm oogt in plaats van een bonte verzameling icoonkleuren.
-    private var accent: Color { Theme.navy }
+/// De route door de terminal: vier haltes, verbonden door een gestreepte
+/// taxibaan. Vervangt de vlakke "Aan de slag"-checklist — dezelfde vier
+/// mijlpalen, maar als looproute door een luchthaven, en hij blijft staan als
+/// alles klaar is ("READY TO BOARD").
+private struct TerminalRouteStrip: View {
+    @ObservedObject private var journey = JourneyManager.shared
+
+    let onAddBag: () -> Void
+    let onCheckBag: () -> Void
+    let onAddFlight: () -> Void
+    let onPlanTrip: () -> Void
+
+    private var stops: [TerminalStop] {
+        [
+            TerminalStop(id: "checkin", gate: "A1", title: "Check-in",
+                         icon: "suitcase.rolling.fill", done: journey.hasBag, action: onAddBag),
+            TerminalStop(id: "scan", gate: "A2", title: "Scan",
+                         icon: "checkmark.shield.fill", done: journey.hasCheckedBag, action: onCheckBag),
+            TerminalStop(id: "gate", gate: "B1", title: "Gate",
+                         icon: "airplane.departure", done: journey.hasFlight, action: onAddFlight),
+            TerminalStop(id: "boarding", gate: "B2", title: "Boarding",
+                         icon: "map.fill", done: journey.hasTrip, action: onPlanTrip),
+        ]
+    }
+
+    private var allDone: Bool { journey.isFullyActivated }
+
+    private var remainingLabel: String {
+        let remaining = journey.totalSteps - journey.completedSteps
+        return remaining == 1
+            ? "Nog één halte te gaan."
+            : "Nog \(remaining) haltes te gaan."
+    }
+
+    @State private var gateTaps: [String: Int] = [:]
+    @State private var lastGateTap = Date.distantPast
+    @State private var announcement: String?
 
     var body: some View {
-        Button {
-            UIImpactFeedbackGenerator(style: .light).impactOccurred()
-            action()
-        } label: {
-            VStack(alignment: .leading, spacing: 8) {
-                ZStack {
-                    RoundedRectangle(cornerRadius: 12)
-                        .fill(accent.opacity(0.10))
-                        .frame(width: 38, height: 38)
-                    Image(systemName: icon)
-                        .font(.system(size: 16, weight: .semibold))
-                        .foregroundStyle(accent)
-                }
+        VStack(alignment: .leading, spacing: 14) {
+            HStack(alignment: .firstTextBaseline) {
                 VStack(alignment: .leading, spacing: 2) {
-                    Text(title)
-                        .font(.frutiger(size: 12, weight: .bold))
-                        .foregroundStyle(Theme.textPrimary)
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.8)
-                    Text(subtitle)
-                        .font(.frutiger(size: 10))
+                    Text(allDone ? "READY TO BOARD" : "JOUW ROUTE DOOR DE TERMINAL")
+                        .font(.system(size: 11, weight: .black, design: .monospaced))
+                        .foregroundStyle(allDone ? Theme.green : Theme.textSecondary)
+                        .kerning(1.1)
+                    Text(allDone
+                         ? "Alles geregeld — je staat klaar bij de gate."
+                         : remainingLabel)
+                        .font(.frutiger(size: 13))
                         .foregroundStyle(Theme.textSecondary)
-                        .lineLimit(2)
+                }
+                Spacer()
+            }
+
+            HStack(spacing: 0) {
+                ForEach(Array(stops.enumerated()), id: \.element.id) { index, stop in
+                    stopNode(stop)
+                    if index < stops.count - 1 {
+                        // Taxibaan tussen twee haltes: doorlopend geel tot waar
+                        // je bent, daarna gestreept grijs.
+                        Rectangle()
+                            .fill(stop.done ? Theme.yellow : Theme.textSecondary.opacity(0.22))
+                            .frame(height: 3)
+                            .frame(maxWidth: .infinity)
+                            .padding(.bottom, 22)
+                    }
                 }
             }
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(12)
-            .background(Color(.systemBackground))
-            .clipShape(RoundedRectangle(cornerRadius: 16))
-            .shadow(color: .black.opacity(0.06), radius: 8, x: 0, y: 3)
+
+            // Easter egg: gate-omroep na 3× tikken op een afgeronde halte.
+            if let announcement {
+                HStack(spacing: 7) {
+                    Image(systemName: "speaker.wave.2.fill")
+                        .font(.system(size: 11, weight: .bold))
+                    Text(announcement)
+                        .font(.system(size: 11, weight: .black, design: .monospaced))
+                        .kerning(0.5)
+                        .lineLimit(2)
+                        .minimumScaleFactor(0.8)
+                }
+                .foregroundStyle(Theme.ink)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.horizontal, 11)
+                .padding(.vertical, 8)
+                .background(Theme.yellow, in: RoundedRectangle(cornerRadius: 10))
+                .transition(.move(edge: .bottom).combined(with: .opacity))
+            }
+        }
+        .padding(16)
+        .background(Color(.systemBackground))
+        .clipShape(RoundedRectangle(cornerRadius: 18))
+        .shadow(color: .black.opacity(0.05), radius: 10, x: 0, y: 3)
+    }
+
+    /// Afgeronde haltes blijven tikbaar — 3× tikken roept de gate om
+    /// (easter egg). Openstaande haltes doen gewoon hun actie.
+    private func handleDoneTap(_ stop: TerminalStop) {
+        let now = Date()
+        if now.timeIntervalSince(lastGateTap) > 1.2 { gateTaps = [:] }
+        lastGateTap = now
+        let count = (gateTaps[stop.id] ?? 0) + 1
+        gateTaps[stop.id] = count
+        guard count >= 3, announcement == nil else { return }
+        gateTaps = [:]
+        EasterEggStore.shared.discover(.gateAnnouncement)
+        UINotificationFeedbackGenerator().notificationOccurred(.success)
+        withAnimation(.spring(response: 0.35, dampingFraction: 0.75)) {
+            announcement = "LAATSTE OMROEP · GATE \(stop.gate) · \(stop.title.uppercased())"
+        }
+        Task {
+            try? await Task.sleep(nanoseconds: 2_600_000_000)
+            withAnimation(.easeOut(duration: 0.35)) { announcement = nil }
+        }
+    }
+
+    private func stopNode(_ stop: TerminalStop) -> some View {
+        Button(action: stop.done ? { handleDoneTap(stop) } : stop.action) {
+            VStack(spacing: 6) {
+                ZStack {
+                    Circle()
+                        .fill(stop.done ? Theme.ink : Color(.secondarySystemBackground))
+                    Circle()
+                        .strokeBorder(stop.done ? Theme.yellow : Theme.textSecondary.opacity(0.25), lineWidth: 2)
+                    Image(systemName: stop.done ? "checkmark" : stop.icon)
+                        .font(.system(size: stop.done ? 15 : 14, weight: .bold))
+                        .foregroundStyle(stop.done ? Theme.yellow : Theme.textSecondary)
+                }
+                .frame(width: 46, height: 46)
+
+                // Eén regel, desnoods verkleind: bij grote letters brak
+                // "Check-in" anders middenin het woord af ("Chec k-in").
+                Text(stop.title)
+                    .font(.frutiger(size: 11, weight: .bold))
+                    .foregroundStyle(stop.done ? Theme.textPrimary : Theme.textSecondary)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.7)
+                    .fixedSize(horizontal: false, vertical: true)
+                GateBadge(code: stop.gate, active: stop.done)
+            }
+            // Iets breder dan de cirkel: zonder deze ruimte had "Boarding" geen
+            // plek en werd het afgekapt tot "Board…" bij grote letters.
+            .frame(width: 66)
         }
         .buttonStyle(.plain)
+        .accessibilityLabel("\(stop.title), gate \(stop.gate), \(stop.done ? "klaar" : "nog te doen")")
+    }
+}
+
+/// Eén tip, gepresenteerd als gate-bordje.
+private struct GateTip: Identifiable {
+    let id: String
+    let gate: String
+    let title: String
+    let body: String
+    let actionTitle: String?
+    let action: (() -> Void)?
+}
+
+/// Rij gate-bordjes met tips om meer uit de app te halen. Elke tip verschijnt
+/// alleen als de bijbehorende actie nog níét gedaan is, en is weg te klikken.
+private struct GateTipsRow: View {
+    let tips: [GateTip]
+    @ObservedObject private var store = HomeTipsStore.shared
+
+    private var visible: [GateTip] {
+        tips.filter { !store.dismissed.contains($0.id) }
+    }
+
+    var body: some View {
+        if !visible.isEmpty {
+            VStack(alignment: .leading, spacing: 10) {
+                Text("TIPS VOOR ONDERWEG")
+                    .font(.system(size: 11, weight: .black, design: .monospaced))
+                    .foregroundStyle(Theme.textSecondary)
+                    .kerning(1.1)
+
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 12) {
+                        ForEach(visible) { tip in
+                            card(tip)
+                        }
+                    }
+                    .padding(.vertical, 2)
+                }
+            }
+        }
+    }
+
+    /// Zwart bord met geel accent — een gate-bordje, geen gewone tipkaart.
+    private func card(_ tip: GateTip) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack(spacing: 8) {
+                GateBadge(code: tip.gate)
+                Spacer()
+                Button {
+                    withAnimation(.spring(response: 0.32, dampingFraction: 0.8)) {
+                        store.dismiss(tip.id)
+                    }
+                } label: {
+                    Image(systemName: "xmark")
+                        .font(.system(size: 10, weight: .bold))
+                        .foregroundStyle(.white.opacity(0.55))
+                        .padding(4)
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel("Tip verbergen")
+            }
+
+            Text(tip.title)
+                .font(.frutiger(size: 15, weight: .bold))
+                .foregroundStyle(.white)
+                .fixedSize(horizontal: false, vertical: true)
+
+            Text(tip.body)
+                .font(.frutiger(size: 12))
+                .foregroundStyle(.white.opacity(0.75))
+                .lineLimit(2)
+                .fixedSize(horizontal: false, vertical: true)
+
+            Spacer(minLength: 0)
+
+            if let actionTitle = tip.actionTitle, let action = tip.action {
+                Button(action: action) {
+                    HStack(spacing: 5) {
+                        Text(actionTitle)
+                            .font(.frutiger(size: 12, weight: .bold))
+                        Image(systemName: "arrow.right")
+                            .font(.system(size: 10, weight: .bold))
+                    }
+                    .foregroundStyle(Theme.ink)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 7)
+                    .background(Theme.yellow, in: Capsule())
+                }
+                .buttonStyle(.plain)
+            }
+        }
+        .padding(14)
+        // Ruimer dan eerst: bij 168pt viel de laatste tekstregel weg achter de
+        // knop. De kaarten houden gelijke hoogte, maar nu mét de tekst erin.
+        .frame(width: 232, height: 196, alignment: .topLeading)
+        .background(Theme.inkGradient)
+        .clipShape(RoundedRectangle(cornerRadius: 16))
+    }
+}
+
+/// Statistiekenstrip in instapkaart-vorm: perforatie, velden en streepjescode
+/// — dezelfde beeldtaal als het bagagelabel in het profiel.
+private struct BoardingPassStats: View {
+    @ObservedObject private var journey = JourneyManager.shared
+    @ObservedObject private var bucket = BucketListStore.shared
+    @ObservedObject private var trips = TripsStore.shared
+    @ObservedObject private var session = UserSession.shared
+
+    /// Jaartal waarin deze reispas "uitgegeven" is — het jaar van je eerste
+    /// reis, of anders dit jaar.
+    private var memberSince: String {
+        let earliest = trips.sortedIncludingHidden.first?.startDate ?? .now
+        let year = Calendar.current.component(.year, from: min(earliest, .now))
+        return String(year)
+    }
+
+    @State private var planeTaps = 0
+    @State private var lastPlaneTap = Date.distantPast
+    @State private var taxiing = false
+    @State private var showLogbook = false
+
+    var body: some View {
+        TagPaper {
+            VStack(spacing: 12) {
+                HStack {
+                    Text("VLIEGTUIGTAS · REISPAS")
+                        .font(.system(size: 10, weight: .black, design: .monospaced))
+                        .foregroundStyle(Theme.textSecondary)
+                        .kerning(1)
+                    Spacer()
+                    // Easter egg: 3× tikken laat het vliegtuigje taxiën.
+                    Image(systemName: "airplane")
+                        .font(.system(size: 11, weight: .bold))
+                        .foregroundStyle(taxiing ? Theme.yellow : Theme.navy)
+                        .offset(x: taxiing ? -170 : 0)
+                        .contentShape(Rectangle().inset(by: -10))
+                        .onTapGesture { handlePlaneTap() }
+                        .accessibilityLabel("Vliegtuigje")
+                }
+
+                TagPerforation()
+
+                // Je naam bovenaan, zoals op de paspoortomslag — dat maakt van
+                // een statistiekenkaart iets persoonlijks.
+                HStack(spacing: 8) {
+                    TagField(label: "PASSAGIER",
+                             value: session.firstName.isEmpty ? "REIZIGER" : session.firstName.uppercased())
+                    TagField(label: "SINDS", value: memberSince, alignment: .trailing)
+                }
+
+                TagPerforation()
+
+                HStack(spacing: 8) {
+                    TagField(label: "CHECKS", value: "\(journey.successfulChecks)")
+                    TagField(label: "LANDEN", value: "\(bucket.visitedCount)", alignment: .center)
+                    TagField(label: "REIZEN", value: "\(trips.trips.count)", alignment: .trailing)
+                }
+
+                Barcode(seed: "vliegtuigtas-\(journey.successfulChecks)-\(bucket.visitedCount)", height: 26)
+
+                // De kleine lettertjes onderaan een instapkaart — hier staat de
+                // verwijzing naar Pursers logboek, met alle hints.
+                Button {
+                    showLogbook = true
+                } label: {
+                    Text("KLEINE LETTERTJES · DEZE APP HEEFT GEHEIMEN. PURSERS LOGBOEK →")
+                        .font(.system(size: 7, weight: .bold, design: .monospaced))
+                        .foregroundStyle(Theme.textSecondary.opacity(0.75))
+                        .kerning(0.3)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.7)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel("Pursers logboek met hints voor verborgen grapjes")
+            }
+            .padding(16)
+        }
+        .sheet(isPresented: $showLogbook) {
+            PurserLogbookView()
+        }
+    }
+
+    private func handlePlaneTap() {
+        let now = Date()
+        if now.timeIntervalSince(lastPlaneTap) > 1.2 { planeTaps = 0 }
+        lastPlaneTap = now
+        planeTaps += 1
+        guard planeTaps >= 3, !taxiing else { return }
+        planeTaps = 0
+        EasterEggStore.shared.discover(.taxiingPlane)
+        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+        withAnimation(.easeInOut(duration: 1.1)) { taxiing = true }
+        Task {
+            try? await Task.sleep(nanoseconds: 1_200_000_000)
+            UINotificationFeedbackGenerator().notificationOccurred(.success)
+            withAnimation(.easeOut(duration: 0.45)) { taxiing = false }
+        }
+    }
+}
+
+private struct NextTripCard: View {
+    @EnvironmentObject private var airlineStore: AirlineStore
+    @EnvironmentObject private var session: UserSession
+    @ObservedObject private var tripsStore = TripsStore.shared
+    @ObservedObject private var flightsStore = FlightsStore.shared
+    @ObservedObject private var bagCollection = BagCollectionStore.shared
+    @State private var selectedAirlineOverride: Airline?
+
+    let onOpenTrip: (UUID) -> Void
+    let onAddBag: () -> Void
+
+    private var trip: Trip? { tripsStore.next }
+
+    private var flight: SavedFlightRecord? {
+        if let linkedId = trip?.linkedFlightId,
+           let linked = flightsStore.flights.first(where: { $0.id == linkedId }) {
+            return linked
+        }
+        return flightsStore.next
+    }
+
+    private var resolvedAirline: Airline? {
+        guard let slug = flight?.airlineSlug else { return nil }
+        return airlineStore.airlines.first { $0.slug == slug }
+    }
+
+    private var countdownLabel: String {
+        trip?.countdownLabel ?? flight?.countdownLabel ?? "—"
+    }
+
+    private var bagFitOK: Bool? {
+        guard let bag = bagCollection.bags.first,
+              let airline = resolvedAirline ?? selectedAirlineOverride else { return nil }
+        return BagAirlineFit.evaluate(bag: bag, airline: airline).allowedInCabin
+    }
+
+    /// Alleen zinvol bij een echte Trip (paklijst-voortgang bestaat niet voor
+    /// een losse, niet-gekoppelde vlucht) — vandaar optioneel.
+    private var readiness: TripReadiness? {
+        guard let trip else { return nil }
+        let progress = trip.progress
+        let packingPercent = progress.total > 0 ? Double(progress.checked) / Double(progress.total) : 1
+        return TripReadiness(
+            packingPercent: packingPercent,
+            bagFitOK: bagFitOK,
+            passportOK: session.isPassportValid(forTripStarting: trip.startDate)
+        )
+    }
+
+    var body: some View {
+        Card {
+            VStack(alignment: .leading, spacing: 0) {
+                header
+                Divider().padding(.leading, 16)
+                if let trip, trip.progress.total > 0 {
+                    packingRow(trip)
+                    Divider().padding(.leading, 16)
+                }
+                bagFitRow
+            }
+        }
+    }
+
+    private var header: some View {
+        Button {
+            if let trip { onOpenTrip(trip.id) }
+        } label: {
+            HStack(spacing: 14) {
+                ZStack {
+                    RoundedRectangle(cornerRadius: 12)
+                        .fill(Theme.navy.opacity(0.10))
+                    if let photoUrl = trip?.photoUrl {
+                        AuthorisedImage(urlString: photoUrl, fill: true)
+                    } else {
+                        Image(systemName: "airplane.departure")
+                            .font(.system(size: 17))
+                            .foregroundStyle(Theme.navy)
+                    }
+                }
+                .frame(width: 44, height: 44)
+                .clipShape(RoundedRectangle(cornerRadius: 12))
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(trip?.name ?? flight?.number ?? "Jouw volgende reis")
+                        .font(.frutiger(size: 15, weight: .bold))
+                        .foregroundStyle(Theme.textPrimary)
+                    if let subtitle = trip?.destination ?? flight?.routeLabel {
+                        Text(subtitle)
+                            .font(.frutiger(size: 12))
+                            .foregroundStyle(Theme.textSecondary)
+                            .lineLimit(1)
+                    }
+                }
+                Spacer()
+                // Geen aftelling meer hier: het vertrekbord direct hierboven
+                // toont die al. Twee keer "Over 3 dagen" pal onder elkaar was
+                // dubbelop. Deze kaart gaat over hoe klaar je bent, het bord
+                // over wanneer je gaat.
+                if let readiness {
+                    Text("\(readiness.overallPercent)% reisklaar")
+                        .font(.frutiger(size: 11, weight: .bold))
+                        .foregroundStyle(Theme.ink)
+                        .padding(.horizontal, 9)
+                        .padding(.vertical, 4)
+                        .background(Theme.yellow)
+                        .clipShape(Capsule())
+                }
+            }
+            .padding(16)
+        }
+        .buttonStyle(.plain)
+        .disabled(trip == nil)
+    }
+
+    private func packingRow(_ trip: Trip) -> some View {
+        Button {
+            onOpenTrip(trip.id)
+        } label: {
+            HStack(spacing: 12) {
+                Image(systemName: "checklist")
+                    .font(.system(size: 14))
+                    .foregroundStyle(Theme.navy)
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Paklijst: \(trip.progress.checked)/\(trip.progress.total) ingepakt")
+                        .font(.frutiger(size: 13, weight: .semibold))
+                        .foregroundStyle(Theme.textPrimary)
+                    ProgressView(value: Double(trip.progress.checked), total: Double(trip.progress.total))
+                        .tint(Theme.navy)
+                }
+                Spacer()
+                Image(systemName: "chevron.right")
+                    .font(.system(size: 11, weight: .semibold))
+                    .foregroundStyle(Theme.textSecondary)
+            }
+            .padding(16)
+        }
+        .buttonStyle(.plain)
+    }
+
+    @ViewBuilder
+    private var bagFitRow: some View {
+        if bagCollection.bags.isEmpty {
+            Button(action: onAddBag) {
+                HStack(spacing: 12) {
+                    Image(systemName: "suitcase.rolling")
+                        .font(.system(size: 14))
+                        .foregroundStyle(Theme.navy)
+                    Text("Voeg een tas toe om je tas-fit te zien")
+                        .font(.frutiger(size: 13, weight: .semibold))
+                        .foregroundStyle(Theme.navy)
+                    Spacer()
+                    Image(systemName: "plus.circle.fill")
+                        .foregroundStyle(Theme.navy)
+                }
+                .padding(16)
+            }
+            .buttonStyle(.plain)
+        } else if let airline = resolvedAirline ?? selectedAirlineOverride {
+            fitVerdictRow(airline: airline)
+        } else {
+            airlinePickerRow
+        }
+    }
+
+    private var airlinePickerRow: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("Kies je maatschappij voor een tas-fit-check")
+                .font(.frutiger(size: 12, weight: .semibold))
+                .foregroundStyle(Theme.textSecondary)
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 8) {
+                    ForEach(airlineStore.airlines.prefix(12)) { airline in
+                        Button {
+                            UISelectionFeedbackGenerator().selectionChanged()
+                            selectedAirlineOverride = airline
+                        } label: {
+                            Text(airline.name)
+                                .font(.frutiger(size: 12, weight: .semibold))
+                                .padding(.horizontal, 11)
+                                .padding(.vertical, 7)
+                                .background(Color(.secondarySystemGroupedBackground))
+                                .clipShape(Capsule())
+                        }
+                        .buttonStyle(.plain)
+                    }
+                }
+            }
+        }
+        .padding(16)
+    }
+
+    private func fitVerdictRow(airline: Airline) -> some View {
+        let fit = BagAirlineFit.evaluate(bag: bagCollection.bags.first!, airline: airline)
+        let (text, icon, color): (String, String, Color) = {
+            if fit.allowedInCabin {
+                return ("Je tas mag mee in de cabine bij \(airline.name)", "checkmark.seal.fill", Theme.green)
+            } else if fit.withinWeight == false {
+                return ("Te zwaar voor de cabine bij \(airline.name)", "scalemass.fill", Theme.orange)
+            } else {
+                return ("Past niet in de cabine bij \(airline.name)", "xmark.seal.fill", Theme.red)
+            }
+        }()
+        return HStack(spacing: 12) {
+            Image(systemName: icon)
+                .font(.system(size: 14, weight: .bold))
+                .foregroundStyle(color)
+            Text(text)
+                .font(.frutiger(size: 13, weight: .semibold))
+                .foregroundStyle(Theme.textPrimary)
+                .fixedSize(horizontal: false, vertical: true)
+            Spacer(minLength: 0)
+        }
+        .padding(16)
     }
 }
 
@@ -903,12 +1132,21 @@ private struct QuickActionCard: View {
 /// Zet een aftelling + notificaties zonder dat er een vluchtnummer nodig is.
 /// Slaat op via dezelfde SharedFlightStore als de vluchtzoeker, dus widget,
 /// Live Activity en Siri-intent werken er automatisch mee.
-private struct DepartureReminderSheet: View {
+/// Vertrekreminder zonder vluchtnummer. Dit scherm was tot 3.0.0 volledig
+/// onbereikbaar: de sheet zat wel in HomeView, maar niets zette de vlag ooit
+/// op true. Nu staat het in de Reizen-tab, naast "Vlucht toevoegen".
+struct DepartureReminderSheet: View {
     @Environment(\.dismiss) private var dismiss
     @ObservedObject private var session = UserSession.shared
     @State private var label = ""
     @State private var departure = Calendar.current.date(byAdding: .day, value: 1, to: .now) ?? .now
     @State private var saved = false
+    /// Schiphol als vertrek voorgevuld: veruit de meeste gebruikers vertrekken
+    /// daar, en het scheelt een keuze.
+    @State private var from: RouteAirport? = RouteAirports.find(iata: "AMS")
+    @State private var to: RouteAirport?
+    @State private var pickingFrom = false
+    @State private var pickingTo = false
 
     var body: some View {
         NavigationStack {
@@ -938,311 +1176,221 @@ private struct DepartureReminderSheet: View {
     }
 
     private var reminderContent: some View {
-        Group {
+        ScrollView {
             VStack(alignment: .leading, spacing: 18) {
-                Text("Geen vluchtnummer? Geen probleem: kies je vertrekmoment en we herinneren je op tijd aan je handbagage.")
+                Text("Geen vluchtnummer? Kies je route en vertrekmoment. Je krijgt dezelfde aftelling op je widget en Apple Watch als bij een echte vlucht.")
                     .font(.frutiger(size: 13))
                     .foregroundStyle(Theme.textSecondary)
+                    .fixedSize(horizontal: false, vertical: true)
+
+                // Route: dit maakt van een kale reminder een echte vlucht met
+                // een herkenbare "AMS → ZRH" op alle glanceable plekken.
+                HStack(spacing: 10) {
+                    airportField(title: "VAN", airport: from) { pickingFrom = true }
+                    Image(systemName: "airplane")
+                        .font(.system(size: 13, weight: .bold))
+                        .foregroundStyle(Theme.textSecondary)
+                        .padding(.top, 14)
+                    airportField(title: "NAAR", airport: to) { pickingTo = true }
+                }
 
                 VStack(alignment: .leading, spacing: 6) {
-                    Text("Naam (optioneel)")
-                        .font(.frutiger(size: 12, weight: .semibold))
+                    Text("VERTREK")
+                        .font(.system(size: 10, weight: .black, design: .monospaced))
+                        .kerning(0.8)
                         .foregroundStyle(Theme.textSecondary)
-                    TextField("Bijv. Vakantie Ibiza", text: $label)
+                    DatePicker("", selection: $departure, in: Date()..., displayedComponents: [.date, .hourAndMinute])
+                        .labelsHidden()
+                        .tint(Theme.navy)
+                }
+
+                VStack(alignment: .leading, spacing: 6) {
+                    Text("NAAM (OPTIONEEL)")
+                        .font(.system(size: 10, weight: .black, design: .monospaced))
+                        .kerning(0.8)
+                        .foregroundStyle(Theme.textSecondary)
+                    TextField(suggestedLabel, text: $label)
                         .font(.frutiger(size: 15))
                         .padding(12)
                         .background(Color(.secondarySystemGroupedBackground))
                         .clipShape(RoundedRectangle(cornerRadius: 12))
                 }
 
-                VStack(alignment: .leading, spacing: 6) {
-                    Text("Vertrek")
-                        .font(.frutiger(size: 12, weight: .semibold))
-                        .foregroundStyle(Theme.textSecondary)
-                    DatePicker("", selection: $departure, in: Date()..., displayedComponents: [.date, .hourAndMinute])
-                        .labelsHidden()
-                }
-
-                Spacer()
-
                 Button {
-                    let name = label.trimmingCharacters(in: .whitespaces)
-                    FlightsStore.shared.upsert(SavedFlightRecord(
-                        number: name.isEmpty ? "Mijn vlucht" : name,
-                        departure: departure
-                    ))
-                    UINotificationFeedbackGenerator().notificationOccurred(.success)
-                    withAnimation(.spring(response: 0.3)) { saved = true }
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.9) { dismiss() }
+                    save()
                 } label: {
                     HStack(spacing: 8) {
                         Image(systemName: saved ? "checkmark" : "bell.badge.fill")
-                        Text(saved ? "Reminder staat aan" : "Zet reminder")
+                        Text(saved ? "Staat in je vluchten" : "Bewaar deze vlucht")
                             .font(.frutiger(size: 16, weight: .semibold))
                     }
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 15)
-                    .background(saved ? AnyShapeStyle(Theme.green) : AnyShapeStyle(Theme.navyGradient))
+                    .background(saved ? AnyShapeStyle(Theme.green) : AnyShapeStyle(Theme.inkGradient))
                     .foregroundStyle(.white)
                     .clipShape(RoundedRectangle(cornerRadius: 16))
                 }
                 .buttonStyle(.plain)
                 .disabled(saved)
+                .padding(.top, 4)
             }
             .padding(20)
-            .background(Color(.systemGroupedBackground))
-            .navigationTitle("Vertrekreminder")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button("Sluit") { dismiss() }
-                }
+        }
+        .background(Color(.systemGroupedBackground))
+        .navigationTitle("Vlucht zonder nummer")
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                Button("Sluit") { dismiss() }
             }
         }
-    }
-}
-
-// MARK: - Sub-components
-
-private struct AirlineCard: View {
-    let airline: Airline
-
-    var body: some View {
-        VStack(spacing: 8) {
-            AirlineLogo(airline: airline, size: 50)
-            Text(airline.name)
-                .font(.frutiger(size: 11, weight: .medium))
-                .foregroundStyle(Theme.textPrimary)
-                .multilineTextAlignment(.center)
-                .lineLimit(2)
-                .minimumScaleFactor(0.8)
+        .sheet(isPresented: $pickingFrom) {
+            AirportPickerSheet(title: "Van welke luchthaven?", selection: $from)
         }
-        .frame(width: 118, height: 106)
-        .background(Color(.systemBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 18))
-        .shadow(color: .black.opacity(0.07), radius: 8, x: 0, y: 3)
-        .contentShape(RoundedRectangle(cornerRadius: 18))
-        .accessibilityLabel("Bekijk bagageregels van \(airline.name)")
-    }
-}
-
-// MARK: - Shop carousel card
-
-private struct ShopCarouselCard: View {
-    let bag: Bag
-
-    private var dimensionsText: String? {
-        let parts = [bag.length, bag.width, bag.depth].compactMap { $0.map { "\(Int($0))" } }
-        guard !parts.isEmpty else { return nil }
-        return parts.joined(separator: "×") + " cm"
-    }
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            // Productafbeelding — witte achtergrond, product centred met minimale padding
-            ZStack {
-                Color.white
-                if bag.imageUrl != nil {
-                    AuthorisedImage(urlString: bag.imageUrl)
-                        .padding(10)
-                } else {
-                    Image(systemName: "bag")
-                        .font(.system(size: 32, weight: .light))
-                        .foregroundStyle(Theme.navy.opacity(0.15))
-                }
-            }
-            .frame(width: 160, height: 120)
-            .clipShape(UnevenRoundedRectangle(
-                topLeadingRadius: 16, bottomLeadingRadius: 0,
-                bottomTrailingRadius: 0, topTrailingRadius: 16
-            ))
-
-            // Info
-            VStack(alignment: .leading, spacing: 5) {
-                if let brand = bag.brand {
-                    Text(brand.uppercased())
-                        .font(.frutiger(size: 9, weight: .bold))
-                        .foregroundStyle(Theme.navy.opacity(0.65))
-                        .kerning(0.7)
-                }
-                Text(bag.name)
-                    .font(.frutiger(size: 12, weight: .semibold))
-                    .foregroundStyle(Theme.textPrimary)
-                    .lineLimit(2)
-                    .fixedSize(horizontal: false, vertical: true)
-                if let dims = dimensionsText {
-                    Text(dims)
-                        .font(.frutiger(size: 9))
-                        .foregroundStyle(Theme.textSecondary)
-                }
-                Spacer(minLength: 6)
-                HStack(alignment: .center) {
-                    if let price = bag.priceEur {
-                        Text("€\(Int(price))")
-                            .font(.frutiger(size: 18, weight: .bold))
-                            .foregroundStyle(Theme.textPrimary)
-                    }
-                    Spacer()
-                    // Decoratief: de hele kaart opent de productpagina (NavigationLink),
-                    // dit is geen losse link meer naar de externe affiliate-URL.
-                    Image(systemName: "arrow.up.right")
-                        .font(.system(size: 11, weight: .bold))
-                        .foregroundStyle(.white)
-                        .frame(width: 30, height: 30)
-                        .background(Theme.navyGradient)
-                        .clipShape(Circle())
-                }
-            }
-            .padding(.horizontal, 12)
-            .padding(.top, 10)
-            .padding(.bottom, 12)
+        .sheet(isPresented: $pickingTo) {
+            AirportPickerSheet(title: "Waar vlieg je heen?", selection: $to)
         }
-        .frame(width: 160)
-        .background(Color(.systemBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 16))
-        .shadow(color: .black.opacity(0.08), radius: 10, x: 0, y: 4)
-        .accessibilityElement(children: .combine)
-        .accessibilityLabel("\(bag.brand.map { $0 + " " } ?? "")\(bag.name)\(bag.priceEur.map { ", €\(Int($0))" } ?? "")")
     }
-}
 
-// MARK: - "Bekijk alle tassen" eindkaart
-
-private struct ViewAllShopCard: View {
-    let action: () -> Void
-
-    var body: some View {
-        Button(action: action) {
-            VStack(spacing: 10) {
-                ZStack {
-                    Circle()
-                        .fill(Theme.navy.opacity(0.08))
-                        .frame(width: 52, height: 52)
-                    Image(systemName: "bag.fill")
-                        .font(.system(size: 22, weight: .medium))
-                        .foregroundStyle(Theme.navy)
-                }
-                VStack(spacing: 3) {
-                    Text("Bekijk alles")
-                        .font(.frutiger(size: 13, weight: .bold))
-                        .foregroundStyle(Theme.navy)
-                    Text("in de shop")
-                        .font(.frutiger(size: 12))
-                        .foregroundStyle(Theme.textSecondary)
-                }
-                Image(systemName: "arrow.right")
-                    .font(.system(size: 13, weight: .semibold))
-                    .foregroundStyle(Theme.navy.opacity(0.45))
+    /// Eén helft van de route. Leeg toont een uitnodiging, gevuld de code groot
+    /// met de stad eronder — zoals op een instapkaart.
+    private func airportField(title: String, airport: RouteAirport?, onTap: @escaping () -> Void) -> some View {
+        Button(action: onTap) {
+            VStack(alignment: .leading, spacing: 3) {
+                Text(title)
+                    .font(.system(size: 10, weight: .black, design: .monospaced))
+                    .kerning(0.8)
+                    .foregroundStyle(Theme.textSecondary)
+                Text(airport?.iata ?? "––")
+                    .font(.system(size: 24, weight: .black, design: .monospaced))
+                    .foregroundStyle(airport == nil ? Theme.textSecondary.opacity(0.5) : Theme.textPrimary)
+                Text(airport?.city ?? "Kies luchthaven")
+                    .font(.frutiger(size: 11))
+                    .foregroundStyle(Theme.textSecondary)
+                    .lineLimit(1)
             }
-            .frame(width: 100)
-            .frame(maxHeight: .infinity)
-            .padding(.vertical, 20)
-            .background(Theme.navy.opacity(0.04))
-            .clipShape(RoundedRectangle(cornerRadius: 16))
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(12)
+            .background(Color(.systemBackground))
+            .clipShape(RoundedRectangle(cornerRadius: 14))
             .overlay(
-                RoundedRectangle(cornerRadius: 16)
-                    .strokeBorder(Theme.navy.opacity(0.10), lineWidth: 1)
+                RoundedRectangle(cornerRadius: 14)
+                    .strokeBorder(Theme.ink.opacity(0.08), lineWidth: 1)
             )
         }
         .buttonStyle(.plain)
-        .accessibilityLabel("Bekijk alle tassen en koffers in de shop")
+    }
+
+    /// Voorstel voor de naam, zodat het veld zelden ingevuld hoeft te worden.
+    private var suggestedLabel: String {
+        if let to { return "Bijv. \(to.city)" }
+        return "Bijv. Vakantie Ibiza"
+    }
+
+    private func save() {
+        let name = label.trimmingCharacters(in: .whitespaces)
+        // Zonder vluchtnummer is de route de beste identificatie; anders de
+        // zelfgekozen naam, en pas als laatste een generieke titel.
+        let number: String
+        if !name.isEmpty {
+            number = name
+        } else if let from, let to {
+            number = "\(from.iata) → \(to.iata)"
+        } else {
+            number = "Mijn vlucht"
+        }
+
+        FlightsStore.shared.upsert(SavedFlightRecord(
+            number: number,
+            departure: departure,
+            departureIata: from?.iata,
+            departureAirport: from.map { "\($0.name), \($0.city)" },
+            arrivalIata: to?.iata,
+            arrivalAirport: to.map { "\($0.name), \($0.city)" }
+        ))
+        UINotificationFeedbackGenerator().notificationOccurred(.success)
+        withAnimation(.spring(response: 0.3)) { saved = true }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.9) { dismiss() }
     }
 }
 
-// MARK: - Skeleton carousel card
+// MARK: - Luchthavenkiezer
 
-private struct ShopCarouselSkeletonCard: View {
-    @State private var opacity: Double = 1
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            Color(.systemFill)
-                .frame(width: 160, height: 120)
-                .clipShape(UnevenRoundedRectangle(
-                    topLeadingRadius: 16, bottomLeadingRadius: 0,
-                    bottomTrailingRadius: 0, topTrailingRadius: 16
-                ))
-            VStack(alignment: .leading, spacing: 8) {
-                RoundedRectangle(cornerRadius: 4).fill(Color(.systemFill)).frame(height: 8).frame(maxWidth: 45)
-                RoundedRectangle(cornerRadius: 4).fill(Color(.systemFill)).frame(height: 11).frame(maxWidth: 136)
-                RoundedRectangle(cornerRadius: 4).fill(Color(.systemFill)).frame(height: 11).frame(maxWidth: 100)
-                RoundedRectangle(cornerRadius: 4).fill(Color(.systemFill)).frame(height: 18).frame(maxWidth: 55)
-            }
-            .padding(12)
-        }
-        .frame(width: 160)
-        .background(Color(.systemBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 16))
-        .shadow(color: .black.opacity(0.05), radius: 8, x: 0, y: 3)
-        .opacity(opacity)
-        .onAppear {
-            withAnimation(.easeInOut(duration: 0.9).repeatForever(autoreverses: true)) { opacity = 0.5 }
-        }
-    }
-}
-
-private struct PhotoStepRow: View {
-    let number: String
-    let icon: String
+/// Zoekbare lijst met luchthavens. Zoekt op code, stad, land én
+/// luchthavennaam, zodat "ZRH", "zurich" en "zwitserland" alle drie werken.
+struct AirportPickerSheet: View {
     let title: String
-    let description: String
+    @Binding var selection: RouteAirport?
+
+    @Environment(\.dismiss) private var dismiss
+    @State private var query = ""
+
+    private var dutchResults: [RouteAirport] {
+        RouteAirports.dutch.filter { $0.matches(query) }
+    }
+    private var otherResults: [RouteAirport] {
+        RouteAirports.international.filter { $0.matches(query) }
+    }
 
     var body: some View {
-        HStack(alignment: .center, spacing: 14) {
-            Image(systemName: icon)
-                .font(.system(size: 16, weight: .semibold))
-                .foregroundStyle(.white)
-                .frame(width: 40, height: 40)
-                .glassChrome(in: Circle(), legacyFill: AnyShapeStyle(.white.opacity(0.15)))
-            VStack(alignment: .leading, spacing: 2) {
-                Text(title)
-                    .font(.frutiger(size: 14, weight: .semibold))
-                    .foregroundStyle(.white)
-                Text(description)
-                    .font(.frutiger(size: 12))
-                    .foregroundStyle(.white.opacity(0.75))
+        NavigationStack {
+            List {
+                if !dutchResults.isEmpty {
+                    Section("Vanuit Nederland") {
+                        ForEach(dutchResults) { airport in row(airport) }
+                    }
+                }
+                if !otherResults.isEmpty {
+                    Section(query.isEmpty ? "Bestemmingen" : "Resultaten") {
+                        ForEach(otherResults) { airport in row(airport) }
+                    }
+                }
+                if dutchResults.isEmpty && otherResults.isEmpty {
+                    Text("Geen luchthaven gevonden voor '\(query)'.")
+                        .font(.frutiger(size: 13))
+                        .foregroundStyle(Theme.textSecondary)
+                }
             }
-            Spacer()
-            Text(number)
-                .font(.frutiger(size: 20, weight: .bold))
-                .foregroundStyle(.white.opacity(0.20))
+            .listStyle(.insetGrouped)
+            .searchable(text: $query, prompt: "Zoek op stad, land of code")
+            .navigationTitle(title)
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("Annuleer") { dismiss() }
+                }
+            }
         }
     }
-}
 
-private struct StepRow: View {
-    let number: String
-    let icon: String
-    let color: Color
-    let title: String
-    let description: String
-
-    var body: some View {
-        HStack(alignment: .center, spacing: 16) {
-            ZStack {
-                RoundedRectangle(cornerRadius: 14)
-                    .fill(color.opacity(0.10))
-                    .frame(width: 50, height: 50)
-                Image(systemName: icon)
-                    .font(.system(size: 20, weight: .semibold))
-                    .foregroundStyle(color)
+    private func row(_ airport: RouteAirport) -> some View {
+        Button {
+            selection = airport
+            UISelectionFeedbackGenerator().selectionChanged()
+            dismiss()
+        } label: {
+            HStack(spacing: 12) {
+                Text(airport.iata)
+                    .font(.system(size: 13, weight: .black, design: .monospaced))
+                    .foregroundStyle(Theme.ink)
+                    .frame(width: 46, alignment: .leading)
+                VStack(alignment: .leading, spacing: 1) {
+                    Text(airport.city)
+                        .font(.frutiger(size: 15, weight: .semibold))
+                        .foregroundStyle(Theme.textPrimary)
+                    Text("\(airport.name) · \(airport.country)")
+                        .font(.frutiger(size: 11))
+                        .foregroundStyle(Theme.textSecondary)
+                        .lineLimit(1)
+                }
+                Spacer()
+                if selection?.iata == airport.iata {
+                    Image(systemName: "checkmark")
+                        .font(.system(size: 13, weight: .bold))
+                        .foregroundStyle(Theme.navy)
+                }
             }
-            VStack(alignment: .leading, spacing: 4) {
-                Text(title)
-                    .font(.frutiger(size: 15, weight: .semibold))
-                    .foregroundStyle(Theme.textPrimary)
-                Text(description)
-                    .font(.frutiger(size: 13))
-                    .foregroundStyle(Theme.textSecondary)
-            }
-            Spacer()
-            Text(number)
-                .font(.frutiger(size: 22, weight: .bold))
-                .foregroundStyle(color.opacity(0.20))
         }
-        .padding(16)
-        .background(Color(.systemBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 18))
-        .shadow(color: .black.opacity(0.05), radius: 6, x: 0, y: 2)
+        .buttonStyle(.plain)
     }
 }

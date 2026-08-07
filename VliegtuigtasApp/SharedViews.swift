@@ -29,15 +29,19 @@ struct PrimaryButton: View {
     var body: some View {
         Button(action: action) {
             HStack(spacing: 8) {
-                if let icon { Image(systemName: icon).font(.system(size: 16, weight: .semibold)) }
+                if let icon {
+                    Image(systemName: icon)
+                        .font(.system(size: 16, weight: .semibold))
+                        .foregroundStyle(Theme.yellow)
+                }
                 Text(title).font(.frutiger(size: 16, weight: .semibold))
             }
             .frame(maxWidth: .infinity)
             .padding(.vertical, 17)
-            .background(Theme.navyGradient)
+            .background(Theme.inkGradient)
             .foregroundStyle(.white)
             .clipShape(RoundedRectangle(cornerRadius: 16))
-            .shadow(color: Theme.navy.opacity(0.30), radius: 10, x: 0, y: 4)
+            .shadow(color: Theme.ink.opacity(0.35), radius: 10, x: 0, y: 4)
         }
     }
 }
@@ -189,9 +193,26 @@ final class ImageLoader: ObservableObject {
         return dir
     }()
 
+    /// Stabiele bestandsnaam per URL (FNV-1a). `hashValue` kan hier niet
+    /// gebruikt worden: Swift randomiseert de hash-seed per proces, dus
+    /// dezelfde foto kreeg bij elke app-start een andere naam. Gevolg: de
+    /// schijfcache sloeg nooit aan ná een herstart, de map liep vol met
+    /// duplicaten, en bij een botsing kon de foto van een ándere URL worden
+    /// teruggegeven.
     nonisolated private static func diskPath(for key: String) -> URL {
-        let safeName = String(abs(key.hashValue))
-        return diskCacheURL.appendingPathComponent(safeName)
+        var hash: UInt64 = 1_469_598_103_934_665_603
+        for byte in key.utf8 {
+            hash = (hash ^ UInt64(byte)) &* 1_099_511_628_211
+        }
+        return diskCacheURL.appendingPathComponent(String(hash, radix: 16))
+    }
+
+    /// Alleen "vliegtuigtas.com" (en subdomeinen) telt als onze eigen API —
+    /// productfoto's wijzen vaak naar externe CDN's (bol.com, Shopify, …)
+    /// die geen bearer-token horen te krijgen.
+    nonisolated private static func isOwnAPIHost(_ url: URL) -> Bool {
+        guard let host = url.host else { return false }
+        return host == "vliegtuigtas.com" || host.hasSuffix(".vliegtuigtas.com")
     }
 
     /// Downsamplet naar een schermvriendelijke maximale afmeting vóór het
@@ -254,13 +275,30 @@ final class ImageLoader: ObservableObject {
             }
             guard let url = URL(string: urlString) else { return nil }
             var req = URLRequest(url: url)
-            req.setValue("Bearer lFkEQW18oyMrdMsbfNK1DtnDnoCcqwNSBRfMCXmszUgbAoLf",
-                         forHTTPHeaderField: "Authorization")
-            guard let (data, resp) = try? await URLSession.shared.data(for: req),
-                  (resp as? HTTPURLResponse)?.statusCode == 200,
-                  let img = downsampled(data) else { return nil }
-            try? data.write(to: diskURL)
-            return img
+            // Alleen ons eigen bearer-token meesturen naar onze eigen API —
+            // productfoto's komen vaak van externe CDN's (bol.com, Shopify).
+            // media.s-bol.com bleek een onverwachte Authorization-header af
+            // te straffen met 401, waardoor precies de tassen met een
+            // bol.com-foto nooit laadden ("de helft wel, de helft niet").
+            // Het token hoort daar sowieso niet te lekken.
+            if isOwnAPIHost(url) {
+                req.setValue("Bearer \(APIClient.shared.publicClientKey)",
+                             forHTTPHeaderField: "Authorization")
+            }
+            // Eén nieuwe poging bij een transiënte hapering (timeout, 5xx),
+            // zodat een kortstondig netwerkblip een foto niet voorgoed leeg
+            // laat — deze view herlaadt zichzelf niet vanzelf.
+            for attempt in 0..<2 {
+                if attempt > 0 { try? await Task.sleep(nanoseconds: 400_000_000) }
+                guard let (data, resp) = try? await URLSession.shared.data(for: req) else { continue }
+                guard let http = resp as? HTTPURLResponse else { continue }
+                if http.statusCode == 200, let img = downsampled(data) {
+                    try? data.write(to: diskURL)
+                    return img
+                }
+                if (400..<500).contains(http.statusCode) { break } // geen zin te herhalen
+            }
+            return nil
         }
 
         inFlight[urlString] = task
@@ -325,8 +363,8 @@ struct FloatingBackButton: View {
                 .font(.system(size: 17, weight: .bold))
                 .foregroundStyle(.white)
                 .frame(width: 44, height: 44)
-                .glassChrome(in: Circle(), tint: Theme.navy, interactive: true,
-                             legacyFill: AnyShapeStyle(Theme.navy.opacity(0.85)))
+                .glassChrome(in: Circle(), tint: Theme.ink, interactive: true,
+                             legacyFill: AnyShapeStyle(Theme.ink.opacity(0.85)))
                 .shadow(color: .black.opacity(0.20), radius: 6, x: 0, y: 2)
                 .contentShape(Circle().inset(by: -8))
         }
@@ -455,15 +493,264 @@ struct VerdictBadge: View {
     }
 }
 
+// MARK: - Vertrekbord-bouwstenen
+//
+// De opbouw van de vluchtdetailkaart, losgetrokken zodat andere schermen 'm
+// kunnen hergebruiken: context klein bovenaan, de kernwaarde groot, een
+// statuspil eronder, dan feitregels waarvan de handelingsgerichte waarde geel
+// oplicht, en onderaan een informatiestrip.
+
+/// Statuspil zoals op een vertrekbord: kort, gekleurd, in één oogopslag te
+/// lezen. De toon bepaalt de kleur, zodat "op tijd" overal hetzelfde groen is.
+struct StatusPill: View {
+    enum Tone { case positive, warning, negative, neutral }
+
+    let text: String
+    var tone: Tone = .neutral
+
+    private var color: Color {
+        switch tone {
+        case .positive: return Theme.green
+        case .warning:  return Theme.orange
+        case .negative: return Theme.red
+        case .neutral:  return Theme.textSecondary
+        }
+    }
+
+    var body: some View {
+        Text(text)
+            .font(.frutiger(size: 10, weight: .bold))
+            .foregroundStyle(color)
+            .padding(.horizontal, 7)
+            .padding(.vertical, 3)
+            .background(color.opacity(0.12))
+            .clipShape(RoundedRectangle(cornerRadius: 5))
+    }
+}
+
+/// Label met waarde. `highlighted` zet de waarde in een geel pilletje — bewaar
+/// dat voor het getal waar iemand daadwerkelijk naar zoekt (gate, bagageband,
+/// aantal resterende items), niet voor elk veld.
+struct FactLine: View {
+    let label: String
+    let value: String
+    var highlighted: Bool = false
+    var alignment: HorizontalAlignment = .leading
+
+    var body: some View {
+        HStack(spacing: 5) {
+            if alignment == .trailing { Spacer(minLength: 0) }
+            Text(label)
+                .font(.frutiger(size: 10))
+                .foregroundStyle(Theme.textSecondary)
+            Text(value)
+                .font(.system(size: 11, weight: .black, design: .monospaced))
+                .foregroundStyle(highlighted ? Theme.ink : Theme.textPrimary)
+                .padding(.horizontal, highlighted ? 6 : 0)
+                .padding(.vertical, highlighted ? 2 : 0)
+                .background(
+                    highlighted ? AnyShapeStyle(Theme.yellow) : AnyShapeStyle(Color.clear),
+                    in: RoundedRectangle(cornerRadius: 4)
+                )
+            if alignment == .leading { Spacer(minLength: 0) }
+        }
+    }
+}
+
+/// Strip onderaan een kaart: icoon, één regel tekst, en rechts optioneel een
+/// waarde die eruit mag springen.
+struct InfoStrip: View {
+    let icon: String
+    let text: String
+    var trailingLabel: String? = nil
+    var trailingValue: String? = nil
+
+    var body: some View {
+        HStack(spacing: 8) {
+            Image(systemName: icon)
+                .font(.system(size: 12, weight: .bold))
+                .foregroundStyle(Theme.navy)
+            Text(text)
+                .font(.frutiger(size: 13, weight: .semibold))
+                .foregroundStyle(Theme.textPrimary)
+                .lineLimit(2)
+                .fixedSize(horizontal: false, vertical: true)
+            Spacer(minLength: 0)
+            if let trailingValue {
+                HStack(spacing: 4) {
+                    if let trailingLabel {
+                        Text(trailingLabel)
+                            .font(.frutiger(size: 10))
+                            .foregroundStyle(Theme.textSecondary)
+                    }
+                    Text(trailingValue)
+                        .font(.system(size: 11, weight: .black, design: .monospaced))
+                        .foregroundStyle(Theme.ink)
+                        .padding(.horizontal, 6)
+                        .padding(.vertical, 2)
+                        .background(Theme.yellow, in: RoundedRectangle(cornerRadius: 4))
+                }
+            }
+        }
+        .padding(.horizontal, 18)
+        .padding(.vertical, 12)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Theme.skyLight)
+    }
+}
+
+/// Kop in vertrekbord-stijl: context klein, kernwaarde groot, status eronder.
+struct BoardHeadline: View {
+    let context: String
+    let value: String
+    var secondary: String? = nil
+    var status: (text: String, tone: StatusPill.Tone)? = nil
+    var alignment: HorizontalAlignment = .leading
+
+    var body: some View {
+        VStack(alignment: alignment, spacing: 5) {
+            Text(context)
+                .font(.frutiger(size: 11, weight: .medium))
+                .foregroundStyle(Theme.textSecondary)
+                .lineLimit(1)
+
+            HStack(alignment: .firstTextBaseline, spacing: 6) {
+                Text(value)
+                    .font(.system(size: 26, weight: .black))
+                    .foregroundStyle(Theme.textPrimary)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.6)
+                if let secondary {
+                    Text(secondary)
+                        .font(.frutiger(size: 12, weight: .semibold))
+                        .foregroundStyle(Theme.textSecondary)
+                }
+            }
+
+            if let status {
+                StatusPill(text: status.text, tone: status.tone)
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: alignment == .leading ? .leading : .trailing)
+    }
+}
+
+// MARK: - Paspoortstempel
+
+/// Inreisstempel in paspoortstijl: bordeauxrood, licht scheef, met de naam van
+/// de reiziger erin. Hetzelfde motief als de omslag van het reispaspoort, zodat
+/// dat gevoel op meer plekken in de app terugkomt dan alleen dat ene scherm.
+struct PassportStamp: View {
+    let place: String
+    let date: Date
+    /// Vaste hoek per stempel: gevarieerd tussen plekken, maar stabiel tussen
+    /// herteken-beurten — een stempel die rondspringt oogt slordig.
+    var angle: Double = -7
+
+    @ObservedObject private var session = UserSession.shared
+
+    private static let formatter: DateFormatter = {
+        let f = DateFormatter()
+        f.locale = Locale(identifier: "nl_NL")
+        f.dateFormat = "dd MMM yyyy"
+        return f
+    }()
+
+    private var ink: Color { Color(red: 0.42, green: 0.10, blue: 0.17) }
+
+    var body: some View {
+        VStack(spacing: 3) {
+            Text("VLIEGTUIGTAS")
+                .font(.system(size: 7, weight: .black, design: .serif))
+                .kerning(1.6)
+            Text(place.uppercased())
+                .font(.system(size: 13, weight: .black, design: .serif))
+                .kerning(1)
+                .lineLimit(1)
+                .minimumScaleFactor(0.6)
+            Rectangle()
+                .fill(ink.opacity(0.55))
+                .frame(width: 60, height: 1)
+            Text(Self.formatter.string(from: date).uppercased())
+                .font(.system(size: 8, weight: .bold, design: .serif))
+                .kerning(0.6)
+            Text(session.firstName.isEmpty ? "REIZIGER" : session.firstName.uppercased())
+                .font(.system(size: 8, weight: .bold, design: .serif))
+                .kerning(1.2)
+        }
+        .foregroundStyle(ink.opacity(0.85))
+        .padding(.horizontal, 14)
+        .padding(.vertical, 10)
+        .overlay(
+            RoundedRectangle(cornerRadius: 8)
+                .strokeBorder(ink.opacity(0.6), lineWidth: 2)
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 10)
+                .strokeBorder(ink.opacity(0.25), lineWidth: 1)
+                .padding(-4)
+        )
+        .rotationEffect(.degrees(angle))
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel("Stempel: \(place), \(Self.formatter.string(from: date))")
+    }
+}
+
+// MARK: - Bestemming-chip (cirkel + label)
+
+/// Ronde foto/vlag-chip met label eronder, voor horizontaal scrollende
+/// bestemming-stroken — dezelfde taal als "populaire bestemmingen"-rijen in
+/// reis-apps: herkenbaar op klein formaat, uitnodigend om doorheen te swipen.
+struct DestinationChip: View {
+    let photoUrl: String?
+    let flagEmoji: String?
+    let label: String
+    var size: CGFloat = 64
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            VStack(spacing: 6) {
+                ZStack {
+                    Circle().fill(Theme.skyLight)
+                    if let photoUrl {
+                        AuthorisedImage(urlString: photoUrl, fill: true)
+                    } else if let flagEmoji {
+                        Text(flagEmoji).font(.system(size: size * 0.4))
+                    }
+                }
+                .frame(width: size, height: size)
+                .clipShape(Circle())
+                .overlay(Circle().strokeBorder(Theme.yellow, lineWidth: 2))
+
+                Text(label)
+                    .font(.frutiger(size: 12, weight: .semibold))
+                    .foregroundStyle(Theme.textPrimary)
+                    .lineLimit(1)
+                    .frame(width: size + 12)
+            }
+        }
+        .buttonStyle(.pressableCard)
+    }
+}
+
 // MARK: - Section header
 
 struct SectionHeader: View {
     let title: String
     var body: some View {
-        Text(title)
-            .font(.headline2)
-            .foregroundStyle(Theme.textPrimary)
-            .frame(maxWidth: .infinity, alignment: .leading)
+        VStack(alignment: .leading, spacing: 6) {
+            Text(title)
+                .font(.headline2)
+                .foregroundStyle(Theme.textPrimary)
+            // Klein geel accentstreepje — terugkerend merkmotief, geïnspireerd
+            // op platform-bewegwijzering, dat de app onderscheidt van een
+            // generiek blauw/wit maatschappij-scherm.
+            Capsule()
+                .fill(Theme.yellow)
+                .frame(width: 22, height: 3)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
 }
 

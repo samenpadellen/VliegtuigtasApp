@@ -17,6 +17,77 @@ enum NotificationPlanner {
             guard granted else { return }
             scheduleInactivityNudge()
             scheduleVacationNudges()
+            scheduleTripReminders()
+            scheduleFirstWeekNudges()
+        }
+    }
+
+    /// Vraagt éénmalig om échte (niet-provisional) toestemming, op het moment
+    /// dat de app zich net bewezen heeft: direct na de eerste geslaagde
+    /// tas-check.
+    ///
+    /// Waarom dit nodig is: `refresh()` vraagt bewust `provisional`
+    /// toestemming, en die meldingen komen stil in het Berichtencentrum —
+    /// geen banner, geen geluid, geen badge. Wie nooit een vlucht opslaat
+    /// (en dat is het gros van de nieuwe gebruikers) kreeg dus letterlijk
+    /// nooit een zichtbare melding van de app. Dat is dodelijk voor de
+    /// retentie in de eerste week.
+    static func promoteToVisibleNotifications() {
+        let defaults = UserDefaults.standard
+        let key = "vt_asked_full_notifications"
+        guard !defaults.bool(forKey: key) else { return }
+        defaults.set(true, forKey: key)
+        UNUserNotificationCenter.current()
+            .requestAuthorization(options: [.alert, .sound, .badge]) { _, _ in }
+    }
+
+    // MARK: - Eerste week
+
+    /// De eerste week is precies het venster waarin de app niets van zich liet
+    /// horen: de inactiviteits-nudge stond op 21 dagen, en vlucht- en
+    /// reisherinneringen bestaan alleen als je iets hebt opgeslagen. Wie de app
+    /// gebruikte zoals bedoeld — één tas checken — hoorde dus nooit meer iets.
+    ///
+    /// Deze reeks loopt alleen zolang er niets is om op af te tellen, en wordt
+    /// bij elke app-start opnieuw opgebouwd. Zodra er een vlucht of reis in
+    /// staat, verdwijnt hij: dan nemen de echte herinneringen het over.
+    private static func scheduleFirstWeekNudges() {
+        let center = UNUserNotificationCenter.current()
+        let ids = ["vt_week1_d1", "vt_week1_d3", "vt_week1_d6"]
+        center.removePendingNotificationRequests(withIdentifiers: ids)
+
+        Task { @MainActor in
+            let hasSomethingPlanned =
+                !FlightsStore.shared.flights.isEmpty || !TripsStore.shared.trips.isEmpty
+            guard !hasSomethingPlanned else { return }
+
+            func add(id: String, afterDays: Int, hour: Int, title: String, body: String) {
+                guard let day = Calendar.current.date(byAdding: .day, value: afterDays, to: .now)
+                else { return }
+                var components = Calendar.current.dateComponents([.year, .month, .day], from: day)
+                components.hour = hour
+                let content = UNMutableNotificationContent()
+                content.title = title
+                content.body = body
+                content.sound = .default
+                center.add(UNNotificationRequest(
+                    identifier: id,
+                    content: content,
+                    trigger: UNCalendarNotificationTrigger(dateMatching: components, repeats: false)
+                ))
+            }
+
+            add(id: ids[0], afterDays: 1, hour: 18,
+                title: "Wanneer vlieg je? ✈️",
+                body: "Zet je vlucht in de app: je krijgt een aftelling en een seintje bij een gatewijziging of vertraging.")
+
+            add(id: ids[1], afterDays: 3, hour: 19,
+                title: "Bewaar je koffermaten 🧳",
+                body: "Eén keer opmeten en je checkt hem daarna bij elke maatschappij in één tik.")
+
+            add(id: ids[2], afterDays: 6, hour: 11,
+                title: "Al iets in gedachten? 🌍",
+                body: "Plan je reis en je paklijst staat binnen een minuut klaar, afgestemd op je bestemming.")
         }
     }
 
@@ -159,5 +230,66 @@ enum NotificationPlanner {
                 body: "Over 3 uur vertrekt \(name). Laatste check van je tas?"
             )
         }
+    }
+
+    // MARK: - Trip-aware pak-herinneringen
+
+    /// Automatische, idempotente herinneringen per aankomende reis (i.p.v.
+    /// het handmatige, one-shot alarm in PackingAlarmsSheet): 3 dagen en 1
+    /// dag vóór vertrek, met de actuele paklijst-voortgang in de tekst.
+    /// Reizen worden aangemaakt/verwijderd, dus — anders dan de vaste
+    /// vakantie-slugs — moeten eerst alle oude "vt_trip_*"-ids opgezocht en
+    /// verwijderd worden vóór opnieuw plannen.
+    private static func scheduleTripReminders() {
+        let center = UNUserNotificationCenter.current()
+        center.getPendingNotificationRequests { requests in
+            let staleIds = requests.map(\.identifier).filter { $0.hasPrefix("vt_trip_") }
+            center.removePendingNotificationRequests(withIdentifiers: staleIds)
+
+            Task { @MainActor in
+                for trip in TripsStore.shared.upcoming.prefix(5) {
+                    scheduleReminders(for: trip, in: center)
+                }
+            }
+        }
+    }
+
+    @MainActor
+    private static func scheduleReminders(for trip: Trip, in center: UNUserNotificationCenter) {
+        let progress = trip.progress
+        let remaining = progress.total - progress.checked
+
+        func add(id: String, offset: TimeInterval, title: String, body: String) {
+            let fireDate = trip.startDate.addingTimeInterval(offset)
+            guard fireDate > .now else { return }
+            let content = UNMutableNotificationContent()
+            content.title = title
+            content.body = body
+            content.sound = .default
+            let components = Calendar.current.dateComponents(
+                [.year, .month, .day, .hour, .minute], from: fireDate
+            )
+            center.add(UNNotificationRequest(
+                identifier: id,
+                content: content,
+                trigger: UNCalendarNotificationTrigger(dateMatching: components, repeats: false)
+            ))
+        }
+
+        let packedBody = "Alles ingepakt voor \(trip.name). Goede reis!"
+        let openBody = remaining > 0
+            ? "Nog \(remaining) van de \(progress.total) items niet ingepakt voor \(trip.name)."
+            : packedBody
+
+        add(
+            id: "vt_trip_\(trip.id.uuidString)_3d", offset: -3 * 24 * 3600,
+            title: "Nog 3 dagen tot \(trip.name) 🧳",
+            body: remaining > 0 ? openBody + " Tijd om verder te pakken!" : packedBody
+        )
+        add(
+            id: "vt_trip_\(trip.id.uuidString)_1d", offset: -24 * 3600,
+            title: "Morgen vertrek: \(trip.name) ✈️",
+            body: remaining > 0 ? openBody + " Check je paklijst voor je vertrekt." : packedBody
+        )
     }
 }

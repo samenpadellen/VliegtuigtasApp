@@ -45,7 +45,9 @@ struct BagsShopView: View {
     @State private var selectedBrand: String? = nil
     @State private var sortOption: SortOption = .default
     @State private var showFilters = false
+    @State private var showMyBags = false
     @Namespace private var zoomNamespace
+    @ObservedObject private var bagCollection = BagCollectionStore.shared
 
     /// Zonder maatschappij-filter tonen we de gedeelde catalogus; met filter
     /// gebruiken we de eigen server-gefilterde resultaten (de API filtert op
@@ -119,12 +121,55 @@ struct BagsShopView: View {
         return result
     }
 
+    /// "Mijn tassen" was alleen bereikbaar als sheet uit de Home-feed of diep
+    /// in het profiel — terwijl het je eigen bezit is. Hier staat het naast de
+    /// tassen die je kúnt kopen: eerst wat je hebt, dan wat erbij past.
+    private var myBagsCard: some View {
+        Button {
+            showMyBags = true
+        } label: {
+            HStack(spacing: 12) {
+                ZStack {
+                    Circle().fill(Theme.yellow)
+                    Image(systemName: "suitcase.fill")
+                        .font(.system(size: 15, weight: .bold))
+                        .foregroundStyle(Theme.ink)
+                }
+                .frame(width: 38, height: 38)
+
+                VStack(alignment: .leading, spacing: 1) {
+                    Text("Mijn tassen")
+                        .font(.frutiger(size: 14, weight: .bold))
+                        .foregroundStyle(Theme.textPrimary)
+                    Text(bagCollection.bags.isEmpty
+                         ? "Voeg je eigen koffer toe"
+                         : "\(bagCollection.bags.count) opgeslagen · past dit bij jouw maatschappij?")
+                        .font(.frutiger(size: 12))
+                        .foregroundStyle(Theme.textSecondary)
+                        .lineLimit(1)
+                }
+                Spacer()
+                Image(systemName: "chevron.right")
+                    .font(.system(size: 12, weight: .semibold))
+                    .foregroundStyle(Theme.textSecondary)
+            }
+            .padding(14)
+            .background(Color(.systemBackground))
+            .clipShape(RoundedRectangle(cornerRadius: 14))
+        }
+        .buttonStyle(.pressableCard)
+    }
+
     var body: some View {
         ScrollView(showsIndicators: false) {
             VStack(alignment: .leading, spacing: 0) {
                 shopHeader
 
                 VStack(alignment: .leading, spacing: 0) {
+                    myBagsCard
+                        .padding(.horizontal, 16)
+                        .padding(.top, 20)
+
                     searchAndFilter
                         .padding(.horizontal, 16)
                         .padding(.top, 20)
@@ -162,6 +207,9 @@ struct BagsShopView: View {
         // zoekbalk-toetsenbord dat het halve scherm blijft blokkeren.
         .scrollDismissesKeyboard(.interactively)
         .refreshable { await refreshAll() }
+        .sheet(isPresented: $showMyBags) {
+            MyBagsOverviewView()
+        }
         .sheet(isPresented: $showFilters) {
             FilterSheet(
                 airlines: airlineStore.airlines,
@@ -294,7 +342,7 @@ struct BagsShopView: View {
                         .font(.system(size: 16, weight: .medium))
                         .foregroundStyle(activeFilterCount > 0 ? .white : Theme.textPrimary)
                         .frame(width: 48, height: 48)
-                        .background(activeFilterCount > 0 ? AnyShapeStyle(Theme.navyGradient) : AnyShapeStyle(Color(.systemBackground)))
+                        .background(activeFilterCount > 0 ? AnyShapeStyle(Theme.inkGradient) : AnyShapeStyle(Color(.systemBackground)))
                         .clipShape(RoundedRectangle(cornerRadius: 14))
                         .shadow(color: .black.opacity(0.07), radius: 8, x: 0, y: 2)
 
@@ -514,7 +562,7 @@ struct BagsShopView: View {
                         .font(.frutiger(size: 14, weight: .semibold))
                         .foregroundStyle(.white)
                         .padding(.horizontal, 24).padding(.vertical, 12)
-                        .background(Theme.navyGradient)
+                        .background(Theme.inkGradient)
                         .clipShape(Capsule())
                 }
                 .buttonStyle(.plain)
@@ -540,33 +588,43 @@ struct BagsShopView: View {
     /// Voor pull-to-refresh: in tegenstelling tot `loadAll()` haalt dit altijd
     /// verse data op, ook als de gedeelde catalogus al gevuld was.
     private func refreshAll() async {
-        async let airlinesTask: () = airlineStore.load()
+        async let airlinesTask: () = airlineStore.reload()
         if selectedAirlineSlug == nil {
             async let bagsTask: () = bagStore.reload()
             await bagsTask
         } else {
-            async let bagsTask: () = loadBags()
+            async let bagsTask: () = loadBags(forceRefresh: true)
             await bagsTask
         }
         await airlinesTask
     }
 
-    private func loadBags() async {
+    private func loadBags(forceRefresh: Bool = false) async {
         guard let slug = selectedAirlineSlug else {
             // Geen filter: gebruik/laad de gedeelde catalogus, geen dubbele fetch.
-            await bagStore.loadIfNeeded()
+            if forceRefresh {
+                await bagStore.reload()
+            } else {
+                await bagStore.loadIfNeeded()
+            }
             return
         }
         isLoadingFiltered = true
-        let result = (try? await APIClient.shared.bags(
+        // Bij een mislukte fetch de bestaande gefilterde lijst laten staan
+        // i.p.v. hem leeg te maken — anders klapt een tijdelijke netwerkfout
+        // (of pull-to-refresh die faalt) de resultaten stil naar leeg.
+        if let result = try? await APIClient.shared.bags(
             airline: slug,
             type: nil,
-            maxPrice: nil
-        )) ?? []
-        // Stale-response guard: is het filter intussen gewijzigd (snel tikken),
-        // dan mag dit oude antwoord de nieuwe selectie niet overschrijven.
-        guard slug == selectedAirlineSlug else { return }
-        filteredBags = result
+            maxPrice: nil,
+            forceRefresh: forceRefresh
+        ) {
+            // Stale-response guard: is het filter intussen gewijzigd (snel
+            // tikken), dan mag dit oude antwoord de nieuwe selectie niet
+            // overschrijven.
+            guard slug == selectedAirlineSlug else { return }
+            filteredBags = result
+        }
         isLoadingFiltered = false
     }
 }
@@ -641,7 +699,15 @@ private struct LoyaltyCard: View {
 
                 Spacer()
 
-                ShareLink(item: url, message: Text("Tip: via deze link krijg je een welkomstbonus op de \(title).")) {
+                // Zonder eigen preview laat de share-sheet de bestemmings-URL
+                // scrapen voor metadata (traag, en vaak niet over déze
+                // specifieke aanbieding) — met een titel weet de ontvanger
+                // in Berichten/WhatsApp meteen waar de link over gaat.
+                ShareLink(
+                    item: url,
+                    message: Text("Tip: via deze link krijg je een welkomstbonus op de \(title)."),
+                    preview: SharePreview("\(title) — \(brand)")
+                ) {
                     Image(systemName: "square.and.arrow.up")
                         .font(.system(size: 14, weight: .medium))
                         .foregroundStyle(.white.opacity(0.55))
@@ -910,7 +976,12 @@ private struct BagCard: View {
                 ZStack {
                     Color.white
                     if bag.imageUrl != nil {
-                        AuthorisedImage(urlString: bag.imageUrl, fill: true)
+                        // Passend in plaats van vullend: productfoto's zijn op
+                        // wit geschoten en werden door het bijsnijden aan de
+                        // boven- en onderkant afgekapt. Nu staat de hele koffer
+                        // in beeld, met lucht eromheen.
+                        AuthorisedImage(urlString: bag.imageUrl)
+                            .padding(12)
                     } else {
                         Image(systemName: "bag")
                             .font(.system(size: 36, weight: .light))
@@ -923,14 +994,17 @@ private struct BagCard: View {
                     topLeadingRadius: 18, bottomLeadingRadius: 0,
                     bottomTrailingRadius: 0, topTrailingRadius: 18))
 
-                // Afmetingen badge rechtsboven
+                // Maten rechtsboven als bagagelabel: monospace cijfers op zwart
+                // met geel accent — leest als het maatlabel aan een koffer,
+                // niet als een generieke blauwe badge.
                 if let dims = dimensionsBadge {
                     Text(dims)
-                        .font(.frutiger(size: 9, weight: .bold))
-                        .foregroundStyle(.white)
+                        .font(.system(size: 9, weight: .black, design: .monospaced))
+                        .foregroundStyle(Theme.yellow)
                         .padding(.horizontal, 7)
                         .padding(.vertical, 4)
-                        .glassChrome(in: Capsule(), tint: Theme.navy, legacyFill: AnyShapeStyle(Theme.navy.opacity(0.80)))
+                        .glassChrome(in: RoundedRectangle(cornerRadius: 6), tint: Theme.ink,
+                                     legacyFill: AnyShapeStyle(Theme.ink.opacity(0.88)))
                         .padding(8)
                 }
 
@@ -938,7 +1012,7 @@ private struct BagCard: View {
                 if bag.featured == true {
                     Image(systemName: "star.fill")
                         .font(.system(size: 10, weight: .bold))
-                        .foregroundStyle(Theme.navy)
+                        .foregroundStyle(Theme.ink)
                         .frame(width: 22, height: 22)
                         .background(Theme.yellow)
                         .clipShape(Circle())
@@ -951,14 +1025,17 @@ private struct BagCard: View {
             VStack(alignment: .leading, spacing: 4) {
                 if let brand = bag.brand {
                     Text(brand.uppercased())
-                        .font(.frutiger(size: 9, weight: .bold))
-                        .foregroundStyle(Theme.navy.opacity(0.55))
-                        .kerning(0.7)
+                        .font(.system(size: 9, weight: .black, design: .monospaced))
+                        .foregroundStyle(Theme.textSecondary)
+                        .kerning(0.9)
                 }
+                // Twee regels ruimte reserveren, ook bij een korte naam: anders
+                // krijgt elke kaart in het raster een andere hoogte en oogt de
+                // hele shop rommelig.
                 Text(bag.name)
                     .font(.frutiger(size: 13, weight: .semibold))
                     .foregroundStyle(Theme.textPrimary)
-                    .lineLimit(2)
+                    .lineLimit(2, reservesSpace: true)
                     .fixedSize(horizontal: false, vertical: true)
 
                 if let colors = bag.colors, !colors.isEmpty {
@@ -978,12 +1055,16 @@ private struct BagCard: View {
                     .padding(.top, 2)
                 }
 
+                // Prijskaartje: geel vlak met zwarte cijfers, zoals de
+                // prijslabels in een duty-free schap.
                 if let label = bag.displayPrice {
                     Text(label)
-                        .font(.frutiger(size: 18, weight: .black))
-                        .monospacedDigit()
-                        .foregroundStyle(Theme.navy)
-                        .padding(.top, 4)
+                        .font(.system(size: 15, weight: .black, design: .monospaced))
+                        .foregroundStyle(Theme.ink)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 4)
+                        .background(Theme.yellow, in: RoundedRectangle(cornerRadius: 7))
+                        .padding(.top, 5)
                 }
                 if let domain = bag.shopDomain {
                     Text(domain)
@@ -991,28 +1072,40 @@ private struct BagCard: View {
                         .foregroundStyle(Theme.textSecondary)
                 }
 
-                // Duty-free-waardig zegel: bij hoeveel maatschappijen past hij?
+                // Goedkeuringsstempel: bij hoeveel maatschappijen past hij?
                 if let count = bag.airlineSlugs?.count, count > 0 {
                     HStack(spacing: 4) {
                         Image(systemName: "checkmark.seal.fill")
                             .font(.system(size: 8, weight: .bold))
-                        Text(count == 1 ? "Past bij 1 maatschappij" : "Past bij \(count) maatschappijen")
-                            .font(.frutiger(size: 9, weight: .semibold))
+                        Text(count == 1 ? "PAST BIJ 1 MAATSCHAPPIJ" : "PAST BIJ \(count) MAATSCHAPPIJEN")
+                            .font(.system(size: 8, weight: .black, design: .monospaced))
+                            .kerning(0.3)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.8)
                     }
                     .foregroundStyle(Theme.green)
-                    .padding(.top, 3)
+                    .padding(.horizontal, 6)
+                    .padding(.vertical, 3)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 4)
+                            .strokeBorder(Theme.green.opacity(0.45), lineWidth: 1)
+                    )
+                    .padding(.top, 5)
                 }
             }
             .padding(12)
-            .frame(maxWidth: .infinity, alignment: .leading)
+            // Vaste minimumhoogte voor het tekstblok: merk, kleuren en het
+            // "past bij"-zegel zijn allemaal optioneel, waardoor de kaarten
+            // anders ongelijk uitvallen naast elkaar in het raster.
+            .frame(maxWidth: .infinity, minHeight: 128, alignment: .topLeading)
         }
         .background(Color(.systemBackground))
         .clipShape(RoundedRectangle(cornerRadius: 18))
         .overlay(
             RoundedRectangle(cornerRadius: 18)
-                .strokeBorder(Theme.navy.opacity(0.08), lineWidth: 1)
+                .strokeBorder(Theme.ink.opacity(0.10), lineWidth: 1)
         )
-        .shadow(color: Theme.navy.opacity(0.10), radius: 12, x: 0, y: 5)
+        .shadow(color: Theme.ink.opacity(0.12), radius: 12, x: 0, y: 5)
     }
 
     private var dimensionsBadge: String? {
@@ -1191,13 +1284,29 @@ private struct CategoryChip: View {
 
     var body: some View {
         Button(action: action) {
-            Text(label)
-                .font(.frutiger(size: 13, weight: .semibold))
-                .padding(.horizontal, 18).padding(.vertical, 9)
-                .background(selected ? AnyShapeStyle(Theme.navyGradient) : AnyShapeStyle(Color(.systemBackground)))
-                .foregroundStyle(selected ? .white : Theme.textPrimary)
-                .clipShape(Capsule())
-                .shadow(color: .black.opacity(selected ? 0.15 : 0.05), radius: 6, x: 0, y: 2)
+            HStack(spacing: 6) {
+                // Geel stipje bij de actieve categorie — hetzelfde
+                // signaal-accent als de gate-bordjes elders in de app.
+                if selected {
+                    Circle()
+                        .fill(Theme.yellow)
+                        .frame(width: 6, height: 6)
+                }
+                Text(label)
+                    .font(.frutiger(size: 13, weight: .semibold))
+            }
+            .padding(.horizontal, selected ? 14 : 18)
+            .padding(.vertical, 9)
+            .background(selected ? AnyShapeStyle(Theme.inkGradient) : AnyShapeStyle(Color(.systemBackground)))
+            .foregroundStyle(selected ? .white : Theme.textPrimary)
+            .clipShape(Capsule())
+            .overlay(
+                Capsule().strokeBorder(
+                    selected ? Color.clear : Theme.textSecondary.opacity(0.22),
+                    lineWidth: 1
+                )
+            )
+            .shadow(color: Theme.ink.opacity(selected ? 0.18 : 0.04), radius: 6, x: 0, y: 2)
         }
         .buttonStyle(.plain)
     }

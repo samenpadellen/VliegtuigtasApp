@@ -97,11 +97,16 @@ private func departureWindow(for context: ActivityViewContext<FlightActivityAttr
 private enum LATheme {
     static let navy     = Color(red: 0.00, green: 0.19, blue: 0.53)
     static let navyDark = Color(red: 0.00, green: 0.12, blue: 0.38)
-    static let yellow   = Color(red: 0.99, green: 0.80, blue: 0.10)
+    static let ink      = Color(red: 0.13, green: 0.15, blue: 0.19)
+    static let inkDark  = Color(red: 0.05, green: 0.06, blue: 0.09)
+    static let yellow   = Color(red: 1.00, green: 0.76, blue: 0.03)
     static let green    = Color(red: 0.18, green: 0.73, blue: 0.45)
 
     static let navyGradient = LinearGradient(
         colors: [navy, navyDark], startPoint: .topLeading, endPoint: .bottomTrailing
+    )
+    static let inkGradient = LinearGradient(
+        colors: [ink, inkDark], startPoint: .topLeading, endPoint: .bottomTrailing
     )
 }
 
@@ -148,59 +153,145 @@ private struct ReminderLine: View {
 
 // MARK: - Lock screen
 
+/// Opzet geïnspireerd op vluchttrackers zoals Flighty: grote route-code +
+/// vertrektijd bovenaan, een volle-breedte gekleurde statusbalk onderaan.
+/// Toont uitsluitend data die we écht hebben (geen verzonnen gate/terminal —
+/// die tracken we niet) — alleen de presentatie is overgenomen.
 private struct LockScreenView: View {
     let context: ActivityViewContext<FlightActivityAttributes>
 
+    private var departed: Bool { context.state.departure <= .now }
+    private var bagChecked: Bool { context.state.bagChecked }
+
+    private static let clockFormatter: DateFormatter = {
+        let f = DateFormatter()
+        f.dateFormat = "HH:mm"
+        return f
+    }()
+
     var body: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            HStack(spacing: 6) {
-                Image(systemName: "airplane.departure")
-                    .font(.system(size: 13, weight: .semibold))
-                    .foregroundStyle(LATheme.yellow)
-                Text(context.attributes.flightNumber)
-                    .font(.frutiger(size: 15, weight: .bold))
-                    .foregroundStyle(.white)
-                if let route = context.attributes.routeLabel {
-                    Text("· \(route)")
+        VStack(alignment: .leading, spacing: 0) {
+            VStack(alignment: .leading, spacing: 12) {
+                HStack(spacing: 6) {
+                    Image(systemName: "airplane.departure")
+                        .font(.system(size: 12, weight: .semibold))
+                        .foregroundStyle(LATheme.yellow)
+                    Text(context.attributes.flightNumber)
                         .font(.frutiger(size: 13, weight: .bold))
-                        .foregroundStyle(.white.opacity(0.85))
-                        .lineLimit(1)
-                } else if let airline = context.attributes.airlineName {
-                    Text("· \(airline)")
-                        .font(.frutiger(size: 13, weight: .medium))
-                        .foregroundStyle(.white.opacity(0.7))
-                        .lineLimit(1)
+                        .foregroundStyle(.white.opacity(0.9))
+                    if let airline = context.attributes.airlineName {
+                        Text("· \(airline)")
+                            .font(.frutiger(size: 12, weight: .medium))
+                            .foregroundStyle(.white.opacity(0.6))
+                            .lineLimit(1)
+                    }
+                    Spacer()
                 }
-                Spacer()
-            }
 
-            HStack(alignment: .firstTextBaseline, spacing: 8) {
-                Text(context.state.departure > .now ? "Vertrek over" : "")
-                    .font(.frutiger(size: 12, weight: .medium))
-                    .foregroundStyle(.white.opacity(0.7))
-                CountdownText(context: context)
-                    .font(.frutiger(size: 28, weight: .black))
-                    .foregroundStyle(.white)
-            }
-
-            if context.state.departure > .now {
-                // Lineaire voortgang door de laatste 8 uur vóór vertrek.
-                ProgressView(timerInterval: departureWindow(for: context), countsDown: true) {
-                    EmptyView()
-                } currentValueLabel: {
-                    EmptyView()
+                HStack(alignment: .firstTextBaseline, spacing: 10) {
+                    if let dep = context.attributes.departureIata, let arr = context.attributes.arrivalIata {
+                        Text(dep)
+                            .font(.frutiger(size: 26, weight: .black))
+                            .foregroundStyle(.white)
+                        Image(systemName: "airplane")
+                            .font(.system(size: 13, weight: .semibold))
+                            .foregroundStyle(.white.opacity(0.4))
+                            .rotationEffect(.degrees(90))
+                        Text(arr)
+                            .font(.frutiger(size: 26, weight: .black))
+                            .foregroundStyle(.white)
+                    } else {
+                        Text(context.attributes.airlineName ?? "Jouw vlucht")
+                            .font(.frutiger(size: 20, weight: .black))
+                            .foregroundStyle(.white)
+                            .lineLimit(1)
+                    }
+                    Spacer()
+                    VStack(alignment: .trailing, spacing: 1) {
+                        Text(departed ? "vertrokken" : "vertrek")
+                            .font(.frutiger(size: 10, weight: .semibold))
+                            .foregroundStyle(.white.opacity(0.5))
+                        Text(Self.clockFormatter.string(from: context.state.departure))
+                            .font(.frutiger(size: 15, weight: .bold))
+                            .monospacedDigit()
+                            .foregroundStyle(.white)
+                    }
                 }
-                .progressViewStyle(.linear)
-                .tint(LATheme.yellow)
-            }
 
-            ReminderLine(context: context)
-                .foregroundStyle(.white.opacity(0.85))
+                if context.state.departure > .now {
+                    // Lineaire voortgang door de laatste 8 uur vóór vertrek.
+                    ProgressView(timerInterval: departureWindow(for: context), countsDown: true) {
+                        EmptyView()
+                    } currentValueLabel: {
+                        EmptyView()
+                    }
+                    .progressViewStyle(.linear)
+                    .tint(LATheme.yellow)
+                }
+            }
+            .padding(14)
+            .padding(.bottom, 12)
+
+            statusBar
         }
-        .padding(14)
         .activityBackgroundTint(LATheme.navyDark)
         .activitySystemActionForegroundColor(.white)
-        .background(LATheme.navyGradient)
+        .background(LATheme.inkGradient)
+    }
+
+    /// Volle-breedte statusbalk, kleur volgt de bagagestatus — zelfde
+    /// visuele taal als de statusbalk in vluchttracker-apps.
+    private var statusBar: some View {
+        HStack(spacing: 8) {
+            Image(systemName: departed ? "airplane" : (bagChecked ? "checkmark.circle.fill" : "bag.fill"))
+                .font(.system(size: 13, weight: .semibold))
+            Text(statusText)
+                .font(.frutiger(size: 13, weight: .semibold))
+                .lineLimit(1)
+                .minimumScaleFactor(0.8)
+            Spacer()
+            if !departed {
+                Text(countdownBadge)
+                    .font(.frutiger(size: 12, weight: .black))
+                    .monospacedDigit()
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 4)
+                    .background(statusForeground.opacity(0.16), in: Capsule())
+            }
+        }
+        .foregroundStyle(statusForeground)
+        .padding(.horizontal, 14)
+        .padding(.vertical, 10)
+        .background(statusColor)
+    }
+
+    /// Geel is te licht voor witte tekst — donkere tekst erop, wit op het
+    /// groene "klaar"-vlak.
+    private var statusForeground: Color {
+        (departed || bagChecked) ? .white : LATheme.inkDark
+    }
+
+    private var statusColor: Color {
+        (departed || bagChecked) ? LATheme.green : LATheme.yellow
+    }
+
+    private var statusText: String {
+        if departed { return "Goede reis! ✈️" }
+        if bagChecked { return "Tas gecheckt, klaar voor vertrek" }
+        return "Nog even je handbagage checken"
+    }
+
+    private var countdownBadge: String {
+        let days = Calendar.current.dateComponents(
+            [.day],
+            from: Calendar.current.startOfDay(for: .now),
+            to: Calendar.current.startOfDay(for: context.state.departure)
+        ).day ?? 0
+        switch days {
+        case 0:  return "VANDAAG"
+        case 1:  return "MORGEN"
+        default: return "\(days)D"
+        }
     }
 }
 #endif

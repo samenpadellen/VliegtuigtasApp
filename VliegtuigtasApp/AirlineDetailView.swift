@@ -141,7 +141,7 @@ struct AirlineDetailView: View {
                 }
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 16)
-                .background(Theme.navyGradient)
+                .background(Theme.inkGradient)
                 .foregroundStyle(.white)
                 .clipShape(RoundedRectangle(cornerRadius: 16))
                 .shadow(color: Theme.navy.opacity(0.30), radius: 10, x: 0, y: 4)
@@ -365,14 +365,21 @@ struct AirlineDetailView: View {
             .padding(.top, 4)
     }
 
+    private static let isoDateFormatter: ISO8601DateFormatter = {
+        let f = ISO8601DateFormatter()
+        f.formatOptions = [.withFullDate]
+        return f
+    }()
+    private static let displayDateFormatter: DateFormatter = {
+        let f = DateFormatter()
+        f.locale = Locale(identifier: "nl_NL")
+        f.dateStyle = .medium
+        return f
+    }()
+
     private func formattedDate(_ raw: String) -> String {
-        let iso = ISO8601DateFormatter()
-        iso.formatOptions = [.withFullDate]
-        guard let date = iso.date(from: raw) else { return raw }
-        let fmt = DateFormatter()
-        fmt.locale = Locale(identifier: "nl_NL")
-        fmt.dateStyle = .medium
-        return fmt.string(from: date)
+        guard let date = Self.isoDateFormatter.date(from: raw) else { return raw }
+        return Self.displayDateFormatter.string(from: date)
     }
 
     private func loadDetail() async {

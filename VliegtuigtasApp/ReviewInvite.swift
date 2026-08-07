@@ -27,18 +27,22 @@ enum ReviewPrompter {
     /// Minimale tussenpoos tussen twee beoordelingsverzoeken: 3 maanden.
     private static let minInterval: TimeInterval = 90 * 24 * 60 * 60
 
-    /// Registreert een geslaagde check en geeft terug of dit een goed moment is
-    /// om om een beoordeling te vragen. `true` de éérste keer dat een tas past,
-    /// daarna pas weer als het ≥ 3 maanden geleden is.
-    @discardableResult
-    static func registerSuccessAndShouldPrompt() -> Bool {
+    /// Telt een geslaagde check (voor mijlpalen/journey). Losgekoppeld van de
+    /// prompt-beslissing zodat de eerste-check-viering het review-venster niet
+    /// opsoupeert.
+    static func recordSuccess() {
         let d = UserDefaults.standard
         d.set(d.integer(forKey: countKey) + 1, forKey: countKey)
+    }
 
+    /// Mag de systeem-beoordelingspopup nu getoond worden? `true` als er nog
+    /// nooit is gevraagd of het ≥ 3 maanden geleden is; zet dan meteen het
+    /// tijdstempel zodat het venster gesloten wordt.
+    static func shouldPrompt() -> Bool {
+        let d = UserDefaults.standard
         let now = Date().timeIntervalSince1970
         let last = d.double(forKey: lastPromptTimeKey)   // 0 = nog nooit gevraagd
         guard last == 0 || now - last >= minInterval else { return false }
-
         d.set(now, forKey: lastPromptTimeKey)
         return true
     }

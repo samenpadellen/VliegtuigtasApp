@@ -178,20 +178,25 @@ struct BagDetailView: View {
                     .font(.system(size: 72, weight: .ultraLight))
                     .foregroundStyle(Theme.navy.opacity(0.10))
             } else if images.count == 1 {
-                AuthorisedImage(urlString: images[0], fill: true)
+                // Passend tonen: bij vullen werd een staande koffer boven en
+                // onder afgesneden. De witte hero-achtergrond loopt door, dus
+                // er ontstaan geen zichtbare balken.
+                AuthorisedImage(urlString: images[0])
+                    .padding(.horizontal, 24)
+                    .padding(.top, bagDetailStatusBarHeight)
                     .frame(maxWidth: .infinity)
                     .frame(height: heroHeight)
-                    .clipped()
             } else if images.count > 1 {
                 // Meerdere shop-afbeeldingen: horizontaal veegbaar. Eigen
                 // stippen (hieronder) i.p.v. de systeem-index, zodat ze niet
                 // wegvallen achter het onderste verloop.
                 TabView(selection: $selectedImage) {
                     ForEach(Array(images.enumerated()), id: \.offset) { idx, url in
-                        AuthorisedImage(urlString: url, fill: true)
+                        AuthorisedImage(urlString: url)
+                            .padding(.horizontal, 24)
+                            .padding(.top, bagDetailStatusBarHeight)
                             .frame(maxWidth: .infinity)
                             .frame(height: heroHeight)
-                            .clipped()
                             .tag(idx)
                     }
                 }
@@ -320,9 +325,9 @@ struct BagDetailView: View {
             VStack(alignment: .leading, spacing: 5) {
                 if let brand = d.brand {
                     Text(brand.uppercased())
-                        .font(.frutiger(size: 11, weight: .bold))
-                        .foregroundStyle(Theme.navy.opacity(0.45))
-                        .kerning(1.2)
+                        .font(.system(size: 10, weight: .black, design: .monospaced))
+                        .foregroundStyle(Theme.textSecondary)
+                        .kerning(1.4)
                 }
                 Text(d.name)
                     .font(.frutiger(size: 24, weight: .bold))
@@ -331,11 +336,15 @@ struct BagDetailView: View {
             }
 
             HStack(alignment: .center, spacing: 0) {
-                VStack(alignment: .leading, spacing: 3) {
+                VStack(alignment: .leading, spacing: 5) {
                     if let label = d.displayPrice {
+                        // Groot geel prijskaartje, zoals in het duty-free schap.
                         Text(label)
-                            .font(.frutiger(size: 32, weight: .black))
-                            .foregroundStyle(Theme.navy)
+                            .font(.system(size: 26, weight: .black, design: .monospaced))
+                            .foregroundStyle(Theme.ink)
+                            .padding(.horizontal, 11)
+                            .padding(.vertical, 6)
+                            .background(Theme.yellow, in: RoundedRectangle(cornerRadius: 10))
                     }
                     if let domain = d.shopDomain {
                         HStack(spacing: 5) {
@@ -364,7 +373,7 @@ struct BagDetailView: View {
                         .foregroundStyle(.white)
                         .padding(.horizontal, 18)
                         .padding(.vertical, 14)
-                        .background(Theme.navyGradient)
+                        .background(Theme.inkGradient)
                         .clipShape(Capsule())
                         .shadow(color: Theme.navy.opacity(0.28), radius: 10, x: 0, y: 4)
                     }
@@ -401,25 +410,34 @@ struct BagDetailView: View {
         .frame(maxWidth: .infinity, alignment: .leading)
     }
 
+    /// Specificatie als vakje op een bagagelabel: monospace kopje in kapitalen,
+    /// waarde eronder — dezelfde beeldtaal als de velden op de instapkaart.
     private func specPill(icon: String, label: String, value: String) -> some View {
         VStack(alignment: .leading, spacing: 4) {
             HStack(spacing: 4) {
                 Image(systemName: icon)
-                    .font(.system(size: 10))
-                    .foregroundStyle(Theme.navy.opacity(0.55))
-                Text(label)
-                    .font(.frutiger(size: 10))
+                    .font(.system(size: 9, weight: .bold))
+                    .foregroundStyle(Theme.ink.opacity(0.55))
+                Text(label.uppercased())
+                    .font(.system(size: 9, weight: .black, design: .monospaced))
                     .foregroundStyle(Theme.textSecondary)
+                    .kerning(0.6)
             }
             Text(value)
-                .font(.frutiger(size: 12, weight: .semibold))
+                .font(.system(size: 13, weight: .bold, design: .monospaced))
                 .foregroundStyle(Theme.textPrimary)
+                .lineLimit(1)
+                .minimumScaleFactor(0.75)
         }
-        .padding(.horizontal, 12)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.horizontal, 11)
         .padding(.vertical, 10)
         .background(Color(.systemBackground))
         .clipShape(RoundedRectangle(cornerRadius: 12))
-        .shadow(color: .black.opacity(0.04), radius: 5, x: 0, y: 2)
+        .overlay(
+            RoundedRectangle(cornerRadius: 12)
+                .strokeBorder(Theme.ink.opacity(0.08), lineWidth: 1)
+        )
     }
 
     // MARK: - Colors
@@ -500,7 +518,7 @@ struct BagDetailView: View {
                             .foregroundStyle(.white)
                             .frame(maxWidth: .infinity)
                             .padding(.vertical, 13)
-                            .background(Theme.navyGradient)
+                            .background(Theme.inkGradient)
                             .clipShape(RoundedRectangle(cornerRadius: 14))
                             .shadow(color: Theme.navy.opacity(0.25), radius: 8, x: 0, y: 3)
                         }
@@ -635,10 +653,18 @@ struct BagDetailView: View {
 
     // MARK: - Helpers
 
+    /// Zelfde kop-motief als de rest van de app: titel met een kort geel
+    /// accentstreepje eronder.
     private func sectionHeader(_ text: String) -> some View {
-        Text(text)
-            .font(.frutiger(size: 18, weight: .bold))
-            .foregroundStyle(Theme.textPrimary)
+        VStack(alignment: .leading, spacing: 6) {
+            Text(text)
+                .font(.frutiger(size: 18, weight: .bold))
+                .foregroundStyle(Theme.textPrimary)
+            Capsule()
+                .fill(Theme.yellow)
+                .frame(width: 22, height: 3)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
 
     private func load() async {

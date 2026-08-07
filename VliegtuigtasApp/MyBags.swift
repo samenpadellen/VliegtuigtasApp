@@ -208,7 +208,7 @@ struct MyBagsOverviewView: View {
                             .padding(.vertical, 8)
                             .background(
                                 selectedAirline?.id == airline.id
-                                    ? AnyShapeStyle(Theme.navyGradient)
+                                    ? AnyShapeStyle(Theme.inkGradient)
                                     : AnyShapeStyle(Color(.systemBackground))
                             )
                             .clipShape(Capsule())
@@ -439,7 +439,7 @@ struct BagEditorSheet: View {
                             .font(.frutiger(size: 16, weight: .semibold))
                             .frame(maxWidth: .infinity)
                             .padding(.vertical, 15)
-                            .background(Theme.navyGradient)
+                            .background(Theme.inkGradient)
                             .foregroundStyle(.white)
                             .clipShape(RoundedRectangle(cornerRadius: 14))
                     }
