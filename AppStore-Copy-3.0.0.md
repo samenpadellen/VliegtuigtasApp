@@ -31,6 +31,8 @@ Plan je een verrassing? Verberg de reis en hij verdwijnt overal uit beeld — oo
 **En verder**
 Een nieuw startscherm in de vorm van een luchthaventerminal, zelf items toevoegen aan je paklijst, een rustiger opstartscherm, een frissere shop met scherpere productfoto's, en vijf verborgen grapjes met een logboek vol hints.
 
+Vliegtuigtas werd in juli 2026 gekozen tot iCulture Nederlandse App van de Maand. Dank aan iedereen die de app gebruikt — deze update is er voor jullie.
+
 Fijne reis!
 
 *(± 2.030 tekens — binnen de limiet van 4.000)*
@@ -50,8 +52,8 @@ Check je handbagage gratis
 *(26 tekens)*
 
 **Promotietekst (170 tekens max):**
-Alles is nu gratis. Je vlucht ververst zichzelf en waarschuwt bij gatewijziging of vertraging. Nieuw: reis-assistent, reispaspoort en verborgen reizen.
-*(150 tekens)*
+iCulture App van de Maand. En vanaf nu is alles gratis: je vlucht ververst zichzelf en waarschuwt bij een gatewijziging of vertraging.
+*(133 tekens)*
 
 **Trefwoorden (100 tekens, kommagescheiden):**
 handbagage,koffer,bagagecheck,vluchtnummer,gate,vertraging,luchthaven,paklijst,ryanair,klm,transavia
@@ -60,6 +62,8 @@ handbagage,koffer,bagagecheck,vluchtnummer,gate,vertraging,luchthaven,paklijst,r
 ---
 
 ## Beschrijving (volledige tekst, vervangt de huidige)
+
+🏆 **iCulture Nederlandse App van de Maand — juli 2026**
 
 **Nooit meer verrast bij de gate.**
 
@@ -81,8 +85,6 @@ Op toestellen met Apple Intelligence denkt Purser Pim met je mee over wat je ver
 
 **Ook handig**
 Luchthaveninfo met wachttijden en tips, de EU-regels voor vloeistoffen en powerbanks, douane-informatie, en hulp als je bagage kwijt of beschadigd is. Plus een Safari-extensie die meekijkt op webshops en direct zegt of die tas past.
-
-*Bekroond met iCulture Nederlandse App van de Maand (juli 2026).*
 
 ---
 

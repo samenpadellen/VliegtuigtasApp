@@ -284,6 +284,7 @@ struct MoreHubView: View {
                             }
                         }
                     }
+                    awardBadge
                 }
                 .frame(maxWidth: Theme.contentMaxWidth)
                 .frame(maxWidth: .infinity)
@@ -307,6 +308,39 @@ struct MoreHubView: View {
         .onChange(of: nav.moreDestination) { _, destination in
             if destination == .bucketList { pushedBucketList = true }
         }
+    }
+
+    /// Bescheiden vermelding onderaan de hub: wél zichtbaar, maar het neemt
+    /// geen plek in van iets waar de gebruiker daadwerkelijk heen wil.
+    private var awardBadge: some View {
+        VStack(spacing: 6) {
+            HStack(spacing: 8) {
+                Image(systemName: "trophy.fill")
+                    .font(.system(size: 13, weight: .bold))
+                    .foregroundStyle(Theme.ink)
+                    .frame(width: 26, height: 26)
+                    .background(Theme.yellow, in: Circle())
+                VStack(alignment: .leading, spacing: 1) {
+                    Text("Nederlandse App van de Maand")
+                        .font(.frutiger(size: 13, weight: .bold))
+                        .foregroundStyle(Theme.textPrimary)
+                    Text("iCulture · juli 2026")
+                        .font(.system(size: 10, weight: .bold, design: .monospaced))
+                        .kerning(0.5)
+                        .foregroundStyle(Theme.textSecondary)
+                }
+                Spacer(minLength: 0)
+            }
+            .padding(14)
+            .background(Color(.systemBackground))
+            .clipShape(RoundedRectangle(cornerRadius: 14))
+
+            Text("Bedankt dat je Vliegtuigtas gebruikt.")
+                .font(.frutiger(size: 11))
+                .foregroundStyle(Theme.textSecondary)
+        }
+        .padding(.top, 6)
+        .accessibilityElement(children: .combine)
     }
 
     /// De bucket list gaat via push, dus die filteren we uit de sheet-binding.
