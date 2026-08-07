@@ -250,8 +250,42 @@ enum NotificationPlanner {
                 for trip in TripsStore.shared.upcoming.prefix(5) {
                     scheduleReminders(for: trip, in: center)
                 }
+                // Verborgen reizen kregen tot nu toe géén herinnering, omdat
+                // `upcoming` ze wegfiltert. Voor een verrassingsreis wil je wél
+                // op tijd gaan pakken — alleen mag de melding niets verraden
+                // aan wie over je schouder meekijkt.
+                for trip in TripsStore.shared.hidden.filter({ !$0.isPast }).prefix(5) {
+                    scheduleDiscreetReminders(for: trip, in: center)
+                }
             }
         }
+    }
+
+    /// Herinnering voor een verborgen reis: zelfde momenten, maar zonder naam,
+    /// bestemming of aantal items op het scherm van een vergrendelde telefoon.
+    @MainActor
+    private static func scheduleDiscreetReminders(for trip: Trip, in center: UNUserNotificationCenter) {
+        func add(id: String, offset: TimeInterval, body: String) {
+            let fireDate = trip.startDate.addingTimeInterval(offset)
+            guard fireDate > .now else { return }
+            let content = UNMutableNotificationContent()
+            content.title = "Vliegtuigtas"
+            content.body = body
+            content.sound = .default
+            let components = Calendar.current.dateComponents(
+                [.year, .month, .day, .hour, .minute], from: fireDate
+            )
+            center.add(UNNotificationRequest(
+                identifier: id,
+                content: content,
+                trigger: UNCalendarNotificationTrigger(dateMatching: components, repeats: false)
+            ))
+        }
+
+        add(id: "vt_trip_\(trip.id.uuidString)_3d", offset: -3 * 24 * 3600,
+            body: "Je hebt over 3 dagen iets staan. Open de app om verder te pakken.")
+        add(id: "vt_trip_\(trip.id.uuidString)_1d", offset: -24 * 3600,
+            body: "Morgen is het zover. Open de app voor je paklijst.")
     }
 
     @MainActor

@@ -29,10 +29,15 @@ private enum CarPlayData {
         flights().filter { !$0.isPast }
     }
 
+    /// Verborgen reizen blijven ook in de auto verborgen. Zonder dit filter
+    /// verscheen een verrassingsreis alsnog op het scherm in de auto — juist
+    /// een plek waar iemand anders meekijkt.
     static func trips() -> [Trip] {
         guard let data = UserDefaults.standard.data(forKey: Key.trips),
               let decoded = try? JSONDecoder().decode([Trip].self, from: data) else { return [] }
-        return decoded.sorted { $0.startDate < $1.startDate }
+        return decoded
+            .filter { !$0.isHidden }
+            .sorted { $0.startDate < $1.startDate }
     }
 
     static func nextTrip() -> Trip? {

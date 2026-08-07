@@ -16,6 +16,7 @@ struct TripsListView: View {
     @State private var showDepartureReminder = false
     @State private var hiddenUnlocked = false
     @State private var lockFailed = false
+    @Environment(\.scenePhase) private var scenePhase
     @Namespace private var zoomNamespace
 
     var body: some View {
@@ -46,6 +47,12 @@ struct TripsListView: View {
             DepartureReminderSheet()
                 .presentationDetents([.medium])
                 .presentationDragIndicator(.visible)
+        }
+        // Zodra de app naar de achtergrond gaat, gaat het slot er weer op.
+        // Anders blijft een ontgrendelde lijst open staan zodra je je telefoon
+        // even uit handen geeft — precies het scenario waar dit voor bedoeld is.
+        .onChange(of: scenePhase) { _, phase in
+            if phase != .active { hiddenUnlocked = false }
         }
     }
 
@@ -1528,6 +1535,7 @@ struct TripWizardView: View {
     @State private var customStyleNaam: String?
     @State private var customStyleTagline: String?
     @State private var customStyleItems: [String] = []
+    @State private var createHidden = false
     @State private var createdItemCount = 0
 
     private var days: Int {
@@ -1882,7 +1890,51 @@ struct TripWizardView: View {
                 }
                 .buttonStyle(.plain)
             }
+
+            hiddenToggle
         }
+    }
+
+    /// Meteen verbergen bij het aanmaken. Tot nu toe kon je een reis pas ná het
+    /// aanmaken verbergen — en tot dat moment stond een verrassingsreis gewoon
+    /// op Start, in je lijst en op je widget.
+    private var hiddenToggle: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Toggle(isOn: $createHidden.animation(.snappy)) {
+                HStack(spacing: 10) {
+                    Image(systemName: createHidden ? "eye.slash.fill" : "eye")
+                        .font(.system(size: 14, weight: .bold))
+                        .foregroundStyle(createHidden ? Theme.ink : Theme.textSecondary)
+                        .frame(width: 26)
+                    VStack(alignment: .leading, spacing: 1) {
+                        Text("Verberg deze reis")
+                            .font(.frutiger(size: 14, weight: .semibold))
+                            .foregroundStyle(Theme.textPrimary)
+                        Text("Voor een verrassing: nergens zichtbaar, alleen achter Face ID")
+                            .font(.frutiger(size: 11))
+                            .foregroundStyle(Theme.textSecondary)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                }
+            }
+            .tint(Theme.navy)
+            .padding(14)
+            .background(Color(.systemBackground))
+            .clipShape(RoundedRectangle(cornerRadius: 16))
+            .overlay(
+                RoundedRectangle(cornerRadius: 16)
+                    .strokeBorder(createHidden ? Theme.yellow : Theme.ink.opacity(0.07),
+                                  lineWidth: createHidden ? 2 : 1)
+            )
+
+            if createHidden && !HiddenTripsLock.isDeviceProtected {
+                Text("Let op: je iPhone heeft geen toegangscode of Face ID. De reis wordt wel verborgen, maar is dan door iedereen te openen.")
+                    .font(.frutiger(size: 11))
+                    .foregroundStyle(Theme.orange)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
+        .padding(.top, 4)
     }
 
     // MARK: - Stap 5: instapkaart
@@ -2008,6 +2060,7 @@ struct TripWizardView: View {
             luggageType: luggageType,
             style: style,
             customStyleLabel: customStyleNaam,
+            isHidden: createHidden,
             linkedFlightId: linkedFlightId
         )
         trip.packingItems = generatePackingList(
