@@ -369,6 +369,10 @@ struct TripsListView: View {
     /// een reis oplevert, niet dat er niets is.
     private var emptyState: some View {
         VStack(alignment: .leading, spacing: 14) {
+            // Illustratie boven de tekst: een leeg scherm met alleen woorden
+            // voelt als een foutmelding, niet als een uitnodiging.
+            AirportScene(height: 140)
+
             VStack(alignment: .leading, spacing: 6) {
                 Text("Plan je eerste reis")
                     .font(.frutiger(size: 20, weight: .bold))
@@ -460,6 +464,121 @@ struct BucketListPreviewCard: View {
             .clipShape(RoundedRectangle(cornerRadius: 14))
         }
         .buttonStyle(.plain)
+    }
+}
+
+// MARK: - Reis aanpassen
+
+/// Een reis was tot nu toe alleen te verwijderen. Een verkeerde datum of een
+/// typefout in de naam betekende dus: weggooien en opnieuw beginnen, inclusief
+/// je afgevinkte paklijst. Hier pas je aan wat er mis is en blijft de rest staan.
+private struct TripEditSheet: View {
+    let trip: Trip
+
+    @ObservedObject private var store = TripsStore.shared
+    @Environment(\.dismiss) private var dismiss
+
+    @State private var name: String
+    @State private var destination: String
+    @State private var startDate: Date
+    @State private var endDate: Date
+    @State private var luggageType: LuggageType
+    @State private var style: TripStyle?
+    @State private var isHidden: Bool
+
+    init(trip: Trip) {
+        self.trip = trip
+        _name = State(initialValue: trip.name)
+        _destination = State(initialValue: trip.destination ?? "")
+        _startDate = State(initialValue: trip.startDate)
+        _endDate = State(initialValue: trip.endDate)
+        _luggageType = State(initialValue: trip.luggageType)
+        _style = State(initialValue: trip.style)
+        _isHidden = State(initialValue: trip.isHidden)
+    }
+
+    private var canSave: Bool {
+        !name.trimmingCharacters(in: .whitespaces).isEmpty && endDate >= startDate
+    }
+
+    var body: some View {
+        NavigationStack {
+            Form {
+                Section("Reis") {
+                    TextField("Naam", text: $name)
+                    TextField("Bestemming", text: $destination)
+                }
+
+                Section("Data") {
+                    DatePicker("Vertrek", selection: $startDate, displayedComponents: .date)
+                    DatePicker("Terug", selection: $endDate, in: startDate..., displayedComponents: .date)
+                }
+
+                Section("Bagage") {
+                    Picker("Bagage", selection: $luggageType) {
+                        ForEach(LuggageType.allCases) { type in
+                            Text(type.label).tag(type)
+                        }
+                    }
+                }
+
+                Section {
+                    Picker("Soort reis", selection: $style) {
+                        Text("Geen").tag(TripStyle?.none)
+                        ForEach(TripStyle.allCases) { option in
+                            Text(option.label).tag(TripStyle?.some(option))
+                        }
+                    }
+                } header: {
+                    Text("Soort reis")
+                } footer: {
+                    // Eerlijk zijn over wat er níét gebeurt: we laten de
+                    // paklijst met rust, want daar staan afvinkjes en eigen
+                    // items van de gebruiker in.
+                    Text(trip.customStyleLabel != nil
+                         ? "Deze reis heeft een eigen type van Pim: \(trip.customStyleLabel!). Kies je hier iets, dan vervangt dat de naam. Je paklijst blijft ongewijzigd."
+                         : "Aanpassen verandert alleen de naam van het reistype. Je paklijst blijft zoals hij is.")
+                }
+
+                Section {
+                    Toggle("Verberg deze reis", isOn: $isHidden)
+                } footer: {
+                    Text(isHidden
+                         ? "Verborgen reizen zijn nergens zichtbaar — ook niet op je widget of in de auto — en alleen te openen achter Face ID."
+                         : "Handig voor een verrassing die niemand mag zien.")
+                }
+            }
+            .navigationTitle("Reis aanpassen")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button("Annuleer") { dismiss() }
+                }
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("Bewaar") { save() }
+                        .fontWeight(.semibold)
+                        .disabled(!canSave)
+                }
+            }
+        }
+    }
+
+    private func save() {
+        var updated = trip
+        updated.name = name.trimmingCharacters(in: .whitespaces)
+        let trimmedDestination = destination.trimmingCharacters(in: .whitespaces)
+        updated.destination = trimmedDestination.isEmpty ? nil : trimmedDestination
+        updated.startDate = startDate
+        updated.endDate = endDate
+        updated.luggageType = luggageType
+        updated.isHidden = isHidden
+        // Kiest de gebruiker een vast type, dan vervalt het eigen type van Pim —
+        // anders zouden er twee namen naast elkaar bestaan.
+        updated.style = style
+        if style != nil { updated.customStyleLabel = nil }
+        store.upsert(updated)
+        UINotificationFeedbackGenerator().notificationOccurred(.success)
+        dismiss()
     }
 }
 
@@ -1059,6 +1178,7 @@ struct TripDetailView: View {
     @EnvironmentObject private var session: UserSession
     @Environment(\.dismiss) private var dismiss
     @State private var showDeleteConfirm = false
+    @State private var showEdit = false
     @State private var newItemName = ""
     @State private var showPimSuggestions = false
     @FocusState private var newItemFocused: Bool
@@ -1132,6 +1252,19 @@ struct TripDetailView: View {
                             linkedInfoCard
                         }
 
+                        Button {
+                            showEdit = true
+                        } label: {
+                            Label("Reis aanpassen", systemImage: "pencil")
+                                .font(.frutiger(size: 14, weight: .semibold))
+                                .foregroundStyle(Theme.navy)
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 13)
+                                .background(Theme.navy.opacity(0.07))
+                                .clipShape(RoundedRectangle(cornerRadius: 14))
+                        }
+                        .buttonStyle(.plain)
+
                         Button(role: .destructive) {
                             showDeleteConfirm = true
                         } label: {
@@ -1157,6 +1290,9 @@ struct TripDetailView: View {
                         dismiss()
                     }
                     Button("Annuleer", role: .cancel) {}
+                }
+                .sheet(isPresented: $showEdit) {
+                    TripEditSheet(trip: trip)
                 }
             } else {
                 ContentUnavailableView("Reis niet meer beschikbaar", systemImage: "suitcase.rolling")

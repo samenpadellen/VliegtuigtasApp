@@ -4,6 +4,11 @@
 <dict>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
+	<!-- De app is ontworpen en getest op lichte modus. Donkere modus half
+	     ondersteunen levert slechtere schermen op dan hem uitzetten; zet dit
+	     pas terug als elk scherm in beide standen is nagelopen. -->
+	<key>UIUserInterfaceStyle</key>
+	<string>Light</string>
 	<!-- Launchscreen in dezelfde bijna-zwarte kleur als SplashView. Zonder dit
 	     toonde iOS eerst een wit vlak en sprong het beeld daarna naar het
 	     donkere startscherm: een zichtbare witte flits bij elke koude start. -->

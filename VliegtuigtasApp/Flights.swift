@@ -835,6 +835,7 @@ struct FlightDetailView: View {
     @State private var brandTint: Color?
     @State private var isRefreshing = false
     @State private var showDeleteConfirm = false
+    @State private var showEdit = false
     @State private var showAirline: Airline?
 
     private var flight: SavedFlightRecord? { store.flights.first { $0.id == flightId } }
@@ -1050,6 +1051,19 @@ struct FlightDetailView: View {
                 .buttonStyle(.plain)
                 .disabled(isRefreshing || flight.number.isEmpty)
 
+                Button {
+                    showEdit = true
+                } label: {
+                    Image(systemName: "pencil")
+                        .font(.system(size: 14, weight: .semibold))
+                        .foregroundStyle(Theme.navy)
+                        .frame(width: 44, height: 44)
+                        .background(Theme.navy.opacity(0.08))
+                        .clipShape(RoundedRectangle(cornerRadius: 12))
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel("Vlucht aanpassen")
+
                 Button(role: .destructive) {
                     showDeleteConfirm = true
                 } label: {
@@ -1068,6 +1082,9 @@ struct FlightDetailView: View {
                 .foregroundStyle(Theme.textSecondary)
                 .multilineTextAlignment(.center)
                 .frame(maxWidth: .infinity)
+        }
+        .sheet(isPresented: $showEdit) {
+            FlightEditSheet(flight: flight)
         }
         .confirmationDialog(
             "Vlucht verwijderen?",
@@ -1321,6 +1338,111 @@ private struct FlightBoardingPassCard: View {
         .frame(maxWidth: .infinity, alignment: alignment == .leading ? .leading : .trailing)
     }
 
+}
+
+// MARK: - Vlucht aanpassen
+
+/// Een opgeslagen vlucht was alleen te verwijderen. Een verkeerd overgetypt
+/// vluchtnummer of een verschoven vertrektijd betekende dus: weggooien en
+/// opnieuw invoeren. Hier corrigeer je wat er mis is.
+private struct FlightEditSheet: View {
+    let flight: SavedFlightRecord
+
+    @ObservedObject private var store = FlightsStore.shared
+    @Environment(\.dismiss) private var dismiss
+
+    @State private var number: String
+    @State private var departure: Date
+    @State private var from: RouteAirport?
+    @State private var to: RouteAirport?
+    @State private var pickingFrom = false
+    @State private var pickingTo = false
+
+    init(flight: SavedFlightRecord) {
+        self.flight = flight
+        _number = State(initialValue: flight.number)
+        _departure = State(initialValue: flight.departure)
+        _from = State(initialValue: flight.departureIata.flatMap { RouteAirports.find(iata: $0) })
+        _to = State(initialValue: flight.arrivalIata.flatMap { RouteAirports.find(iata: $0) })
+    }
+
+    private var canSave: Bool {
+        !number.trimmingCharacters(in: .whitespaces).isEmpty
+    }
+
+    var body: some View {
+        NavigationStack {
+            Form {
+                Section("Vlucht") {
+                    TextField("Vluchtnummer of naam", text: $number)
+                        .autocorrectionDisabled()
+                        .textInputAutocapitalization(.characters)
+                    DatePicker("Vertrek", selection: $departure,
+                               displayedComponents: [.date, .hourAndMinute])
+                }
+
+                Section {
+                    Button { pickingFrom = true } label: {
+                        routeRow(label: "Van", airport: from)
+                    }
+                    Button { pickingTo = true } label: {
+                        routeRow(label: "Naar", airport: to)
+                    }
+                } header: {
+                    Text("Route")
+                } footer: {
+                    Text("De route bepaalt wat er op je widget, Apple Watch en in CarPlay staat.")
+                }
+            }
+            .navigationTitle("Vlucht aanpassen")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button("Annuleer") { dismiss() }
+                }
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("Bewaar") { save() }
+                        .fontWeight(.semibold)
+                        .disabled(!canSave)
+                }
+            }
+            .sheet(isPresented: $pickingFrom) {
+                AirportPickerSheet(title: "Van welke luchthaven?", selection: $from)
+            }
+            .sheet(isPresented: $pickingTo) {
+                AirportPickerSheet(title: "Waar vlieg je heen?", selection: $to)
+            }
+        }
+    }
+
+    private func routeRow(label: String, airport: RouteAirport?) -> some View {
+        HStack {
+            Text(label)
+                .foregroundStyle(Theme.textPrimary)
+            Spacer()
+            Text(airport?.shortLabel ?? "Kies")
+                .foregroundStyle(airport == nil ? Theme.textSecondary : Theme.navy)
+            Image(systemName: "chevron.right")
+                .font(.system(size: 12, weight: .semibold))
+                .foregroundStyle(Theme.textSecondary)
+        }
+    }
+
+    private func save() {
+        var updated = flight
+        updated.number = number.trimmingCharacters(in: .whitespaces)
+        updated.departure = departure
+        updated.departureIata = from?.iata
+        updated.departureAirport = from.map { "\($0.name), \($0.city)" }
+        updated.arrivalIata = to?.iata
+        updated.arrivalAirport = to.map { "\($0.name), \($0.city)" }
+        // Handmatig gewijzigd, dus de opgehaalde tijden kloppen mogelijk niet
+        // meer. Stempel wissen zodat de vluchtwacht opnieuw ophaalt.
+        updated.lastRefreshed = nil
+        store.upsert(updated)
+        UINotificationFeedbackGenerator().notificationOccurred(.success)
+        dismiss()
+    }
 }
 
 // MARK: - Status-tijdlijn

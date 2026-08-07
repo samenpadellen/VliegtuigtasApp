@@ -493,6 +493,178 @@ struct VerdictBadge: View {
     }
 }
 
+// MARK: - Luchthaven-illustratie
+
+/// Vlakke illustratie van een vliegtuig op het platform, met verkeerstoren.
+/// Volledig in SwiftUI getekend in plaats van als afbeelding: zo schaalt hij
+/// scherp mee op elk formaat, weegt hij niets in de app-bundel, en kunnen de
+/// kleuren meebewegen met licht/donker.
+///
+/// Bedoeld voor lege staten — daar waar nog niets te tonen valt en een kale
+/// tekstregel het scherm doods maakt.
+struct AirportScene: View {
+    var height: CGFloat = 150
+
+    var body: some View {
+        GeometryReader { geo in
+            let w = geo.size.width
+            let h = geo.size.height
+            let groundY = h * 0.70
+            // Middellijn van het toestel; iets rechts van het midden zodat de
+            // toren links ademruimte houdt.
+            let cx = w * 0.56
+
+            ZStack(alignment: .topLeading) {
+                sky
+                ground(w: w, h: h, groundY: groundY)
+                tower(w: w, h: h, groundY: groundY)
+                plane(w: w, h: h, groundY: groundY, cx: cx)
+            }
+        }
+        .frame(height: height)
+        .clipShape(RoundedRectangle(cornerRadius: 16))
+        .accessibilityHidden(true)
+    }
+
+    // MARK: Kleuren — oplopend in verzadiging, zoals in een vlakke illustratie
+
+    private var skyTint: Color { Theme.sky.opacity(0.14) }
+    private var apronTint: Color { Theme.sky.opacity(0.22) }
+    private var stripTint: Color { Theme.sky.opacity(0.34) }
+    private var towerTint: Color { Theme.sky.opacity(0.28) }
+    private var planeTint: Color { Theme.sky.opacity(0.85) }
+    private var planeDark: Color { Theme.navy.opacity(0.55) }
+
+    // MARK: Onderdelen
+
+    private var sky: some View {
+        Rectangle().fill(skyTint)
+    }
+
+    private func ground(w: CGFloat, h: CGFloat, groundY: CGFloat) -> some View {
+        ZStack(alignment: .topLeading) {
+            Rectangle()
+                .fill(apronTint)
+                .frame(width: w, height: h - groundY)
+                .offset(y: groundY)
+            Rectangle()
+                .fill(stripTint)
+                .frame(width: w, height: max(h * 0.10, 6))
+                .offset(y: h - max(h * 0.10, 6))
+        }
+    }
+
+    /// Verkeerstoren: smalle schacht met een breder uitlopend hoofd.
+    private func tower(w: CGFloat, h: CGFloat, groundY: CGFloat) -> some View {
+        let towerX = w * 0.13
+        let headW = w * 0.055
+        let shaftW = w * 0.022
+        let headTop = h * 0.14
+        let headH = h * 0.17
+        return ZStack(alignment: .topLeading) {
+            // Schacht
+            Rectangle()
+                .fill(towerTint)
+                .frame(width: shaftW, height: groundY - (headTop + headH) + 2)
+                .offset(x: towerX - shaftW / 2, y: headTop + headH - 2)
+            // Hoofd: naar boven verbredend
+            Path { p in
+                let left = towerX - headW / 2
+                let right = towerX + headW / 2
+                p.move(to: CGPoint(x: left + headW * 0.18, y: headTop))
+                p.addLine(to: CGPoint(x: right - headW * 0.18, y: headTop))
+                p.addLine(to: CGPoint(x: right, y: headTop + headH * 0.55))
+                p.addLine(to: CGPoint(x: right - headW * 0.28, y: headTop + headH))
+                p.addLine(to: CGPoint(x: left + headW * 0.28, y: headTop + headH))
+                p.addLine(to: CGPoint(x: left, y: headTop + headH * 0.55))
+                p.closeSubpath()
+            }
+            .fill(towerTint)
+        }
+    }
+
+    /// Vliegtuig van voren: romp als cirkel, doorlopende vleugels, staartvin,
+    /// twee motoren en het landingsgestel.
+    private func plane(w: CGFloat, h: CGFloat, groundY: CGFloat, cx: CGFloat) -> some View {
+        let bodyR = h * 0.13
+        let bodyCY = groundY - h * 0.20
+        let wingSpan = w * 0.72
+        let wingY = bodyCY + bodyR * 0.15
+
+        return ZStack(alignment: .topLeading) {
+            // Staartvin
+            Path { p in
+                p.move(to: CGPoint(x: cx, y: bodyCY - bodyR * 3.1))
+                p.addLine(to: CGPoint(x: cx + bodyR * 0.20, y: bodyCY - bodyR * 0.6))
+                p.addLine(to: CGPoint(x: cx - bodyR * 0.20, y: bodyCY - bodyR * 0.6))
+                p.closeSubpath()
+            }
+            .fill(planeTint)
+
+            // Hoogteroeren
+            Capsule()
+                .fill(planeTint)
+                .frame(width: w * 0.26, height: max(h * 0.018, 2))
+                .offset(x: cx - w * 0.13, y: bodyCY - bodyR * 1.05)
+
+            // Hoofdvleugels: van de romp naar buiten aflopend
+            Path { p in
+                p.move(to: CGPoint(x: cx - bodyR * 0.9, y: wingY))
+                p.addLine(to: CGPoint(x: cx - wingSpan / 2, y: wingY + h * 0.045))
+                p.addLine(to: CGPoint(x: cx - wingSpan / 2, y: wingY + h * 0.075))
+                p.addLine(to: CGPoint(x: cx - bodyR * 0.9, y: wingY + h * 0.085))
+                p.closeSubpath()
+            }
+            .fill(planeTint)
+            Path { p in
+                p.move(to: CGPoint(x: cx + bodyR * 0.9, y: wingY))
+                p.addLine(to: CGPoint(x: cx + wingSpan / 2, y: wingY + h * 0.045))
+                p.addLine(to: CGPoint(x: cx + wingSpan / 2, y: wingY + h * 0.075))
+                p.addLine(to: CGPoint(x: cx + bodyR * 0.9, y: wingY + h * 0.085))
+                p.closeSubpath()
+            }
+            .fill(planeTint)
+
+            // Motoren
+            ForEach([-1.0, 1.0], id: \.self) { side in
+                Capsule()
+                    .fill(planeDark)
+                    .frame(width: bodyR * 0.85, height: bodyR * 0.72)
+                    .offset(x: cx + CGFloat(side) * bodyR * 1.75 - bodyR * 0.42,
+                            y: wingY + h * 0.055)
+            }
+
+            // Landingsgestel: neuswiel en twee hoofdstellen
+            ForEach([-1.0, 0.0, 1.0], id: \.self) { side in
+                let legX = cx + CGFloat(side) * bodyR * 1.15
+                let legTop = bodyCY + bodyR * 0.75
+                ZStack(alignment: .topLeading) {
+                    Rectangle()
+                        .fill(planeDark)
+                        .frame(width: max(bodyR * 0.10, 1.5), height: groundY - legTop - bodyR * 0.22)
+                        .offset(x: legX - bodyR * 0.05, y: legTop)
+                    Capsule()
+                        .fill(planeDark)
+                        .frame(width: bodyR * 0.34, height: bodyR * 0.22)
+                        .offset(x: legX - bodyR * 0.17, y: groundY - bodyR * 0.22)
+                }
+            }
+
+            // Romp
+            Circle()
+                .fill(planeTint)
+                .frame(width: bodyR * 2, height: bodyR * 2)
+                .offset(x: cx - bodyR, y: bodyCY - bodyR)
+
+            // Cockpitramen
+            Capsule()
+                .fill(planeDark)
+                .frame(width: bodyR * 0.95, height: bodyR * 0.26)
+                .offset(x: cx - bodyR * 0.475, y: bodyCY - bodyR * 0.20)
+        }
+    }
+}
+
 // MARK: - Vertrekbord-bouwstenen
 //
 // De opbouw van de vluchtdetailkaart, losgetrokken zodat andere schermen 'm

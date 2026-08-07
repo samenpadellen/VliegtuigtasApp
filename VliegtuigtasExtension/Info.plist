@@ -16,8 +16,11 @@
 	<string>XPC!</string>
 	<key>CFBundleShortVersionString</key>
 	<string>$(MARKETING_VERSION)</string>
+	<!-- Moet gelijk lopen met de app; een afwijkend buildnummer laat App Store
+	     Connect de upload weigeren. Daarom de buildinstelling in plaats van een
+	     vast getal, net als CFBundleShortVersionString hierboven. -->
 	<key>CFBundleVersion</key>
-	<string>1</string>
+	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>NSExtension</key>
 	<dict>
 		<key>NSExtensionPointIdentifier</key>
