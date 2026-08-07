@@ -1,0 +1,6 @@
+# Build-output hoort niet in versiebeheer: het wordt bij elke build opnieuw
+# gegenereerd en zorgt voor duizenden ruis-wijzigingen per commit.
+build/
+DerivedData/
+*.xcuserstate
+.DS_Store
