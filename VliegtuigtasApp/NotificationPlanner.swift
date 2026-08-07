@@ -52,11 +52,14 @@ enum NotificationPlanner {
     /// bij elke app-start opnieuw opgebouwd. Zodra er een vlucht of reis in
     /// staat, verdwijnt hij: dan nemen de echte herinneringen het over.
     private static func scheduleFirstWeekNudges() {
-        let center = UNUserNotificationCenter.current()
         let ids = ["vt_week1_d1", "vt_week1_d3", "vt_week1_d6"]
-        center.removePendingNotificationRequests(withIdentifiers: ids)
+        UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: ids)
 
         Task { @MainActor in
+            // Center hier aanmaken in plaats van vangen: UNUserNotificationCenter
+            // is niet Sendable, en vangen levert een concurrency-waarschuwing op
+            // die onder Swift 6 een fout wordt.
+            let center = UNUserNotificationCenter.current()
             let hasSomethingPlanned =
                 !FlightsStore.shared.flights.isEmpty || !TripsStore.shared.trips.isEmpty
             guard !hasSomethingPlanned else { return }
@@ -244,9 +247,10 @@ enum NotificationPlanner {
         let center = UNUserNotificationCenter.current()
         center.getPendingNotificationRequests { requests in
             let staleIds = requests.map(\.identifier).filter { $0.hasPrefix("vt_trip_") }
-            center.removePendingNotificationRequests(withIdentifiers: staleIds)
 
             Task { @MainActor in
+                let center = UNUserNotificationCenter.current()
+                center.removePendingNotificationRequests(withIdentifiers: staleIds)
                 for trip in TripsStore.shared.upcoming.prefix(5) {
                     scheduleReminders(for: trip, in: center)
                 }

@@ -272,7 +272,10 @@ enum FlightWatcher {
             content.title = title
             content.body = body
             content.sound = .default
-            center.add(UNNotificationRequest(
+            // Hier opnieuw ophalen in plaats van vangen: UNUserNotificationCenter
+            // is niet Sendable, en vangen in deze closure geeft een
+            // concurrency-waarschuwing die onder Swift 6 een fout wordt.
+            UNUserNotificationCenter.current().add(UNNotificationRequest(
                 identifier: id,
                 content: content,
                 trigger: UNTimeIntervalNotificationTrigger(timeInterval: 1, repeats: false)
