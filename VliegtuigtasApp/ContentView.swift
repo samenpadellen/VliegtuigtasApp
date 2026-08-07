@@ -310,37 +310,57 @@ struct MoreHubView: View {
         }
     }
 
-    /// Bescheiden vermelding onderaan de hub: wél zichtbaar, maar het neemt
-    /// geen plek in van iets waar de gebruiker daadwerkelijk heen wil.
+    /// Onderscheiding in de vorm die je bij prijsuitreikingen ziet: lauwertakken
+    /// om gecentreerde tekst op een donker vlak. `laurel.leading` en
+    /// `laurel.trailing` zijn precies daarvoor bedoeld in SF Symbols.
+    ///
+    /// Staat bewust onderaan de hub: het mag zichtbaar zijn, maar niet de plek
+    /// innemen van iets waar de gebruiker daadwerkelijk heen wil.
     private var awardBadge: some View {
-        VStack(spacing: 6) {
-            HStack(spacing: 8) {
-                Image(systemName: "trophy.fill")
-                    .font(.system(size: 13, weight: .bold))
-                    .foregroundStyle(Theme.ink)
-                    .frame(width: 26, height: 26)
-                    .background(Theme.yellow, in: Circle())
-                VStack(alignment: .leading, spacing: 1) {
-                    Text("Nederlandse App van de Maand")
-                        .font(.frutiger(size: 13, weight: .bold))
-                        .foregroundStyle(Theme.textPrimary)
-                    Text("iCulture · juli 2026")
-                        .font(.system(size: 10, weight: .bold, design: .monospaced))
-                        .kerning(0.5)
-                        .foregroundStyle(Theme.textSecondary)
+        VStack(spacing: 8) {
+            HStack(spacing: 6) {
+                Image(systemName: "laurel.leading")
+                    .font(.system(size: 42, weight: .light))
+                    .foregroundStyle(.white.opacity(0.55))
+
+                VStack(spacing: 3) {
+                    Text("Nederlandse App\nvan de Maand")
+                        .font(.frutiger(size: 16, weight: .bold))
+                        .foregroundStyle(.white)
+                        .multilineTextAlignment(.center)
+                        .lineSpacing(1)
+                        .fixedSize(horizontal: false, vertical: true)
+                    Text("iCulture · 2026")
+                        .font(.system(size: 10, weight: .semibold, design: .monospaced))
+                        .kerning(1)
+                        .foregroundStyle(.white.opacity(0.5))
                 }
-                Spacer(minLength: 0)
+
+                Image(systemName: "laurel.trailing")
+                    .font(.system(size: 42, weight: .light))
+                    .foregroundStyle(.white.opacity(0.55))
             }
-            .padding(14)
-            .background(Color(.systemBackground))
-            .clipShape(RoundedRectangle(cornerRadius: 14))
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 20)
+            .padding(.horizontal, 16)
+            .background(
+                LinearGradient(
+                    colors: [
+                        Color(red: 0.16, green: 0.18, blue: 0.30),
+                        Color(red: 0.09, green: 0.10, blue: 0.18)
+                    ],
+                    startPoint: .topLeading, endPoint: .bottomTrailing
+                )
+            )
+            .clipShape(RoundedRectangle(cornerRadius: 16))
 
             Text("Bedankt dat je Vliegtuigtas gebruikt.")
                 .font(.frutiger(size: 11))
                 .foregroundStyle(Theme.textSecondary)
         }
         .padding(.top, 6)
-        .accessibilityElement(children: .combine)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel("Nederlandse App van de Maand, iCulture 2026")
     }
 
     /// De bucket list gaat via push, dus die filteren we uit de sheet-binding.
