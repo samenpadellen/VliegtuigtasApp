@@ -564,9 +564,7 @@ private struct AirlineStepView: View {
 
     private var heroBanner: some View {
         ZStack(alignment: .bottomLeading) {
-            Image("PhotoWindowWing")
-                .resizable()
-                .scaledToFill()
+            SeasonalHeroImage()
                 .frame(maxWidth: .infinity)
                 .frame(height: checkerStatusBarHeight + 230)
                 .clipped()
@@ -947,6 +945,7 @@ private struct DimensionsStepView: View {
     let onCheck: () -> Void
 
     @State private var showScanner = false
+    @State private var isDragging = false
 
     /// Grootste toegestane handbagagemaat van de gekozen maatschappij,
     /// als AR-limietkooi in de scanner.
@@ -986,7 +985,7 @@ private struct DimensionsStepView: View {
                 .padding(.horizontal, 20)
 
                 // Visual bag diagram
-                BagDiagram(length: length, width: width, depth: depth)
+                BagDiagram(length: length, width: width, depth: depth, isDragging: isDragging)
                     .padding(.horizontal, 20)
 
                 #if !targetEnvironment(macCatalyst)
@@ -1036,11 +1035,11 @@ private struct DimensionsStepView: View {
                 // Dimension inputs
                 Card {
                     VStack(spacing: 14) {
-                        DimSlider(label: "Hoogte", value: $length, range: 20...90, color: Theme.navy)
+                        DimSlider(label: "Hoogte", value: $length, range: 20...90, color: Theme.navy, isDragging: $isDragging)
                         Divider()
-                        DimSlider(label: "Breedte", value: $width,  range: 10...60, color: Theme.navy)
+                        DimSlider(label: "Breedte", value: $width,  range: 10...60, color: Theme.navy, isDragging: $isDragging)
                         Divider()
-                        DimSlider(label: "Diepte",  value: $depth,  range: 5...50,  color: Theme.navy)
+                        DimSlider(label: "Diepte",  value: $depth,  range: 5...50,  color: Theme.navy, isDragging: $isDragging)
                     }
                     .padding(16)
                 }
@@ -1218,6 +1217,7 @@ private struct BagDiagram: View {
     let length: Double   // hoogte (cm)
     let width:  Double   // breedte (cm)
     let depth:  Double   // diepte (cm)
+    var isDragging: Bool = false
 
     // Schaling van cm naar tekenpunten, binnen het paneel.
     private var w: CGFloat { 28 + CGFloat((width  - 10) / 50) * 62 }  // 10–60 cm → 28–90 pt
@@ -1231,21 +1231,62 @@ private struct BagDiagram: View {
     // Hoeveel de wielophanging in de onderrand verzinkt, om dezelfde reden.
     private let wheelOverlap: CGFloat = 6
 
+    // Extra "swoosh"-pop bovenop de maatverandering zelf: een korte
+    // overshoot in schaal bij elke stap, zodat het schuiven energieker
+    // aanvoelt dan een kalme maatovergang alleen.
+    @State private var pop: CGFloat = 1.0
+
     var body: some View {
         ZStack {
             RoundedRectangle(cornerRadius: 16)
                 .fill(Theme.skyLight)
                 .frame(height: 200)
 
+            if isDragging {
+                speedLines
+            }
+
             suitcase
                 // Elke maatverandering veert vloeiend mee — de custom Shapes
-                // interpoleren de schuinte via animatableData.
-                .animation(.spring(response: 0.45, dampingFraction: 0.7), value: length)
-                .animation(.spring(response: 0.45, dampingFraction: 0.7), value: width)
-                .animation(.spring(response: 0.45, dampingFraction: 0.7), value: depth)
+                // interpoleren de schuinte via animatableData. Een lagere
+                // dampingfraction dan voorheen laat 'm net iets doorschieten
+                // vóór hij settelt — dat overshoot is wat "swoosh" leest in
+                // plaats van een kalme, vlakke overgang.
+                .animation(.spring(response: 0.38, dampingFraction: 0.58), value: length)
+                .animation(.spring(response: 0.38, dampingFraction: 0.58), value: width)
+                .animation(.spring(response: 0.38, dampingFraction: 0.58), value: depth)
+                .scaleEffect(pop)
+                .onChange(of: length) { _, _ in bounce() }
+                .onChange(of: width)  { _, _ in bounce() }
+                .onChange(of: depth)  { _, _ in bounce() }
 
             overlayLabels
         }
+    }
+
+    private func bounce() {
+        withAnimation(.spring(response: 0.16, dampingFraction: 0.5)) { pop = 1.035 }
+        withAnimation(.spring(response: 0.30, dampingFraction: 0.55).delay(0.08)) { pop = 1.0 }
+    }
+
+    /// Korte, diagonale "vaart"-strepen die alleen oplichten terwijl je
+    /// écht aan een slider trekt — het letterlijke swoosh-effect, geen
+    /// permanent decoratie-element.
+    private var speedLines: some View {
+        HStack(spacing: 5) {
+            ForEach(0..<3, id: \.self) { index in
+                Capsule()
+                    .fill(Theme.sky.opacity(0.35 - Double(index) * 0.09))
+                    .frame(width: 3, height: 26 - CGFloat(index) * 5)
+            }
+        }
+        .rotationEffect(.degrees(-18))
+        .offset(x: -(w + d) / 2 - 26, y: -8)
+        .transition(.asymmetric(
+            insertion: .opacity.combined(with: .offset(x: 10)),
+            removal: .opacity
+        ))
+        .animation(.easeOut(duration: 0.18), value: isDragging)
     }
 
     private var suitcase: some View {
@@ -1538,6 +1579,12 @@ private struct DimSlider: View {
     @Binding var value: Double
     let range: ClosedRange<Double>
     let color: Color
+    /// Gedeeld met `BagDiagram` zodat de koffer alleen tijdens het schuiven
+    /// zijn "swoosh"-lijnen laat zien — niet erna, als bevestiging dat er
+    /// écht iets in beweging is en niet een permanent decoratie-element.
+    @Binding var isDragging: Bool
+
+    private let impact = UIImpactFeedbackGenerator(style: .light)
 
     var body: some View {
         HStack(spacing: 12) {
@@ -1546,11 +1593,20 @@ private struct DimSlider: View {
                 .frame(width: 60, alignment: .leading)
 
             Slider(value: $value, in: range, step: 1) { editing in
+                isDragging = editing
                 if editing {
+                    impact.prepare()
                     UISelectionFeedbackGenerator().selectionChanged()
                 }
             }
             .tint(color)
+            // Elke hele cm een tikje, niet alleen bij het beetpakken —
+            // dat maakt het schuiven zelf voelbaar in plaats van alleen
+            // de start ervan.
+            .onChange(of: value) { _, _ in
+                guard isDragging else { return }
+                impact.impactOccurred(intensity: 0.55)
+            }
 
             Text("\(Int(value))")
                 .font(.frutiger(size: 16, weight: .bold))
