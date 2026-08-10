@@ -19,6 +19,7 @@ enum NotificationPlanner {
             scheduleVacationNudges()
             scheduleTripReminders()
             scheduleFirstWeekNudges()
+            scheduleBucketListNudge()
         }
     }
 
@@ -116,6 +117,64 @@ enum NotificationPlanner {
             content: content,
             trigger: UNCalendarNotificationTrigger(dateMatching: components, repeats: false)
         ))
+    }
+
+    // MARK: - Bucket list als jaarrond-haakje
+
+    /// Bagage checken is eenmalig per reis; "waar wil ik nog heen" is
+    /// altijd relevant, het hele jaar door. Dit is dan ook geen op-de-reis
+    /// gerichte melding zoals de rest van dit bestand, maar een persoonlijke
+    /// nudge die — net als `scheduleInactivityNudge` — bij elke app-start
+    /// meeschuift en dus alleen afgaat als je écht wegblijft.
+    ///
+    /// Verschijnt niet als er al een vlucht of reis gepland staat: dan is er
+    /// al genoeg aandacht via de trip/vlucht-herinneringen hierboven. Wie wél
+    /// landen op de bucket list heeft krijgt een melding met een concreet
+    /// land erin (persoonlijker dan een generieke "kom terug"-tekst); wie nog
+    /// geen enkel land heeft aangevinkt krijgt een duwtje om daar juist mee
+    /// te beginnen — dát is de laagdrempelige vervolgstap na de eerste
+    /// tas-check, niet nóg een bagagecheck.
+    private static func scheduleBucketListNudge() {
+        let center = UNUserNotificationCenter.current()
+        let ids = ["vt_bucketlist_nudge", "vt_bucketlist_empty_nudge"]
+        center.removePendingNotificationRequests(withIdentifiers: ids)
+
+        Task { @MainActor in
+            let center = UNUserNotificationCenter.current()
+            guard FlightsStore.shared.flights.isEmpty, TripsStore.shared.trips.isEmpty else { return }
+
+            let store = BucketListStore.shared
+            let wantToVisit = allCountries.filter { store.status(for: $0) == .wantToVisit }
+
+            func add(id: String, title: String, body: String) {
+                guard let day = Calendar.current.date(byAdding: .day, value: 9, to: .now) else { return }
+                var components = Calendar.current.dateComponents([.year, .month, .day], from: day)
+                components.hour = 18
+                let content = UNMutableNotificationContent()
+                content.title = title
+                content.body = body
+                content.sound = .default
+                center.add(UNNotificationRequest(
+                    identifier: id,
+                    content: content,
+                    trigger: UNCalendarNotificationTrigger(dateMatching: components, repeats: false)
+                ))
+            }
+
+            if let country = wantToVisit.randomElement() {
+                add(
+                    id: ids[0],
+                    title: "Nog steeds naar \(country.name)? \(country.flagEmoji)",
+                    body: "Die staat al op je bucket list. Kijk of er binnenkort een goede periode voor is."
+                )
+            } else if store.visitedCount == 0 {
+                add(
+                    id: ids[1],
+                    title: "Waar wil je nog heen? 🌍",
+                    body: "Vink landen af op je bucket list — in twee tikken zie je hoeveel van de wereld je al hebt gezien."
+                )
+            }
+        }
     }
 
     // MARK: - Schoolvakanties (NL, 2026)
