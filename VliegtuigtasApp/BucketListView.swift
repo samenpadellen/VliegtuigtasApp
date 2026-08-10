@@ -377,6 +377,65 @@ struct CountryDetailView: View {
 /// bestemmingsfoto als hero (i.p.v. foto's te mengen in de kleine mozaïek,
 /// wat onduidelijk oogde) — de mozaïek zelf blijft puur vlaggetjes, in één
 /// oogopslag herkenbaar op 24pt, wat een willekeurig foto-snippertje niet is.
+/// Kaart voor "Jouw reiswereld" in de Meer-hub: een miniatuur van de omslag
+/// hieronder — zelfde bordeaux/goud, zelfde vliegtuig-embleem — in plaats
+/// van een generiek icoontje. Zo herken je bij het scrollen al wat je
+/// reispaspoort is, en trekt het door naar de echte omslag zodra je 'm opent.
+struct PassportPreviewCard: View {
+    @ObservedObject private var bucketList = BucketListStore.shared
+    @ObservedObject private var trips = TripsStore.shared
+    let action: () -> Void
+
+    private var passportGold: Color { Color(red: 0.85, green: 0.72, blue: 0.44) }
+    private var completedTripsCount: Int { trips.trips.filter(\.isPast).count }
+
+    var body: some View {
+        Button(action: action) {
+            HStack(spacing: 14) {
+                ZStack {
+                    RoundedRectangle(cornerRadius: 8)
+                        .fill(
+                            LinearGradient(
+                                colors: [
+                                    Color(red: 0.42, green: 0.10, blue: 0.17),
+                                    Color(red: 0.29, green: 0.06, blue: 0.11)
+                                ],
+                                startPoint: .topLeading, endPoint: .bottomTrailing
+                            )
+                        )
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 8)
+                                .strokeBorder(passportGold.opacity(0.35), lineWidth: 1)
+                        )
+                    Image(systemName: "airplane")
+                        .font(.system(size: 16, weight: .light))
+                        .foregroundStyle(passportGold)
+                        .rotationEffect(.degrees(-45))
+                }
+                .frame(width: 52, height: 68)
+                .shadow(color: .black.opacity(0.18), radius: 6, x: 0, y: 3)
+
+                VStack(alignment: .leading, spacing: 3) {
+                    Text("Jouw reispaspoort")
+                        .font(.frutiger(size: 14, weight: .bold))
+                        .foregroundStyle(Theme.textPrimary)
+                    Text("\(bucketList.visitedCount) stempels · \(completedTripsCount) reizen afgerond")
+                        .font(.frutiger(size: 12))
+                        .foregroundStyle(Theme.textSecondary)
+                }
+                Spacer()
+                Image(systemName: "chevron.right")
+                    .font(.system(size: 12, weight: .semibold))
+                    .foregroundStyle(Theme.textSecondary)
+            }
+            .padding(14)
+            .background(Color(.systemBackground))
+            .clipShape(RoundedRectangle(cornerRadius: 14))
+        }
+        .buttonStyle(.plain)
+    }
+}
+
 struct TravelPassportView: View {
     @Environment(\.dismiss) private var dismiss
     @EnvironmentObject private var session: UserSession

@@ -42,6 +42,67 @@ struct PurserPimCap: View {
     }
 }
 
+// MARK: - Kaart voor "Jouw reiswereld"
+
+/// Kaart voor de Meer-hub: Pim voelt hier aanwezig, niet als een menu-item.
+/// Met zijn petje in plaats van een generiek icoontje en, als er een verse
+/// tip klaarstaat (dezelfde cache als de widget), die tip in een
+/// spreekbelletje — zodat hij ook zonder tikken al iets te zeggen heeft.
+struct PimPreviewCard: View {
+    let action: () -> Void
+
+    private var cachedTip: String? {
+        guard let d = UserDefaults(suiteName: PimTipCache.suiteName),
+              let tip = d.string(forKey: "vt_shared_pim_tip"), !tip.isEmpty else { return nil }
+        let stamp = d.double(forKey: "vt_shared_pim_tip_stamp")
+        guard stamp > 0, Date().timeIntervalSince1970 - stamp < 60 * 60 * 48 else { return nil }
+        return tip
+    }
+
+    var body: some View {
+        Button(action: action) {
+            HStack(alignment: .top, spacing: 12) {
+                ZStack {
+                    Circle().fill(Theme.inkGradient)
+                    PurserPimCap(size: 30)
+                }
+                .frame(width: 52, height: 52)
+
+                VStack(alignment: .leading, spacing: 6) {
+                    Text("Purser Pim")
+                        .font(.frutiger(size: 14, weight: .bold))
+                        .foregroundStyle(Theme.textPrimary)
+
+                    if let cachedTip {
+                        Text("\u{201C}\(cachedTip)\u{201D}")
+                            .font(.frutiger(size: 12, weight: .medium))
+                            .foregroundStyle(Theme.textPrimary)
+                            .italic()
+                            .lineLimit(2)
+                            .fixedSize(horizontal: false, vertical: true)
+                            .padding(.horizontal, 10)
+                            .padding(.vertical, 7)
+                            .background(Theme.yellow.opacity(0.16), in: RoundedRectangle(cornerRadius: 10))
+                    } else {
+                        Text("Vraag Pim om paklijst- of alarmadvies voor je volgende reis.")
+                            .font(.frutiger(size: 12))
+                            .foregroundStyle(Theme.textSecondary)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                }
+                Spacer(minLength: 0)
+                Image(systemName: "chevron.right")
+                    .font(.system(size: 12, weight: .semibold))
+                    .foregroundStyle(Theme.textSecondary)
+            }
+            .padding(14)
+            .background(Color(.systemBackground))
+            .clipShape(RoundedRectangle(cornerRadius: 14))
+        }
+        .buttonStyle(.plain)
+    }
+}
+
 // MARK: - Home-kaart
 
 /// Entreekaart op Home. Toont zichzelf alleen als het on-device model

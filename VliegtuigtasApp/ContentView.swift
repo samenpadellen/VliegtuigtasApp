@@ -272,14 +272,22 @@ struct MoreHubView: View {
                         VStack(alignment: .leading, spacing: 12) {
                             SectionHeader(title: group.title)
                             if group == .travel {
-                                BucketListPreviewCard { pushedBucketList = true }
-                            }
-                            LazyVGrid(
-                                columns: [GridItem(.adaptive(minimum: 150), spacing: 12)],
-                                spacing: 12
-                            ) {
-                                ForEach(MoreDestination.allCases.filter { $0.group == group }) { item in
-                                    MoreTile(item: item) { open(item) }
+                                // Elk van de drie items hier heeft al zijn eigen
+                                // gezicht (foto's, paspoortomslag, Pim's petje),
+                                // dus die krijgen geen generieke tegel meer.
+                                VStack(spacing: 10) {
+                                    BucketListPreviewCard { pushedBucketList = true }
+                                    PassportPreviewCard { open(.passport) }
+                                    PimPreviewCard { open(.pim) }
+                                }
+                            } else {
+                                LazyVGrid(
+                                    columns: [GridItem(.adaptive(minimum: 150), spacing: 12)],
+                                    spacing: 12
+                                ) {
+                                    ForEach(MoreDestination.allCases.filter { $0.group == group }) { item in
+                                        MoreTile(item: item) { open(item) }
+                                    }
                                 }
                             }
                         }

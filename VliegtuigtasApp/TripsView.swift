@@ -413,24 +413,28 @@ struct TripsListView: View {
 /// Voortgangskaart voor de bucket list. Staat sinds 3.0.0 bovenaan "Jouw
 /// reiswereld" in de Meer-hub: één plek voor bucket list en paspoort, met de
 /// voortgang meteen zichtbaar in plaats van achter een tegel.
+///
+/// De landenfoto's staan als overlappende, cirkelvormige "stempels" — dat
+/// verwijst naar het reispaspoort verderop in dezelfde sectie — met een
+/// voortgangsbalk voor het percentage van de wereld dat je al bezocht hebt.
 struct BucketListPreviewCard: View {
     @ObservedObject private var store = BucketListStore.shared
     @ObservedObject private var photoCache = CountryPhotoCache.shared
     let action: () -> Void
 
     private var highlighted: [Country] {
-        Array((store.visitedCountries + allCountries.filter { store.status(for: $0) == .wantToVisit }).prefix(6))
+        Array((store.visitedCountries + allCountries.filter { store.status(for: $0) == .wantToVisit }).prefix(5))
     }
 
     var body: some View {
         Button(action: action) {
-            VStack(alignment: .leading, spacing: 10) {
+            VStack(alignment: .leading, spacing: 12) {
                 HStack {
                     VStack(alignment: .leading, spacing: 2) {
                         Text("Jouw bucket list")
                             .font(.frutiger(size: 14, weight: .bold))
                             .foregroundStyle(Theme.textPrimary)
-                        Text("\(store.visitedCount)/\(allCountries.count) landen bezocht")
+                        Text("\(store.visitedCount)/\(allCountries.count) landen · \(store.visitedContinents.count) continenten")
                             .font(.frutiger(size: 12))
                             .foregroundStyle(Theme.textSecondary)
                     }
@@ -441,29 +445,44 @@ struct BucketListPreviewCard: View {
                 }
 
                 if !highlighted.isEmpty {
-                    HStack(spacing: 6) {
-                        ForEach(highlighted) { country in
+                    HStack(spacing: -14) {
+                        ForEach(Array(highlighted.enumerated()), id: \.element.id) { index, country in
                             ZStack {
-                                RoundedRectangle(cornerRadius: 8)
-                                    .fill(Theme.navy.opacity(0.08))
+                                Circle().fill(Theme.navy.opacity(0.08))
                                 if let photoUrl = photoCache.photo(for: country)?.url {
                                     AuthorisedImage(urlString: photoUrl, fill: true)
                                 } else {
-                                    Text(country.flagEmoji).font(.system(size: 16))
+                                    Text(country.flagEmoji).font(.system(size: 20))
                                 }
                             }
-                            .frame(width: 36, height: 36)
-                            .clipShape(RoundedRectangle(cornerRadius: 8))
+                            .frame(width: 48, height: 48)
+                            .clipShape(Circle())
+                            .overlay(Circle().strokeBorder(Color(.systemBackground), lineWidth: 2.5))
+                            .zIndex(Double(highlighted.count - index))
                         }
                         Spacer()
                     }
                 }
+
+                worldProgressBar
             }
             .padding(14)
             .background(Color(.systemBackground))
             .clipShape(RoundedRectangle(cornerRadius: 14))
         }
         .buttonStyle(.plain)
+    }
+
+    private var worldProgressBar: some View {
+        GeometryReader { geo in
+            ZStack(alignment: .leading) {
+                Capsule().fill(Theme.navy.opacity(0.08))
+                Capsule().fill(Theme.yellow)
+                    .frame(width: max(6, geo.size.width * store.percentWorld / 100))
+            }
+        }
+        .frame(height: 6)
+        .accessibilityHidden(true)
     }
 }
 
