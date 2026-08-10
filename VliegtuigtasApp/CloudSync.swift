@@ -265,6 +265,26 @@ final class CloudSync {
         stamp(.bag)
     }
 
+    /// Vangnet bij accountverwijdering: de losse `clear*`-functies wissen elk
+    /// hun eigen sleutels, maar dit veegt alles met het `vt_`-voorvoegsel weg
+    /// dat we zijn vergeten — zowel in iCloud zelf als in de App Group die de
+    /// widget/watch spiegelt. Zo blijft er gegarandeerd niets achter, ook niet
+    /// na toekomstige toevoegingen die deze functie nooit heeft leren kennen.
+    func eraseEverythingRemaining() {
+        for key in cloud.dictionaryRepresentation.keys where key.hasPrefix("vt_") {
+            cloud.removeObject(forKey: key)
+        }
+        cloud.synchronize()
+
+        if let group = UserDefaults(suiteName: "group.com.vliegtuigtas.app") {
+            for key in group.dictionaryRepresentation().keys where key.hasPrefix("vt_") {
+                group.removeObject(forKey: key)
+            }
+        }
+
+        WidgetCenter.shared.reloadAllTimelines()
+    }
+
     // MARK: - Overnemen (iCloud → dit toestel, alleen lokaal schrijven)
 
     private func adoptFromCloud() {

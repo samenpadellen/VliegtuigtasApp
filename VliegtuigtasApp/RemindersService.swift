@@ -127,6 +127,17 @@ final class RemindersService: ObservableObject {
         return sources.first(where: { $0.sourceType == .local }) ?? sources.first
     }
 
+    /// Accountverwijdering: wist de eigen "Vliegtuigtas"-lijst mét alle
+    /// herinneringen erin, echt uit de Herinneringen-app (en dus ook uit
+    /// iCloud als dat de bron van die lijst is). Vraagt bewust geen toegang
+    /// aan als die nooit gegeven is — er is dan simpelweg niets om te wissen.
+    func deleteAllAppReminders() {
+        // Zonder toegang geeft calendars(for:) gewoon een lege lijst terug —
+        // geen aparte statuscheck nodig en geen ongevraagde toegangsprompt.
+        guard let calendar = store.calendars(for: .reminder).first(where: { $0.title == listTitle }) else { return }
+        try? store.removeCalendar(calendar, commit: true)
+    }
+
     /// Vraagt toegang op als die nog niet bepaald is; geeft terug of we
     /// uiteindelijk mogen schrijven.
     private func ensureAccess() async -> Bool {

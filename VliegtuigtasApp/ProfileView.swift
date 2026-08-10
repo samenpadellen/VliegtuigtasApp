@@ -1,4 +1,5 @@
 import SwiftUI
+import UserNotifications
 
 /// Profiel: persoonsgegevens inzien, eigen tas en vlucht bekijken en
 /// uitloggen. Bereikbaar via de naam-chip op Home.
@@ -576,19 +577,41 @@ struct ProfileView: View {
                     // Verwijderverzoek voor de servergegevens (lead).
                     APIClient.shared.requestAccountDeletion(email: email)
                 }
+
+                // Vlucht, tas en reisdata: elk hun eigen local+cloud-paar,
+                // zodat er geen blob (al is die leeg) blijft hangen.
                 SharedFlightStore.clearFlight()
                 FlightsStore.shared.removeAll()
                 CloudSync.shared.clearFlightList()
-                FlightLiveActivityManager.shared.sync()
+
                 CloudSync.shared.clearBagDims()
                 BagCollectionStore.shared.removeAll()
                 CloudSync.shared.clearBagList()
+
+                TripsStore.shared.removeAll()
+                CloudSync.shared.clearTripList()
+
+                BucketListStore.shared.removeAll()
+                CloudSync.shared.clearBucketList()
+
+                // Geplande meldingen horen bij de data die net weg is —
+                // deze app plant alleen zijn eigen herinneringen, dus een
+                // volledige veeg is hier veilig.
+                UNUserNotificationCenter.current().removeAllPendingNotificationRequests()
+                UNUserNotificationCenter.current().removeAllDeliveredNotifications()
+                RemindersService.shared.deleteAllAppReminders()
+                FlightLiveActivityManager.shared.sync()
+
                 session.reset()
+                // Vangnet: veegt alles met het vt_-voorvoegsel dat hierboven
+                // niet met naam genoemd is, zowel in iCloud als in de
+                // App Group voor widget/watch — zo blijft er echt niets staan.
+                CloudSync.shared.eraseEverythingRemaining()
                 dismiss()
             }
             Button("Annuleer", role: .cancel) {}
         } message: {
-            Text("Dit verwijdert je naam, e-mail, tasmaten en opgeslagen vlucht van dit toestel, uit iCloud en van onze server. Dit kan niet ongedaan worden gemaakt.")
+            Text("Dit verwijdert je naam, e-mail, tasmaten, reizen, paklijsten, bucketlist en opgeslagen vlucht van dit toestel, uit iCloud en van onze server — inclusief geplande meldingen en herinneringen. Dit kan niet ongedaan worden gemaakt.")
         }
     }
 }

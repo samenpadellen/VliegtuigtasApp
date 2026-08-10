@@ -207,6 +207,12 @@ final class BucketListStore: ObservableObject {
         return Double(visitedCount) / Double(allCountries.count) * 100
     }
 
+    /// Accountverwijdering: alle bezochte/wil-ik-heen-landen wissen.
+    func removeAll() {
+        statuses = [:]
+        persist()
+    }
+
     /// Vanuit iCloud overgenomen — alleen lokaal schrijven, niet terugpushen.
     func adopt(data: Data) {
         guard let decoded = try? JSONDecoder().decode([String: VisitStatus].self, from: data) else { return }
