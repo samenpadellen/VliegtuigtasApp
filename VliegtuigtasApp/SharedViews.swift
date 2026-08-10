@@ -1,5 +1,7 @@
 import SwiftUI
 import ImageIO
+import Vision
+import CoreImage
 
 // MARK: - Card
 
@@ -232,7 +234,54 @@ final class ImageLoader: ObservableObject {
         guard let cgImage = CGImageSourceCreateThumbnailAtIndex(source, 0, thumbnailOptions as CFDictionary) else {
             return UIImage(data: data)
         }
-        return UIImage(cgImage: cgImage)
+        return leveled(UIImage(cgImage: cgImage))
+    }
+
+    /// Corrigeert een scheve horizon automatisch, zoals Foto's "Rechtzetten".
+    /// Reisfoto's komen hier ongecureerd binnen (Unsplash/Pexels-zoekresultaat
+    /// op bestemmingsnaam) — een scheve architectuurfoto die in de volle
+    /// afbeelding een bewuste dutch angle is, oogt in een klein, uitgesneden
+    /// kaartje al snel als "geladen onder een verkeerde hoek". Vision's
+    /// horizondetectie draait 'm recht vóórdat 'm ooit getoond wordt.
+    ///
+    /// Bewust terughoudend: bij een kleine hoek (al recht) of een grote hoek
+    /// (Vision heeft waarschijnlijk geen echte horizon gevonden, bijv. een
+    /// close-up zonder lucht) blijft de foto ongewijzigd — beter een
+    /// onaangeroerde foto dan een verkeerd "gecorrigeerde".
+    nonisolated private static func leveled(_ image: UIImage) -> UIImage {
+        guard let cgImage = image.cgImage else { return image }
+        let request = VNDetectHorizonRequest()
+        let handler = VNImageRequestHandler(cgImage: cgImage, options: [:])
+        guard (try? handler.perform([request])) != nil,
+              let observation = request.results?.first as? VNHorizonObservation,
+              abs(observation.angle) > (0.5 * .pi / 180),
+              abs(observation.angle) < (20 * .pi / 180)
+        else { return image }
+
+        let angle = observation.angle
+        let ciImage = CIImage(cgImage: cgImage)
+        let rotated = ciImage.transformed(by: CGAffineTransform(rotationAngle: angle))
+
+        // Roteren legt de hoeken van het beeld bloot (transparant) — hier
+        // terugsnijden naar een rechthoek die met zekerheid volledig binnen
+        // het geroteerde beeld valt. `k` is de wiskundige grens voor een
+        // vierkant dat om zijn midden roteert; de 0.85 is extra marge omdat
+        // een niet-vierkante foto (zoals de meeste hier) net iets minder
+        // ruimte overhoudt dan een vierkant bij dezelfde hoek — leeg-geverifieerd
+        // tot de maximale hoek hierboven (20°) op een 900×630-formaat.
+        let k = 1 / (cos(abs(angle)) + sin(abs(angle))) * 0.85
+        let cropWidth = ciImage.extent.width * k
+        let cropHeight = ciImage.extent.height * k
+        let cropRect = CGRect(
+            x: rotated.extent.midX - cropWidth / 2,
+            y: rotated.extent.midY - cropHeight / 2,
+            width: cropWidth, height: cropHeight
+        )
+        let cropped = rotated.cropped(to: cropRect)
+
+        let context = CIContext()
+        guard let leveledCG = context.createCGImage(cropped, from: cropped.extent) else { return image }
+        return UIImage(cgImage: leveledCG, scale: image.scale, orientation: .up)
     }
 
     private static func cost(of image: UIImage) -> Int {
@@ -489,6 +538,87 @@ struct VerdictBadge: View {
         case .ok:      return "checkmark.circle.fill"
         case .warning: return "exclamationmark.triangle.fill"
         case .fail:    return "xmark.circle.fill"
+        }
+    }
+}
+
+// MARK: - Seizoensfoto's
+
+/// Kiest de hero-foto op basis van het seizoen: in december zie je sneeuw, in
+/// juli palmen. Zo voelt de app mee met het moment waarop je hem opent, zonder
+/// dat er ook maar iets ingesteld hoeft te worden.
+///
+/// Ontbreekt een seizoensfoto in de assets, dan valt hij terug op de bestaande
+/// hero. Dat is geen luxe: `Image("naam")` met een onbekende naam rendert als
+/// een leeg vlak, en dan zou het belangrijkste beeld van de app zomaar
+/// verdwijnen op 1 december.
+enum SeasonalPhoto {
+    /// De foto die altijd bestaat, en waar we op terugvallen.
+    static let fallback = "PhotoWindowWing"
+
+    enum Season: String, CaseIterable {
+        case winter, lente, zomer, herfst
+
+        /// Meteorologische seizoenen op het noordelijk halfrond — dat sluit aan
+        /// bij wanneer Nederlanders wintersport of zomervakantie boeken.
+        static func current(_ date: Date = .now) -> Season {
+            switch Calendar.current.component(.month, from: date) {
+            case 12, 1, 2: return .winter
+            case 3, 4, 5:  return .lente
+            case 6, 7, 8:  return .zomer
+            default:       return .herfst
+            }
+        }
+
+        var assetName: String {
+            switch self {
+            case .winter: return "PhotoSeasonWinter"
+            case .lente:  return "PhotoSeasonSpring"
+            case .zomer:  return "PhotoSeasonSummer"
+            case .herfst: return "PhotoSeasonAutumn"
+            }
+        }
+    }
+
+    /// Naam van de hero-foto voor nu, of de terugval als die er niet is.
+    static var heroAssetName: String {
+        let preferred = Season.current().assetName
+        return UIImage(named: preferred) != nil ? preferred : fallback
+    }
+}
+
+/// Hero-afbeelding die met het seizoen meebeweegt. Gebruikt overal dezelfde
+/// keuze, zodat Start en Check hetzelfde beeld tonen.
+struct SeasonalHeroImage: View {
+    var body: some View {
+        Image(SeasonalPhoto.heroAssetName)
+            .resizable()
+            .scaledToFill()
+    }
+}
+
+/// Foto van luchthavenbewegwijzering als kop boven het luchthavenscherm.
+/// Verschijnt alleen als de afbeelding daadwerkelijk in de assets zit — zo
+/// staat er nooit een leeg vlak boven de lijst.
+struct SignageHeader: View {
+    var height: CGFloat = 130
+
+    var body: some View {
+        if UIImage(named: "PhotoAirportSigns") != nil {
+            Image("PhotoAirportSigns")
+                .resizable()
+                .scaledToFill()
+                .frame(height: height)
+                .frame(maxWidth: .infinity)
+                .clipped()
+                .overlay(alignment: .bottom) {
+                    LinearGradient(
+                        colors: [.clear, Color(.systemGroupedBackground)],
+                        startPoint: .center, endPoint: .bottom
+                    )
+                    .frame(height: height * 0.5)
+                }
+                .accessibilityHidden(true)
         }
     }
 }
