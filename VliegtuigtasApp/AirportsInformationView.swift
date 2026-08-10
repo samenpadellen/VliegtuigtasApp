@@ -11,6 +11,11 @@ struct AirportSelectionView: View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: 12) {
+                    // Bewegwijzering als kop: dit scherm gaat over de weg
+                    // vinden op een luchthaven, en een foto van echte borden
+                    // zegt dat in één blik.
+                    SignageHeader()
+
                     VStack(alignment: .leading, spacing: 8) {
                         Text("Nederlandse luchthavens")
                             .font(.frutiger(size: 24, weight: .bold))
@@ -20,7 +25,7 @@ struct AirportSelectionView: View {
                             .fixedSize(horizontal: false, vertical: true)
                     }
                     .padding(.horizontal, 20)
-                    .padding(.top, 8)
+                    .padding(.top, 4)
 
                     VStack(spacing: 10) {
                         ForEach(airportsStore.airports) { airport in

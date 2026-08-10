@@ -315,9 +315,7 @@ struct HomeView: View {
             // het tekenen, niet de hit-test. Op iPad werd deze fill-foto
             // honderden punten hoger dan de hero en ving hij onzichtbaar
             // alle tikken onder de hero af (o.a. de maatschappijen-carrousel).
-            Image("PhotoWindowWing")
-                .resizable()
-                .scaledToFill()
+            SeasonalHeroImage()
                 .allowsHitTesting(false)
         }
         .overlay {
