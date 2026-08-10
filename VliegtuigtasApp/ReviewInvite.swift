@@ -48,10 +48,13 @@ enum ReviewPrompter {
     }
 }
 
-// MARK: - Boarding pass-review-kaart (op zijn vliegvelds)
+// MARK: - Review-knop (Profiel)
 
-/// Uitnodiging om de app te beoordelen, vormgegeven als een instapkaart.
-/// Tikken opent het review-formulier in de App Store.
+/// Uitnodiging om de app te beoordelen. Stond eerder als een uitgebreid
+/// instapkaart-illustratie — leuk, maar las bij het scrollen niet meteen
+/// als knop. Nu dezelfde rij-opbouw als de andere tegels in de app (geel
+/// rond icoon, titel + uitleg, chevron): in één oogopslag duidelijk dat dit
+/// iets is om op te tikken. Tikken opent het review-formulier in de App Store.
 struct ReviewInviteCard: View {
     var body: some View {
         Button {
@@ -60,108 +63,37 @@ struct ReviewInviteCard: View {
                 UIApplication.shared.open(url)
             }
         } label: {
-            boardingPass
+            HStack(spacing: 12) {
+                ZStack {
+                    Circle().fill(Theme.yellow)
+                    Image(systemName: "star.fill")
+                        .font(.system(size: 17, weight: .bold))
+                        .foregroundStyle(Theme.ink)
+                }
+                .frame(width: 40, height: 40)
+
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Beoordeel Vliegtuigtas")
+                        .font(.frutiger(size: 15, weight: .bold))
+                        .foregroundStyle(Theme.textPrimary)
+                    Text("Laat 5 sterren achter in de App Store")
+                        .font(.frutiger(size: 12))
+                        .foregroundStyle(Theme.textSecondary)
+                }
+
+                Spacer()
+
+                Image(systemName: "chevron.right")
+                    .font(.system(size: 13, weight: .semibold))
+                    .foregroundStyle(Theme.textSecondary)
+            }
+            .padding(14)
+            .frame(maxWidth: .infinity)
+            .background(Color(.systemBackground))
+            .clipShape(RoundedRectangle(cornerRadius: 16))
+            .shadow(color: .black.opacity(0.06), radius: 8, x: 0, y: 2)
         }
         .buttonStyle(.pressableCard)
         .accessibilityLabel("Schrijf een review in de App Store")
-    }
-
-    private var boardingPass: some View {
-        HStack(spacing: 0) {
-            // — Hoofdstrook —
-            VStack(alignment: .leading, spacing: 10) {
-                HStack(spacing: 6) {
-                    Image(systemName: "airplane.departure")
-                        .font(.system(size: 10, weight: .bold))
-                    Text("BOARDING PASS · REVIEW")
-                        .font(.frutiger(size: 10, weight: .bold))
-                        .kerning(1.4)
-                }
-                .foregroundStyle(.white.opacity(0.7))
-
-                Text("Fijne reis gehad?")
-                    .font(.frutiger(size: 20, weight: .bold))
-                    .foregroundStyle(.white)
-
-                Text("Laat 5 sterren achter en help andere reizigers ons te vinden.")
-                    .font(.frutiger(size: 12))
-                    .foregroundStyle(.white.opacity(0.7))
-                    .fixedSize(horizontal: false, vertical: true)
-
-                HStack(spacing: 4) {
-                    ForEach(0..<5, id: \.self) { _ in
-                        Image(systemName: "star.fill")
-                            .font(.system(size: 13))
-                            .foregroundStyle(Theme.yellow)
-                    }
-                    Text("Beoordeel in de App Store")
-                        .font(.frutiger(size: 11, weight: .semibold))
-                        .foregroundStyle(.white)
-                        .padding(.leading, 6)
-                }
-                .padding(.top, 2)
-            }
-            .padding(18)
-            .frame(maxWidth: .infinity, alignment: .leading)
-
-            // — Perforatie —
-            perforation
-
-            // — Afscheurstrook (gate) —
-            VStack(spacing: 6) {
-                Text("GATE")
-                    .font(.frutiger(size: 9, weight: .bold))
-                    .foregroundStyle(.white.opacity(0.6))
-                    .kerning(1.5)
-                Text("5★")
-                    .font(.frutiger(size: 22, weight: .black))
-                    .foregroundStyle(Theme.yellow)
-                Image(systemName: "arrow.up.right")
-                    .font(.system(size: 12, weight: .bold))
-                    .foregroundStyle(.white)
-                    .padding(.top, 2)
-            }
-            .frame(width: 74)
-            .frame(maxHeight: .infinity)
-        }
-        .background(
-            LinearGradient(
-                colors: [Theme.navy, Color(red: 0.03, green: 0.14, blue: 0.34)],
-                startPoint: .topLeading, endPoint: .bottomTrailing
-            )
-        )
-        .clipShape(RoundedRectangle(cornerRadius: 20))
-        .shadow(color: Theme.navy.opacity(0.28), radius: 14, x: 0, y: 6)
-    }
-
-    /// Verticale gestippelde perforatie met een "uitgeknipte" ronding boven en
-    /// onder — de klassieke instapkaart-look.
-    private var perforation: some View {
-        ZStack {
-            Rectangle()
-                .fill(Color.white.opacity(0.18))
-                .frame(width: 1)
-                .overlay(
-                    Line()
-                        .stroke(style: StrokeStyle(lineWidth: 1.5, dash: [3, 3]))
-                        .foregroundStyle(.white.opacity(0.45))
-                )
-        }
-        .overlay(alignment: .top) {
-            Circle().fill(Color(.systemGroupedBackground)).frame(width: 14, height: 14).offset(y: -7)
-        }
-        .overlay(alignment: .bottom) {
-            Circle().fill(Color(.systemGroupedBackground)).frame(width: 14, height: 14).offset(y: 7)
-        }
-    }
-}
-
-/// Een enkele verticale lijn (voor de perforatie-stippellijn).
-private struct Line: Shape {
-    func path(in rect: CGRect) -> Path {
-        var p = Path()
-        p.move(to: CGPoint(x: rect.midX, y: rect.minY))
-        p.addLine(to: CGPoint(x: rect.midX, y: rect.maxY))
-        return p
     }
 }
