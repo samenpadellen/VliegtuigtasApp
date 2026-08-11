@@ -1247,18 +1247,23 @@ private struct BagDiagram: View {
             }
 
             suitcase
-                // Elke maatverandering veert vloeiend mee — de custom Shapes
-                // interpoleren de schuinte via animatableData. Een lagere
-                // dampingfraction dan voorheen laat 'm net iets doorschieten
-                // vóór hij settelt — dat overshoot is wat "swoosh" leest in
-                // plaats van een kalme, vlakke overgang.
-                .animation(.spring(response: 0.38, dampingFraction: 0.58), value: length)
-                .animation(.spring(response: 0.38, dampingFraction: 0.58), value: width)
-                .animation(.spring(response: 0.38, dampingFraction: 0.58), value: depth)
+                // De sliders leveren nu continue (niet meer per cm gestapte)
+                // waarden, dus deze spring retarget'  tientallen keren per
+                // seconde tijdens het schuiven — dát, en niet de spring-
+                // instelling zelf, is wat een vloeiende "meesleep" geeft in
+                // plaats van kleine sprongetjes. Een net iets lagere
+                // dampingfraction laat 'm bovendien even doorschieten vóór
+                // hij settelt, wat swoosh leest in plaats van kalm inschuiven.
+                .animation(.spring(response: 0.32, dampingFraction: 0.62), value: length)
+                .animation(.spring(response: 0.32, dampingFraction: 0.62), value: width)
+                .animation(.spring(response: 0.32, dampingFraction: 0.62), value: depth)
                 .scaleEffect(pop)
-                .onChange(of: length) { _, _ in bounce() }
-                .onChange(of: width)  { _, _ in bounce() }
-                .onChange(of: depth)  { _, _ in bounce() }
+                // De "pop" hoort bij een hele cm, niet bij elke sub-pixel
+                // verandering — anders zou hij tijdens continu schuiven
+                // continu afgaan in plaats van als duidelijke mijlpaal.
+                .onChange(of: Int(length.rounded())) { _, _ in bounce() }
+                .onChange(of: Int(width.rounded()))  { _, _ in bounce() }
+                .onChange(of: Int(depth.rounded()))  { _, _ in bounce() }
 
             overlayLabels
         }
@@ -1557,7 +1562,7 @@ private struct BagDiagram: View {
         HStack(spacing: 4) {
             Image(systemName: icon)
                 .font(.system(size: 9, weight: .bold))
-            Text("\(Int(value)) cm")
+            Text("\(Int(value.rounded())) cm")
                 // Vast: maatlabel dat op de getekende koffer zweeft.
                 .font(.frutiger(size: 11, weight: .semibold))
                 .monospacedDigit()
@@ -1585,6 +1590,11 @@ private struct DimSlider: View {
     @Binding var isDragging: Bool
 
     private let impact = UIImpactFeedbackGenerator(style: .light)
+    // Volgt de laatst gevoelde hele cm, zodat de haptiek per stap tikt in
+    // plaats van continu te trillen — de sleepbeweging zelf is nu vloeiend
+    // (geen `step` meer op de Slider), maar het gevoel moet wél in duidelijke
+    // stapjes blijven aanvoelen, anders wordt het een ononderbroken gebrom.
+    @State private var lastHapticStep: Int?
 
     var body: some View {
         HStack(spacing: 12) {
@@ -1592,23 +1602,33 @@ private struct DimSlider: View {
                 .font(.frutiger(size: 16)).fontWeight(.medium)
                 .frame(width: 60, alignment: .leading)
 
-            Slider(value: $value, in: range, step: 1) { editing in
+            // Geen `step` meer: de koffer-illustratie mag continu meeschuiven
+            // in plaats van in sprongen van 1 cm — dat alleen al maakt de
+            // hele interactie merkbaar vloeiender aanvoelen.
+            Slider(value: $value, in: range) { editing in
                 isDragging = editing
                 if editing {
                     impact.prepare()
+                    lastHapticStep = Int(value.rounded())
                     UISelectionFeedbackGenerator().selectionChanged()
+                } else {
+                    // Loslaten "snapt" terug naar een hele cm — de maat die
+                    // je uiteindelijk checkt en bewaart is dus altijd een
+                    // rond getal, met een laatste vloeiende veer als beloning
+                    // voor het loslaten.
+                    value = value.rounded()
                 }
             }
             .tint(color)
-            // Elke hele cm een tikje, niet alleen bij het beetpakken —
-            // dat maakt het schuiven zelf voelbaar in plaats van alleen
-            // de start ervan.
-            .onChange(of: value) { _, _ in
+            .onChange(of: value) { _, newValue in
                 guard isDragging else { return }
+                let step = Int(newValue.rounded())
+                guard step != lastHapticStep else { return }
+                lastHapticStep = step
                 impact.impactOccurred(intensity: 0.55)
             }
 
-            Text("\(Int(value))")
+            Text("\(Int(value.rounded()))")
                 .font(.frutiger(size: 16, weight: .bold))
                 .monospacedDigit()
                 .frame(width: 36, alignment: .trailing)
