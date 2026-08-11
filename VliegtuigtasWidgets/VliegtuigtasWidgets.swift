@@ -916,6 +916,7 @@ struct PurserPimWidgetView: View {
             case .accessoryCircular:    circularView
             case .accessoryRectangular: rectangularView
             case .systemMedium:         mediumView
+            case .systemLarge:          largeView
             default:                    smallView
             }
         }
@@ -985,6 +986,77 @@ struct PurserPimWidgetView: View {
         .containerBackground(for: .widget) { WTheme.inkGradient }
     }
 
+    // — Home screen: groot —
+    // De kleine/medium varianten laten maar één tip zien; op deze maat is er
+    // ruimte voor Pim's tip van vandaag mét voorproefje van twee andere
+    // tips, zodat "groot" ook echt meer te bieden heeft, niet enkel meer
+    // witruimte om dezelfde ene tip.
+
+    private var largeView: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            HStack(spacing: 10) {
+                PimCapIcon(size: 36)
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Purser Pim")
+                        .font(.frutiger(size: 15, weight: .bold))
+                        .foregroundStyle(.white)
+                    Text(kicker)
+                        .font(.frutiger(size: 9, weight: .bold))
+                        .foregroundStyle(WTheme.yellow)
+                        .kerning(0.5)
+                }
+                Spacer()
+                if entry.isFromPim {
+                    Image(systemName: "checkmark.seal.fill")
+                        .font(.system(size: 13))
+                        .foregroundStyle(WTheme.yellow)
+                }
+            }
+
+            Text(entry.tip)
+                .font(.frutiger(size: 15, weight: .medium))
+                .foregroundStyle(.white)
+                .lineLimit(4)
+                .fixedSize(horizontal: false, vertical: true)
+
+            Divider().overlay(.white.opacity(0.15))
+
+            VStack(alignment: .leading, spacing: 9) {
+                Text("NOG WAT TIPS VOOR ONDERWEG")
+                    .font(.frutiger(size: 9, weight: .bold))
+                    .foregroundStyle(.white.opacity(0.5))
+                    .kerning(0.5)
+                ForEach(otherTips, id: \.self) { tip in
+                    HStack(alignment: .top, spacing: 8) {
+                        Circle()
+                            .fill(WTheme.yellow)
+                            .frame(width: 4, height: 4)
+                            .padding(.top, 5)
+                        Text(tip)
+                            .font(.frutiger(size: 12, weight: .medium))
+                            .foregroundStyle(.white.opacity(0.75))
+                            .lineLimit(2)
+                    }
+                }
+            }
+
+            Spacer(minLength: 0)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
+        .containerBackground(for: .widget) { WTheme.inkGradient }
+    }
+
+    /// Twee andere tips dan die van vandaag, puur ter inspiratie in de grote
+    /// widget — decoratief, geen eigen state, dus geen risico dat ze ooit
+    /// uit sync raken met wat de kleinere varianten tonen.
+    private var otherTips: [String] {
+        let all = PimStaticTips.all
+        guard !all.isEmpty else { return [] }
+        let todayIndex = (Calendar.current.ordinality(of: .day, in: .year, for: entry.date) ?? 0) % all.count
+        let candidates = [all[(todayIndex + 3) % all.count], all[(todayIndex + 7) % all.count]]
+        return candidates.filter { $0 != entry.tip }
+    }
+
     // — Lock screen —
     // Accessory-families renderen monochroom: geen custom mascotte-vormen
     // hier, gewoon een duidelijk SF Symbol zoals bij de andere widgets.
@@ -1039,6 +1111,7 @@ struct PurserPimWidget: Widget {
         .supportedFamilies([
             .systemSmall,
             .systemMedium,
+            .systemLarge,
             .accessoryInline,
             .accessoryCircular,
             .accessoryRectangular
