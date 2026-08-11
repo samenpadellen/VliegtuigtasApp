@@ -147,6 +147,20 @@ final class BagScanModel: ObservableObject {
 
 // MARK: - Geometrie: beste-passende rechthoek door een puntenwolk
 
+/// Geeft de (min,max) van een reeks terug, met de buitenste ~1% aan elke
+/// kant weggesneden. Een enkel ruispunt — een kortstondig mesh-artefact, een
+/// vinger net binnen het scanvolume — mag de hele meting niet laten
+/// uitschieten: `orientedFloorBox` en de hoogtemeting gebruikten voorheen de
+/// werkelijke extremen, waardoor één uitschieter de tas blijvend te groot
+/// liet meten (het rasterpuntenwolk groeit alleen maar tijdens het scannen,
+/// dus die uitschieter verdween nooit meer). Bij weinig punten is er te
+/// weinig om veilig te trimmen; dan valt dit terug op de echte extremen.
+private func trimmedExtent(_ values: [Float], trimFraction: Float = 0.01) -> (min: Float, max: Float) {
+    let sorted = values.sorted()
+    let trim = min(sorted.count / 3, Int(Float(sorted.count) * trimFraction))
+    return (sorted[trim], sorted[sorted.count - 1 - trim])
+}
+
 /// Georiënteerde boundingbox van een puntenwolk in het platte (x,z) vlak,
 /// via hoofdcomponentenanalyse (PCA): de richting van de grootste variantie
 /// is de lange as van de tas, ongeacht hoe de tas t.o.v. de camera staat.
@@ -185,15 +199,17 @@ private func orientedFloorBox(of points: [SIMD2<Float>]) -> (center: SIMD2<Float
 
     // Alle punten uitdrukken in het door PCA gevonden assenstelsel en de
     // extent per as opmeten — dat geeft de strakst passende rechthoek.
-    var minU = Float.greatestFiniteMagnitude, maxU = -Float.greatestFiniteMagnitude
-    var minV = Float.greatestFiniteMagnitude, maxV = -Float.greatestFiniteMagnitude
+    // Getrimd (zie trimmedExtent) i.p.v. de kale min/max, zodat één
+    // uitschieter de tas niet blijvend te groot laat meten.
+    var us: [Float] = []; us.reserveCapacity(points.count)
+    var vs: [Float] = []; vs.reserveCapacity(points.count)
     for p in points {
         let dx = p.x - meanX, dz = p.y - meanZ
-        let u =  dx * cosT + dz * sinT
-        let v = -dx * sinT + dz * cosT
-        minU = min(minU, u); maxU = max(maxU, u)
-        minV = min(minV, v); maxV = max(maxV, v)
+        us.append(dx * cosT + dz * sinT)
+        vs.append(-dx * sinT + dz * cosT)
     }
+    let (minU, maxU) = trimmedExtent(us)
+    let (minV, maxV) = trimmedExtent(vs)
 
     let centerU = (minU + maxU) / 2
     let centerV = (minV + maxV) / 2
@@ -424,8 +440,12 @@ private struct ARMeasureContainer: UIViewRepresentable {
             }
 
             let pointsXZ = localGrid.map { SIMD2<Float>(Float($0.x) / 100, Float($0.z) / 100) }
-            let maxYcm = localGrid.map(\.y).max() ?? 0
-            let heightM = max(0, Float(maxYcm) / 100 - floorY)
+            // Getrimde max i.p.v. de kale max: hetzelfde uitschieter-probleem
+            // als bij de lengte/breedte, en de rasterpuntenwolk groeit alleen
+            // maar tijdens het scannen — één ruispunt in frame 3 van 40 zou
+            // de hoogte anders voor de rest van de scan laten uitschieten.
+            let maxYcm = trimmedExtent(localGrid.map { Float($0.y) }).max
+            let heightM = max(0, maxYcm / 100 - floorY)
             guard let box = orientedFloorBox(of: pointsXZ) else { return }
 
             let lengthCm = Double(box.sizeAlongAxis) * 100
