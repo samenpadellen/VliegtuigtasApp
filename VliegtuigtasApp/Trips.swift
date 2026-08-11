@@ -201,6 +201,10 @@ struct Trip: Identifiable, Codable, Equatable {
     var photoUrl: String?
     var photoAuthorName: String?
     var photoAuthorUrl: String?
+    /// Terugblik na de reis: een paklijst is dan niet meer relevant, een
+    /// cijfer en een verslagje wel. 1...5, nil = nog niet beoordeeld.
+    var rating: Int?
+    var journalText: String?
 
     /// Hoe dit reistype heet, ongeacht of het een vast type of een eigen type
     /// van Pim is.

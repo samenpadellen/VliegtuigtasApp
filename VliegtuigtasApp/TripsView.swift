@@ -1254,18 +1254,26 @@ struct TripDetailView: View {
                     VStack(spacing: 16) {
                         photoHero(trip)
                         header(trip)
-                        readinessCard(trip)
-                        if let country = matchedCountry(trip), trip.isPast,
-                           BucketListStore.shared.status(for: country) != .visited {
-                            bucketListBanner(country: country)
-                        }
-                        checklistCard(trip)
 
-                        SaveToRemindersButton(
-                            titles: trip.packingItems.filter { !$0.isChecked }
-                                .map { "\($0.name) (\($0.quantity)x)" },
-                            notes: "Paklijst voor \(trip.name)"
-                        )
+                        if trip.isPast {
+                            // Na de reis is "ben ik er klaar voor" (readiness-
+                            // ring, paklijst) niet meer relevant — alleen de
+                            // terugblik telt nog.
+                            if let country = matchedCountry(trip),
+                               BucketListStore.shared.status(for: country) != .visited {
+                                bucketListBanner(country: country)
+                            }
+                            journalCard(trip)
+                        } else {
+                            readinessCard(trip)
+                            checklistCard(trip)
+
+                            SaveToRemindersButton(
+                                titles: trip.packingItems.filter { !$0.isChecked }
+                                    .map { "\($0.name) (\($0.quantity)x)" },
+                                notes: "Paklijst voor \(trip.name)"
+                            )
+                        }
 
                         if linkedFlight != nil || linkedBag != nil {
                             linkedInfoCard
@@ -1299,6 +1307,10 @@ struct TripDetailView: View {
                     .padding(.bottom, 32)
                 }
                 .background(Color(.systemGroupedBackground))
+                // Nodig voor het reisverslag: TextEditor heeft geen "klaar"-
+                // toets zoals TextField, dus zonder dit blijft het
+                // toetsenbord open tot je terugnavigeert.
+                .scrollDismissesKeyboard(.interactively)
                 .confirmationDialog(
                     "Reis verwijderen?",
                     isPresented: $showDeleteConfirm,
@@ -1492,6 +1504,44 @@ struct TripDetailView: View {
         .buttonStyle(.plain)
     }
 
+    /// Vervangt de paklijst zodra een reis voorbij is: die is dan niet meer
+    /// relevant, een cijfer en een verslagje wel. Beide worden meteen
+    /// opgeslagen via TripsStore.upsert — hetzelfde lokaal+iCloud-pad als de
+    /// rest van de reis, geen apart opslagmechanisme nodig.
+    private func journalCard(_ trip: Trip) -> some View {
+        VStack(alignment: .leading, spacing: 14) {
+            Text("Hoe was de reis?")
+                .font(.frutiger(size: 14, weight: .bold))
+                .foregroundStyle(Theme.textPrimary)
+
+            HStack(spacing: 6) {
+                ForEach(1...5, id: \.self) { star in
+                    Button {
+                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                        var updated = trip
+                        updated.rating = (trip.rating == star) ? nil : star
+                        store.upsert(updated)
+                    } label: {
+                        Image(systemName: star <= (trip.rating ?? 0) ? "star.fill" : "star")
+                            .font(.system(size: 24))
+                            .foregroundStyle(Theme.yellow)
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
+
+            VStack(alignment: .leading, spacing: 6) {
+                Text("Reisverslag")
+                    .font(.frutiger(size: 12, weight: .semibold))
+                    .foregroundStyle(Theme.textSecondary)
+                JournalTextEditor(trip: trip)
+            }
+        }
+        .padding(16)
+        .background(Color(.systemBackground))
+        .clipShape(RoundedRectangle(cornerRadius: 16))
+    }
+
     private func checklistCard(_ trip: Trip) -> some View {
         VStack(alignment: .leading, spacing: 16) {
             ForEach(groupedItems(trip), id: \.category) { group in
@@ -1636,6 +1686,76 @@ struct TripDetailView: View {
         .padding(14)
         .background(Color(.systemBackground))
         .clipShape(RoundedRectangle(cornerRadius: 14))
+    }
+}
+
+/// Los stukje state voor het reisverslag: bewaart pas bij het wegtikken
+/// (focus verliezen) in plaats van bij elke toets — dat zou bij een lang
+/// verslagje op elk lettertje een schrijfactie (+ iCloud-push) betekenen.
+///
+/// Focus verliezen is niet het enige moment dat hier telt: wie de app
+/// wegveegt of naar een andere app schakelt terwijl het toetsenbord nog
+/// openstaat, verliest anders alsnog het hele verslagje — vandaar ook een
+/// vangnet op scenePhase en op het verdwijnen van de view zelf.
+private struct JournalTextEditor: View {
+    let trip: Trip
+    @ObservedObject private var store = TripsStore.shared
+    @State private var text: String
+    @FocusState private var focused: Bool
+    @Environment(\.scenePhase) private var scenePhase
+
+    init(trip: Trip) {
+        self.trip = trip
+        _text = State(initialValue: trip.journalText ?? "")
+    }
+
+    var body: some View {
+        TextEditor(text: $text)
+            .font(.frutiger(size: 14))
+            .foregroundStyle(Theme.textPrimary)
+            .scrollContentBackground(.hidden)
+            .frame(minHeight: 110)
+            .padding(10)
+            .background(Color(.secondarySystemBackground))
+            .clipShape(RoundedRectangle(cornerRadius: 10))
+            .focused($focused)
+            .overlay(alignment: .topLeading) {
+                if text.isEmpty {
+                    Text("Wat waren de hoogtepunten? Wat zou je anders doen?")
+                        .font(.frutiger(size: 14))
+                        .foregroundStyle(Theme.textSecondary.opacity(0.6))
+                        .padding(.horizontal, 15)
+                        .padding(.vertical, 18)
+                        .allowsHitTesting(false)
+                }
+            }
+            // TextEditor heeft, anders dan TextField, geen submit-toets — de
+            // return-toets voegt gewoon een nieuwe regel toe. Zonder deze
+            // knop is er geen voor de hand liggende manier om het toetsenbord
+            // weg te tikken en zo de opslag te activeren.
+            .toolbar {
+                ToolbarItemGroup(placement: .keyboard) {
+                    Spacer()
+                    Button("Klaar") { focused = false }
+                }
+            }
+            .onChange(of: focused) { _, isFocused in
+                guard !isFocused else { return }
+                commit()
+            }
+            .onChange(of: scenePhase) { _, phase in
+                guard phase != .active else { return }
+                commit()
+            }
+            .onDisappear { commit() }
+    }
+
+    private func commit() {
+        guard var updated = store.trips.first(where: { $0.id == trip.id }) else { return }
+        let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard trimmed != (updated.journalText ?? "") else { return }
+        updated.journalText = trimmed.isEmpty ? nil : trimmed
+        store.upsert(updated)
     }
 }
 
