@@ -56,6 +56,7 @@ final class TVSavedData: ObservableObject {
 
     private let cloud = NSUbiquitousKeyValueStore.default
     private var started = false
+    private var periodicRefreshTimer: Timer?
 
     private init() {}
 
@@ -73,6 +74,16 @@ final class TVSavedData: ObservableObject {
         #endif
         cloud.synchronize()
         refresh()
+
+        // Vangnet naast didChangeExternallyNotification: die komt op een
+        // "best effort"-moment van het systeem, niet gegarandeerd meteen —
+        // en dit scherm staat bedoeld de hele dag aan te kijken zijn.
+        // Elke 5 min zelf actief verversen voorkomt merkbaar achterlopen
+        // zonder de iCloud-daemon onnodig te belasten.
+        periodicRefreshTimer?.invalidate()
+        periodicRefreshTimer = Timer.scheduledTimer(withTimeInterval: 300, repeats: true) { [weak self] _ in
+            Task { @MainActor in self?.refresh() }
+        }
     }
 
     #if DEBUG

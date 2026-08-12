@@ -2,9 +2,12 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>com.apple.developer.icloud-container-identifiers</key>
-	<array/>
+	<!-- Expliciete id (niet $(CFBundleIdentifier)): dit target deelt dezelfde
+	     bundle-id als de hoofdapp (Universal Purchase), dus dat zou hier
+	     toevallig ook goed uitkomen — maar expliciet is robuust tegen een
+	     eventuele toekomstige bundle-id-wijziging, en houdt deze regel
+	     identiek aan Vliegtuigtas.entitlements en VliegtuigtasWatch.entitlements. -->
 	<key>com.apple.developer.ubiquity-kvstore-identifier</key>
-	<string>$(TeamIdentifierPrefix)$(CFBundleIdentifier)</string>
+	<string>$(TeamIdentifierPrefix)com.vliegtuigtas.app</string>
 </dict>
 </plist>

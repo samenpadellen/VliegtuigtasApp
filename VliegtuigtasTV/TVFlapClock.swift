@@ -1,4 +1,5 @@
 import SwiftUI
+import Combine
 
 /// Eigen, minimale tvOS-kopie van de Solari-/split-flap-animatie uit
 /// SplitFlapBoard.swift (hoofdapp): zelfde golfbeweging door de tekenset,
