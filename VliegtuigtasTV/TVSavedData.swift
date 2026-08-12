@@ -50,6 +50,7 @@ final class TVSavedData: ObservableObject {
     static let shared = TVSavedData()
 
     @Published private(set) var nextTrip: TVTrip?
+    @Published private(set) var upcomingTrips: [TVTrip] = []
     @Published private(set) var nextFlight: TVFlight?
     @Published private(set) var lastUpdated = Date()
 
@@ -81,9 +82,18 @@ final class TVSavedData: ObservableObject {
     /// nooit vanzelf aan. Zet diezelfde voorbeelddata rechtstreeks lokaal
     /// klaar, puur om het bord te kunnen zien — overschrijft nooit al
     /// aanwezige (echt gesyncte) data.
+    ///
+    /// Check op de laatste vlucht i.p.v. simpelweg "is er al iets": de
+    /// Simulator bewaart deze sleutels in zijn eigen iCloud-daemon, los van
+    /// de app zelf — een install/uninstall van de app wist dat niet, dus een
+    /// kale nil-check zou een oudere, kleinere testset nooit meer aanvullen.
     private func seedDummyDataForTesting() {
-        guard cloud.data(forKey: "vt_saved_trips") == nil,
-              cloud.data(forKey: "vt_saved_flights") == nil else { return }
+        let alreadySeeded: Bool = {
+            guard let data = cloud.data(forKey: "vt_saved_flights"),
+                  let flights = try? JSONDecoder().decode([TVFlight].self, from: data) else { return false }
+            return flights.contains { $0.number == "KL643" }
+        }()
+        guard !alreadySeeded else { return }
 
         let cal = Calendar.current
         func days(_ n: Int) -> Date { cal.date(byAdding: .day, value: n, to: .now) ?? .now }
@@ -130,13 +140,13 @@ final class TVSavedData: ObservableObject {
 
         if let data = cloud.data(forKey: "vt_saved_trips"),
            let trips = try? JSONDecoder().decode([TVTrip].self, from: data) {
-            nextTrip = trips
+            upcomingTrips = trips
                 .filter { !$0.isHidden && !$0.isPast }
                 .sorted { $0.startDate < $1.startDate }
-                .first
         } else {
-            nextTrip = nil
+            upcomingTrips = []
         }
+        nextTrip = upcomingTrips.first
 
         if let data = cloud.data(forKey: "vt_saved_flights"),
            let flights = try? JSONDecoder().decode([TVFlight].self, from: data) {

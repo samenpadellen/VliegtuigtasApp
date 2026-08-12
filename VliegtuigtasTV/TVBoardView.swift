@@ -25,10 +25,13 @@ struct TVBoardView: View {
                         .frame(height: 3)
                         .padding(.top, 24)
 
-                    Spacer(minLength: 0)
+                    Spacer(minLength: 24)
 
                     if savedData.nextTrip != nil || savedData.nextFlight != nil {
                         boardPanel
+                        if savedData.upcomingTrips.count > 1 {
+                            upcomingList
+                        }
                     } else {
                         emptyState
                     }
@@ -192,6 +195,65 @@ struct TVBoardView: View {
         }
         .padding(20)
         .background(.white.opacity(0.08), in: RoundedRectangle(cornerRadius: 16))
+    }
+
+    // MARK: - Ook gepland: de rest van je reizen, als echte bordregels
+
+    /// De hoofdreis hierboven krijgt de volledige behandeling (vlucht,
+    /// bagageregel); de rest verdient geen tweede keer diezelfde herrie —
+    /// gewoon een compacte lijst zoals de onderste regels van een echt
+    /// vertrekbord: bestemming en aftelling, verder niets.
+    private var upcomingList: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            Text("OOK GEPLAND")
+                .font(.system(size: 15, weight: .bold, design: .monospaced))
+                .kerning(2)
+                .foregroundStyle(.white.opacity(0.35))
+                .padding(.top, 32)
+                .padding(.bottom, 14)
+
+            VStack(spacing: 0) {
+                ForEach(Array(otherTrips.enumerated()), id: \.element.id) { index, trip in
+                    upcomingRow(trip)
+                    if index < otherTrips.count - 1 {
+                        Rectangle()
+                            .fill(.white.opacity(0.08))
+                            .frame(height: 1)
+                    }
+                }
+            }
+        }
+    }
+
+    /// Bewust begrensd tot 4: dit blijft een rustig bord om naar te kijken,
+    /// geen scrollbare lijst (die kun je toch niet bedienen vanaf de bank).
+    private var otherTrips: [TVTrip] {
+        Array(savedData.upcomingTrips.dropFirst().prefix(4))
+    }
+
+    private func upcomingRow(_ trip: TVTrip) -> some View {
+        HStack(alignment: .center, spacing: 20) {
+            TVSplitFlapText(text: rowDestination(trip), size: 22)
+            Spacer(minLength: 12)
+            Text(rowCountdown(trip).uppercased())
+                .font(.system(size: 14, weight: .bold, design: .monospaced))
+                .foregroundStyle(TVTheme.yellow)
+        }
+        .padding(.vertical, 14)
+    }
+
+    private func rowDestination(_ trip: TVTrip) -> String {
+        if let destination = trip.destination, !destination.isEmpty { return destination }
+        return trip.name
+    }
+
+    private func rowCountdown(_ trip: TVTrip) -> String {
+        switch trip.daysUntilStart {
+        case ..<0: return "Onderweg"
+        case 0:    return "Vandaag"
+        case 1:    return "Morgen"
+        default:   return "Nog \(trip.daysUntilStart) dagen"
+        }
     }
 
     // MARK: - Lege staat
