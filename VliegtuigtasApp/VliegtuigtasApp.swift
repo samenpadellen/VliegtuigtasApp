@@ -28,6 +28,8 @@ struct VliegtuigtasApp: App {
             RootView(soundPlayer: soundPlayer)
                 .environmentObject(session)
                 .onAppear {
+                    // TEMP TEST-ONLY: forceer onboarding om te verifiëren — wordt hierna direct teruggedraaid.
+                    session.reset()
                     // Alleen voorbereiden: het geluid start pas in SplashView,
                     // op het moment dat het icoon écht in beeld staat.
                     soundPlayer.prepare()

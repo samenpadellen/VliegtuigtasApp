@@ -12,6 +12,16 @@
 			<key>objcSymbol</key>
 			<string>ACImageNameContent</string>
 			<key>relativePath</key>
+			<string>./AppIcon.solidimagestack/Front.solidimagestacklayer/Content.imageset</string>
+			<key>swiftSymbol</key>
+			<string>content</string>
+		</dict>
+		<dict>
+			<key>catalogPath</key>
+			<string>/Users/wouterschut/Documents/VliegtuigtasApp/VliegtuigtasVision/Assets.xcassets</string>
+			<key>objcSymbol</key>
+			<string>ACImageNameContent</string>
+			<key>relativePath</key>
 			<string>./AppIcon.solidimagestack/Middle.solidimagestacklayer/Content.imageset</string>
 			<key>swiftSymbol</key>
 			<string>content</string>

@@ -26,6 +26,7 @@
     }
   ],
   "host_permissions": [
+    "https://vliegtuigtas.com/*",
     "https://www.vliegtuigtas.com/*"
   ],
   "permissions": [

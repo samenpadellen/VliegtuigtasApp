@@ -36,6 +36,16 @@
     "swift-dependencies" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-iphonesimulator/Vliegtuigtas Watch.build/Objects-normal/x86_64/Models.swiftdeps",
     "swiftmodule" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-iphonesimulator/Vliegtuigtas Watch.build/Objects-normal/x86_64/Models~partial.swiftmodule"
   },
+  "/Users/wouterschut/Documents/VliegtuigtasApp/VliegtuigtasApp/Typography.swift" : {
+    "const-values" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-iphonesimulator/Vliegtuigtas Watch.build/Objects-normal/x86_64/Typography.swiftconstvalues",
+    "dependencies" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-iphonesimulator/Vliegtuigtas Watch.build/Objects-normal/x86_64/Typography.d",
+    "diagnostics" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-iphonesimulator/Vliegtuigtas Watch.build/Objects-normal/x86_64/Typography.dia",
+    "index-unit-output-path" : "/VliegtuigtasApp.build/Debug-iphonesimulator/Vliegtuigtas Watch.build/Objects-normal/x86_64/Typography.o",
+    "llvm-bc" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-iphonesimulator/Vliegtuigtas Watch.build/Objects-normal/x86_64/Typography.bc",
+    "object" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-iphonesimulator/Vliegtuigtas Watch.build/Objects-normal/x86_64/Typography.o",
+    "swift-dependencies" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-iphonesimulator/Vliegtuigtas Watch.build/Objects-normal/x86_64/Typography.swiftdeps",
+    "swiftmodule" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-iphonesimulator/Vliegtuigtas Watch.build/Objects-normal/x86_64/Typography~partial.swiftmodule"
+  },
   "/Users/wouterschut/Documents/VliegtuigtasApp/VliegtuigtasWatch/VliegtuigtasWatchApp.swift" : {
     "const-values" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-iphonesimulator/Vliegtuigtas Watch.build/Objects-normal/x86_64/VliegtuigtasWatchApp.swiftconstvalues",
     "dependencies" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-iphonesimulator/Vliegtuigtas Watch.build/Objects-normal/x86_64/VliegtuigtasWatchApp.d",
@@ -75,6 +85,16 @@
     "object" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-iphonesimulator/Vliegtuigtas Watch.build/Objects-normal/x86_64/WatchContentView.o",
     "swift-dependencies" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-iphonesimulator/Vliegtuigtas Watch.build/Objects-normal/x86_64/WatchContentView.swiftdeps",
     "swiftmodule" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-iphonesimulator/Vliegtuigtas Watch.build/Objects-normal/x86_64/WatchContentView~partial.swiftmodule"
+  },
+  "/Users/wouterschut/Documents/VliegtuigtasApp/VliegtuigtasWatch/WatchIntents.swift" : {
+    "const-values" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-iphonesimulator/Vliegtuigtas Watch.build/Objects-normal/x86_64/WatchIntents.swiftconstvalues",
+    "dependencies" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-iphonesimulator/Vliegtuigtas Watch.build/Objects-normal/x86_64/WatchIntents.d",
+    "diagnostics" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-iphonesimulator/Vliegtuigtas Watch.build/Objects-normal/x86_64/WatchIntents.dia",
+    "index-unit-output-path" : "/VliegtuigtasApp.build/Debug-iphonesimulator/Vliegtuigtas Watch.build/Objects-normal/x86_64/WatchIntents.o",
+    "llvm-bc" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-iphonesimulator/Vliegtuigtas Watch.build/Objects-normal/x86_64/WatchIntents.bc",
+    "object" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-iphonesimulator/Vliegtuigtas Watch.build/Objects-normal/x86_64/WatchIntents.o",
+    "swift-dependencies" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-iphonesimulator/Vliegtuigtas Watch.build/Objects-normal/x86_64/WatchIntents.swiftdeps",
+    "swiftmodule" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-iphonesimulator/Vliegtuigtas Watch.build/Objects-normal/x86_64/WatchIntents~partial.swiftmodule"
   },
   "/Users/wouterschut/Documents/VliegtuigtasApp/VliegtuigtasWatch/WatchMyBagView.swift" : {
     "const-values" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-iphonesimulator/Vliegtuigtas Watch.build/Objects-normal/x86_64/WatchMyBagView.swiftconstvalues",

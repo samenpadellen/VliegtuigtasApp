@@ -42,6 +42,14 @@ extension DeveloperToolsSupport.ImageResource {
 
         }
 
+        /// The "AppIcon/Front" asset catalog resource namespace.
+        enum Front {
+
+            /// The "AppIcon/Front/Content" asset catalog image resource.
+            static let content = DeveloperToolsSupport.ImageResource(name: "AppIcon/Front/Content", bundle: resourceBundle)
+
+        }
+
         /// The "AppIcon/Middle" asset catalog resource namespace.
         enum Middle {
 
@@ -108,6 +116,20 @@ extension AppKit.NSImage {
 
         }
 
+        /// The "AppIcon/Front" asset catalog resource namespace.
+        enum Front {
+
+            /// The "AppIcon/Front/Content" asset catalog image.
+            static var content: AppKit.NSImage {
+#if !targetEnvironment(macCatalyst)
+                .init(resource: .AppIcon.Front.content)
+#else
+                .init()
+#endif
+            }
+
+        }
+
         /// The "AppIcon/Middle" asset catalog resource namespace.
         enum Middle {
 
@@ -142,6 +164,20 @@ extension UIKit.UIImage {
             static var content: UIKit.UIImage {
 #if !os(watchOS)
                 .init(resource: .AppIcon.Back.content)
+#else
+                .init()
+#endif
+            }
+
+        }
+
+        /// The "AppIcon/Front" asset catalog resource namespace.
+        enum Front {
+
+            /// The "AppIcon/Front/Content" asset catalog image.
+            static var content: UIKit.UIImage {
+#if !os(watchOS)
+                .init(resource: .AppIcon.Front.content)
 #else
                 .init()
 #endif

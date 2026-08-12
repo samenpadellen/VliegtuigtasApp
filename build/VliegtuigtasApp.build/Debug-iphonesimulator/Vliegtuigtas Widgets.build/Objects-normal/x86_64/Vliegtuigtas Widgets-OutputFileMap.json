@@ -16,6 +16,16 @@
     "swift-dependencies" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-iphonesimulator/Vliegtuigtas Widgets.build/Objects-normal/x86_64/FlightActivityAttributes.swiftdeps",
     "swiftmodule" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-iphonesimulator/Vliegtuigtas Widgets.build/Objects-normal/x86_64/FlightActivityAttributes~partial.swiftmodule"
   },
+  "/Users/wouterschut/Documents/VliegtuigtasApp/VliegtuigtasApp/Typography.swift" : {
+    "const-values" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-iphonesimulator/Vliegtuigtas Widgets.build/Objects-normal/x86_64/Typography.swiftconstvalues",
+    "dependencies" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-iphonesimulator/Vliegtuigtas Widgets.build/Objects-normal/x86_64/Typography.d",
+    "diagnostics" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-iphonesimulator/Vliegtuigtas Widgets.build/Objects-normal/x86_64/Typography.dia",
+    "index-unit-output-path" : "/VliegtuigtasApp.build/Debug-iphonesimulator/Vliegtuigtas Widgets.build/Objects-normal/x86_64/Typography.o",
+    "llvm-bc" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-iphonesimulator/Vliegtuigtas Widgets.build/Objects-normal/x86_64/Typography.bc",
+    "object" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-iphonesimulator/Vliegtuigtas Widgets.build/Objects-normal/x86_64/Typography.o",
+    "swift-dependencies" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-iphonesimulator/Vliegtuigtas Widgets.build/Objects-normal/x86_64/Typography.swiftdeps",
+    "swiftmodule" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-iphonesimulator/Vliegtuigtas Widgets.build/Objects-normal/x86_64/Typography~partial.swiftmodule"
+  },
   "/Users/wouterschut/Documents/VliegtuigtasApp/VliegtuigtasWidgets/FlightLiveActivity.swift" : {
     "const-values" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-iphonesimulator/Vliegtuigtas Widgets.build/Objects-normal/x86_64/FlightLiveActivity.swiftconstvalues",
     "dependencies" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-iphonesimulator/Vliegtuigtas Widgets.build/Objects-normal/x86_64/FlightLiveActivity.d",
@@ -25,6 +35,16 @@
     "object" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-iphonesimulator/Vliegtuigtas Widgets.build/Objects-normal/x86_64/FlightLiveActivity.o",
     "swift-dependencies" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-iphonesimulator/Vliegtuigtas Widgets.build/Objects-normal/x86_64/FlightLiveActivity.swiftdeps",
     "swiftmodule" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-iphonesimulator/Vliegtuigtas Widgets.build/Objects-normal/x86_64/FlightLiveActivity~partial.swiftmodule"
+  },
+  "/Users/wouterschut/Documents/VliegtuigtasApp/VliegtuigtasWidgets/TripCountdownWidget.swift" : {
+    "const-values" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-iphonesimulator/Vliegtuigtas Widgets.build/Objects-normal/x86_64/TripCountdownWidget.swiftconstvalues",
+    "dependencies" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-iphonesimulator/Vliegtuigtas Widgets.build/Objects-normal/x86_64/TripCountdownWidget.d",
+    "diagnostics" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-iphonesimulator/Vliegtuigtas Widgets.build/Objects-normal/x86_64/TripCountdownWidget.dia",
+    "index-unit-output-path" : "/VliegtuigtasApp.build/Debug-iphonesimulator/Vliegtuigtas Widgets.build/Objects-normal/x86_64/TripCountdownWidget.o",
+    "llvm-bc" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-iphonesimulator/Vliegtuigtas Widgets.build/Objects-normal/x86_64/TripCountdownWidget.bc",
+    "object" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-iphonesimulator/Vliegtuigtas Widgets.build/Objects-normal/x86_64/TripCountdownWidget.o",
+    "swift-dependencies" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-iphonesimulator/Vliegtuigtas Widgets.build/Objects-normal/x86_64/TripCountdownWidget.swiftdeps",
+    "swiftmodule" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-iphonesimulator/Vliegtuigtas Widgets.build/Objects-normal/x86_64/TripCountdownWidget~partial.swiftmodule"
   },
   "/Users/wouterschut/Documents/VliegtuigtasApp/VliegtuigtasWidgets/VliegtuigtasWidgets.swift" : {
     "const-values" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-iphonesimulator/Vliegtuigtas Widgets.build/Objects-normal/x86_64/VliegtuigtasWidgets.swiftconstvalues",

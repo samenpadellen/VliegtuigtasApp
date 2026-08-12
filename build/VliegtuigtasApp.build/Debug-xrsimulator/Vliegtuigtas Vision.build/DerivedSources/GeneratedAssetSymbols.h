@@ -6,6 +6,9 @@
 #define AC_SWIFT_PRIVATE
 #endif
 
+/// The "AppIcon/Front/Content" asset catalog image resource.
+static NSString * const ACImageNameAppIconFrontContent AC_SWIFT_PRIVATE = @"AppIcon/Front/Content";
+
 /// The "AppIcon/Middle/Content" asset catalog image resource.
 static NSString * const ACImageNameAppIconMiddleContent AC_SWIFT_PRIVATE = @"AppIcon/Middle/Content";
 

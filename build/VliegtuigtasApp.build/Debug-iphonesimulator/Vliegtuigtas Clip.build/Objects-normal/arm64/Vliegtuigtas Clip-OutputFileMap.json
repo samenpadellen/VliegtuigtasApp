@@ -46,6 +46,16 @@
     "swift-dependencies" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-iphonesimulator/Vliegtuigtas Clip.build/Objects-normal/arm64/Theme.swiftdeps",
     "swiftmodule" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-iphonesimulator/Vliegtuigtas Clip.build/Objects-normal/arm64/Theme~partial.swiftmodule"
   },
+  "/Users/wouterschut/Documents/VliegtuigtasApp/VliegtuigtasApp/Typography.swift" : {
+    "const-values" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-iphonesimulator/Vliegtuigtas Clip.build/Objects-normal/arm64/Typography.swiftconstvalues",
+    "dependencies" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-iphonesimulator/Vliegtuigtas Clip.build/Objects-normal/arm64/Typography.d",
+    "diagnostics" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-iphonesimulator/Vliegtuigtas Clip.build/Objects-normal/arm64/Typography.dia",
+    "index-unit-output-path" : "/VliegtuigtasApp.build/Debug-iphonesimulator/Vliegtuigtas Clip.build/Objects-normal/arm64/Typography.o",
+    "llvm-bc" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-iphonesimulator/Vliegtuigtas Clip.build/Objects-normal/arm64/Typography.bc",
+    "object" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-iphonesimulator/Vliegtuigtas Clip.build/Objects-normal/arm64/Typography.o",
+    "swift-dependencies" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-iphonesimulator/Vliegtuigtas Clip.build/Objects-normal/arm64/Typography.swiftdeps",
+    "swiftmodule" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-iphonesimulator/Vliegtuigtas Clip.build/Objects-normal/arm64/Typography~partial.swiftmodule"
+  },
   "/Users/wouterschut/Documents/VliegtuigtasApp/VliegtuigtasClip/ClipCheckView.swift" : {
     "const-values" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-iphonesimulator/Vliegtuigtas Clip.build/Objects-normal/arm64/ClipCheckView.swiftconstvalues",
     "dependencies" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-iphonesimulator/Vliegtuigtas Clip.build/Objects-normal/arm64/ClipCheckView.d",

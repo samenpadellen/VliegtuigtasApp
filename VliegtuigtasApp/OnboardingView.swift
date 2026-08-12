@@ -15,18 +15,36 @@ struct OnboardingView: View {
         ZStack {
             switch page {
             case 0:
-                WelcomePage(onNext: { withAnimation(.easeInOut(duration: 0.35)) { page = 1 } })
+                WelcomePage(onNext: { advance(to: 1) })
                     .transition(.asymmetric(
                         insertion: .move(edge: .trailing),
                         removal: .move(edge: .leading)
                     ))
             case 1:
+                TripsFeaturePage(onNext: { advance(to: 2) })
+                    .transition(.asymmetric(
+                        insertion: .move(edge: .trailing),
+                        removal: .move(edge: .leading)
+                    ))
+            case 2:
+                JourneyFeaturePage(onNext: { advance(to: 3) })
+                    .transition(.asymmetric(
+                        insertion: .move(edge: .trailing),
+                        removal: .move(edge: .leading)
+                    ))
+            case 3:
+                PimFeaturePage(onNext: { advance(to: 4) })
+                    .transition(.asymmetric(
+                        insertion: .move(edge: .trailing),
+                        removal: .move(edge: .leading)
+                    ))
+            case 4:
                 NamePage(
                     firstName: $firstName,
                     error: $nameError,
                     isFocused: $nameFocused,
                     onNext: tryAdvanceFromName,
-                    onBack: { withAnimation(.easeInOut(duration: 0.35)) { page = 0 } }
+                    onBack: { advance(to: 3) }
                 )
                 .transition(.asymmetric(
                     insertion: .move(edge: .trailing),
@@ -40,7 +58,7 @@ struct OnboardingView: View {
                     isFocused: $emailFocused,
                     isSending: isSending,
                     onNext: tryComplete,
-                    onBack: { withAnimation(.easeInOut(duration: 0.35)) { page = 1 } }
+                    onBack: { advance(to: 4) }
                 )
                 .transition(.asymmetric(
                     insertion: .move(edge: .trailing),
@@ -76,10 +94,12 @@ struct OnboardingView: View {
 
     // MARK: - Progress dots
 
+    private static let pageCount = 6
+
     private var progressDots: some View {
-        // Witte dots: alle drie de pagina's hebben bovenin een foto/hero.
+        // Witte dots: alle pagina's hebben bovenin een foto/hero.
         HStack(spacing: 6) {
-            ForEach(0..<3) { i in
+            ForEach(0..<Self.pageCount, id: \.self) { i in
                 Capsule()
                     .fill(i == page ? .white : .white.opacity(0.35))
                     .frame(width: i == page ? 20 : 6, height: 6)
@@ -91,6 +111,10 @@ struct OnboardingView: View {
 
     // MARK: - Logic
 
+    private func advance(to newPage: Int) {
+        withAnimation(.easeInOut(duration: 0.35)) { page = newPage }
+    }
+
     private func tryAdvanceFromName() {
         let trimmed = firstName.trimmingCharacters(in: .whitespaces)
         if trimmed.isEmpty {
@@ -100,7 +124,7 @@ struct OnboardingView: View {
             firstName = trimmed
             nameError = false
             nameFocused = false
-            withAnimation(.easeInOut(duration: 0.35)) { page = 2 }
+            advance(to: 5)
         }
     }
 
@@ -207,14 +231,27 @@ private struct WelcomePage: View {
 
 /// Featureregel op de donkere welkomstpagina: glazen chip-stijl.
 private struct WelcomeFeatureRow: View {
-    let icon: String
+    let iconView: AnyView
     let tint: Color
     let text: String
 
+    init(icon systemName: String, tint: Color, text: String) {
+        self.iconView = AnyView(Image(systemName: systemName).font(.system(size: 14, weight: .semibold)))
+        self.tint = tint
+        self.text = text
+    }
+
+    /// Voor niet-SF Symbol iconen, zoals Purser Pim's eigen petje-tekening
+    /// (bewust géén sparkles/AI-iconografie — zie PurserPimCap).
+    init(icon: AnyView, tint: Color, text: String) {
+        self.iconView = icon
+        self.tint = tint
+        self.text = text
+    }
+
     var body: some View {
         HStack(spacing: 12) {
-            Image(systemName: icon)
-                .font(.system(size: 14, weight: .semibold))
+            iconView
                 .foregroundStyle(tint)
                 .frame(width: 34, height: 34)
                 .background(.white.opacity(0.12))
@@ -224,6 +261,156 @@ private struct WelcomeFeatureRow: View {
                 .foregroundStyle(.white.opacity(0.92))
             Spacer(minLength: 0)
         }
+    }
+}
+
+// MARK: - Featurepagina's (alles wat de app te bieden heeft)
+
+/// Zelfde opbouw als WelcomePage — full-bleed foto, navy scrim, wordmark,
+/// kop + subkop, drie featureregels, witte knop — maar herbruikbaar voor
+/// de extra pagina's die laten zien wat de app allemaal kan, vóórdat er om
+/// een naam/e-mailadres wordt gevraagd.
+private struct FeaturePage: View {
+    let heroImageName: String
+    let heading: String
+    let subheading: String
+    let features: [(icon: AnyView, tint: Color, text: String)]
+    let onNext: () -> Void
+
+    var body: some View {
+        ZStack(alignment: .bottom) {
+            GeometryReader { geo in
+                heroImage(heroImageName, height: geo.size.height + geo.safeAreaInsets.top + geo.safeAreaInsets.bottom)
+                    .offset(y: -geo.safeAreaInsets.top)
+            }
+
+            LinearGradient(
+                stops: [
+                    .init(color: .clear, location: 0),
+                    .init(color: Theme.navyDark.opacity(0.55), location: 0.45),
+                    .init(color: Theme.navyDark.opacity(0.96), location: 1)
+                ],
+                startPoint: .top, endPoint: .bottom
+            )
+            .ignoresSafeArea()
+            .allowsHitTesting(false)
+
+            VStack(alignment: .leading, spacing: 18) {
+                HStack(spacing: 8) {
+                    Image(systemName: "suitcase.rolling.fill")
+                        .font(.system(size: 13, weight: .semibold))
+                        .foregroundStyle(Theme.yellow)
+                    Text("VLIEGTUIGTAS")
+                        .font(.frutiger(size: 11, weight: .black))
+                        .foregroundStyle(.white.opacity(0.8))
+                        .kerning(2)
+                }
+
+                VStack(alignment: .leading, spacing: 8) {
+                    Text(heading)
+                        .font(.frutiger(size: 34, weight: .bold))
+                        .foregroundStyle(.white)
+                        .lineSpacing(2)
+                    Text(subheading)
+                        .font(.frutiger(size: 15))
+                        .foregroundStyle(.white.opacity(0.8))
+                        .lineSpacing(2)
+                }
+
+                VStack(spacing: 8) {
+                    ForEach(features.indices, id: \.self) { i in
+                        WelcomeFeatureRow(icon: features[i].icon, tint: features[i].tint, text: features[i].text)
+                    }
+                }
+
+                Button(action: onNext) {
+                    HStack(spacing: 8) {
+                        Text("Volgende")
+                            .font(.frutiger(size: 17, weight: .semibold))
+                        Image(systemName: "arrow.right")
+                            .font(.system(size: 15, weight: .semibold))
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 17)
+                    .background(.white)
+                    .foregroundStyle(Theme.navy)
+                    .clipShape(RoundedRectangle(cornerRadius: 16))
+                }
+                .buttonStyle(.plain)
+                .padding(.top, 6)
+            }
+            .frame(maxWidth: Theme.contentMaxWidth)
+            .padding(.horizontal, 24)
+            .padding(.bottom, 24)
+        }
+        .background(Theme.navyDark)
+        .ignoresSafeArea(edges: .top)
+    }
+}
+
+/// Reizen: paklijst, reisklaar-score, bucket list, reisverslag.
+private struct TripsFeaturePage: View {
+    let onNext: () -> Void
+
+    var body: some View {
+        FeaturePage(
+            heroImageName: "PhotoTraveler",
+            heading: "Jouw hele reis,\nop één plek.",
+            subheading: "Van paklijst tot reisverslag — Vliegtuigtas denkt met je mee, vóór en ná iedere trip.",
+            features: [
+                (AnyView(Image(systemName: "list.bullet.clipboard.fill")), Theme.green,
+                 "Slimme paklijst per soort reis"),
+                (AnyView(Image(systemName: "gauge.with.dots.needle.67percent")), Theme.sky,
+                 "Reisklaar-score in één oogopslag"),
+                (AnyView(Image(systemName: "star.fill")), Theme.yellow,
+                 "Beoordeel en bewaar je reisverslag")
+            ],
+            onNext: onNext
+        )
+    }
+}
+
+/// Onderweg: vluchten volgen, widget/Watch/CarPlay/Apple TV.
+private struct JourneyFeaturePage: View {
+    let onNext: () -> Void
+
+    var body: some View {
+        FeaturePage(
+            heroImageName: "PhotoAirportSigns",
+            heading: "Ook onderweg\naltijd op de hoogte.",
+            subheading: "Volg je vlucht live, en vind je gegevens automatisch terug op je widget, Watch en zelfs je tv.",
+            features: [
+                (AnyView(Image(systemName: "airplane.circle.fill")), Theme.sky,
+                 "Live gate- en vertragingsinformatie"),
+                (AnyView(Image(systemName: "applewatch")), Theme.orange,
+                 "Ook op je Apple Watch en widget"),
+                (AnyView(Image(systemName: "tv.fill")), Theme.yellow,
+                 "Vertrekbord op je Apple TV")
+            ],
+            onNext: onNext
+        )
+    }
+}
+
+/// Purser Pim + LiDAR-scan + gratis.
+private struct PimFeaturePage: View {
+    let onNext: () -> Void
+
+    var body: some View {
+        FeaturePage(
+            heroImageName: "PhotoBaggageTag",
+            heading: "Purser Pim helpt\njou persoonlijk.",
+            subheading: "Scan je tas met de camera, krijg pakadvies op maat — allemaal volledig gratis.",
+            features: [
+                (AnyView(Image(systemName: "camera.viewfinder")), Theme.sky,
+                 "3D-scan van je tas met LiDAR"),
+                (AnyView(PurserPimCap(size: 22)), Theme.yellow,
+                 "Purser Pim geeft pakadvies op maat"),
+                (AnyView(Image(systemName: "checkmark.seal.fill")), Theme.green,
+                 "Alles gratis — geen abonnement")
+            ],
+            onNext: onNext
+        )
     }
 }
 
@@ -507,7 +694,7 @@ private struct OnboardBackButton: View {
 // MARK: - Shared hero image
 // LinearGradient establishes the layout frame; image is overlay to prevent width overflow.
 
-private func heroImage(height: CGFloat) -> some View {
+private func heroImage(_ name: String = "HeroSuitcase", height: CGFloat) -> some View {
     LinearGradient(
         colors: [Theme.navy, Theme.navyDark],
         startPoint: .topLeading, endPoint: .bottomTrailing
@@ -515,8 +702,8 @@ private func heroImage(height: CGFloat) -> some View {
     .frame(maxWidth: .infinity)
     .frame(height: height)
     .overlay {
-        if UIImage(named: "HeroSuitcase") != nil {
-            Image("HeroSuitcase")
+        if UIImage(named: name) != nil {
+            Image(name)
                 .resizable()
                 .scaledToFill()
         } else {
