@@ -17,26 +17,35 @@ struct TVBoardView: View {
         ZStack {
             TVTheme.inkGradient.ignoresSafeArea()
 
-            VStack(alignment: .leading, spacing: 0) {
-                header
-                Rectangle()
-                    .fill(TVTheme.yellow)
-                    .frame(height: 3)
-                    .padding(.top, 24)
+            VStack(spacing: 0) {
+                VStack(alignment: .leading, spacing: 0) {
+                    header
+                    Rectangle()
+                        .fill(TVTheme.yellow)
+                        .frame(height: 3)
+                        .padding(.top, 24)
 
-                Spacer(minLength: 0)
+                    Spacer(minLength: 0)
 
-                if savedData.nextTrip != nil || savedData.nextFlight != nil {
-                    boardPanel
-                } else {
-                    emptyState
+                    if savedData.nextTrip != nil || savedData.nextFlight != nil {
+                        boardPanel
+                    } else {
+                        emptyState
+                    }
+
+                    Spacer(minLength: 0)
+                    footer
                 }
+                .padding(60)
+                .frame(maxHeight: .infinity)
 
-                Spacer(minLength: 0)
-                footer
+                // Bewust vol-breed, buiten de safe-area-padding hierboven —
+                // net als op een echt vertrekbord/nieuwszender loopt dit lint
+                // helemaal van rand tot rand.
+                PimTickerView(trip: savedData.nextTrip, flight: savedData.nextFlight)
             }
-            .padding(60)
         }
+        .ignoresSafeArea(edges: .bottom)
         .task {
             savedData.start()
             await airlineStore.load()
