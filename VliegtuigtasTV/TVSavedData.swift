@@ -77,28 +77,49 @@ final class TVSavedData: ObservableObject {
     #if DEBUG
     /// Tijdelijke testhulp: de Simulator heeft geen ingelogd iCloud-account,
     /// dus de echte sync vanaf de telefoon (zie VliegtuigtasApp.swift'
-    /// seedDummyDataForTesting) komt hier nooit vanzelf aan. Zet dezelfde
-    /// voorbeeldreis/-vlucht rechtstreeks lokaal klaar, puur om het bord
-    /// te kunnen zien — overschrijft nooit al aanwezige (echt gesyncte) data.
+    /// seedDummyDataForTesting, dezelfde vijf reis/vlucht-paren) komt hier
+    /// nooit vanzelf aan. Zet diezelfde voorbeelddata rechtstreeks lokaal
+    /// klaar, puur om het bord te kunnen zien — overschrijft nooit al
+    /// aanwezige (echt gesyncte) data.
     private func seedDummyDataForTesting() {
         guard cloud.data(forKey: "vt_saved_trips") == nil,
               cloud.data(forKey: "vt_saved_flights") == nil else { return }
 
         let cal = Calendar.current
-        let start = cal.date(byAdding: .day, value: 5, to: .now) ?? .now
-        let end = cal.date(byAdding: .day, value: 9, to: .now) ?? .now
-        let departure = cal.date(bySettingHour: 9, minute: 15, second: 0, of: start) ?? start
+        func days(_ n: Int) -> Date { cal.date(byAdding: .day, value: n, to: .now) ?? .now }
+        func at(_ date: Date, _ hour: Int, _ minute: Int) -> Date {
+            cal.date(bySettingHour: hour, minute: minute, second: 0, of: date) ?? date
+        }
 
-        let trip = TVTrip(name: "Rome", destination: "Rome, Italië", startDate: start, endDate: end)
-        let flight = TVFlight(
-            number: "KL1595", airlineName: "KLM", airlineSlug: "klm",
-            departure: departure, departureIata: "AMS", departureAirport: "Amsterdam Schiphol",
-            arrivalIata: "FCO", arrivalAirport: "Rome Fiumicino"
-        )
-        if let tripData = try? JSONEncoder().encode([trip]) {
+        let trips = [
+            TVTrip(name: "Rome", destination: "Rome, Italië", startDate: days(5), endDate: days(9)),
+            TVTrip(name: "Barcelona", destination: "Barcelona, Spanje", startDate: days(15), endDate: days(19)),
+            TVTrip(name: "Lissabon", destination: "Lissabon, Portugal", startDate: days(30), endDate: days(35)),
+            TVTrip(name: "Londen", destination: "Londen, Verenigd Koninkrijk", startDate: days(-20), endDate: days(-16)),
+            TVTrip(name: "New York", destination: "New York, Verenigde Staten", startDate: days(60), endDate: days(70))
+        ]
+        let flights = [
+            TVFlight(number: "KL1595", airlineName: "KLM", airlineSlug: "klm",
+                     departure: at(days(5), 9, 15), departureIata: "AMS", departureAirport: "Amsterdam Schiphol",
+                     arrivalIata: "FCO", arrivalAirport: "Rome Fiumicino"),
+            TVFlight(number: "VY8438", airlineName: "Vueling", airlineSlug: "vueling",
+                     departure: at(days(15), 7, 40), departureIata: "AMS", departureAirport: "Amsterdam Schiphol",
+                     arrivalIata: "BCN", arrivalAirport: "Barcelona El Prat"),
+            TVFlight(number: "TP653", airlineName: "TAP Air Portugal", airlineSlug: "tap-air-portugal",
+                     departure: at(days(30), 11, 5), departureIata: "AMS", departureAirport: "Amsterdam Schiphol",
+                     arrivalIata: "LIS", arrivalAirport: "Lissabon Humberto Delgado"),
+            TVFlight(number: "BA430", airlineName: "British Airways", airlineSlug: "british-airways",
+                     departure: at(days(-20), 8, 30), departureIata: "AMS", departureAirport: "Amsterdam Schiphol",
+                     arrivalIata: "LHR", arrivalAirport: "Londen Heathrow"),
+            TVFlight(number: "KL643", airlineName: "KLM", airlineSlug: "klm",
+                     departure: at(days(60), 13, 20), departureIata: "AMS", departureAirport: "Amsterdam Schiphol",
+                     arrivalIata: "JFK", arrivalAirport: "New York JFK")
+        ]
+
+        if let tripData = try? JSONEncoder().encode(trips) {
             cloud.set(tripData, forKey: "vt_saved_trips")
         }
-        if let flightData = try? JSONEncoder().encode([flight]) {
+        if let flightData = try? JSONEncoder().encode(flights) {
             cloud.set(flightData, forKey: "vt_saved_flights")
         }
     }
