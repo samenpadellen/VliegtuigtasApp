@@ -128,6 +128,16 @@
 		TYPO_WCH /* Typography.swift in Sources */ = {isa = PBXBuildFile; fileRef = TYPOREF1 /* Typography.swift */; };
 		TYPO_WID /* Typography.swift in Sources */ = {isa = PBXBuildFile; fileRef = TYPOREF1 /* Typography.swift */; };
 		TYPO_WWG /* Typography.swift in Sources */ = {isa = PBXBuildFile; fileRef = TYPOREF1 /* Typography.swift */; };
+		ATV00001 /* VliegtuigtasTVApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = ATV10001 /* VliegtuigtasTVApp.swift */; };
+		ATV00002 /* TVBoardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ATV10002 /* TVBoardView.swift */; };
+		ATV00003 /* TVSavedData.swift in Sources */ = {isa = PBXBuildFile; fileRef = ATV10003 /* TVSavedData.swift */; };
+		ATV00004 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = ATV10004 /* Assets.xcassets */; };
+		ATV00005 /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA100004 /* Models.swift */; };
+		ATV00006 /* APIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA100005 /* APIClient.swift */; };
+		ATV00007 /* AirlineStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA100006 /* AirlineStore.swift */; };
+		TYPO_TV /* Typography.swift in Sources */ = {isa = PBXBuildFile; fileRef = TYPOREF1 /* Typography.swift */; };
+		FRG_TV /* Frutiger.ttf in Resources */ = {isa = PBXBuildFile; fileRef = FRUTREG1 /* Frutiger.ttf */; };
+		FBL_TV /* Frutiger_bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = FRUTBLD1 /* Frutiger_bold.ttf */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -326,6 +336,12 @@
 		REMS1001 /* RemindersService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemindersService.swift; sourceTree = "<group>"; };
 		REVWR1 /* ReviewInvite.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewInvite.swift; sourceTree = "<group>"; };
 		TYPOREF1 /* Typography.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Typography.swift; sourceTree = "<group>"; };
+		ATV10001 /* VliegtuigtasTVApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VliegtuigtasTVApp.swift; sourceTree = "<group>"; };
+		ATV10002 /* TVBoardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TVBoardView.swift; sourceTree = "<group>"; };
+		ATV10003 /* TVSavedData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TVSavedData.swift; sourceTree = "<group>"; };
+		ATV10004 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		ATV10005 /* VliegtuigtasTV.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = VliegtuigtasTV.entitlements; sourceTree = "<group>"; };
+		ATVPROD1 /* Vliegtuigtas TV.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Vliegtuigtas TV.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -366,6 +382,13 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		AWWPH002 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		ATVPH002 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -418,6 +441,7 @@
 				AWWGRP01 /* VliegtuigtasWatchWidgets */,
 				ACLGRP01 /* VliegtuigtasClip */,
 				AVNGRP01 /* VliegtuigtasVision */,
+				ATVGRP01 /* VliegtuigtasTV */,
 				A2A76474FA7E96403C8DE346 /* Frameworks */,
 			);
 			sourceTree = "<group>";
@@ -502,6 +526,7 @@
 				ACLPROD1 /* Vliegtuigtas Clip.app */,
 				AWWPROD1 /* Vliegtuigtas Watch Widgets.appex */,
 				AVNPROD1 /* Vliegtuigtas Vision.app */,
+				ATVPROD1 /* Vliegtuigtas TV.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -541,6 +566,18 @@
 				1983025B3BCD9971F0E73437 /* PrivacyInfo.xcprivacy */,
 			);
 			path = VliegtuigtasVision;
+			sourceTree = "<group>";
+		};
+		ATVGRP01 /* VliegtuigtasTV */ = {
+			isa = PBXGroup;
+			children = (
+				ATV10004 /* Assets.xcassets */,
+				ATV10001 /* VliegtuigtasTVApp.swift */,
+				ATV10002 /* TVBoardView.swift */,
+				ATV10003 /* TVSavedData.swift */,
+				ATV10005 /* VliegtuigtasTV.entitlements */,
+			);
+			path = VliegtuigtasTV;
 			sourceTree = "<group>";
 		};
 		AWGRP01 /* VliegtuigtasWatch */ = {
@@ -700,6 +737,23 @@
 			productReference = AWWPROD1 /* Vliegtuigtas Watch Widgets.appex */;
 			productType = "com.apple.product-type.app-extension";
 		};
+		ATVTGT01 /* Vliegtuigtas TV */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = ATVCFGL1 /* Build configuration list for PBXNativeTarget "Vliegtuigtas TV" */;
+			buildPhases = (
+				ATVPH001 /* Sources */,
+				ATVPH002 /* Frameworks */,
+				ATVPH003 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "Vliegtuigtas TV";
+			productName = "Vliegtuigtas TV";
+			productReference = ATVPROD1 /* Vliegtuigtas TV.app */;
+			productType = "com.apple.product-type.application";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -736,6 +790,7 @@
 				ACLTGT01 /* Vliegtuigtas Clip */,
 				AWWTGT01 /* Vliegtuigtas Watch Widgets */,
 				AVNTGT01 /* Vliegtuigtas Vision */,
+				ATVTGT01 /* Vliegtuigtas TV */,
 			);
 		};
 /* End PBXProject section */
@@ -815,6 +870,16 @@
 			buildActionMask = 2147483647;
 			files = (
 				05ADF2D3D8FA6A6DEC81460C /* PrivacyInfo.xcprivacy in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		ATVPH003 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FRG_TV /* Frutiger.ttf in Resources */,
+				FBL_TV /* Frutiger_bold.ttf in Resources */,
+				ATV00004 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -954,6 +1019,20 @@
 			buildActionMask = 2147483647;
 			files = (
 				18DA73838EF3EBE610CF3986 /* SafariWebExtensionHandler.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		ATVPH001 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				TYPO_TV /* Typography.swift in Sources */,
+				ATV00001 /* VliegtuigtasTVApp.swift in Sources */,
+				ATV00002 /* TVBoardView.swift in Sources */,
+				ATV00003 /* TVSavedData.swift in Sources */,
+				ATV00005 /* Models.swift in Sources */,
+				ATV00006 /* APIClient.swift in Sources */,
+				ATV00007 /* AirlineStore.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1538,6 +1617,61 @@
 			};
 			name = Debug;
 		};
+		ATVCFG01 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = VliegtuigtasTV/VliegtuigtasTV.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 300;
+				DEVELOPMENT_TEAM = FDH27DW6H2;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = Vliegtuigtas;
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 3.0.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.vliegtuigtas.app;
+				PRODUCT_NAME = "Vliegtuigtas TV";
+				SDKROOT = appletvos;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 3;
+				TVOS_DEPLOYMENT_TARGET = 17.0;
+			};
+			name = Debug;
+		};
+		ATVCFG02 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = VliegtuigtasTV/VliegtuigtasTV.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 300;
+				DEVELOPMENT_TEAM = FDH27DW6H2;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = Vliegtuigtas;
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 3.0.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.vliegtuigtas.app;
+				PRODUCT_NAME = "Vliegtuigtas TV";
+				SDKROOT = appletvos;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 3;
+				VALIDATE_PRODUCT = YES;
+				TVOS_DEPLOYMENT_TARGET = 17.0;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -1609,6 +1743,15 @@
 			buildConfigurations = (
 				4975D71CF1A72AECD63E9547 /* Release */,
 				BD2AC1793D1A7FF13B70F458 /* Debug */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		ATVCFGL1 /* Build configuration list for PBXNativeTarget "Vliegtuigtas TV" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				ATVCFG01 /* Debug */,
+				ATVCFG02 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
