@@ -139,6 +139,7 @@
 		FRG_TV /* Frutiger.ttf in Resources */ = {isa = PBXBuildFile; fileRef = FRUTREG1 /* Frutiger.ttf */; };
 		FBL_TV /* Frutiger_bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = FRUTBLD1 /* Frutiger_bold.ttf */; };
 		ATV00008 /* PimTicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = ATV10006 /* PimTicker.swift */; };
+		ATV00009 /* TVFlapClock.swift in Sources */ = {isa = PBXBuildFile; fileRef = ATV10007 /* TVFlapClock.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -344,6 +345,7 @@
 		ATV10005 /* VliegtuigtasTV.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = VliegtuigtasTV.entitlements; sourceTree = "<group>"; };
 		ATVPROD1 /* Vliegtuigtas TV.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Vliegtuigtas TV.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		ATV10006 /* PimTicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PimTicker.swift; sourceTree = "<group>"; };
+		ATV10007 /* TVFlapClock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TVFlapClock.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -578,6 +580,7 @@
 				ATV10002 /* TVBoardView.swift */,
 				ATV10003 /* TVSavedData.swift */,
 				ATV10006 /* PimTicker.swift */,
+				ATV10007 /* TVFlapClock.swift */,
 				ATV10005 /* VliegtuigtasTV.entitlements */,
 			);
 			path = VliegtuigtasTV;
@@ -1034,6 +1037,7 @@
 				ATV00002 /* TVBoardView.swift in Sources */,
 				ATV00003 /* TVSavedData.swift in Sources */,
 				ATV00008 /* PimTicker.swift in Sources */,
+				ATV00009 /* TVFlapClock.swift in Sources */,
 				ATV00005 /* Models.swift in Sources */,
 				ATV00006 /* APIClient.swift in Sources */,
 				ATV00007 /* AirlineStore.swift in Sources */,

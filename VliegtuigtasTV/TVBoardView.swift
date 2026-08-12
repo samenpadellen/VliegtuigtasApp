@@ -66,18 +66,9 @@ struct TVBoardView: View {
                     .foregroundStyle(.white)
             }
             Spacer()
-            Text(Self.dateFormatter.string(from: .now).uppercased())
-                .font(.system(size: 20, weight: .semibold, design: .monospaced))
-                .foregroundStyle(.white.opacity(0.6))
+            TVFlapClock()
         }
     }
-
-    private static let dateFormatter: DateFormatter = {
-        let f = DateFormatter()
-        f.locale = Locale(identifier: "nl_NL")
-        f.dateFormat = "EEEE d MMMM"
-        return f
-    }()
 
     // MARK: - Hoofdpaneel: jouw eerstvolgende reis/vlucht
 
