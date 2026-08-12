@@ -97,37 +97,68 @@ private struct RootView: View {
 #if DEBUG
 /// Tijdelijke testhulp om de tvOS-sync te verifiëren: vult Reizen/
 /// Vluchten via het echte opslag- en iCloud-pushpad, precies zoals een
-/// gebruiker dat via de wizard zou doen. Alleen actief in Debug-builds en
-/// alleen als de voorbeeldreis er nog niet al staat — bestaande (test)reizen
-/// blijven dus gewoon staan, dit voegt alleen toe.
+/// gebruiker dat via de wizard zou doen. Alleen actief in Debug-builds.
+/// Elk paar wordt onafhankelijk toegevoegd (op vluchtnummer), zodat
+/// eerder toegevoegde testdata gewoon blijft staan en dit alleen aanvult.
 @MainActor
 private func seedDummyDataForTesting() {
-    let marker = "KL1595"
-    guard !FlightsStore.shared.flights.contains(where: { $0.number == marker }) else { return }
-
     let cal = Calendar.current
-    let start = cal.date(byAdding: .day, value: 5, to: .now) ?? .now
-    let end = cal.date(byAdding: .day, value: 9, to: .now) ?? .now
-    let departure = cal.date(bySettingHour: 9, minute: 15, second: 0, of: start) ?? start
+    func days(_ n: Int) -> Date { cal.date(byAdding: .day, value: n, to: .now) ?? .now }
+    func at(_ date: Date, _ hour: Int, _ minute: Int) -> Date {
+        cal.date(bySettingHour: hour, minute: minute, second: 0, of: date) ?? date
+    }
 
-    TripsStore.shared.upsert(Trip(
-        name: "Rome",
-        destination: "Rome, Italië",
-        startDate: start,
-        endDate: end,
-        luggageType: .both
-    ))
+    let seeds: [(trip: Trip, flight: SavedFlightRecord)] = [
+        (
+            Trip(name: "Rome", destination: "Rome, Italië",
+                 startDate: days(5), endDate: days(9), luggageType: .both),
+            SavedFlightRecord(number: "KL1595", airlineName: "KLM", airlineSlug: "klm",
+                               departure: at(days(5), 9, 15),
+                               departureIata: "AMS", departureAirport: "Amsterdam Schiphol",
+                               arrivalIata: "FCO", arrivalAirport: "Rome Fiumicino")
+        ),
+        (
+            Trip(name: "Barcelona", destination: "Barcelona, Spanje",
+                 startDate: days(15), endDate: days(19), luggageType: .carryOnOnly),
+            SavedFlightRecord(number: "VY8438", airlineName: "Vueling", airlineSlug: "vueling",
+                               departure: at(days(15), 7, 40),
+                               departureIata: "AMS", departureAirport: "Amsterdam Schiphol",
+                               arrivalIata: "BCN", arrivalAirport: "Barcelona El Prat")
+        ),
+        (
+            Trip(name: "Lissabon", destination: "Lissabon, Portugal",
+                 startDate: days(30), endDate: days(35), luggageType: .both),
+            SavedFlightRecord(number: "TP653", airlineName: "TAP Air Portugal", airlineSlug: "tap-air-portugal",
+                               departure: at(days(30), 11, 5),
+                               departureIata: "AMS", departureAirport: "Amsterdam Schiphol",
+                               arrivalIata: "LIS", arrivalAirport: "Lissabon Humberto Delgado")
+        ),
+        (
+            Trip(name: "Londen", destination: "Londen, Verenigd Koninkrijk",
+                 startDate: days(-20), endDate: days(-16), luggageType: .checkedOnly),
+            SavedFlightRecord(number: "BA430", airlineName: "British Airways", airlineSlug: "british-airways",
+                               departure: at(days(-20), 8, 30),
+                               departureIata: "AMS", departureAirport: "Amsterdam Schiphol",
+                               arrivalIata: "LHR", arrivalAirport: "Londen Heathrow")
+        ),
+        (
+            Trip(name: "New York", destination: "New York, Verenigde Staten",
+                 startDate: days(60), endDate: days(70), luggageType: .both),
+            SavedFlightRecord(number: "KL643", airlineName: "KLM", airlineSlug: "klm",
+                               departure: at(days(60), 13, 20),
+                               departureIata: "AMS", departureAirport: "Amsterdam Schiphol",
+                               arrivalIata: "JFK", arrivalAirport: "New York JFK")
+        )
+    ]
 
-    FlightsStore.shared.upsert(SavedFlightRecord(
-        number: "KL1595",
-        airlineName: "KLM",
-        airlineSlug: "klm",
-        departure: departure,
-        departureIata: "AMS",
-        departureAirport: "Amsterdam Schiphol",
-        arrivalIata: "FCO",
-        arrivalAirport: "Rome Fiumicino"
-    ))
+    for seed in seeds {
+        if !TripsStore.shared.trips.contains(where: { $0.name == seed.trip.name }) {
+            TripsStore.shared.upsert(seed.trip)
+        }
+        if !FlightsStore.shared.flights.contains(where: { $0.number == seed.flight.number }) {
+            FlightsStore.shared.upsert(seed.flight)
+        }
+    }
 }
 #endif
 
