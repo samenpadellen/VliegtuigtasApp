@@ -46,6 +46,9 @@ struct VliegtuigtasApp: App {
                     // hoeft te verversen — de wacht bepaalt zelf wat eraan toe
                     // is, dus dit is goedkoop om bij elke start aan te roepen.
                     Task { await FlightWatcher.refreshDueFlights() }
+                    #if DEBUG
+                    seedDummyDataForTesting()
+                    #endif
                 }
                 // Ook bij terugkeren uit de achtergrond: je opent de app juist
                 // op het vliegveld, en dán wil je de actuele gate zien.
@@ -90,6 +93,43 @@ private struct RootView: View {
         .animation(.easeInOut(duration: 0.5), value: session.isOnboarded)
     }
 }
+
+#if DEBUG
+/// Tijdelijke testhulp om de tvOS-sync te verifiëren: vult Reizen/
+/// Vluchten via het echte opslag- en iCloud-pushpad, precies zoals een
+/// gebruiker dat via de wizard zou doen. Alleen actief in Debug-builds en
+/// alleen als de voorbeeldreis er nog niet al staat — bestaande (test)reizen
+/// blijven dus gewoon staan, dit voegt alleen toe.
+@MainActor
+private func seedDummyDataForTesting() {
+    let marker = "KL1595"
+    guard !FlightsStore.shared.flights.contains(where: { $0.number == marker }) else { return }
+
+    let cal = Calendar.current
+    let start = cal.date(byAdding: .day, value: 5, to: .now) ?? .now
+    let end = cal.date(byAdding: .day, value: 9, to: .now) ?? .now
+    let departure = cal.date(bySettingHour: 9, minute: 15, second: 0, of: start) ?? start
+
+    TripsStore.shared.upsert(Trip(
+        name: "Rome",
+        destination: "Rome, Italië",
+        startDate: start,
+        endDate: end,
+        luggageType: .both
+    ))
+
+    FlightsStore.shared.upsert(SavedFlightRecord(
+        number: "KL1595",
+        airlineName: "KLM",
+        airlineSlug: "klm",
+        departure: departure,
+        departureIata: "AMS",
+        departureAirport: "Amsterdam Schiphol",
+        arrivalIata: "FCO",
+        arrivalAirport: "Rome Fiumicino"
+    ))
+}
+#endif
 
 // MARK: - Startup sound
 
