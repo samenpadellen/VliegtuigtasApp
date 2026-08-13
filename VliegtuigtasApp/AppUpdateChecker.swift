@@ -102,19 +102,22 @@ enum WhatsNewContent {
     }
 
     static let notes: [String: [Highlight]] = [
-        "3.0.0": [
+        "3.1.0": [
             Highlight(icon: "tv.fill", tint: Theme.sky,
                       title: "Vliegtuigtas op je Apple TV",
-                      description: "Bekijk je eerstvolgende reis en vlucht op een eigen vertrekbord, thuis op de bank."),
-            Highlight(icon: "paintbrush.fill", tint: Theme.yellow,
-                      title: "Frisse, strakkere look",
-                      description: "Een nieuw kleurenpalet en opgeruimde schermen door de hele app heen."),
+                      description: "Een eigen vertrekbord thuis op de bank: je eerstvolgende reis en vlucht, met tips van Purser Pim die voorbij scrollen."),
+            Highlight(icon: "square.grid.2x2.fill", tint: Theme.yellow,
+                      title: "Nieuwe stickers voor iMessage",
+                      description: "Purser Pim en klapperbord-stickers als BOARDING en GOEDE REIS, rechtstreeks vanuit je berichten-app."),
             Highlight(icon: "star.fill", tint: Theme.orange,
                       title: "Reisverslag",
                       description: "Beoordeel je reis achteraf en bewaar je herinneringen bij je reispaspoort."),
             Highlight(icon: "camera.viewfinder", tint: Theme.green,
                       title: "Nauwkeuriger 3D-scannen",
-                      description: "LiDAR-scans van je tas zijn sneller en preciezer dan ooit.")
+                      description: "LiDAR-scans van je tas zijn sneller en preciezer dan ooit."),
+            Highlight(icon: "paintbrush.fill", tint: Theme.sky,
+                      title: "Frisse, strakkere look",
+                      description: "Een nieuw kleurenpalet en opgeruimde schermen door de hele app heen.")
         ]
     ]
 }
