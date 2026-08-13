@@ -393,28 +393,7 @@ struct PassportPreviewCard: View {
     var body: some View {
         Button(action: action) {
             HStack(spacing: 14) {
-                ZStack {
-                    RoundedRectangle(cornerRadius: 8)
-                        .fill(
-                            LinearGradient(
-                                colors: [
-                                    Color(red: 0.42, green: 0.10, blue: 0.17),
-                                    Color(red: 0.29, green: 0.06, blue: 0.11)
-                                ],
-                                startPoint: .topLeading, endPoint: .bottomTrailing
-                            )
-                        )
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 8)
-                                .strokeBorder(passportGold.opacity(0.35), lineWidth: 1)
-                        )
-                    Image(systemName: "airplane")
-                        .font(.system(size: 16, weight: .light))
-                        .foregroundStyle(passportGold)
-                        .rotationEffect(.degrees(-45))
-                }
-                .frame(width: 52, height: 68)
-                .shadow(color: .black.opacity(0.18), radius: 6, x: 0, y: 3)
+                sleeveIcon
 
                 VStack(alignment: .leading, spacing: 3) {
                     Text("Jouw reispaspoort")
@@ -434,6 +413,60 @@ struct PassportPreviewCard: View {
             .clipShape(RoundedRectangle(cornerRadius: 14))
         }
         .buttonStyle(.plain)
+    }
+
+    /// Leren sleeve met een hoekje van het paspoort erin — een suggestie
+    /// van "je hebt hier iets tastbaars zitten", in plaats van een vlak
+    /// icoontje. De kaart piept boven de sleeve uit, licht gedraaid, zoals
+    /// een kaart die net niet helemaal in zijn hoesje zit.
+    private var sleeveIcon: some View {
+        ZStack(alignment: .top) {
+            RoundedRectangle(cornerRadius: 8)
+                .fill(
+                    LinearGradient(
+                        colors: [
+                            Color(red: 0.62, green: 0.52, blue: 0.38),
+                            Color(red: 0.48, green: 0.39, blue: 0.28)
+                        ],
+                        startPoint: .topLeading, endPoint: .bottomTrailing
+                    )
+                )
+                .overlay(
+                    RoundedRectangle(cornerRadius: 8)
+                        .strokeBorder(style: StrokeStyle(lineWidth: 1, dash: [2, 2]))
+                        .foregroundStyle(.white.opacity(0.25))
+                        .padding(2)
+                )
+                .frame(width: 52, height: 50)
+                .offset(y: 18)
+                .shadow(color: .black.opacity(0.18), radius: 4, x: 0, y: 2)
+
+            RoundedRectangle(cornerRadius: 6)
+                .fill(
+                    LinearGradient(
+                        colors: [
+                            Color(red: 0.42, green: 0.10, blue: 0.17),
+                            Color(red: 0.29, green: 0.06, blue: 0.11)
+                        ],
+                        startPoint: .topLeading, endPoint: .bottomTrailing
+                    )
+                )
+                .overlay(
+                    RoundedRectangle(cornerRadius: 6)
+                        .strokeBorder(passportGold.opacity(0.4), lineWidth: 1)
+                )
+                .overlay(alignment: .top) {
+                    Image(systemName: "airplane")
+                        .font(.system(size: 13, weight: .light))
+                        .foregroundStyle(passportGold)
+                        .rotationEffect(.degrees(-45))
+                        .padding(.top, 7)
+                }
+                .frame(width: 38, height: 40)
+                .rotationEffect(.degrees(-4))
+                .shadow(color: .black.opacity(0.22), radius: 3, x: 0, y: 2)
+        }
+        .frame(width: 52, height: 68)
     }
 }
 
