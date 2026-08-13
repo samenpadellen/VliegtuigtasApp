@@ -1,4 +1,5 @@
 import SwiftUI
+import PhotosUI
 
 // MARK: - Bucket list
 
@@ -441,6 +442,8 @@ struct TravelPassportView: View {
     @EnvironmentObject private var session: UserSession
     @ObservedObject private var store = BucketListStore.shared
     @ObservedObject private var photoCache = CountryPhotoCache.shared
+    @ObservedObject private var passportPhoto = TravelPassportPhotoStore.shared
+    @State private var pickerItem: PhotosPickerItem?
     @State private var renderedImage: UIImage?
 
     /// Het meest tot de verbeelding sprekende bezochte land — wordt de
@@ -463,6 +466,12 @@ struct TravelPassportView: View {
     }
 
     @State private var isOpen = false
+
+    @MainActor
+    private func resnapshot() async {
+        try? await Task.sleep(nanoseconds: 100_000_000)
+        renderedImage = passportCard.snapshotImage()
+    }
 
     var body: some View {
         NavigationStack {
@@ -489,6 +498,17 @@ struct TravelPassportView: View {
                 }
                 try? await Task.sleep(nanoseconds: 100_000_000)
                 renderedImage = passportCard.snapshotImage()
+            }
+            .onChange(of: pickerItem) { _, newItem in
+                guard let newItem else { return }
+                Task {
+                    if let data = try? await newItem.loadTransferable(type: Data.self),
+                       let image = UIImage(data: data) {
+                        passportPhoto.setPhoto(image)
+                        await resnapshot()
+                    }
+                    pickerItem = nil
+                }
             }
         }
     }
@@ -813,7 +833,19 @@ struct TravelPassportView: View {
     /// een echte cover in plaats van een vlakke kleurverloop-kaart.
     private var heroHeader: some View {
         ZStack(alignment: .bottom) {
-            if let photoUrl = heroPhoto?.url {
+            if let customImage = passportPhoto.customImage {
+                Image(uiImage: customImage)
+                    .resizable()
+                    .scaledToFill()
+                    .frame(height: 280)
+                    .clipped()
+                    .allowsHitTesting(false)
+                LinearGradient(
+                    colors: [.clear, .black.opacity(0.35), .black.opacity(0.75)],
+                    startPoint: .top, endPoint: .bottom
+                )
+                .frame(height: 280)
+            } else if let photoUrl = heroPhoto?.url {
                 AuthorisedImage(urlString: photoUrl, fill: true)
                     .frame(height: 280)
                     .clipped()
@@ -852,7 +884,8 @@ struct TravelPassportView: View {
             .padding(.bottom, 20)
             .padding(.horizontal, 16)
 
-            if let photo = heroPhoto,
+            if passportPhoto.customImage == nil,
+               let photo = heroPhoto,
                let authorUrl = URL(string: photo.authorProfileUrl),
                let pexelsUrl = URL(string: "https://www.pexels.com") {
                 HStack(spacing: 3) {
@@ -869,6 +902,42 @@ struct TravelPassportView: View {
                 .padding(10)
                 .frame(maxWidth: .infinity, alignment: .trailing)
                 .frame(maxHeight: .infinity, alignment: .top)
+            }
+
+            photoEditControls
+                .padding(10)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .frame(maxHeight: .infinity, alignment: .top)
+        }
+    }
+
+    /// Eigen achtergrondfoto kiezen — of, als er al een is, weer terugzetten
+    /// naar de automatisch gekozen bestemmingsfoto. Bewust een klein, stil
+    /// knopje linksboven: dit is een verrijking, geen hoofdactie.
+    private var photoEditControls: some View {
+        HStack(spacing: 8) {
+            PhotosPicker(selection: $pickerItem, matching: .images) {
+                Image(systemName: "camera.fill")
+                    .font(.system(size: 13, weight: .semibold))
+                    .foregroundStyle(.white)
+                    .frame(width: 30, height: 30)
+                    .background(.black.opacity(0.35), in: Circle())
+            }
+            .accessibilityLabel("Eigen achtergrondfoto kiezen")
+
+            if passportPhoto.customImage != nil {
+                Button {
+                    UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                    passportPhoto.reset()
+                    Task { await resnapshot() }
+                } label: {
+                    Image(systemName: "arrow.uturn.backward")
+                        .font(.system(size: 13, weight: .semibold))
+                        .foregroundStyle(.white)
+                        .frame(width: 30, height: 30)
+                        .background(.black.opacity(0.35), in: Circle())
+                }
+                .accessibilityLabel("Terug naar automatische foto")
             }
         }
     }
@@ -908,6 +977,42 @@ struct TravelPassportView: View {
         .padding(12)
         .background(.white.opacity(0.12))
         .clipShape(RoundedRectangle(cornerRadius: 14))
+    }
+}
+
+// MARK: - Eigen achtergrondfoto voor het reispaspoort
+
+/// Bewaart een zelfgekozen foto als achtergrond van de paspoortkaart, in
+/// plaats van de automatisch gekozen bestemmingsfoto — zodat het kaartje
+/// persoonlijk genoeg aanvoelt om ook echt op social media te posten.
+/// Bewust op schijf (niet UserDefaults): een volle-resolutie foto is te
+/// groot voor UserDefaults' praktische grens.
+@MainActor
+final class TravelPassportPhotoStore: ObservableObject {
+    static let shared = TravelPassportPhotoStore()
+
+    @Published private(set) var customImage: UIImage?
+
+    private var fileURL: URL {
+        FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+            .appendingPathComponent("vt_passport_photo.jpg")
+    }
+
+    private init() {
+        if let data = try? Data(contentsOf: fileURL) {
+            customImage = UIImage(data: data)
+        }
+    }
+
+    func setPhoto(_ image: UIImage) {
+        guard let data = image.jpegData(compressionQuality: 0.88) else { return }
+        try? data.write(to: fileURL, options: .atomic)
+        customImage = image
+    }
+
+    func reset() {
+        try? FileManager.default.removeItem(at: fileURL)
+        customImage = nil
     }
 }
 
