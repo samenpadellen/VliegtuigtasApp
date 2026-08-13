@@ -9,6 +9,7 @@ import SwiftUI
 /// standaardicoon (dat kan nooit expliciet als "alternate" gezet worden).
 enum AppIconOption: String, CaseIterable, Identifiable {
     case standaard
+    case wit
     case pim
     case flap
     case vertrek
@@ -21,6 +22,7 @@ enum AppIconOption: String, CaseIterable, Identifiable {
     var iconName: String? {
         switch self {
         case .standaard: return nil
+        case .wit:       return "AppIcon-White"
         case .pim:       return "AppIcon-Pim"
         case .flap:      return "AppIcon-Flap"
         case .vertrek:   return "AppIcon-Vertrek"
@@ -36,6 +38,7 @@ enum AppIconOption: String, CaseIterable, Identifiable {
     var previewAsset: String {
         switch self {
         case .standaard: return "AppIconPreviewDefault"
+        case .wit:       return "AppIconPreviewWhite"
         case .pim:       return "AppIconPreviewPim"
         case .flap:      return "AppIconPreviewFlap"
         case .vertrek:   return "AppIconPreviewVertrek"
@@ -48,6 +51,7 @@ enum AppIconOption: String, CaseIterable, Identifiable {
     var title: String {
         switch self {
         case .standaard: return "Standaard"
+        case .wit:       return "Puur wit"
         case .pim:       return "Purser Pim"
         case .flap:      return "Vertrekbord"
         case .vertrek:   return "Vertrek"
@@ -60,6 +64,7 @@ enum AppIconOption: String, CaseIterable, Identifiable {
     var subtitle: String {
         switch self {
         case .standaard: return "Het originele Vliegtuigtas-icoon"
+        case .wit:       return "Strak en minimaal, zoals veel apps"
         case .pim:       return "De pet van je bagageassistent"
         case .flap:      return "Solari-klepjes, zoals op Home"
         case .vertrek:   return "Geel bord richting vertrek"
