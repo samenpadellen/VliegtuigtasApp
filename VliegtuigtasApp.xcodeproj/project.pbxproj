@@ -42,6 +42,8 @@
 		AAW00001 /* VliegtuigtasWidgets.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAW10001 /* VliegtuigtasWidgets.swift */; };
 		TRW00001 /* TripCountdownWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = TRW10001 /* TripCountdownWidget.swift */; };
 		AAW00002 /* Vliegtuigtas Widgets.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = AAW10003 /* Vliegtuigtas Widgets.appex */; settings = {ATTRIBUTES = (RemoveHeaderOnCopy, ); }; };
+		STK00001 /* Stickers.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = STK10002 /* Stickers.xcassets */; };
+		STK00002 /* Vliegtuigtas Stickers.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = STK10003 /* Vliegtuigtas Stickers.appex */; settings = {ATTRIBUTES = (RemoveHeaderOnCopy, ); }; };
 		AB61B0FF462FD1FB680C4E54 /* content.js in Resources */ = {isa = PBXBuildFile; fileRef = D21544F7D8CDB9643A45CBB3 /* content.js */; };
 		AC000001 /* BagScannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC100001 /* BagScannerView.swift */; };
 		ACL00001 /* VliegtuigtasClipApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACL10001 /* VliegtuigtasClipApp.swift */; };
@@ -159,6 +161,13 @@
 			remoteGlobalIDString = AAWTGT01;
 			remoteInfo = "Vliegtuigtas Widgets";
 		};
+		STKPRX01 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = AAPROJECT1 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = STKTGT01;
+			remoteInfo = "Vliegtuigtas Stickers";
+		};
 		ACLPRX01 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = AAPROJECT1 /* Project object */;
@@ -191,6 +200,7 @@
 			files = (
 				BE744C57DCD58610FDB56695 /* Vliegtuigtas Extension.appex in Embed Foundation Extensions */,
 				AAW00002 /* Vliegtuigtas Widgets.appex in Embed Foundation Extensions */,
+				STK00002 /* Vliegtuigtas Stickers.appex in Embed Foundation Extensions */,
 			);
 			name = "Embed Foundation Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -273,6 +283,9 @@
 		TRW10001 /* TripCountdownWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TripCountdownWidget.swift; sourceTree = "<group>"; };
 		AAW10002 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		AAW10003 /* Vliegtuigtas Widgets.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "Vliegtuigtas Widgets.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
+		STK10001 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		STK10002 /* Stickers.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Stickers.xcassets; sourceTree = "<group>"; };
+		STK10003 /* Vliegtuigtas Stickers.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "Vliegtuigtas Stickers.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
 		AAW10004 /* VliegtuigtasWidgets.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = VliegtuigtasWidgets.entitlements; sourceTree = "<group>"; };
 		AC100001 /* BagScannerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BagScannerView.swift; sourceTree = "<group>"; };
 		ACL10001 /* VliegtuigtasClipApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VliegtuigtasClipApp.swift; sourceTree = "<group>"; };
@@ -403,6 +416,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		STKPH002 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -445,6 +465,7 @@
 				AAGRP002 /* Products */,
 				0FDF3B46CEF837A2E0680C07 /* VliegtuigtasExtension */,
 				AAWGRP01 /* VliegtuigtasWidgets */,
+				STKGRP01 /* VliegtuigtasStickers */,
 				AWGRP01 /* VliegtuigtasWatch */,
 				AWWGRP01 /* VliegtuigtasWatchWidgets */,
 				ACLGRP01 /* VliegtuigtasClip */,
@@ -532,6 +553,7 @@
 				AAPROD001 /* Vliegtuigtas.app */,
 				1777E1FA4F444DC27257F0E8 /* Vliegtuigtas Extension.appex */,
 				AAW10003 /* Vliegtuigtas Widgets.appex */,
+				STK10003 /* Vliegtuigtas Stickers.appex */,
 				AWPROD01 /* Vliegtuigtas Watch.app */,
 				ACLPROD1 /* Vliegtuigtas Clip.app */,
 				AWWPROD1 /* Vliegtuigtas Watch Widgets.appex */,
@@ -539,6 +561,15 @@
 				ATVPROD1 /* Vliegtuigtas TV.app */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		STKGRP01 /* VliegtuigtasStickers */ = {
+			isa = PBXGroup;
+			children = (
+				STK10002 /* Stickers.xcassets */,
+				STK10001 /* Info.plist */,
+			);
+			path = VliegtuigtasStickers;
 			sourceTree = "<group>";
 		};
 		AAWGRP01 /* VliegtuigtasWidgets */ = {
@@ -654,6 +685,7 @@
 			dependencies = (
 				56539FABA16615F638E56135 /* PBXTargetDependency */,
 				AAWDEP01 /* PBXTargetDependency */,
+				STKDEP01 /* PBXTargetDependency */,
 				AWDEP01 /* PBXTargetDependency */,
 				ACLDEP01 /* PBXTargetDependency */,
 			);
@@ -678,6 +710,23 @@
 			productName = "Vliegtuigtas Widgets";
 			productReference = AAW10003 /* Vliegtuigtas Widgets.appex */;
 			productType = "com.apple.product-type.app-extension";
+		};
+		STKTGT01 /* Vliegtuigtas Stickers */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = STKCFGL1 /* Build configuration list for PBXNativeTarget "Vliegtuigtas Stickers" */;
+			buildPhases = (
+				STKPH001 /* Sources */,
+				STKPH002 /* Frameworks */,
+				STKPH003 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "Vliegtuigtas Stickers";
+			productName = "Vliegtuigtas Stickers";
+			productReference = STK10003 /* Vliegtuigtas Stickers.appex */;
+			productType = "com.apple.product-type.app-extension.messages-sticker-pack";
 		};
 		ACLTGT01 /* Vliegtuigtas Clip */ = {
 			isa = PBXNativeTarget;
@@ -798,6 +847,7 @@
 				AATARGET1 /* Vliegtuigtas */,
 				1CA59C60E1B2ACA8433200B3 /* Vliegtuigtas Extension */,
 				AAWTGT01 /* Vliegtuigtas Widgets */,
+				STKTGT01 /* Vliegtuigtas Stickers */,
 				AWTGT01 /* Vliegtuigtas Watch */,
 				ACLTGT01 /* Vliegtuigtas Clip */,
 				AWWTGT01 /* Vliegtuigtas Watch Widgets */,
@@ -892,6 +942,14 @@
 				FRG_TV /* Frutiger.ttf in Resources */,
 				FBL_TV /* Frutiger_bold.ttf in Resources */,
 				ATV00004 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		STKPH003 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				STK00001 /* Stickers.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1052,6 +1110,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		STKPH001 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -1067,6 +1132,12 @@
 			name = "Vliegtuigtas Widgets";
 			target = AAWTGT01 /* Vliegtuigtas Widgets */;
 			targetProxy = AAWPRX01 /* PBXContainerItemProxy */;
+		};
+		STKDEP01 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = "Vliegtuigtas Stickers";
+			target = STKTGT01 /* Vliegtuigtas Stickers */;
+			targetProxy = STKPRX01 /* PBXContainerItemProxy */;
 		};
 		ACLDEP01 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -1690,6 +1761,54 @@
 			};
 			name = Release;
 		};
+		STKCFG01 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 300;
+				DEVELOPMENT_TEAM = FDH27DW6H2;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = VliegtuigtasStickers/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = Vliegtuigtas;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 3.0.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.vliegtuigtas.app.Stickers;
+				PRODUCT_NAME = "Vliegtuigtas Stickers";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		STKCFG02 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 300;
+				DEVELOPMENT_TEAM = FDH27DW6H2;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = VliegtuigtasStickers/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = Vliegtuigtas;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 3.0.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.vliegtuigtas.app.Stickers;
+				PRODUCT_NAME = "Vliegtuigtas Stickers";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -1770,6 +1889,15 @@
 			buildConfigurations = (
 				ATVCFG01 /* Debug */,
 				ATVCFG02 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		STKCFGL1 /* Build configuration list for PBXNativeTarget "Vliegtuigtas Stickers" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				STKCFG01 /* Debug */,
+				STKCFG02 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
