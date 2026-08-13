@@ -156,6 +156,7 @@ struct ContentView: View {
     // een laadspinner bij elke tabwissel, ook als de data al bekend was.
     @StateObject private var airlineStore = AirlineStore()
     @StateObject private var bagStore = BagStore()
+    @StateObject private var updateChecker = AppUpdateChecker.shared
 
     var body: some View {
         tabView
@@ -163,6 +164,44 @@ struct ContentView: View {
             .environmentObject(nav)
             .environmentObject(airlineStore)
             .environmentObject(bagStore)
+            // "Wat is er nieuw" na een update, of anders — stil — een
+            // check of de App Store een nieuwere versie heeft. Nooit
+            // allebei tegelijk: net bijgewerkt zijn en al weer achterlopen
+            // kan in theorie, maar is geen twee schermen waard.
+            .task {
+                updateChecker.checkForUpdateNotes()
+                if !updateChecker.showWhatsNew {
+                    await updateChecker.checkForAvailableUpdate()
+                }
+            }
+            .fullScreenCover(isPresented: Binding(
+                get: { updateChecker.showWhatsNew },
+                set: { if !$0 { updateChecker.dismissWhatsNew() } }
+            )) {
+                if let highlights = WhatsNewContent.notes[updateChecker.currentVersion] {
+                    WhatsNewView(
+                        version: updateChecker.currentVersion,
+                        highlights: highlights,
+                        onDismiss: { updateChecker.dismissWhatsNew() }
+                    )
+                }
+            }
+            .sheet(isPresented: Binding(
+                get: { updateChecker.updateAvailableVersion != nil },
+                set: { if !$0 { updateChecker.dismissUpdateAvailable() } }
+            )) {
+                if let version = updateChecker.updateAvailableVersion {
+                    UpdateAvailableView(
+                        version: version,
+                        onUpdate: {
+                            updateChecker.openAppStore()
+                            updateChecker.dismissUpdateAvailable()
+                        },
+                        onDismiss: { updateChecker.dismissUpdateAvailable() }
+                    )
+                    .presentationDetents([.medium])
+                }
+            }
             // Lichte tik-feedback bij elke tabwissel — een kleine, directe
             // microanimatie op het moment dat je "naar een andere pagina gaat",
             // los van de overgang van de pagina-inhoud zelf.

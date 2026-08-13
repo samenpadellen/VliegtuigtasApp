@@ -81,6 +81,8 @@
 		APRT0001 /* AirportsInformationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = APRT1001 /* AirportsInformationView.swift */; };
 		APST0001 /* AirportsStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = APST1001 /* AirportsStore.swift */; };
 		AS000001 /* SplitFlapBoard.swift in Sources */ = {isa = PBXBuildFile; fileRef = AS100001 /* SplitFlapBoard.swift */; };
+		AUC00001 /* AppUpdateChecker.swift in Sources */ = {isa = PBXBuildFile; fileRef = AUC10001 /* AppUpdateChecker.swift */; };
+		AWN00001 /* WhatsNewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AWN10001 /* WhatsNewView.swift */; };
 		AVN00001 /* VliegtuigtasVisionApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = AVN10001 /* VliegtuigtasVisionApp.swift */; };
 		AVN00002 /* VisionContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AVN10002 /* VisionContentView.swift */; };
 		AVN00003 /* BagVolumeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AVN10003 /* BagVolumeView.swift */; };
@@ -306,6 +308,8 @@
 		APRT1001 /* AirportsInformationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AirportsInformationView.swift; sourceTree = "<group>"; };
 		APST1001 /* AirportsStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AirportsStore.swift; sourceTree = "<group>"; };
 		AS100001 /* SplitFlapBoard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplitFlapBoard.swift; sourceTree = "<group>"; };
+		AUC10001 /* AppUpdateChecker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppUpdateChecker.swift; sourceTree = "<group>"; };
+		AWN10001 /* WhatsNewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WhatsNewView.swift; sourceTree = "<group>"; };
 		AVN10001 /* VliegtuigtasVisionApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VliegtuigtasVisionApp.swift; sourceTree = "<group>"; };
 		AVN10002 /* VisionContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisionContentView.swift; sourceTree = "<group>"; };
 		AVN10003 /* BagVolumeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BagVolumeView.swift; sourceTree = "<group>"; };
@@ -490,6 +494,8 @@
 				REMS1001 /* RemindersService.swift */,
 				AP100001 /* AppIntentsSupport.swift */,
 				AS100001 /* SplitFlapBoard.swift */,
+				AUC10001 /* AppUpdateChecker.swift */,
+				AWN10001 /* WhatsNewView.swift */,
 				AC100001 /* BagScannerView.swift */,
 				AG100001 /* BaggageGuideView.swift */,
 				AY100001 /* CloudSync.swift */,
@@ -927,6 +933,8 @@
 				REMS0001 /* RemindersService.swift in Sources */,
 				AP000001 /* AppIntentsSupport.swift in Sources */,
 				AS000001 /* SplitFlapBoard.swift in Sources */,
+				AUC00001 /* AppUpdateChecker.swift in Sources */,
+				AWN00001 /* WhatsNewView.swift in Sources */,
 				AC000001 /* BagScannerView.swift in Sources */,
 				AG000001 /* BaggageGuideView.swift in Sources */,
 				AY000001 /* CloudSync.swift in Sources */,
