@@ -11,7 +11,6 @@ enum AppIconOption: String, CaseIterable, Identifiable {
     case standaard
     case wit
     case pim
-    case flap
     case vertrek
     case bagage
     case gate
@@ -24,7 +23,6 @@ enum AppIconOption: String, CaseIterable, Identifiable {
         case .standaard: return nil
         case .wit:       return "AppIcon-White"
         case .pim:       return "AppIcon-Pim"
-        case .flap:      return "AppIcon-Flap"
         case .vertrek:   return "AppIcon-Vertrek"
         case .bagage:    return "AppIcon-Bagage"
         case .gate:      return "AppIcon-Gate"
@@ -40,7 +38,6 @@ enum AppIconOption: String, CaseIterable, Identifiable {
         case .standaard: return "AppIconPreviewDefault"
         case .wit:       return "AppIconPreviewWhite"
         case .pim:       return "AppIconPreviewPim"
-        case .flap:      return "AppIconPreviewFlap"
         case .vertrek:   return "AppIconPreviewVertrek"
         case .bagage:    return "AppIconPreviewBagage"
         case .gate:      return "AppIconPreviewGate"
@@ -53,7 +50,6 @@ enum AppIconOption: String, CaseIterable, Identifiable {
         case .standaard: return "Standaard"
         case .wit:       return "Puur wit"
         case .pim:       return "Purser Pim"
-        case .flap:      return "Vertrekbord"
         case .vertrek:   return "Vertrek"
         case .bagage:    return "Bagagehal"
         case .gate:      return "Gate 21"
@@ -66,7 +62,6 @@ enum AppIconOption: String, CaseIterable, Identifiable {
         case .standaard: return "Het originele Vliegtuigtas-icoon"
         case .wit:       return "Strak en minimaal, zoals veel apps"
         case .pim:       return "De pet van je bagageassistent"
-        case .flap:      return "Solari-klepjes, zoals op Home"
         case .vertrek:   return "Geel bord richting vertrek"
         case .bagage:    return "Blauw bord van de bagagehal"
         case .gate:      return "Bijna instappen"

@@ -42,6 +42,13 @@ final class AppUpdateChecker: ObservableObject {
         showWhatsNew = false
     }
 
+    /// Handmatig geopend vanuit de Meer-pagina — toont hetzelfde scherm als
+    /// na een update, ongeacht of je het al gezien hebt. Raakt het "laatst
+    /// geziene versie"-bijhouden niet aan.
+    func showWhatsNewManually() {
+        showWhatsNew = true
+    }
+
     /// Stil op de achtergrond; bij een netwerkfout, een niet-gevonden App
     /// Store-listing, of als je al up-to-date bent, gebeurt er gewoon niets.
     func checkForAvailableUpdate() async {

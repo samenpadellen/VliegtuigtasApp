@@ -88,7 +88,7 @@ enum MoreDestination: String, Identifiable, Hashable, CaseIterable {
 }
 
 enum MoreGroup: String, CaseIterable {
-    case airport, travel, account
+    case travel, airport, account
 
     var title: String {
         switch self {
@@ -331,6 +331,9 @@ struct MoreHubView: View {
                             }
                         }
                     }
+                    if WhatsNewContent.notes[AppUpdateChecker.shared.currentVersion] != nil {
+                        VersionInfoCard { AppUpdateChecker.shared.showWhatsNewManually() }
+                    }
                     awardBadge
                 }
                 .frame(maxWidth: Theme.contentMaxWidth)
@@ -488,5 +491,46 @@ private struct MoreTile: View {
         }
         .buttonStyle(.pressableCard)
         .accessibilityLabel("\(item.title). \(item.subtitle)")
+    }
+}
+
+/// Toont het huidige versienummer onderaan Meer, met een tik terug naar
+/// "wat is er nieuw" — dat scherm verschijnt anders maar één keer
+/// automatisch (vlak na een update), dit is de blijvende, vindbare plek
+/// om het nog eens terug te lezen.
+private struct VersionInfoCard: View {
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            HStack(spacing: 12) {
+                ZStack {
+                    Circle().fill(Theme.inkGradient)
+                    Image(systemName: "sparkles")
+                        .font(.system(size: 16, weight: .semibold))
+                        .foregroundStyle(Theme.yellow)
+                }
+                .frame(width: 44, height: 44)
+
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Versie \(AppUpdateChecker.shared.currentVersion)")
+                        .font(.frutiger(size: 14, weight: .bold))
+                        .foregroundStyle(Theme.textPrimary)
+                    Text("Bekijk wat er nieuw is")
+                        .font(.frutiger(size: 12))
+                        .foregroundStyle(Theme.textSecondary)
+                }
+
+                Spacer(minLength: 0)
+                Image(systemName: "chevron.right")
+                    .font(.system(size: 12, weight: .semibold))
+                    .foregroundStyle(Theme.textSecondary)
+            }
+            .padding(14)
+            .background(Color(.systemBackground))
+            .clipShape(RoundedRectangle(cornerRadius: 14))
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel("Versie \(AppUpdateChecker.shared.currentVersion). Bekijk wat er nieuw is.")
     }
 }
