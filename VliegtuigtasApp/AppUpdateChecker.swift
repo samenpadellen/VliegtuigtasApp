@@ -125,6 +125,17 @@ enum WhatsNewContent {
             Highlight(icon: "paintbrush.fill", tint: Theme.sky,
                       title: "Frisse, strakkere look",
                       description: "Een nieuw kleurenpalet en opgeruimde schermen door de hele app heen.")
+        ],
+        "3.1.1": [
+            Highlight(icon: "photo.fill", tint: Theme.sky,
+                      title: "Eigen foto voor je reispaspoort",
+                      description: "Zet je eigen foto achter de statistiekenkaart en deel 'm trots op social media."),
+            Highlight(icon: "paintbrush.fill", tint: Theme.yellow,
+                      title: "Nieuw appicoon: Puur wit",
+                      description: "Een strak wit icoon met alleen het Vliegtuigtas-silhouet, naast de bestaande varianten."),
+            Highlight(icon: "checkmark.seal.fill", tint: Theme.green,
+                      title: "Kleinere verbeteringen",
+                      description: "De iMessage-stickers installeren nu correct, en Meer is overzichtelijker ingedeeld.")
         ]
     ]
 }
