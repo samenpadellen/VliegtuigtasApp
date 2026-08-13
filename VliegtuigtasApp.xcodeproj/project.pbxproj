@@ -1764,12 +1764,14 @@
 		STKCFG01 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = "iMessage App Icon";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 310;
 				DEVELOPMENT_TEAM = FDH27DW6H2;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = VliegtuigtasStickers/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = Vliegtuigtas;
+				INFOPLIST_KEY_NSStickerSharingLevel = OS;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1788,12 +1790,14 @@
 		STKCFG02 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = "iMessage App Icon";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 310;
 				DEVELOPMENT_TEAM = FDH27DW6H2;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = VliegtuigtasStickers/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = Vliegtuigtas;
+				INFOPLIST_KEY_NSStickerSharingLevel = OS;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
