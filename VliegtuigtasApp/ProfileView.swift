@@ -62,8 +62,8 @@ struct ProfileView: View {
                 }
                 .frame(maxWidth: Theme.contentMaxWidth)
                 .frame(maxWidth: .infinity)
-                .padding(16)
-                .padding(.bottom, 32)
+                .padding(Theme.Spacing.base)
+                .padding(.bottom, Theme.Spacing.xl)
             }
             .background(Color(.systemGroupedBackground))
             .navigationTitle("Mijn profiel")
@@ -133,7 +133,7 @@ struct ProfileView: View {
                 tagHeader
                 tagBody
                 TagPerforation()
-                    .padding(.horizontal, 18)
+                    .padding(.horizontal, Theme.Spacing.base)
                 personalStubContent
             }
         }
@@ -180,10 +180,10 @@ struct ProfileView: View {
                 .kerning(1.5)
         }
         .foregroundStyle(Theme.red)
-        .padding(.horizontal, 18)
-        .padding(.vertical, 12)
+        .padding(.horizontal, Theme.Spacing.base)
+        .padding(.vertical, Theme.Spacing.md)
         .overlay(
-            RoundedRectangle(cornerRadius: 12)
+            RoundedRectangle(cornerRadius: Theme.Radius.md)
                 .strokeBorder(Theme.red, lineWidth: 2.5)
         )
         .background(Color(.systemBackground).opacity(0.001)) // houdt hit-testing/animatie soepel
@@ -210,13 +210,13 @@ struct ProfileView: View {
             }
             .font(.frutiger(size: 9, weight: .bold))
             .foregroundStyle(Theme.navy)
-            .padding(.horizontal, 10)
-            .padding(.vertical, 5)
+            .padding(.horizontal, Theme.Spacing.sm)
+            .padding(.vertical, Theme.Spacing.xs)
             .background(TagPalette.accent)
             .clipShape(Capsule())
         }
-        .padding(.horizontal, 18)
-        .padding(.vertical, 14)
+        .padding(.horizontal, Theme.Spacing.base)
+        .padding(.vertical, Theme.Spacing.md)
         .background(Theme.inkGradient)
     }
 
@@ -243,7 +243,7 @@ struct ProfileView: View {
                 Image(systemName: "airplane")
                     .font(.system(size: 12, weight: .semibold))
                     .foregroundStyle(Theme.sky)
-                    .padding(.top, 12)
+                    .padding(.top, Theme.Spacing.md)
                 TagField(label: "TO", value: toCode)
                 TagField(label: "FLIGHT", value: nextFlight?.number.uppercased() ?? "—")
             }
@@ -266,7 +266,7 @@ struct ProfileView: View {
                             Image(systemName: "checkmark.seal.fill")
                                 .font(.system(size: 14))
                                 .foregroundStyle(Theme.green)
-                                .padding(.leading, 8)
+                                .padding(.leading, Theme.Spacing.sm)
                                 .background(Color(.secondarySystemGroupedBackground))
                                 .accessibilityHidden(true)
                         }
@@ -284,7 +284,7 @@ struct ProfileView: View {
                 }
             }
         }
-        .padding(18)
+        .padding(Theme.Spacing.base)
     }
 
     // MARK: - PAX-strook (persoonsgegevens onder de perforatie)
@@ -321,14 +321,14 @@ struct ProfileView: View {
                     .printed(9, weight: .bold).kerning(1)
             }
             .foregroundStyle(Theme.navy)
-            .padding(.horizontal, 12)
-            .padding(.vertical, 7)
+            .padding(.horizontal, Theme.Spacing.md)
+            .padding(.vertical, Theme.Spacing.sm)
             .frame(maxWidth: .infinity)
             .background(Theme.sky.opacity(0.12))
-            .clipShape(RoundedRectangle(cornerRadius: 10))
-            .padding(.top, 2)
+            .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.sm))
+            .padding(.top, Theme.Spacing.xxs)
         }
-        .padding(18)
+        .padding(Theme.Spacing.base)
     }
 
     // MARK: - Mijn tassen & koffers
@@ -345,7 +345,7 @@ struct ProfileView: View {
                             .foregroundStyle(Theme.yellow)
                             .frame(width: 40, height: 40)
                             .background(Theme.yellow.opacity(0.15))
-                            .clipShape(RoundedRectangle(cornerRadius: 12))
+                            .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
                         VStack(alignment: .leading, spacing: 2) {
                             Text(bag.name)
                                 .font(.frutiger(size: 15, weight: .bold))
@@ -360,10 +360,10 @@ struct ProfileView: View {
                             .font(.system(size: 12, weight: .semibold))
                             .foregroundStyle(Theme.textSecondary)
                     }
-                    .padding(12)
+                    .padding(Theme.Spacing.md)
                     .background(Color(.systemBackground))
-                    .clipShape(RoundedRectangle(cornerRadius: 14))
-                    .contentShape(RoundedRectangle(cornerRadius: 14))
+                    .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
+                    .contentShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
                 }
                 .buttonStyle(.plain)
             }
@@ -375,10 +375,10 @@ struct ProfileView: View {
                     Label("Toevoegen", systemImage: "plus")
                         .font(.frutiger(size: 13, weight: .semibold))
                         .frame(maxWidth: .infinity)
-                        .padding(.vertical, 11)
+                        .padding(.vertical, Theme.Spacing.md)
                         .background(Theme.navy.opacity(0.07))
                         .foregroundStyle(Theme.navy)
-                        .clipShape(RoundedRectangle(cornerRadius: 12))
+                        .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
                 }
                 .buttonStyle(.plain)
 
@@ -389,10 +389,10 @@ struct ProfileView: View {
                         Label("Past dit?", systemImage: "checkmark.shield.fill")
                             .font(.frutiger(size: 13, weight: .semibold))
                             .frame(maxWidth: .infinity)
-                            .padding(.vertical, 11)
+                            .padding(.vertical, Theme.Spacing.md)
                             .background(Theme.inkGradient)
                             .foregroundStyle(.white)
-                            .clipShape(RoundedRectangle(cornerRadius: 12))
+                            .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
                     }
                     .buttonStyle(.plain)
                 }
@@ -423,12 +423,12 @@ struct ProfileView: View {
                     ? "Beschikbaar"
                     : "Toestel beschikt niet over de vereiste hardware"
             )
-            Divider().padding(.leading, 44)
+            Divider().padding(.leading, Theme.Spacing.xxl)
             pimFeatureRow
         }
-        .padding(.horizontal, 16)
+        .padding(.horizontal, Theme.Spacing.base)
         .background(Color(.systemBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 16))
+        .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
     }
 
     @ViewBuilder
@@ -471,7 +471,7 @@ struct ProfileView: View {
                 .font(.system(size: 15))
                 .foregroundStyle(available ? Theme.green : Theme.textSecondary)
         }
-        .padding(.vertical, 12)
+        .padding(.vertical, Theme.Spacing.md)
     }
 
     // MARK: - Bouwstenen
@@ -490,7 +490,7 @@ struct ProfileView: View {
                 .frame(height: 1)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(.top, 4)
+        .padding(.top, Theme.Spacing.xs)
     }
 
     /// Laat zien hoe je bent ingelogd — via Sign in with Apple of met een
@@ -513,9 +513,9 @@ struct ProfileView: View {
             }
             Spacer()
         }
-        .padding(14)
+        .padding(Theme.Spacing.md)
         .background(Color(.systemBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 14))
+        .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
     }
 
     private var logoutButton: some View {
@@ -526,12 +526,12 @@ struct ProfileView: View {
                 .font(.frutiger(size: 15, weight: .semibold))
                 .foregroundStyle(Theme.red)
                 .frame(maxWidth: .infinity)
-                .padding(.vertical, 14)
+                .padding(.vertical, Theme.Spacing.base)
                 .background(Color(.systemBackground))
-                .clipShape(RoundedRectangle(cornerRadius: 16))
+                .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
         }
         .buttonStyle(.plain)
-        .padding(.top, 8)
+        .padding(.top, Theme.Spacing.sm)
         .confirmationDialog(
             "Uitloggen?",
             isPresented: $showLogoutConfirm,
@@ -562,7 +562,7 @@ struct ProfileView: View {
                     .foregroundStyle(Theme.textSecondary)
             }
             .frame(maxWidth: .infinity)
-            .padding(.vertical, 12)
+            .padding(.vertical, Theme.Spacing.md)
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
@@ -675,22 +675,22 @@ struct ProfileEditorSheet: View {
                                 .fixedSize(horizontal: false, vertical: true)
                         }
                     }
-                    .padding(14)
+                    .padding(Theme.Spacing.md)
                     .background(Color(.secondarySystemGroupedBackground))
-                    .clipShape(RoundedRectangle(cornerRadius: 12))
+                    .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
 
                     Button(action: save) {
                         Text("Opslaan")
                             .font(.frutiger(size: 16, weight: .semibold))
                             .frame(maxWidth: .infinity)
-                            .padding(.vertical, 15)
+                            .padding(.vertical, Theme.Spacing.base)
                             .background(Theme.inkGradient)
                             .foregroundStyle(.white)
-                            .clipShape(RoundedRectangle(cornerRadius: 14))
+                            .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
                     }
                     .buttonStyle(.plain)
                 }
-                .padding(18)
+                .padding(Theme.Spacing.base)
             }
             .background(Color(.systemGroupedBackground))
             .navigationTitle("Mijn gegevens")
@@ -722,9 +722,9 @@ struct ProfileEditorSheet: View {
             .textInputAutocapitalization(autocaps)
             .autocorrectionDisabled()
             .font(.frutiger(size: 15))
-            .padding(13)
+            .padding(Theme.Spacing.md)
             .background(Color(.secondarySystemGroupedBackground))
-            .clipShape(RoundedRectangle(cornerRadius: 12))
+            .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
     }
 
     private func save() {
@@ -774,7 +774,7 @@ struct AccountRequiredView: View {
                         .foregroundStyle(Theme.yellow)
                         .frame(width: 44, height: 44)
                         .background(.white.opacity(0.14))
-                        .clipShape(RoundedRectangle(cornerRadius: 12))
+                        .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
                     Text(title)
                         .font(.frutiger(size: 18, weight: .bold))
                         .foregroundStyle(.white)
@@ -792,10 +792,10 @@ struct AccountRequiredView: View {
                     benefit("Purser Pim kent jouw tas en vlucht")
                     benefit("Gratis, zonder wachtwoord, in 10 seconden geregeld")
                 }
-                .padding(.top, 2)
+                .padding(.top, Theme.Spacing.xxs)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(18)
+            .padding(Theme.Spacing.base)
             .background(Theme.inkGradient)
 
             // Formulier op wit: twee velden en klaar. Na aanmaken: duidelijke
@@ -813,13 +813,16 @@ struct AccountRequiredView: View {
                         .foregroundStyle(Theme.textSecondary)
                 }
                 .frame(maxWidth: .infinity)
-                .padding(.vertical, 28)
+                .padding(.vertical, Theme.Spacing.xl)
                 .background(Color(.systemBackground))
             } else {
                 formSection
             }
         }
-        .clipShape(RoundedRectangle(cornerRadius: 20))
+        .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.lg))
+        // bewust eigen schaduw: navy-getinte, prominentere schaduw voor deze
+        // upsell/hero-kaart — sterker dan de standaard cardElevation() omdat
+        // dit een wervend account-aanmaakscherm is, geen gewone lijstkaart.
         .shadow(color: Theme.navy.opacity(0.15), radius: 14, x: 0, y: 6)
         .animation(.spring(response: 0.35, dampingFraction: 0.8), value: completed)
     }
@@ -847,9 +850,9 @@ struct AccountRequiredView: View {
                         .textContentType(.givenName)
                         .autocorrectionDisabled()
                         .font(.frutiger(size: 15))
-                        .padding(13)
+                        .padding(Theme.Spacing.md)
                         .background(Color(.secondarySystemGroupedBackground))
-                        .clipShape(RoundedRectangle(cornerRadius: 12))
+                        .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
 
                     TextField("E-mailadres", text: $email)
                         .textContentType(.emailAddress)
@@ -857,9 +860,9 @@ struct AccountRequiredView: View {
                         .textInputAutocapitalization(.never)
                         .autocorrectionDisabled()
                         .font(.frutiger(size: 15))
-                        .padding(13)
+                        .padding(Theme.Spacing.md)
                         .background(Color(.secondarySystemGroupedBackground))
-                        .clipShape(RoundedRectangle(cornerRadius: 12))
+                        .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
                 }
 
                 if showError {
@@ -893,10 +896,10 @@ struct AccountRequiredView: View {
                             .font(.system(size: 13, weight: .semibold))
                     }
                     .frame(maxWidth: .infinity)
-                    .padding(.vertical, 15)
+                    .padding(.vertical, Theme.Spacing.base)
                     .background(Theme.inkGradient)
                     .foregroundStyle(.white)
-                    .clipShape(RoundedRectangle(cornerRadius: 14))
+                    .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
                 }
                 .buttonStyle(.plain)
 
@@ -905,7 +908,7 @@ struct AccountRequiredView: View {
                     .foregroundStyle(Theme.textSecondary)
                     .frame(maxWidth: .infinity, alignment: .leading)
             }
-            .padding(16)
+            .padding(Theme.Spacing.base)
             .background(Color(.systemBackground))
     }
 
@@ -914,7 +917,7 @@ struct AccountRequiredView: View {
             Image(systemName: "checkmark.circle.fill")
                 .font(.system(size: 12, weight: .bold))
                 .foregroundStyle(Theme.yellow)
-                .padding(.top, 1)
+                .padding(.top, Theme.Spacing.xxs)
             Text(text)
                 .font(.frutiger(size: 12.5, weight: .medium))
                 .foregroundStyle(.white.opacity(0.92))

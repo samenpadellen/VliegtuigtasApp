@@ -201,10 +201,10 @@ struct CheckFlowView: View {
                 }
                 Spacer()
             }
-            .padding(.horizontal, 20)
+            .padding(.horizontal, Theme.Spacing.base)
 
             FlowStepper(step: step)
-                .padding(.horizontal, 28)
+                .padding(.horizontal, Theme.Spacing.lg)
 
             Divider().opacity(0.4)
         }
@@ -253,7 +253,7 @@ private struct FlightWidgetSheet: View {
                         title: "Vlucht opslaan werkt met een profiel",
                         reason: "Je vlucht hoort bij je profiel: zo telt dezelfde vlucht af op je widget, je Apple Watch en al je andere apparaten."
                     )
-                    .padding(16)
+                    .padding(Theme.Spacing.base)
                 }
                 .background(Color(.systemGroupedBackground))
                 .navigationTitle("Vlucht opslaan")
@@ -283,9 +283,9 @@ private struct FlightWidgetSheet: View {
                     .autocorrectionDisabled()
                     .textInputAutocapitalization(.characters)
                     .font(.frutiger(size: 15))
-                    .padding(12)
+                    .padding(Theme.Spacing.md)
                     .background(Color(.secondarySystemGroupedBackground))
-                    .clipShape(RoundedRectangle(cornerRadius: 12))
+                    .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
             }
 
             VStack(alignment: .leading, spacing: 6) {
@@ -317,15 +317,15 @@ private struct FlightWidgetSheet: View {
                         .font(.frutiger(size: 16, weight: .semibold))
                 }
                 .frame(maxWidth: .infinity)
-                .padding(.vertical, 15)
+                .padding(.vertical, Theme.Spacing.base)
                 .background(saved ? AnyShapeStyle(Theme.green) : AnyShapeStyle(Theme.inkGradient))
                 .foregroundStyle(.white)
-                .clipShape(RoundedRectangle(cornerRadius: 16))
+                .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
             }
             .buttonStyle(.plain)
             .disabled(saved)
         }
-        .padding(20)
+        .padding(Theme.Spacing.base)
         .background(Color(.systemGroupedBackground))
         .navigationTitle("Vlucht opslaan")
         .navigationBarTitleDisplayMode(.inline)
@@ -454,32 +454,33 @@ private struct AirlineStepView: View {
                     // onder de foto — niet als zwevende overlay, zodat hij nooit
                     // met de koptekst kan overlappen.
                     FlowStepper(step: .airline)
-                        .padding(.horizontal, 28)
-                        .padding(.vertical, 18)
+                        .padding(.horizontal, Theme.Spacing.lg)
+                        .padding(.vertical, Theme.Spacing.base)
                         .frame(maxWidth: .infinity)
                         .background(Color(.systemBackground))
-                        .clipShape(UnevenRoundedRectangle(topLeadingRadius: 22, topTrailingRadius: 22))
+                        .clipShape(UnevenRoundedRectangle(topLeadingRadius: Theme.Radius.lg, topTrailingRadius: Theme.Radius.lg))
+                        // bewust eigen schaduw: schaduw wijst omhoog (negatieve y) om het paneel los te maken van de foto erboven — cardElevation() valt altijd omlaag.
                         .shadow(color: .black.opacity(0.06), radius: 10, x: 0, y: -3)
 
                     HStack(spacing: 10) {
                         searchBar
                         filterButton
                     }
-                    .padding(.horizontal, 20)
-                    .padding(.top, 14)
-                    .padding(.bottom, activeFilterCount > 0 ? 10 : 0)
+                    .padding(.horizontal, Theme.Spacing.base)
+                    .padding(.top, Theme.Spacing.md)
+                    .padding(.bottom, activeFilterCount > 0 ? Theme.Spacing.sm : 0)
 
                     if activeFilterCount > 0 {
                         activeFiltersBar
-                            .padding(.top, 10)
-                            .padding(.bottom, 10)
+                            .padding(.top, Theme.Spacing.sm)
+                            .padding(.bottom, Theme.Spacing.sm)
                     }
 
                     if isLoading {
                         ProgressView()
                             .tint(Theme.sky)
                             .frame(maxWidth: .infinity)
-                            .padding(.top, 60)
+                            .padding(.top, Theme.Spacing.section)
                     } else if !search.isEmpty || activeFilterCount > 0 {
                         searchResults
                     } else {
@@ -517,8 +518,8 @@ private struct AirlineStepView: View {
                     .foregroundStyle(activeFilterCount > 0 ? .white : Theme.textPrimary)
                     .frame(width: 48, height: 48)
                     .background(activeFilterCount > 0 ? AnyShapeStyle(Theme.inkGradient) : AnyShapeStyle(Color(.systemBackground)))
-                    .clipShape(RoundedRectangle(cornerRadius: 14))
-                    .shadow(color: .black.opacity(0.07), radius: 8, x: 0, y: 2)
+                    .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
+                    .cardElevation()
 
                 if activeFilterCount > 0 {
                     Text("\(activeFilterCount)")
@@ -556,7 +557,7 @@ private struct AirlineStepView: View {
                         .foregroundStyle(Theme.red)
                 }
             }
-            .padding(.horizontal, 20)
+            .padding(.horizontal, Theme.Spacing.base)
         }
     }
 
@@ -595,8 +596,8 @@ private struct AirlineStepView: View {
                     .lineSpacing(2)
                     .minimumScaleFactor(0.7)
             }
-            .padding(.horizontal, 24)
-            .padding(.bottom, 28)
+            .padding(.horizontal, Theme.Spacing.lg)
+            .padding(.bottom, Theme.Spacing.lg)
         }
         .frame(height: checkerStatusBarHeight + 230)
         .clipped()
@@ -620,11 +621,11 @@ private struct AirlineStepView: View {
                 .accessibilityLabel("Zoekopdracht wissen")
             }
         }
-        .padding(.horizontal, 14)
-        .padding(.vertical, 13)
+        .padding(.horizontal, Theme.Spacing.md)
+        .padding(.vertical, Theme.Spacing.md)
         .background(Color(.systemBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 14))
-        .shadow(color: .black.opacity(0.07), radius: 8, x: 0, y: 2)
+        .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
+        .cardElevation()
     }
 
     // MARK: - Popular horizontal section
@@ -635,7 +636,7 @@ private struct AirlineStepView: View {
                 .font(.frutiger(size: 12, weight: .bold))
                 .foregroundStyle(Theme.textSecondary)
                 .kerning(0.4)
-                .padding(.horizontal, 20)
+                .padding(.horizontal, Theme.Spacing.base)
 
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 10) {
@@ -645,12 +646,12 @@ private struct AirlineStepView: View {
                         }
                     }
                 }
-                .padding(.horizontal, 20)
-                .padding(.vertical, 2)
+                .padding(.horizontal, Theme.Spacing.base)
+                .padding(.vertical, Theme.Spacing.xxs)
             }
         }
-        .padding(.top, 6)
-        .padding(.bottom, 24)
+        .padding(.top, Theme.Spacing.xs)
+        .padding(.bottom, Theme.Spacing.lg)
     }
 
     // MARK: - All airlines grid
@@ -661,7 +662,7 @@ private struct AirlineStepView: View {
                 .font(.frutiger(size: 12, weight: .bold))
                 .foregroundStyle(Theme.textSecondary)
                 .kerning(0.4)
-                .padding(.horizontal, 20)
+                .padding(.horizontal, Theme.Spacing.base)
 
             LazyVGrid(
                 columns: Array(repeating: GridItem(.flexible(), spacing: 12), count: 2),
@@ -673,8 +674,8 @@ private struct AirlineStepView: View {
                     }
                 }
             }
-            .padding(.horizontal, 20)
-            .padding(.bottom, 40)
+            .padding(.horizontal, Theme.Spacing.base)
+            .padding(.bottom, Theme.Spacing.xl)
         }
     }
 
@@ -698,8 +699,8 @@ private struct AirlineStepView: View {
                 action: onShowGuide
             )
         }
-        .padding(.horizontal, 20)
-        .padding(.bottom, 40)
+        .padding(.horizontal, Theme.Spacing.base)
+        .padding(.bottom, Theme.Spacing.xl)
     }
 
     private func quickLink(
@@ -728,9 +729,9 @@ private struct AirlineStepView: View {
                     .font(.system(size: 12, weight: .semibold))
                     .foregroundStyle(Theme.textSecondary)
             }
-            .padding(14)
+            .padding(Theme.Spacing.md)
             .background(Color(.systemBackground))
-            .clipShape(RoundedRectangle(cornerRadius: 14))
+            .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
         }
         .buttonStyle(.pressableCard)
     }
@@ -748,9 +749,9 @@ private struct AirlineStepView: View {
                 }
             }
         }
-        .padding(.horizontal, 20)
-        .padding(.top, 4)
-        .padding(.bottom, 40)
+        .padding(.horizontal, Theme.Spacing.base)
+        .padding(.top, Theme.Spacing.xs)
+        .padding(.bottom, Theme.Spacing.xl)
     }
 
     // MARK: - Floating header overlay (alleen de terugknop, zwevend op de foto)
@@ -761,8 +762,8 @@ private struct AirlineStepView: View {
                 FloatingBackButton(action: onDismiss)
                 Spacer()
             }
-            .padding(.horizontal, 20)
-            .padding(.top, checkerStatusBarHeight + 14)
+            .padding(.horizontal, Theme.Spacing.base)
+            .padding(.top, checkerStatusBarHeight + Theme.Spacing.md)
 
             Spacer()
         }
@@ -883,15 +884,15 @@ private struct PopularAirlinePill: View {
                     .foregroundStyle(isSelected ? Theme.navy : Theme.textPrimary)
                     .lineLimit(1)
             }
-            .padding(.horizontal, 14)
-            .padding(.vertical, 10)
+            .padding(.horizontal, Theme.Spacing.md)
+            .padding(.vertical, Theme.Spacing.sm)
             .background(isSelected ? Theme.skyLight : Color(.systemBackground))
             .clipShape(Capsule())
             .overlay(
                 Capsule()
                     .strokeBorder(isSelected ? Theme.sky : Color(.systemGray5), lineWidth: 1.5)
             )
-            .shadow(color: .black.opacity(0.06), radius: 6, x: 0, y: 2)
+            .cardElevation()
             .scaleEffect(isSelected ? 1.03 : 1)
             .animation(.spring(response: 0.2), value: isSelected)
         }
@@ -915,14 +916,15 @@ private struct AirlineTile: View {
                     .lineLimit(2)
             }
             .frame(maxWidth: .infinity)
-            .padding(.vertical, 20)
-            .padding(.horizontal, 8)
+            .padding(.vertical, Theme.Spacing.base)
+            .padding(.horizontal, Theme.Spacing.sm)
             .background(isSelected ? Theme.skyLight : Color(.systemBackground))
-            .clipShape(RoundedRectangle(cornerRadius: 18))
+            .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.lg))
             .overlay(
-                RoundedRectangle(cornerRadius: 18)
+                RoundedRectangle(cornerRadius: Theme.Radius.lg)
                     .strokeBorder(isSelected ? Theme.sky : Color(.systemGray6), lineWidth: isSelected ? 2 : 1)
             )
+            // bewust eigen schaduw: schaduwintensiteit varieert met isSelected — cardElevation() is een vaste waarde.
             .shadow(color: .black.opacity(isSelected ? 0.10 : 0.04), radius: 8, x: 0, y: 3)
             .scaleEffect(isSelected ? 1.03 : 1)
             .animation(.spring(response: 0.2), value: isSelected)
@@ -977,16 +979,16 @@ private struct DimensionsStepView: View {
                     }
                     Text("Hoe groot is\njouw handbagage?")
                         .font(.frutiger(size: 26, weight: .bold))
-                        .padding(.top, 2)
+                        .padding(.top, Theme.Spacing.xxs)
                     Text("Meet jouw tas op en vul de maten in.")
                         .font(.frutiger(size: 16)).foregroundStyle(Theme.textSecondary)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.horizontal, 20)
+                .padding(.horizontal, Theme.Spacing.base)
 
                 // Visual bag diagram
                 BagDiagram(length: length, width: width, depth: depth, isDragging: isDragging)
-                    .padding(.horizontal, 20)
+                    .padding(.horizontal, Theme.Spacing.base)
 
                 #if !targetEnvironment(macCatalyst)
                 // AR-meting: alleen op toestellen met LiDAR — zonder die
@@ -1005,19 +1007,19 @@ private struct DimensionsStepView: View {
                         Text("LiDAR")
                             .font(.frutiger(size: 10, weight: .black))
                             .foregroundStyle(Theme.navy)
-                            .padding(.horizontal, 8)
-                            .padding(.vertical, 4)
+                            .padding(.horizontal, Theme.Spacing.sm)
+                            .padding(.vertical, Theme.Spacing.xs)
                             .background(Theme.yellow)
                             .clipShape(Capsule())
                     }
                     .foregroundStyle(.white)
-                    .padding(.horizontal, 16)
-                    .padding(.vertical, 14)
+                    .padding(.horizontal, Theme.Spacing.base)
+                    .padding(.vertical, Theme.Spacing.md)
                     .background(Theme.skyGradient)
-                    .clipShape(RoundedRectangle(cornerRadius: 16))
+                    .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
                 }
                 .buttonStyle(.plain)
-                .padding(.horizontal, 20)
+                .padding(.horizontal, Theme.Spacing.base)
                 .fullScreenCover(isPresented: $showScanner) {
                     BagScannerView(
                         airlineName: airline?.name,
@@ -1041,9 +1043,9 @@ private struct DimensionsStepView: View {
                         Divider()
                         DimSlider(label: "Diepte",  value: $depth,  range: 5...50,  color: Theme.navy, isDragging: $isDragging)
                     }
-                    .padding(16)
+                    .padding(Theme.Spacing.base)
                 }
-                .padding(.horizontal, 20)
+                .padding(.horizontal, Theme.Spacing.base)
 
                 // Weight
                 Card {
@@ -1086,9 +1088,9 @@ private struct DimensionsStepView: View {
                             .accessibilityLabel("Gewicht verhogen")
                         }
                     }
-                    .padding(16)
+                    .padding(Theme.Spacing.base)
                 }
-                .padding(.horizontal, 20)
+                .padding(.horizontal, Theme.Spacing.base)
 
                 // Check button
                 VStack(spacing: 8) {
@@ -1108,12 +1110,13 @@ private struct DimensionsStepView: View {
                                 .font(.frutiger(size: 16, weight: .semibold))
                         }
                         .frame(maxWidth: .infinity)
-                        .padding(.vertical, 17)
+                        .padding(.vertical, Theme.Spacing.base)
                         .background(isChecking
                             ? AnyShapeStyle(Theme.navy.opacity(0.5))
                             : AnyShapeStyle(Theme.inkGradient))
                         .foregroundStyle(.white)
-                        .clipShape(RoundedRectangle(cornerRadius: 16))
+                        .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
+                        // bewust eigen schaduw: navy-getinte gloed onder de ink-gradient knop, geen neutrale kaart-schaduw.
                         .shadow(color: Theme.navy.opacity(0.30), radius: 10, x: 0, y: 4)
                     }
                     .disabled(isChecking)
@@ -1123,10 +1126,10 @@ private struct DimensionsStepView: View {
                             .font(.frutiger(size: 13)).foregroundStyle(Theme.red)
                     }
                 }
-                .padding(.horizontal, 20)
-                .padding(.bottom, 32)
+                .padding(.horizontal, Theme.Spacing.base)
+                .padding(.bottom, Theme.Spacing.xl)
             }
-            .padding(.top, topInset + 8)
+            .padding(.top, topInset + Theme.Spacing.sm)
         }
     }
 }
@@ -1238,7 +1241,7 @@ private struct BagDiagram: View {
 
     var body: some View {
         ZStack {
-            RoundedRectangle(cornerRadius: 16)
+            RoundedRectangle(cornerRadius: Theme.Radius.md)
                 .fill(Theme.skyLight)
                 .frame(height: 200)
 
@@ -1430,6 +1433,7 @@ private struct BagDiagram: View {
             }
             .offset(x: w + d * 0.5 - 3.5, y: h - 5)
         }
+        // bewust eigen schaduw: contactschaduw van de getekende koffer op de "vloer", geen kaart-elevatie.
         .shadow(color: Theme.navy.opacity(0.16), radius: 10, x: 0, y: 7)
     }
 
@@ -1534,6 +1538,7 @@ private struct BagDiagram: View {
                             .frame(width: 7, height: 1.5)
                     }
                 )
+                // bewust eigen schaduw: minuscule illustratie-schaduw op het bagagelabeltje, op koffer-schaal.
                 .shadow(color: .black.opacity(0.12), radius: 2, x: 0, y: 1)
         }
         .rotationEffect(.degrees(8), anchor: .top)
@@ -1552,7 +1557,7 @@ private struct BagDiagram: View {
                 dimLabel(icon: "arrow.left.and.right", value: width)
             }
         }
-        .padding(10)
+        .padding(Theme.Spacing.sm)
         .frame(height: 200)
     }
 
@@ -1569,8 +1574,8 @@ private struct BagDiagram: View {
                 .contentTransition(.numericText(value: value))
         }
         .foregroundStyle(Theme.sky)
-        .padding(.horizontal, 8)
-        .padding(.vertical, 4)
+        .padding(.horizontal, Theme.Spacing.sm)
+        .padding(.vertical, Theme.Spacing.xs)
         .background(Color(.systemBackground).opacity(0.72))
         .clipShape(Capsule())
         .animation(.snappy(duration: 0.25), value: value)
@@ -1700,20 +1705,20 @@ struct ResultStepView: View {
                         Label("Opnieuw controleren", systemImage: "arrow.clockwise")
                             .font(.frutiger(size: 16)).fontWeight(.semibold)
                             .frame(maxWidth: .infinity)
-                            .padding(.vertical, 15)
+                            .padding(.vertical, Theme.Spacing.base)
                             .background(Theme.navy.opacity(0.07))
                             .foregroundStyle(Theme.navy)
-                            .clipShape(RoundedRectangle(cornerRadius: 14))
+                            .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
                     }
-                    .padding(.horizontal, 20)
+                    .padding(.horizontal, Theme.Spacing.base)
 
                     Text("Indicatie: controleer altijd de officiële regels.")
                         .font(.frutiger(size: 13)).foregroundStyle(Theme.textSecondary)
                         .multilineTextAlignment(.center)
                 }
-                .padding(.bottom, 36)
+                .padding(.bottom, Theme.Spacing.xl)
             }
-            .padding(.top, topInset + 16)
+            .padding(.top, topInset + Theme.Spacing.base)
         }
         .task { await loadBags() }
         .onAppear(perform: maybeAskForReview)
@@ -1779,10 +1784,10 @@ struct ResultStepView: View {
                     DimPill(value: "\(Int(dimensions.0))×\(Int(dimensions.1))×\(Int(dimensions.2)) cm", icon: "ruler")
                     DimPill(value: String(format: "%.1f kg", dimensions.3), icon: "scalemass")
                 }
-                .padding(.top, 4)
+                .padding(.top, Theme.Spacing.xs)
             }
         }
-        .padding(.top, 12)
+        .padding(.top, Theme.Spacing.md)
         .frame(maxWidth: .infinity)
         // VoiceOver leest de hele uitkomst als één duidelijke zin voor, in
         // plaats van losse fragmenten (icoon, titel, logo, pillen).
@@ -1827,7 +1832,7 @@ struct ResultStepView: View {
                 }
             }
         }
-        .padding(.horizontal, 20)
+        .padding(.horizontal, Theme.Spacing.base)
     }
 
     private func resultRow(icon: String, label: String, value: String, color: Color = Theme.textSecondary) -> some View {
@@ -1846,7 +1851,7 @@ struct ResultStepView: View {
                     .foregroundStyle(Theme.textSecondary)
             }
         }
-        .padding(.vertical, 4)
+        .padding(.vertical, Theme.Spacing.xs)
     }
 
     // MARK: Bag recommendations
@@ -1859,7 +1864,7 @@ struct ResultStepView: View {
                 Text("Geselecteerd voor \(airline.name).")
                     .font(.frutiger(size: 13)).foregroundStyle(Theme.textSecondary)
             }
-            .padding(.horizontal, 20)
+            .padding(.horizontal, Theme.Spacing.base)
 
             if loadingBags {
                 ProgressView().tint(Theme.sky).frame(maxWidth: .infinity).padding()
@@ -1871,21 +1876,21 @@ struct ResultStepView: View {
                             BagRecommendationCard(bag: bag)
                         }
                     }
-                    .padding(.horizontal, 20)
-                    .padding(.vertical, 4)
+                    .padding(.horizontal, Theme.Spacing.base)
+                    .padding(.vertical, Theme.Spacing.xs)
                 }
             } else if bagsFailed {
                 InlineRetryState(
                     message: "We konden de tas-suggesties niet laden. Controleer je verbinding.",
                     onRetry: { Task { await loadBags() } }
                 )
-                .padding(.horizontal, 20)
+                .padding(.horizontal, Theme.Spacing.base)
             } else {
                 // Geen fout, maar (nog) geen match — eerlijk en zonder lege ruimte.
                 Text("Nog geen passende tassen gevonden voor \(airline.name). Bekijk de hele shop hieronder.")
                     .font(.frutiger(size: 13))
                     .foregroundStyle(Theme.textSecondary)
-                    .padding(.horizontal, 20)
+                    .padding(.horizontal, Theme.Spacing.base)
             }
         }
     }
@@ -1908,13 +1913,13 @@ struct ResultStepView: View {
                     .font(.system(size: 12, weight: .semibold))
             }
             .frame(maxWidth: .infinity)
-            .padding(.vertical, 15)
+            .padding(.vertical, Theme.Spacing.base)
             .background(Theme.inkGradient)
             .foregroundStyle(.white)
-            .clipShape(RoundedRectangle(cornerRadius: 14))
+            .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
         }
         .buttonStyle(.plain)
-        .padding(.horizontal, 20)
+        .padding(.horizontal, Theme.Spacing.base)
     }
 
     /// Fit: houd het momentum vast met logische volgende stappen.
@@ -1940,7 +1945,7 @@ struct ResultStepView: View {
                 nav.openShop(airlineSlug: airline.slug)
             }
         }
-        .padding(.horizontal, 20)
+        .padding(.horizontal, Theme.Spacing.base)
     }
 
     private func nextStepRow(
@@ -1957,7 +1962,7 @@ struct ResultStepView: View {
                     .foregroundStyle(color)
                     .frame(width: 40, height: 40)
                     .background(color.opacity(0.12))
-                    .clipShape(RoundedRectangle(cornerRadius: 12))
+                    .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
                 VStack(alignment: .leading, spacing: 2) {
                     Text(title)
                         .font(.frutiger(size: 14, weight: .semibold))
@@ -1971,11 +1976,11 @@ struct ResultStepView: View {
                     .font(.system(size: 12, weight: .semibold))
                     .foregroundStyle(Theme.textSecondary)
             }
-            .padding(14)
+            .padding(Theme.Spacing.md)
             .background(Color(.systemBackground))
-            .clipShape(RoundedRectangle(cornerRadius: 16))
-            .shadow(color: .black.opacity(0.05), radius: 8, x: 0, y: 3)
-            .contentShape(RoundedRectangle(cornerRadius: 16))
+            .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
+            .cardElevation()
+            .contentShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
         }
         .buttonStyle(.plain)
     }
@@ -1988,10 +1993,10 @@ struct ResultStepView: View {
                 .font(.frutiger(size: 14, weight: .semibold))
         }
         .frame(maxWidth: .infinity)
-        .padding(.vertical, 16)
+        .padding(.vertical, Theme.Spacing.base)
         .background(Theme.green.opacity(0.10))
-        .clipShape(RoundedRectangle(cornerRadius: 14))
-        .padding(.horizontal, 20)
+        .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
+        .padding(.horizontal, Theme.Spacing.base)
     }
 
     // MARK: Lead card
@@ -2012,18 +2017,18 @@ struct ResultStepView: View {
                 HStack(spacing: 10) {
                     TextField("Voornaam", text: $firstName)
                         .textContentType(.givenName)
-                        .padding(11)
+                        .padding(Theme.Spacing.md)
                         .background(Theme.card)
-                        .clipShape(RoundedRectangle(cornerRadius: 10))
+                        .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.sm))
 
                     TextField("E-mail", text: $email)
                         .textContentType(.emailAddress)
                         .keyboardType(.emailAddress)
                         .autocorrectionDisabled()
                         .textInputAutocapitalization(.never)
-                        .padding(11)
+                        .padding(Theme.Spacing.md)
                         .background(Theme.card)
-                        .clipShape(RoundedRectangle(cornerRadius: 10))
+                        .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.sm))
                 }
 
                 Button {
@@ -2034,16 +2039,16 @@ struct ResultStepView: View {
                     Text("Stuur mij tips")
                         .font(.frutiger(size: 16)).fontWeight(.semibold)
                         .frame(maxWidth: .infinity)
-                        .padding(.vertical, 13)
+                        .padding(.vertical, Theme.Spacing.md)
                         .background(canSendLead ? Theme.sky : Theme.sky.opacity(0.35))
                         .foregroundStyle(.white)
-                        .clipShape(RoundedRectangle(cornerRadius: 12))
+                        .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
                 }
                 .disabled(!canSendLead)
             }
-            .padding(16)
+            .padding(Theme.Spacing.base)
         }
-        .padding(.horizontal, 20)
+        .padding(.horizontal, Theme.Spacing.base)
     }
 
     private var canSendLead: Bool { !firstName.isEmpty && email.contains("@") }
@@ -2076,7 +2081,7 @@ private struct BagRecommendationCard: View {
             AuthorisedImage(urlString: bag.imageUrl, fill: true)
             .frame(width: 160, height: 130)
             .background(Theme.skyLight)
-            .clipShape(RoundedRectangle(cornerRadius: 12))
+            .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
 
             VStack(alignment: .leading, spacing: 3) {
                 Text(bag.name)
@@ -2097,18 +2102,18 @@ private struct BagRecommendationCard: View {
                     Text("Bekijk tas")
                         .font(.frutiger(size: 12, weight: .semibold))
                         .frame(maxWidth: .infinity)
-                        .padding(.vertical, 8)
+                        .padding(.vertical, Theme.Spacing.sm)
                         .background(Theme.sky)
                         .foregroundStyle(.white)
-                        .clipShape(RoundedRectangle(cornerRadius: 8))
+                        .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.sm))
                 }
             }
         }
         .frame(width: 160)
-        .padding(10)
+        .padding(Theme.Spacing.sm)
         .background(Theme.surface)
-        .clipShape(RoundedRectangle(cornerRadius: 16))
-        .shadow(color: .black.opacity(0.06), radius: 8, x: 0, y: 2)
+        .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
+        .cardElevation()
     }
 }
 
@@ -2121,8 +2126,8 @@ private struct DimPill: View {
     var body: some View {
         Label(value, systemImage: icon)
             .font(.frutiger(size: 12, weight: .medium))
-            .padding(.horizontal, 12)
-            .padding(.vertical, 6)
+            .padding(.horizontal, Theme.Spacing.md)
+            .padding(.vertical, Theme.Spacing.xs)
             .background(Theme.card)
             .clipShape(Capsule())
             .foregroundStyle(Theme.textSecondary)

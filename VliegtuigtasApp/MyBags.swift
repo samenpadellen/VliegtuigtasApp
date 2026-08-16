@@ -156,17 +156,17 @@ struct MyBagsOverviewView: View {
                         Label("Tas of koffer toevoegen", systemImage: "plus")
                             .font(.frutiger(size: 14, weight: .semibold))
                             .frame(maxWidth: .infinity)
-                            .padding(.vertical, 13)
+                            .padding(.vertical, Theme.Spacing.md)
                             .background(Theme.navy.opacity(0.07))
                             .foregroundStyle(Theme.navy)
-                            .clipShape(RoundedRectangle(cornerRadius: 14))
+                            .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
                     }
                     .buttonStyle(.plain)
                 }
                 .frame(maxWidth: Theme.contentMaxWidth)
                 .frame(maxWidth: .infinity)
-                .padding(16)
-                .padding(.bottom, 32)
+                .padding(Theme.Spacing.base)
+                .padding(.bottom, Theme.Spacing.xl)
             }
             .background(Color(.systemGroupedBackground))
             .navigationTitle("Passen mijn tassen?")
@@ -204,8 +204,8 @@ struct MyBagsOverviewView: View {
                         Text(airline.name)
                             .font(.frutiger(size: 13, weight: .semibold))
                             .foregroundStyle(selectedAirline?.id == airline.id ? .white : Theme.textPrimary)
-                            .padding(.horizontal, 13)
-                            .padding(.vertical, 8)
+                            .padding(.horizontal, Theme.Spacing.md)
+                            .padding(.vertical, Theme.Spacing.sm)
                             .background(
                                 selectedAirline?.id == airline.id
                                     ? AnyShapeStyle(Theme.inkGradient)
@@ -216,10 +216,10 @@ struct MyBagsOverviewView: View {
                     .buttonStyle(.plain)
                 }
             }
-            .padding(.horizontal, 16)
-            .padding(.vertical, 2)
+            .padding(.horizontal, Theme.Spacing.base)
+            .padding(.vertical, Theme.Spacing.xxs)
         }
-        .padding(.horizontal, -16)
+        .padding(.horizontal, -Theme.Spacing.base)
     }
 
     private var emptyState: some View {
@@ -235,7 +235,7 @@ struct MyBagsOverviewView: View {
                 .multilineTextAlignment(.center)
         }
         .frame(maxWidth: .infinity)
-        .padding(.vertical, 28)
+        .padding(.vertical, Theme.Spacing.lg)
     }
 }
 
@@ -256,7 +256,7 @@ private struct BagFitCard: View {
                     .foregroundStyle(Theme.yellow)
                     .frame(width: 38, height: 38)
                     .background(Theme.yellow.opacity(0.14))
-                    .clipShape(RoundedRectangle(cornerRadius: 11))
+                    .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.sm))
 
                 VStack(alignment: .leading, spacing: 2) {
                     Text(bag.name)
@@ -302,10 +302,10 @@ private struct BagFitCard: View {
                 status: fit.cabinBag
             )
         }
-        .padding(14)
+        .padding(Theme.Spacing.md)
         .background(Color(.systemBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 16))
-        .shadow(color: .black.opacity(0.05), radius: 8, x: 0, y: 3)
+        .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
+        .cardElevation()
     }
 
     @ViewBuilder
@@ -339,11 +339,11 @@ private struct BagFitCard: View {
                 .font(.frutiger(size: 12, weight: .bold))
         }
         .foregroundStyle(color)
-        .padding(.horizontal, 10)
-        .padding(.vertical, 6)
+        .padding(.horizontal, Theme.Spacing.sm)
+        .padding(.vertical, Theme.Spacing.xs)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(color.opacity(0.12))
-        .clipShape(RoundedRectangle(cornerRadius: 9))
+        .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.sm))
     }
 
     private func fitRow(title: String, detail: String?, status: Bool?) -> some View {
@@ -405,9 +405,9 @@ struct BagEditorSheet: View {
                             .foregroundStyle(Theme.textSecondary)
                         TextField("Bijv. Rode trolley of Werkrugzak", text: $name)
                             .font(.frutiger(size: 15))
-                            .padding(12)
+                            .padding(Theme.Spacing.md)
                             .background(Color(.secondarySystemGroupedBackground))
-                            .clipShape(RoundedRectangle(cornerRadius: 12))
+                            .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
                     }
 
                     VStack(spacing: 12) {
@@ -419,9 +419,9 @@ struct BagEditorSheet: View {
                         Divider()
                         editorSlider("Gewicht", value: $weight, range: 1...40, unit: "kg", step: 0.5)
                     }
-                    .padding(14)
+                    .padding(Theme.Spacing.md)
                     .background(Color(.systemBackground))
-                    .clipShape(RoundedRectangle(cornerRadius: 14))
+                    .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
 
                     Button {
                         var saved = bag ?? SavedBag(name: "", length: 0, width: 0, depth: 0, weight: 0)
@@ -438,10 +438,10 @@ struct BagEditorSheet: View {
                         Text(bag == nil ? "Tas toevoegen" : "Opslaan")
                             .font(.frutiger(size: 16, weight: .semibold))
                             .frame(maxWidth: .infinity)
-                            .padding(.vertical, 15)
+                            .padding(.vertical, Theme.Spacing.base)
                             .background(Theme.inkGradient)
                             .foregroundStyle(.white)
-                            .clipShape(RoundedRectangle(cornerRadius: 14))
+                            .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
                     }
                     .buttonStyle(.plain)
 
@@ -454,12 +454,12 @@ struct BagEditorSheet: View {
                                 .font(.frutiger(size: 13, weight: .semibold))
                                 .foregroundStyle(Theme.red)
                                 .frame(maxWidth: .infinity)
-                                .padding(.vertical, 10)
+                                .padding(.vertical, Theme.Spacing.sm)
                         }
                         .buttonStyle(.plain)
                     }
                 }
-                .padding(16)
+                .padding(Theme.Spacing.base)
             }
             .background(Color(.systemGroupedBackground))
             .navigationTitle(bag == nil ? "Nieuwe tas of koffer" : "Tas bewerken")

@@ -117,10 +117,10 @@ struct InviteByContactCard: View {
                     .font(.frutiger(size: 16, weight: .black))
                     .foregroundStyle(Theme.navy)
                     .kerning(2)
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 6)
+                    .padding(.horizontal, Theme.Spacing.md)
+                    .padding(.vertical, Theme.Spacing.xs)
                     .background(Theme.navy.opacity(0.08))
-                    .clipShape(RoundedRectangle(cornerRadius: 10))
+                    .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.sm))
                 Spacer()
                 Button {
                     UIPasteboard.general.string = code
@@ -142,16 +142,16 @@ struct InviteByContactCard: View {
                 Label("Kies contactpersoon", systemImage: "person.crop.circle.badge.plus")
                     .font(.frutiger(size: 13, weight: .semibold))
                     .frame(maxWidth: .infinity)
-                    .padding(.vertical, 11)
+                    .padding(.vertical, Theme.Spacing.md)
                     .background(Theme.inkGradient)
                     .foregroundStyle(.white)
-                    .clipShape(RoundedRectangle(cornerRadius: 12))
+                    .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
             }
             .buttonStyle(.plain)
         }
-        .padding(14)
+        .padding(Theme.Spacing.md)
         .background(Color(.systemBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 14))
+        .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
         .sheet(isPresented: $showContactPicker) {
             ContactPicker { contact in
                 if let number = contact.phoneNumbers.first?.value.stringValue {
@@ -207,10 +207,10 @@ struct ReferralCodeEntryField: View {
                         .textInputAutocapitalization(.characters)
                         .autocorrectionDisabled()
                         .font(.frutiger(size: 14))
-                        .padding(10)
+                        .padding(Theme.Spacing.sm)
                         .background(.white.opacity(0.15))
                         .foregroundStyle(.white)
-                        .clipShape(RoundedRectangle(cornerRadius: 10))
+                        .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.sm))
 
                     Button("Inwisselen") {
                         if ReferralManager.shared.redeem(code: code) {
@@ -223,10 +223,10 @@ struct ReferralCodeEntryField: View {
                     }
                     .font(.frutiger(size: 13, weight: .semibold))
                     .foregroundStyle(Theme.navy)
-                    .padding(.horizontal, 14)
-                    .padding(.vertical, 10)
+                    .padding(.horizontal, Theme.Spacing.md)
+                    .padding(.vertical, Theme.Spacing.sm)
                     .background(.white)
-                    .clipShape(RoundedRectangle(cornerRadius: 10))
+                    .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.sm))
                 }
                 if showInvalid {
                     Text("Code ongeldig of al gebruikt.")

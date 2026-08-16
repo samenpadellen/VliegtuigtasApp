@@ -145,6 +145,6 @@ struct TagPaper<Content: View>: View {
         content
             .background(Color(.secondarySystemGroupedBackground))
             .clipShape(RoundedRectangle(cornerRadius: corner))
-            .shadow(color: .black.opacity(0.08), radius: 14, x: 0, y: 6)
+            .cardElevation()
     }
 }

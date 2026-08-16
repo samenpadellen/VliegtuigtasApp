@@ -87,11 +87,11 @@ struct ReviewInviteCard: View {
                     .font(.system(size: 13, weight: .semibold))
                     .foregroundStyle(Theme.textSecondary)
             }
-            .padding(14)
+            .padding(Theme.Spacing.md)
             .frame(maxWidth: .infinity)
             .background(Color(.systemBackground))
-            .clipShape(RoundedRectangle(cornerRadius: 16))
-            .shadow(color: .black.opacity(0.06), radius: 8, x: 0, y: 2)
+            .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
+            .cardElevation()
         }
         .buttonStyle(.pressableCard)
         .accessibilityLabel("Schrijf een review in de App Store")

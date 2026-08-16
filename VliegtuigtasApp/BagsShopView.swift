@@ -153,9 +153,9 @@ struct BagsShopView: View {
                     .font(.system(size: 12, weight: .semibold))
                     .foregroundStyle(Theme.textSecondary)
             }
-            .padding(14)
+            .padding(Theme.Spacing.md)
             .background(Color(.systemBackground))
-            .clipShape(RoundedRectangle(cornerRadius: 14))
+            .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
         }
         .buttonStyle(.pressableCard)
     }
@@ -167,34 +167,34 @@ struct BagsShopView: View {
 
                 VStack(alignment: .leading, spacing: 0) {
                     myBagsCard
-                        .padding(.horizontal, 16)
-                        .padding(.top, 20)
+                        .padding(.horizontal, Theme.Spacing.base)
+                        .padding(.top, Theme.Spacing.base)
 
                     searchAndFilter
-                        .padding(.horizontal, 16)
-                        .padding(.top, 20)
-                        .padding(.bottom, 20)
+                        .padding(.horizontal, Theme.Spacing.base)
+                        .padding(.top, Theme.Spacing.base)
+                        .padding(.bottom, Theme.Spacing.base)
 
                     featuredCarousel
-                        .padding(.bottom, 24)
+                        .padding(.bottom, Theme.Spacing.lg)
 
                     loyaltySection
-                        .padding(.horizontal, 16)
-                        .padding(.bottom, 20)
+                        .padding(.horizontal, Theme.Spacing.base)
+                        .padding(.bottom, Theme.Spacing.base)
 
                     if availableTypes.count > 1 {
-                        typeRow.padding(.bottom, 16)
+                        typeRow.padding(.bottom, Theme.Spacing.base)
                     }
 
                     if !availableFitTypes.isEmpty {
-                        fitTypeRow.padding(.bottom, 16)
+                        fitTypeRow.padding(.bottom, Theme.Spacing.base)
                     }
 
                     activeFiltersBar
 
                     productGrid
-                        .padding(.horizontal, 16)
-                        .padding(.bottom, 48)
+                        .padding(.horizontal, Theme.Spacing.base)
+                        .padding(.bottom, Theme.Spacing.xxl)
                 }
                 .frame(maxWidth: Theme.contentMaxWidth)
                 .frame(maxWidth: .infinity)
@@ -287,11 +287,11 @@ struct BagsShopView: View {
                             headerStat(icon: "storefront.fill", label: "\(distinctShopCount) aanbieders")
                             headerStat(icon: "checkmark.seal.fill", label: "cabin checked")
                         }
-                        .padding(.top, 2)
+                        .padding(.top, Theme.Spacing.xxs)
                     }
                 }
-                .padding(.horizontal, 20)
-                .padding(.bottom, 24)
+                .padding(.horizontal, Theme.Spacing.lg)
+                .padding(.bottom, Theme.Spacing.lg)
             }
             .clipped()
 
@@ -330,11 +330,11 @@ struct BagsShopView: View {
                     }
                 }
             }
-            .padding(.horizontal, 14)
-            .padding(.vertical, 13)
+            .padding(.horizontal, Theme.Spacing.base)
+            .padding(.vertical, Theme.Spacing.md)
             .background(Color(.systemBackground))
-            .clipShape(RoundedRectangle(cornerRadius: 14))
-            .shadow(color: .black.opacity(0.06), radius: 8, x: 0, y: 2)
+            .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
+            .cardElevation()
 
             Button { showFilters = true } label: {
                 ZStack(alignment: .topTrailing) {
@@ -343,8 +343,8 @@ struct BagsShopView: View {
                         .foregroundStyle(activeFilterCount > 0 ? .white : Theme.textPrimary)
                         .frame(width: 48, height: 48)
                         .background(activeFilterCount > 0 ? AnyShapeStyle(Theme.inkGradient) : AnyShapeStyle(Color(.systemBackground)))
-                        .clipShape(RoundedRectangle(cornerRadius: 14))
-                        .shadow(color: .black.opacity(0.07), radius: 8, x: 0, y: 2)
+                        .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
+                        .cardElevation()
 
                     if activeFilterCount > 0 {
                         Text("\(activeFilterCount)")
@@ -377,7 +377,7 @@ struct BagsShopView: View {
                     }
                 }
             }
-            .padding(.horizontal, 16)
+            .padding(.horizontal, Theme.Spacing.base)
         }
     }
 
@@ -395,7 +395,7 @@ struct BagsShopView: View {
                     }
                 }
             }
-            .padding(.horizontal, 16)
+            .padding(.horizontal, Theme.Spacing.base)
         }
     }
 
@@ -428,9 +428,9 @@ struct BagsShopView: View {
                             .foregroundStyle(Theme.red)
                     }
                 }
-                .padding(.horizontal, 16)
+                .padding(.horizontal, Theme.Spacing.base)
             }
-            .padding(.bottom, 14)
+            .padding(.bottom, Theme.Spacing.base)
         }
     }
 
@@ -441,10 +441,10 @@ struct BagsShopView: View {
         if isLoading {
             SkeletonCard()
                 .frame(height: 220)
-                .padding(.horizontal, 16)
+                .padding(.horizontal, Theme.Spacing.base)
         } else if featuredBags.isEmpty {
             FeaturedBagCard(bag: nil)
-                .padding(.horizontal, 16)
+                .padding(.horizontal, Theme.Spacing.base)
         } else {
             FeaturedCarousel(bags: featuredBags)
         }
@@ -488,7 +488,7 @@ struct BagsShopView: View {
                 message: "We konden de tassen niet laden. Controleer je verbinding en probeer het opnieuw.",
                 onRetry: { Task { await refreshAll() } }
             )
-            .padding(.vertical, 40)
+            .padding(.vertical, Theme.Spacing.xxl)
         } else if filtered.isEmpty {
             emptyState
         } else {
@@ -511,7 +511,7 @@ struct BagsShopView: View {
                         .foregroundStyle(Theme.navy)
                     }
                 }
-                .padding(.bottom, 14)
+                .padding(.bottom, Theme.Spacing.md)
 
                 LazyVGrid(
                     columns: [GridItem(.adaptive(minimum: 160), spacing: 12)],
@@ -561,7 +561,7 @@ struct BagsShopView: View {
                     Text("Wis alle filters")
                         .font(.frutiger(size: 14, weight: .semibold))
                         .foregroundStyle(.white)
-                        .padding(.horizontal, 24).padding(.vertical, 12)
+                        .padding(.horizontal, Theme.Spacing.lg).padding(.vertical, Theme.Spacing.md)
                         .background(Theme.inkGradient)
                         .clipShape(Capsule())
                 }
@@ -569,7 +569,7 @@ struct BagsShopView: View {
             }
         }
         .frame(maxWidth: .infinity)
-        .padding(.vertical, 60)
+        .padding(.vertical, Theme.Spacing.section)
     }
 
     // MARK: - Helpers
@@ -662,8 +662,8 @@ private struct LoyaltyCard: View {
                         .font(.frutiger(size: 9, weight: .bold))
                         .foregroundStyle(gold.opacity(0.9))
                         .kerning(0.8)
-                        .padding(.horizontal, 8)
-                        .padding(.vertical, 4)
+                        .padding(.horizontal, Theme.Spacing.sm)
+                        .padding(.vertical, Theme.Spacing.xs)
                         .overlay(
                             Capsule().strokeBorder(gold.opacity(0.4), lineWidth: 1)
                         )
@@ -679,7 +679,7 @@ private struct LoyaltyCard: View {
                     .lineSpacing(2.5)
                     .fixedSize(horizontal: false, vertical: true)
             }
-            .padding(18)
+            .padding(Theme.Spacing.base)
 
             Rectangle()
                 .fill(.white.opacity(0.08))
@@ -715,19 +715,19 @@ private struct LoyaltyCard: View {
                         .contentShape(Rectangle())
                 }
             }
-            .padding(.horizontal, 18)
-            .padding(.vertical, 8)
-            .padding(.bottom, 6)
+            .padding(.horizontal, Theme.Spacing.base)
+            .padding(.vertical, Theme.Spacing.sm)
+            .padding(.bottom, Theme.Spacing.xs)
         }
         .background(Color(red: 0.07, green: 0.09, blue: 0.14))
-        .clipShape(RoundedRectangle(cornerRadius: 18))
+        .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.lg))
         .overlay(
-            RoundedRectangle(cornerRadius: 18)
+            RoundedRectangle(cornerRadius: Theme.Radius.lg)
                 .strokeBorder(.white.opacity(0.09), lineWidth: 1)
         )
         .overlay(alignment: .top) {
             // Dun gouden keyline bovenlangs: het enige sieraad.
-            RoundedRectangle(cornerRadius: 18)
+            RoundedRectangle(cornerRadius: Theme.Radius.lg)
                 .strokeBorder(gold.opacity(0.35), lineWidth: 1)
                 .mask(
                     LinearGradient(
@@ -736,7 +736,7 @@ private struct LoyaltyCard: View {
                     )
                 )
         }
-        .shadow(color: .black.opacity(0.18), radius: 14, x: 0, y: 6)
+        .cardElevation()
     }
 }
 
@@ -754,7 +754,7 @@ private struct BoardingPassDivider: View {
                 .stroke(style: StrokeStyle(lineWidth: 1.5, dash: [6, 5]))
                 .foregroundStyle(Color(.systemGray4))
                 .frame(height: 1.5)
-                .padding(.horizontal, 24)
+                .padding(.horizontal, Theme.Spacing.lg)
 
             HStack {
                 Circle()
@@ -798,7 +798,7 @@ private struct FeaturedCarousel: View {
             TabView(selection: $page) {
                 ForEach(Array(bags.enumerated()), id: \.element.id) { index, bag in
                     FeaturedBagCard(bag: bag, badgeLabel: index == 0 ? "KEUZE VAN DE CREW" : "AANBEVOLEN")
-                        .padding(.horizontal, 16)
+                        .padding(.horizontal, Theme.Spacing.base)
                         .tag(index)
                 }
             }
@@ -880,8 +880,8 @@ private struct FeaturedBagCard: View {
                             .foregroundStyle(Theme.yellow)
                             .kerning(1.2)
                     }
-                    .padding(.horizontal, 10)
-                    .padding(.vertical, 6)
+                    .padding(.horizontal, Theme.Spacing.sm)
+                    .padding(.vertical, Theme.Spacing.xs)
                     .background(Theme.yellow.opacity(0.18))
                     .clipShape(Capsule())
 
@@ -924,13 +924,13 @@ private struct FeaturedBagCard: View {
                             .font(.system(size: 11, weight: .bold))
                     }
                     .foregroundStyle(Theme.navy)
-                    .padding(.horizontal, 14)
-                    .padding(.vertical, 10)
+                    .padding(.horizontal, Theme.Spacing.base)
+                    .padding(.vertical, Theme.Spacing.md)
                     .background(.white)
                     .clipShape(Capsule())
-                    .shadow(color: .black.opacity(0.18), radius: 8, x: 0, y: 3)
+                    .cardElevation()
                 }
-                .padding(18)
+                .padding(Theme.Spacing.base)
             }
             .frame(maxWidth: .infinity)
 
@@ -944,8 +944,10 @@ private struct FeaturedBagCard: View {
                     Image(systemName: "play.circle.fill")
                         .font(.system(size: 18))
                         .foregroundStyle(.white)
+                        // bewust eigen schaduw: legibility-schaduw voor een icoon op
+                        // wisselende videobeelden, geen kaart-lift
                         .shadow(color: .black.opacity(0.35), radius: 3, x: 0, y: 1)
-                        .padding(8)
+                        .padding(Theme.Spacing.sm)
                 } else if bag?.imageUrl != nil {
                     AuthorisedImage(urlString: bag?.imageUrl, fill: true)
                 } else {
@@ -958,7 +960,9 @@ private struct FeaturedBagCard: View {
             .clipped()
         }
         .frame(height: 220)
-        .clipShape(RoundedRectangle(cornerRadius: 22))
+        .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.lg))
+        // bewust eigen schaduw: navy-getinte dramatische gloed voor de
+        // uitgelichte hero-kaart, geen neutrale kaart-lift
         .shadow(color: Theme.navy.opacity(0.25), radius: 18, x: 0, y: 8)
     }
 }
@@ -981,7 +985,7 @@ private struct BagCard: View {
                         // boven- en onderkant afgekapt. Nu staat de hele koffer
                         // in beeld, met lucht eromheen.
                         AuthorisedImage(urlString: bag.imageUrl)
-                            .padding(12)
+                            .padding(Theme.Spacing.md)
                     } else {
                         Image(systemName: "bag")
                             .font(.system(size: 36, weight: .light))
@@ -991,8 +995,8 @@ private struct BagCard: View {
                 .frame(maxWidth: .infinity)
                 .frame(height: 148)
                 .clipShape(UnevenRoundedRectangle(
-                    topLeadingRadius: 18, bottomLeadingRadius: 0,
-                    bottomTrailingRadius: 0, topTrailingRadius: 18))
+                    topLeadingRadius: Theme.Radius.lg, bottomLeadingRadius: 0,
+                    bottomTrailingRadius: 0, topTrailingRadius: Theme.Radius.lg))
 
                 // Maten rechtsboven als bagagelabel: monospace cijfers op zwart
                 // met geel accent — leest als het maatlabel aan een koffer,
@@ -1001,11 +1005,11 @@ private struct BagCard: View {
                     Text(dims)
                         .font(.system(size: 9, weight: .black, design: .monospaced))
                         .foregroundStyle(Theme.yellow)
-                        .padding(.horizontal, 7)
-                        .padding(.vertical, 4)
-                        .glassChrome(in: RoundedRectangle(cornerRadius: 6), tint: Theme.ink,
+                        .padding(.horizontal, Theme.Spacing.sm)
+                        .padding(.vertical, Theme.Spacing.xs)
+                        .glassChrome(in: RoundedRectangle(cornerRadius: Theme.Radius.sm), tint: Theme.ink,
                                      legacyFill: AnyShapeStyle(Theme.ink.opacity(0.88)))
-                        .padding(8)
+                        .padding(Theme.Spacing.sm)
                 }
 
                 // Topkeuze badge linksboven (compact zodat het niet botst met de afmetingen-badge)
@@ -1016,7 +1020,7 @@ private struct BagCard: View {
                         .frame(width: 22, height: 22)
                         .background(Theme.yellow)
                         .clipShape(Circle())
-                        .padding(8)
+                        .padding(Theme.Spacing.sm)
                         .frame(maxWidth: .infinity, alignment: .leading)
                 }
             }
@@ -1052,7 +1056,7 @@ private struct BagCard: View {
                                 .foregroundStyle(Theme.textSecondary)
                         }
                     }
-                    .padding(.top, 2)
+                    .padding(.top, Theme.Spacing.xxs)
                 }
 
                 // Prijskaartje: geel vlak met zwarte cijfers, zoals de
@@ -1061,10 +1065,10 @@ private struct BagCard: View {
                     Text(label)
                         .font(.system(size: 15, weight: .black, design: .monospaced))
                         .foregroundStyle(Theme.ink)
-                        .padding(.horizontal, 8)
-                        .padding(.vertical, 4)
-                        .background(Theme.yellow, in: RoundedRectangle(cornerRadius: 7))
-                        .padding(.top, 5)
+                        .padding(.horizontal, Theme.Spacing.sm)
+                        .padding(.vertical, Theme.Spacing.xs)
+                        .background(Theme.yellow, in: RoundedRectangle(cornerRadius: Theme.Radius.sm))
+                        .padding(.top, Theme.Spacing.xs)
                 }
                 if let domain = bag.shopDomain {
                     Text(domain)
@@ -1084,28 +1088,28 @@ private struct BagCard: View {
                             .minimumScaleFactor(0.8)
                     }
                     .foregroundStyle(Theme.green)
-                    .padding(.horizontal, 6)
-                    .padding(.vertical, 3)
+                    .padding(.horizontal, Theme.Spacing.xs)
+                    .padding(.vertical, Theme.Spacing.xxs)
                     .overlay(
-                        RoundedRectangle(cornerRadius: 4)
+                        RoundedRectangle(cornerRadius: Theme.Radius.sm)
                             .strokeBorder(Theme.green.opacity(0.45), lineWidth: 1)
                     )
-                    .padding(.top, 5)
+                    .padding(.top, Theme.Spacing.xs)
                 }
             }
-            .padding(12)
+            .padding(Theme.Spacing.md)
             // Vaste minimumhoogte voor het tekstblok: merk, kleuren en het
             // "past bij"-zegel zijn allemaal optioneel, waardoor de kaarten
             // anders ongelijk uitvallen naast elkaar in het raster.
             .frame(maxWidth: .infinity, minHeight: 128, alignment: .topLeading)
         }
         .background(Color(.systemBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 18))
+        .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.lg))
         .overlay(
-            RoundedRectangle(cornerRadius: 18)
+            RoundedRectangle(cornerRadius: Theme.Radius.lg)
                 .strokeBorder(Theme.ink.opacity(0.10), lineWidth: 1)
         )
-        .shadow(color: Theme.ink.opacity(0.12), radius: 12, x: 0, y: 5)
+        .cardElevation()
     }
 
     private var dimensionsBadge: String? {
@@ -1268,8 +1272,8 @@ struct ActiveFilterChip: View {
             }
         }
         .foregroundStyle(Theme.navy)
-        .padding(.horizontal, 12)
-        .padding(.vertical, 6)
+        .padding(.horizontal, Theme.Spacing.md)
+        .padding(.vertical, Theme.Spacing.xs)
         .background(Theme.navy.opacity(0.08))
         .clipShape(Capsule())
     }
@@ -1295,8 +1299,8 @@ private struct CategoryChip: View {
                 Text(label)
                     .font(.frutiger(size: 13, weight: .semibold))
             }
-            .padding(.horizontal, selected ? 14 : 18)
-            .padding(.vertical, 9)
+            .padding(.horizontal, selected ? Theme.Spacing.md : Theme.Spacing.base)
+            .padding(.vertical, Theme.Spacing.sm)
             .background(selected ? AnyShapeStyle(Theme.inkGradient) : AnyShapeStyle(Color(.systemBackground)))
             .foregroundStyle(selected ? .white : Theme.textPrimary)
             .clipShape(Capsule())
@@ -1306,6 +1310,8 @@ private struct CategoryChip: View {
                     lineWidth: 1
                 )
             )
+            // bewust eigen schaduw: intensiteit hangt af van select-status
+            // (0.18/0.04), niet uit te drukken in de statische cardElevation()
             .shadow(color: Theme.ink.opacity(selected ? 0.18 : 0.04), radius: 6, x: 0, y: 2)
         }
         .buttonStyle(.plain)
@@ -1319,21 +1325,24 @@ private struct SkeletonCard: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
+            // cornerRadius: 0 hier is bewust ongewijzigd — dit vlak wordt direct
+            // hieronder herclipt door de UnevenRoundedRectangle, dus de eigen
+            // hoekstraal doet er nooit toe.
             RoundedRectangle(cornerRadius: 0)
                 .fill(Color(.systemFill))
                 .frame(height: 150)
-                .clipShape(UnevenRoundedRectangle(topLeadingRadius: 18, bottomLeadingRadius: 0,
-                                                  bottomTrailingRadius: 0, topTrailingRadius: 18))
+                .clipShape(UnevenRoundedRectangle(topLeadingRadius: Theme.Radius.lg, bottomLeadingRadius: 0,
+                                                  bottomTrailingRadius: 0, topTrailingRadius: Theme.Radius.lg))
             VStack(alignment: .leading, spacing: 8) {
-                RoundedRectangle(cornerRadius: 4).fill(Color(.systemFill)).frame(height: 8).frame(maxWidth: 50)
-                RoundedRectangle(cornerRadius: 4).fill(Color(.systemFill)).frame(height: 12)
-                RoundedRectangle(cornerRadius: 4).fill(Color(.systemFill)).frame(height: 8).frame(maxWidth: 80)
-                RoundedRectangle(cornerRadius: 4).fill(Color(.systemFill)).frame(height: 20).frame(maxWidth: 60)
+                RoundedRectangle(cornerRadius: Theme.Radius.sm).fill(Color(.systemFill)).frame(height: 8).frame(maxWidth: 50)
+                RoundedRectangle(cornerRadius: Theme.Radius.sm).fill(Color(.systemFill)).frame(height: 12)
+                RoundedRectangle(cornerRadius: Theme.Radius.sm).fill(Color(.systemFill)).frame(height: 8).frame(maxWidth: 80)
+                RoundedRectangle(cornerRadius: Theme.Radius.sm).fill(Color(.systemFill)).frame(height: 20).frame(maxWidth: 60)
             }
-            .padding(12)
+            .padding(Theme.Spacing.md)
         }
         .background(Color(.systemBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 18))
+        .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.lg))
         .opacity(opacity)
         .onAppear {
             withAnimation(.easeInOut(duration: 0.9).repeatForever(autoreverses: true)) { opacity = 0.45 }

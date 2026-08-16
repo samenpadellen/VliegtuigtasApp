@@ -338,8 +338,8 @@ struct MoreHubView: View {
                 }
                 .frame(maxWidth: Theme.contentMaxWidth)
                 .frame(maxWidth: .infinity)
-                .padding(16)
-                .padding(.bottom, 40)
+                .padding(Theme.Spacing.base)
+                .padding(.bottom, Theme.Spacing.xl)
             }
             .background(Color(.systemGroupedBackground))
             .navigationTitle("Meer")
@@ -391,8 +391,8 @@ struct MoreHubView: View {
                     .foregroundStyle(.white.opacity(0.55))
             }
             .frame(maxWidth: .infinity)
-            .padding(.vertical, 20)
-            .padding(.horizontal, 16)
+            .padding(.vertical, Theme.Spacing.lg)
+            .padding(.horizontal, Theme.Spacing.base)
             .background(
                 LinearGradient(
                     colors: [
@@ -402,13 +402,13 @@ struct MoreHubView: View {
                     startPoint: .topLeading, endPoint: .bottomTrailing
                 )
             )
-            .clipShape(RoundedRectangle(cornerRadius: 16))
+            .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
 
             Text("Bedankt dat je Vliegtuigtas gebruikt.")
                 .font(.frutiger(size: 11))
                 .foregroundStyle(Theme.textSecondary)
         }
-        .padding(.top, 6)
+        .padding(.top, Theme.Spacing.sm)
         .accessibilityElement(children: .ignore)
         .accessibilityLabel("Nederlandse App van de Maand, iCulture 2026")
     }
@@ -484,10 +484,10 @@ private struct MoreTile: View {
                 }
             }
             .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(14)
+            .padding(Theme.Spacing.md)
             .background(Color(.systemBackground))
-            .clipShape(RoundedRectangle(cornerRadius: 16))
-            .shadow(color: .black.opacity(0.06), radius: 8, x: 0, y: 2)
+            .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
+            .cardElevation()
         }
         .buttonStyle(.pressableCard)
         .accessibilityLabel("\(item.title). \(item.subtitle)")
@@ -526,9 +526,9 @@ private struct VersionInfoCard: View {
                     .font(.system(size: 12, weight: .semibold))
                     .foregroundStyle(Theme.textSecondary)
             }
-            .padding(14)
+            .padding(Theme.Spacing.md)
             .background(Color(.systemBackground))
-            .clipShape(RoundedRectangle(cornerRadius: 14))
+            .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
         }
         .buttonStyle(.plain)
         .accessibilityLabel("Versie \(AppUpdateChecker.shared.currentVersion). Bekijk wat er nieuw is.")

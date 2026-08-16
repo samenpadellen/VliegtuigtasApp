@@ -164,7 +164,7 @@ private struct PimAlarmAdviesSheet: View {
                                 .foregroundStyle(Theme.textSecondary)
                         }
                         .frame(maxWidth: .infinity)
-                        .padding(.top, 40)
+                        .padding(.top, Theme.Spacing.xl)
                     } else if let advies = model.advies {
                         Text(advies.toelichting)
                             .font(.frutiger(size: 14))
@@ -179,7 +179,7 @@ private struct PimAlarmAdviesSheet: View {
                             adviceRow("Inpakken", days: advies.dagenVoorInpakken)
                         }
                         .background(Color(.systemBackground))
-                        .clipShape(RoundedRectangle(cornerRadius: 14))
+                        .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
 
                         Button {
                             onApply(advies)
@@ -188,10 +188,10 @@ private struct PimAlarmAdviesSheet: View {
                             Text("Neem dit schema over")
                                 .font(.frutiger(size: 15, weight: .semibold))
                                 .frame(maxWidth: .infinity)
-                                .padding(.vertical, 14)
+                                .padding(.vertical, Theme.Spacing.md)
                                 .background(Theme.inkGradient)
                                 .foregroundStyle(.white)
-                                .clipShape(RoundedRectangle(cornerRadius: 14))
+                                .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
                         }
                         .buttonStyle(.plain)
 
@@ -202,10 +202,10 @@ private struct PimAlarmAdviesSheet: View {
                         Label(error, systemImage: "exclamationmark.circle.fill")
                             .font(.system(size: 14))
                             .foregroundStyle(Theme.red)
-                            .padding(.top, 30)
+                            .padding(.top, Theme.Spacing.xl)
                     }
                 }
-                .padding(16)
+                .padding(Theme.Spacing.base)
             }
             .background(Color(.systemGroupedBackground))
             .navigationTitle("Pims schema")
@@ -235,11 +235,11 @@ private struct PimAlarmAdviesSheet: View {
             Text(days == 1 ? "1 dag vooraf" : "\(days) dagen vooraf")
                 .font(.system(size: 12, weight: .bold, design: .monospaced))
                 .foregroundStyle(Theme.ink)
-                .padding(.horizontal, 9)
-                .padding(.vertical, 4)
+                .padding(.horizontal, Theme.Spacing.sm)
+                .padding(.vertical, Theme.Spacing.xs)
                 .background(Theme.yellow, in: Capsule())
         }
-        .padding(14)
+        .padding(Theme.Spacing.md)
     }
 }
 
@@ -288,8 +288,8 @@ struct PackingAlarmsSheet: View {
                 }
                 .frame(maxWidth: Theme.contentMaxWidth)
                 .frame(maxWidth: .infinity)
-                .padding(16)
-                .padding(.bottom, 24)
+                .padding(Theme.Spacing.base)
+                .padding(.bottom, Theme.Spacing.lg)
             }
             .background(Color(.systemGroupedBackground))
             .navigationTitle("Inpak-alarmen")
@@ -334,10 +334,10 @@ struct PackingAlarmsSheet: View {
                         .foregroundStyle(Theme.textSecondary)
                 }
                 .foregroundStyle(Theme.navy)
-                .padding(.vertical, 12)
-                .padding(.horizontal, 14)
+                .padding(.vertical, Theme.Spacing.md)
+                .padding(.horizontal, Theme.Spacing.md)
                 .background(Theme.skyLight)
-                .clipShape(RoundedRectangle(cornerRadius: 14))
+                .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
             }
             .buttonStyle(.plain)
             .sheet(isPresented: $showPimAdvies) {
@@ -399,10 +399,10 @@ struct PackingAlarmsSheet: View {
                             .foregroundStyle(Theme.green)
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(.vertical, 12)
-                    .padding(.horizontal, 14)
+                    .padding(.vertical, Theme.Spacing.md)
+                    .padding(.horizontal, Theme.Spacing.md)
                     .background(Theme.green.opacity(0.10))
-                    .clipShape(RoundedRectangle(cornerRadius: 12))
+                    .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
                 } else {
                     HStack(spacing: 8) {
                         Text("Herinner me op")
@@ -433,14 +433,14 @@ struct PackingAlarmsSheet: View {
                             .font(.frutiger(size: 14, weight: .bold))
                             .foregroundStyle(.white)
                             .frame(maxWidth: .infinity)
-                            .padding(.vertical, 12)
+                            .padding(.vertical, Theme.Spacing.md)
                             .background(Theme.inkGradient)
-                            .clipShape(RoundedRectangle(cornerRadius: 12))
+                            .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
                     }
                     .buttonStyle(.plain)
                 }
             }
-            .padding(16)
+            .padding(Theme.Spacing.base)
         }
     }
 
@@ -461,6 +461,6 @@ struct PackingAlarmsSheet: View {
                 .font(.system(size: 11))
                 .foregroundStyle(Theme.sky)
         }
-        .padding(.top, 4)
+        .padding(.top, Theme.Spacing.xs)
     }
 }

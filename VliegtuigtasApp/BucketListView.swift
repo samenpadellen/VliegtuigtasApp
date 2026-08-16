@@ -71,19 +71,19 @@ struct BucketListView: View {
                                 )
                                 .zoomSource(id: country.iso2, in: zoomNamespace)
                                 if country.id != group.countries.last?.id {
-                                    Divider().padding(.leading, 54)
+                                    Divider().padding(.leading, Theme.Spacing.xxl)
                                 }
                             }
                         }
                         .background(Color(.systemBackground))
-                        .clipShape(RoundedRectangle(cornerRadius: 14))
+                        .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
                     }
                 }
             }
             .frame(maxWidth: Theme.contentMaxWidth)
             .frame(maxWidth: .infinity)
-            .padding(16)
-            .padding(.bottom, 32)
+            .padding(Theme.Spacing.base)
+            .padding(.bottom, Theme.Spacing.xl)
         }
         .background(Color(.systemGroupedBackground))
         .navigationTitle("Bucket list")
@@ -127,8 +127,8 @@ struct BucketListView: View {
                         }
                     }
                 }
-                .padding(.horizontal, 2)
-                .padding(.vertical, 2)
+                .padding(.horizontal, Theme.Spacing.xxs)
+                .padding(.vertical, Theme.Spacing.xxs)
             }
         }
     }
@@ -143,8 +143,8 @@ struct BucketListView: View {
                     Text(f.label)
                         .font(.frutiger(size: 13, weight: .semibold))
                         .foregroundStyle(filter == f ? .white : Theme.textPrimary)
-                        .padding(.horizontal, 13)
-                        .padding(.vertical, 8)
+                        .padding(.horizontal, Theme.Spacing.md)
+                        .padding(.vertical, Theme.Spacing.sm)
                         .background(
                             filter == f
                                 ? AnyShapeStyle(Theme.inkGradient)
@@ -181,18 +181,18 @@ private struct CountryRow: View {
                     // foto, wat de lijst onduidelijk maakte.
                     ZStack(alignment: .bottomTrailing) {
                         ZStack {
-                            RoundedRectangle(cornerRadius: 8)
+                            RoundedRectangle(cornerRadius: Theme.Radius.sm)
                                 .fill(Theme.navy.opacity(0.08))
                             if let photoUrl = photoCache.photo(for: country)?.url {
                                 AuthorisedImage(urlString: photoUrl, fill: true)
                             }
                         }
                         .frame(width: 40, height: 40)
-                        .clipShape(RoundedRectangle(cornerRadius: 8))
+                        .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.sm))
 
                         Text(country.flagEmoji)
                             .font(.system(size: 15))
-                            .padding(1)
+                            .padding(Theme.Spacing.xxs)
                             .background(.white, in: Circle())
                             .overlay(Circle().strokeBorder(Color(.systemBackground), lineWidth: 1.5))
                             .offset(x: 5, y: 5)
@@ -231,8 +231,8 @@ private struct CountryRow: View {
             }
             .buttonStyle(.plain)
         }
-        .padding(.horizontal, 12)
-        .padding(.vertical, 10)
+        .padding(.horizontal, Theme.Spacing.md)
+        .padding(.vertical, Theme.Spacing.md)
         .contentShape(Rectangle())
     }
 }
@@ -264,8 +264,8 @@ struct CountryDetailView: View {
                 photoHero
                 statusCard
             }
-            .padding(16)
-            .padding(.bottom, 32)
+            .padding(Theme.Spacing.base)
+            .padding(.bottom, Theme.Spacing.xl)
         }
         .background(Color(.systemGroupedBackground))
         .navigationBarTitleDisplayMode(.inline)
@@ -278,7 +278,7 @@ struct CountryDetailView: View {
     private var photoHero: some View {
         VStack(alignment: .trailing, spacing: 4) {
             ZStack {
-                RoundedRectangle(cornerRadius: 18)
+                RoundedRectangle(cornerRadius: Theme.Radius.lg)
                     .fill(Theme.navy.opacity(0.08))
                 if let photoUrl = photoCache.photo(for: country)?.url {
                     AuthorisedImage(urlString: photoUrl, fill: true)
@@ -289,7 +289,7 @@ struct CountryDetailView: View {
             }
             .frame(height: 200)
             .frame(maxWidth: .infinity)
-            .clipShape(RoundedRectangle(cornerRadius: 18))
+            .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.lg))
 
             // Pexels vraagt credit bij prominente weergave.
             if let photo = photoCache.photo(for: country),
@@ -345,9 +345,9 @@ struct CountryDetailView: View {
                 }
             }
         }
-        .padding(16)
+        .padding(Theme.Spacing.base)
         .background(Color(.systemBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 16))
+        .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
     }
 
     private func statusButton(
@@ -362,9 +362,9 @@ struct CountryDetailView: View {
             }
             .foregroundStyle(isActive ? .white : color)
             .frame(maxWidth: .infinity)
-            .padding(.vertical, 11)
+            .padding(.vertical, Theme.Spacing.md)
             .background(isActive ? AnyShapeStyle(color) : AnyShapeStyle(color.opacity(0.12)))
-            .clipShape(RoundedRectangle(cornerRadius: 12))
+            .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
         }
         .buttonStyle(.plain)
     }
@@ -408,9 +408,9 @@ struct PassportPreviewCard: View {
                     .font(.system(size: 12, weight: .semibold))
                     .foregroundStyle(Theme.textSecondary)
             }
-            .padding(14)
+            .padding(Theme.Spacing.base)
             .background(Color(.systemBackground))
-            .clipShape(RoundedRectangle(cornerRadius: 14))
+            .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
         }
         .buttonStyle(.plain)
     }
@@ -420,6 +420,10 @@ struct PassportPreviewCard: View {
     /// icoontje. De kaart piept boven de sleeve uit, licht gedraaid, zoals
     /// een kaart die net niet helemaal in zijn hoesje zit.
     private var sleeveIcon: some View {
+        // Bewust buiten Theme.Radius: de sleeve (8) en de kaart erin (6) zijn
+        // met opzet 2pt uit elkaar zodat de kaart net iets scherper oogt en
+        // strak binnen de sleeve nestelt — los tokenizen zou dat verschil
+        // laten drijven en de nesting verstoren.
         ZStack(alignment: .top) {
             RoundedRectangle(cornerRadius: 8)
                 .fill(
@@ -435,10 +439,12 @@ struct PassportPreviewCard: View {
                     RoundedRectangle(cornerRadius: 8)
                         .strokeBorder(style: StrokeStyle(lineWidth: 1, dash: [2, 2]))
                         .foregroundStyle(.white.opacity(0.25))
-                        .padding(2)
+                        .padding(Theme.Spacing.xxs)
                 )
                 .frame(width: 52, height: 50)
                 .offset(y: 18)
+                // bewust eigen schaduw: korte, zachte lift voor de leren
+                // sleeve-laag zelf, niet de algemene kaart-elevatie
                 .shadow(color: .black.opacity(0.18), radius: 4, x: 0, y: 2)
 
             RoundedRectangle(cornerRadius: 6)
@@ -460,10 +466,12 @@ struct PassportPreviewCard: View {
                         .font(.system(size: 13, weight: .light))
                         .foregroundStyle(passportGold)
                         .rotationEffect(.degrees(-45))
-                        .padding(.top, 7)
+                        .padding(.top, Theme.Spacing.sm)
                 }
                 .frame(width: 38, height: 40)
                 .rotationEffect(.degrees(-4))
+                // bewust eigen schaduw: losse, scheefstaande kaart-laag
+                // heeft een net iets diepere lift dan de sleeve eronder
                 .shadow(color: .black.opacity(0.22), radius: 3, x: 0, y: 2)
         }
         .frame(width: 52, height: 68)
@@ -568,12 +576,12 @@ struct TravelPassportView: View {
             Text("Tik om te openen")
                 .font(.frutiger(size: 13))
                 .foregroundStyle(Theme.textSecondary)
-                .padding(.top, 22)
+                .padding(.top, Theme.Spacing.lg)
 
             Spacer(minLength: 0)
         }
         .frame(maxWidth: .infinity)
-        .padding(24)
+        .padding(Theme.Spacing.lg)
     }
 
     private var coverCard: some View {
@@ -582,13 +590,13 @@ struct TravelPassportView: View {
                 .font(.system(size: 9, weight: .bold, design: .serif))
                 .kerning(3.5)
                 .foregroundStyle(passportGold)
-                .padding(.top, 34)
+                .padding(.top, Theme.Spacing.xl)
 
             Text("REISPASPOORT")
                 .font(.system(size: 20, weight: .bold, design: .serif))
                 .kerning(2.5)
                 .foregroundStyle(passportGold)
-                .padding(.top, 26)
+                .padding(.top, Theme.Spacing.lg)
 
             Spacer(minLength: 0)
 
@@ -616,6 +624,8 @@ struct TravelPassportView: View {
 
             // Chipsymbool onderaan, zoals op een biometrisch paspoort.
             ZStack {
+                // bewust buiten Theme.Radius: piepklein chipje (26×19pt) —
+                // Radius.sm (8) zou hier al te rond/pil-achtig ogen
                 RoundedRectangle(cornerRadius: 3)
                     .strokeBorder(passportGold.opacity(0.8), lineWidth: 1.4)
                     .frame(width: 26, height: 19)
@@ -623,8 +633,8 @@ struct TravelPassportView: View {
                     .strokeBorder(passportGold.opacity(0.8), lineWidth: 1.4)
                     .frame(width: 9, height: 9)
             }
-            .padding(.top, 14)
-            .padding(.bottom, 30)
+            .padding(.top, Theme.Spacing.base)
+            .padding(.bottom, Theme.Spacing.xl)
         }
         .frame(maxWidth: 280)
         .frame(height: 400)
@@ -638,10 +648,12 @@ struct TravelPassportView: View {
             )
         )
         .overlay(
-            RoundedRectangle(cornerRadius: 14)
+            RoundedRectangle(cornerRadius: Theme.Radius.md)
                 .strokeBorder(passportGold.opacity(0.22), lineWidth: 1)
         )
-        .clipShape(RoundedRectangle(cornerRadius: 14))
+        .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
+        // bewust eigen schaduw: dramatische "zwevende paspoort"-lift voor de
+        // omslag, veel dieper dan de standaard kaart-elevatie
         .shadow(color: .black.opacity(0.35), radius: 22, x: 0, y: 12)
         .accessibilityElement(children: .ignore)
         .accessibilityLabel("Reispaspoort, tik om te openen")
@@ -657,7 +669,7 @@ struct TravelPassportView: View {
         ScrollView {
                 VStack(spacing: 24) {
                     passportCard
-                        .padding(.top, 8)
+                        .padding(.top, Theme.Spacing.sm)
 
                     if let renderedImage {
                         ShareLink(
@@ -667,10 +679,10 @@ struct TravelPassportView: View {
                             Label("Deel je reispaspoort", systemImage: "square.and.arrow.up")
                                 .font(.frutiger(size: 15, weight: .semibold))
                                 .frame(maxWidth: .infinity)
-                                .padding(.vertical, 14)
+                                .padding(.vertical, Theme.Spacing.base)
                                 .background(Theme.inkGradient)
                                 .foregroundStyle(.white)
-                                .clipShape(RoundedRectangle(cornerRadius: 14))
+                                .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
                         }
                     } else {
                         ProgressView().tint(Theme.navy)
@@ -680,8 +692,8 @@ struct TravelPassportView: View {
                     continentSection
                     tripsSection
                 }
-                .padding(16)
-                .padding(.bottom, 24)
+                .padding(Theme.Spacing.base)
+                .padding(.bottom, Theme.Spacing.lg)
         }
         .transition(.opacity.combined(with: .move(edge: .bottom)))
     }
@@ -726,11 +738,11 @@ struct TravelPassportView: View {
                 .foregroundStyle(Theme.green)
         }
         .foregroundStyle(Theme.textPrimary)
-        .padding(.vertical, 9)
-        .padding(.horizontal, 6)
+        .padding(.vertical, Theme.Spacing.sm)
+        .padding(.horizontal, Theme.Spacing.sm)
         .frame(maxWidth: .infinity)
         .overlay(
-            RoundedRectangle(cornerRadius: 9)
+            RoundedRectangle(cornerRadius: Theme.Radius.sm)
                 .strokeBorder(Theme.green.opacity(0.55), style: StrokeStyle(lineWidth: 1.5, dash: [3, 2]))
         )
         .rotationEffect(.degrees(angle))
@@ -750,9 +762,9 @@ struct TravelPassportView: View {
                     continentRow(continent)
                 }
             }
-            .padding(14)
+            .padding(Theme.Spacing.base)
             .background(Color(.systemBackground))
-            .clipShape(RoundedRectangle(cornerRadius: 16))
+            .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
         }
     }
 
@@ -790,20 +802,20 @@ struct TravelPassportView: View {
                     .foregroundStyle(Theme.textSecondary)
                     .fixedSize(horizontal: false, vertical: true)
                     .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(14)
+                    .padding(Theme.Spacing.base)
                     .background(Color(.systemBackground))
-                    .clipShape(RoundedRectangle(cornerRadius: 16))
+                    .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
             } else {
                 VStack(spacing: 0) {
                     ForEach(completedTrips) { trip in
                         tripRow(trip)
                         if trip.id != completedTrips.last?.id {
-                            Divider().padding(.leading, 68)
+                            Divider().padding(.leading, Theme.Spacing.section)
                         }
                     }
                 }
                 .background(Color(.systemBackground))
-                .clipShape(RoundedRectangle(cornerRadius: 16))
+                .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
             }
         }
     }
@@ -811,7 +823,7 @@ struct TravelPassportView: View {
     private func tripRow(_ trip: Trip) -> some View {
         HStack(spacing: 12) {
             ZStack {
-                RoundedRectangle(cornerRadius: 10).fill(Theme.skyLight)
+                RoundedRectangle(cornerRadius: Theme.Radius.sm).fill(Theme.skyLight)
                 if let photoUrl = trip.photoUrl {
                     AuthorisedImage(urlString: photoUrl, fill: true)
                 } else {
@@ -821,7 +833,7 @@ struct TravelPassportView: View {
                 }
             }
             .frame(width: 44, height: 44)
-            .clipShape(RoundedRectangle(cornerRadius: 10))
+            .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.sm))
 
             VStack(alignment: .leading, spacing: 2) {
                 Text(trip.name)
@@ -838,7 +850,7 @@ struct TravelPassportView: View {
                 .font(.system(size: 14))
                 .foregroundStyle(Theme.green)
         }
-        .padding(12)
+        .padding(Theme.Spacing.md)
     }
 
     private func tripSubtitle(_ trip: Trip) -> String {
@@ -854,12 +866,12 @@ struct TravelPassportView: View {
             heroHeader
             if !store.visitedCountries.isEmpty {
                 flagMosaic
-                    .padding(20)
+                    .padding(Theme.Spacing.lg)
             }
         }
         .frame(maxWidth: .infinity)
         .background(Theme.skyGradient)
-        .clipShape(RoundedRectangle(cornerRadius: 24))
+        .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.xl))
     }
 
     /// Full-page bestemmingsfoto als achtergrond, met de kernstats erop —
@@ -901,8 +913,12 @@ struct TravelPassportView: View {
                 }
                 .foregroundStyle(.white)
 
+                // Het ene luide typografische moment van de app — net als Airbnb's
+                // ratingcijfer (64px/700): de rest van het scherm blijft bewust
+                // ingetogen zodat dit percentage het enige is dat er echt uitspringt.
                 Text("\(Int(store.percentWorld.rounded()))%")
-                    .font(.frutiger(size: 52, weight: .black))
+                    .font(.frutiger(size: 64, weight: .black))
+                    .kerning(-1)
                     .foregroundStyle(.white)
                 Text("van de wereld gezien")
                     .font(.frutiger(size: 13, weight: .semibold))
@@ -914,8 +930,8 @@ struct TravelPassportView: View {
                     statColumn(value: "\(store.wantToVisitCount)", label: "Op de lijst")
                 }
             }
-            .padding(.bottom, 20)
-            .padding(.horizontal, 16)
+            .padding(.bottom, Theme.Spacing.base)
+            .padding(.horizontal, Theme.Spacing.base)
 
             if passportPhoto.customImage == nil,
                let photo = heroPhoto,
@@ -929,16 +945,16 @@ struct TravelPassportView: View {
                 }
                 .font(.frutiger(size: 9, weight: .semibold))
                 .foregroundStyle(.white.opacity(0.75))
-                .padding(.horizontal, 8)
-                .padding(.vertical, 4)
+                .padding(.horizontal, Theme.Spacing.sm)
+                .padding(.vertical, Theme.Spacing.xs)
                 .background(.black.opacity(0.25), in: Capsule())
-                .padding(10)
+                .padding(Theme.Spacing.md)
                 .frame(maxWidth: .infinity, alignment: .trailing)
                 .frame(maxHeight: .infinity, alignment: .top)
             }
 
             photoEditControls
-                .padding(10)
+                .padding(Theme.Spacing.md)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .frame(maxHeight: .infinity, alignment: .top)
         }
@@ -1007,9 +1023,9 @@ struct TravelPassportView: View {
                     .foregroundStyle(.white.opacity(0.75))
             }
         }
-        .padding(12)
+        .padding(Theme.Spacing.md)
         .background(.white.opacity(0.12))
-        .clipShape(RoundedRectangle(cornerRadius: 14))
+        .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
     }
 }
 

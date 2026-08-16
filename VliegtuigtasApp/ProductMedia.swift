@@ -167,12 +167,12 @@ struct ProductGalleryView: View {
                     .foregroundStyle(Theme.ink)
                     .frame(width: 40, height: 40)
                     .background(.white, in: Circle())
-                    .shadow(color: .black.opacity(0.10), radius: 6, x: 0, y: 2)
+                    .cardElevation()
             }
             .accessibilityLabel("Sluit gallerij")
         }
-        .padding(.horizontal, 18)
-        .padding(.top, 12)
+        .padding(.horizontal, Theme.Spacing.base)
+        .padding(.top, Theme.Spacing.md)
     }
 
     @ViewBuilder
@@ -213,7 +213,7 @@ struct ProductGalleryView: View {
                 .animation(.spring(response: 0.3), value: selection)
             }
         }
-        .padding(.bottom, 26)
+        .padding(.bottom, Theme.Spacing.lg)
     }
 }
 

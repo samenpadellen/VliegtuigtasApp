@@ -88,10 +88,11 @@ struct HomeView: View {
                         BoardingPassStats()
                     }
                     .frame(maxWidth: contentMaxWidth)
-                    .padding(.horizontal, 16)
-                    .padding(.top, 24)
-                    // Ruim genoeg om onder de zwevende tabbalk uit te scrollen;
-                    // met 48pt bleef de onderste kaart er half achter hangen.
+                    .padding(.horizontal, Theme.Spacing.base)
+                    .padding(.top, Theme.Spacing.lg)
+                    // bewust buiten Theme.Spacing: ruim genoeg om onder de zwevende
+                    // tabbalk uit te scrollen; met 48pt (xxl) bleef de onderste kaart
+                    // er half achter hangen.
                     .padding(.bottom, 110)
                 }
             }
@@ -129,7 +130,7 @@ struct HomeView: View {
                             savePendingFlight()
                         }
                     )
-                    .padding(16)
+                    .padding(Theme.Spacing.base)
                 }
                 .background(Color(.systemGroupedBackground))
                 .presentationDetents([.medium, .large])
@@ -190,8 +191,8 @@ struct HomeView: View {
                 Text(boardCountdown.uppercased())
                     .font(.system(size: 10, weight: .black, design: .monospaced))
                     .foregroundStyle(Theme.ink)
-                    .padding(.horizontal, 8)
-                    .padding(.vertical, 3)
+                    .padding(.horizontal, Theme.Spacing.sm)
+                    .padding(.vertical, Theme.Spacing.xs)
                     .background(Theme.yellow, in: Capsule())
             }
 
@@ -207,9 +208,9 @@ struct HomeView: View {
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(16)
+        .padding(Theme.Spacing.base)
         .background(Theme.inkGradient)
-        .clipShape(RoundedRectangle(cornerRadius: 18))
+        .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.lg))
         // Easter egg: bord lang vasthouden → afscheidsgroet over het bord.
         .overlay {
             if showFarewell {
@@ -223,7 +224,7 @@ struct HomeView: View {
                 .foregroundStyle(Theme.ink)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .background(Theme.yellow)
-                .clipShape(RoundedRectangle(cornerRadius: 18))
+                .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.lg))
                 .transition(.scale(scale: 0.85).combined(with: .opacity))
             }
         }
@@ -364,8 +365,8 @@ struct HomeView: View {
                             .opacity(0.7)
                     }
                     .foregroundStyle(.white.opacity(0.9))
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 8)
+                    .padding(.horizontal, Theme.Spacing.md)
+                    .padding(.vertical, Theme.Spacing.sm)
                     .glassChrome(in: Capsule(), interactive: true, legacyFill: AnyShapeStyle(.white.opacity(0.15)))
                     .contentShape(Capsule())
                 }
@@ -373,8 +374,8 @@ struct HomeView: View {
                 .accessibilityLabel("Open mijn profiel")
             }
             .frame(maxWidth: contentMaxWidth)
-            .padding(.horizontal, 20)
-            .padding(.top, statusBarHeight + 8)
+            .padding(.horizontal, Theme.Spacing.lg)
+            .padding(.top, statusBarHeight + Theme.Spacing.sm)
         }
         // Headline + CTA pinned to bottom (gecentreerde kolom op brede schermen)
         .overlay(alignment: .bottom) {
@@ -402,16 +403,16 @@ struct HomeView: View {
                             .font(.frutiger(size: 16, weight: .semibold))
                     }
                     .frame(maxWidth: .infinity)
-                    .padding(.vertical, 17)
+                    .padding(.vertical, Theme.Spacing.base)
                     .background(.white)
                     .foregroundStyle(Theme.navy)
-                    .clipShape(RoundedRectangle(cornerRadius: 16))
+                    .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
                 }
                 .buttonStyle(.plain)
             }
             .frame(maxWidth: contentMaxWidth)
-            .padding(.horizontal, 20)
-            .padding(.bottom, 28)
+            .padding(.horizontal, Theme.Spacing.lg)
+            .padding(.bottom, Theme.Spacing.xl)
             // De hero heeft een vaste hoogte, en het klapperbord schaalt niet
             // mee met Dynamic Type. Zonder deze grens liep de tekst bij de
             // grootste letterinstellingen dwars door de merkregel bovenaan.
@@ -543,11 +544,11 @@ private struct GateBadge: View {
         Text(code)
             .font(.system(size: 10, weight: .black, design: .monospaced))
             .foregroundStyle(active ? Theme.ink : Theme.textSecondary)
-            .padding(.horizontal, 7)
-            .padding(.vertical, 3)
+            .padding(.horizontal, Theme.Spacing.sm)
+            .padding(.vertical, Theme.Spacing.xs)
             .background(
                 active ? AnyShapeStyle(Theme.yellow) : AnyShapeStyle(Color(.tertiarySystemFill)),
-                in: RoundedRectangle(cornerRadius: 5)
+                in: RoundedRectangle(cornerRadius: Theme.Radius.sm)
             )
     }
 }
@@ -627,7 +628,7 @@ private struct TerminalRouteStrip: View {
                             .fill(stop.done ? Theme.yellow : Theme.textSecondary.opacity(0.22))
                             .frame(height: 3)
                             .frame(maxWidth: .infinity)
-                            .padding(.bottom, 22)
+                            .padding(.bottom, Theme.Spacing.lg)
                     }
                 }
             }
@@ -645,16 +646,16 @@ private struct TerminalRouteStrip: View {
                 }
                 .foregroundStyle(Theme.ink)
                 .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.horizontal, 11)
-                .padding(.vertical, 8)
-                .background(Theme.yellow, in: RoundedRectangle(cornerRadius: 10))
+                .padding(.horizontal, Theme.Spacing.md)
+                .padding(.vertical, Theme.Spacing.sm)
+                .background(Theme.yellow, in: RoundedRectangle(cornerRadius: Theme.Radius.sm))
                 .transition(.move(edge: .bottom).combined(with: .opacity))
             }
         }
-        .padding(16)
+        .padding(Theme.Spacing.base)
         .background(Color(.systemBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 18))
-        .shadow(color: .black.opacity(0.05), radius: 10, x: 0, y: 3)
+        .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.lg))
+        .cardElevation()
     }
 
     /// Afgeronde haltes blijven tikbaar — 3× tikken roept de gate om
@@ -745,7 +746,7 @@ private struct GateTipsRow: View {
                             card(tip)
                         }
                     }
-                    .padding(.vertical, 2)
+                    .padding(.vertical, Theme.Spacing.xxs)
                 }
             }
         }
@@ -765,7 +766,7 @@ private struct GateTipsRow: View {
                     Image(systemName: "xmark")
                         .font(.system(size: 10, weight: .bold))
                         .foregroundStyle(.white.opacity(0.55))
-                        .padding(4)
+                        .padding(Theme.Spacing.xs)
                 }
                 .buttonStyle(.plain)
                 .accessibilityLabel("Tip verbergen")
@@ -793,19 +794,19 @@ private struct GateTipsRow: View {
                             .font(.system(size: 10, weight: .bold))
                     }
                     .foregroundStyle(Theme.ink)
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 7)
+                    .padding(.horizontal, Theme.Spacing.md)
+                    .padding(.vertical, Theme.Spacing.sm)
                     .background(Theme.yellow, in: Capsule())
                 }
                 .buttonStyle(.plain)
             }
         }
-        .padding(14)
+        .padding(Theme.Spacing.md)
         // Ruimer dan eerst: bij 168pt viel de laatste tekstregel weg achter de
         // knop. De kaarten houden gelijke hoogte, maar nu mét de tekst erin.
         .frame(width: 232, height: 196, alignment: .topLeading)
         .background(Theme.inkGradient)
-        .clipShape(RoundedRectangle(cornerRadius: 16))
+        .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
     }
 }
 
@@ -885,7 +886,7 @@ private struct BoardingPassStats: View {
                 .buttonStyle(.plain)
                 .accessibilityLabel("Pursers logboek met hints voor verborgen grapjes")
             }
-            .padding(16)
+            .padding(Theme.Spacing.base)
         }
         .sheet(isPresented: $showLogbook) {
             PurserLogbookView()
@@ -963,10 +964,10 @@ private struct NextTripCard: View {
         Card {
             VStack(alignment: .leading, spacing: 0) {
                 header
-                Divider().padding(.leading, 16)
+                Divider().padding(.leading, Theme.Spacing.base)
                 if let trip, trip.progress.total > 0 {
                     packingRow(trip)
-                    Divider().padding(.leading, 16)
+                    Divider().padding(.leading, Theme.Spacing.base)
                 }
                 bagFitRow
             }
@@ -979,7 +980,7 @@ private struct NextTripCard: View {
         } label: {
             HStack(spacing: 14) {
                 ZStack {
-                    RoundedRectangle(cornerRadius: 12)
+                    RoundedRectangle(cornerRadius: Theme.Radius.md)
                         .fill(Theme.navy.opacity(0.10))
                     if let photoUrl = trip?.photoUrl {
                         AuthorisedImage(urlString: photoUrl, fill: true)
@@ -990,7 +991,7 @@ private struct NextTripCard: View {
                     }
                 }
                 .frame(width: 44, height: 44)
-                .clipShape(RoundedRectangle(cornerRadius: 12))
+                .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
                 VStack(alignment: .leading, spacing: 2) {
                     Text(trip?.name ?? flight?.number ?? "Jouw volgende reis")
                         .font(.frutiger(size: 15, weight: .bold))
@@ -1011,13 +1012,13 @@ private struct NextTripCard: View {
                     Text("\(readiness.overallPercent)% reisklaar")
                         .font(.frutiger(size: 11, weight: .bold))
                         .foregroundStyle(Theme.ink)
-                        .padding(.horizontal, 9)
-                        .padding(.vertical, 4)
+                        .padding(.horizontal, Theme.Spacing.sm)
+                        .padding(.vertical, Theme.Spacing.xs)
                         .background(Theme.yellow)
                         .clipShape(Capsule())
                 }
             }
-            .padding(16)
+            .padding(Theme.Spacing.base)
         }
         .buttonStyle(.plain)
         .disabled(trip == nil)
@@ -1043,7 +1044,7 @@ private struct NextTripCard: View {
                     .font(.system(size: 11, weight: .semibold))
                     .foregroundStyle(Theme.textSecondary)
             }
-            .padding(16)
+            .padding(Theme.Spacing.base)
         }
         .buttonStyle(.plain)
     }
@@ -1063,7 +1064,7 @@ private struct NextTripCard: View {
                     Image(systemName: "plus.circle.fill")
                         .foregroundStyle(Theme.navy)
                 }
-                .padding(16)
+                .padding(Theme.Spacing.base)
             }
             .buttonStyle(.plain)
         } else if let airline = resolvedAirline ?? selectedAirlineOverride {
@@ -1087,8 +1088,8 @@ private struct NextTripCard: View {
                         } label: {
                             Text(airline.name)
                                 .font(.frutiger(size: 12, weight: .semibold))
-                                .padding(.horizontal, 11)
-                                .padding(.vertical, 7)
+                                .padding(.horizontal, Theme.Spacing.md)
+                                .padding(.vertical, Theme.Spacing.sm)
                                 .background(Color(.secondarySystemGroupedBackground))
                                 .clipShape(Capsule())
                         }
@@ -1097,7 +1098,7 @@ private struct NextTripCard: View {
                 }
             }
         }
-        .padding(16)
+        .padding(Theme.Spacing.base)
     }
 
     private func fitVerdictRow(airline: Airline) -> some View {
@@ -1121,7 +1122,7 @@ private struct NextTripCard: View {
                 .fixedSize(horizontal: false, vertical: true)
             Spacer(minLength: 0)
         }
-        .padding(16)
+        .padding(Theme.Spacing.base)
     }
 }
 
@@ -1159,7 +1160,7 @@ struct DepartureReminderSheet: View {
                         title: "Reminders werken met een profiel",
                         reason: "Je vertrekreminder hoort bij je profiel: de notificaties zijn persoonlijk en dezelfde aftelling verschijnt op je widget, je Apple Watch en al je andere apparaten."
                     )
-                    .padding(16)
+                    .padding(Theme.Spacing.base)
                 }
                 .background(Color(.systemGroupedBackground))
                 .navigationTitle("Vertrekreminder")
@@ -1188,7 +1189,7 @@ struct DepartureReminderSheet: View {
                     Image(systemName: "airplane")
                         .font(.system(size: 13, weight: .bold))
                         .foregroundStyle(Theme.textSecondary)
-                        .padding(.top, 14)
+                        .padding(.top, Theme.Spacing.md)
                     airportField(title: "NAAR", airport: to) { pickingTo = true }
                 }
 
@@ -1209,9 +1210,9 @@ struct DepartureReminderSheet: View {
                         .foregroundStyle(Theme.textSecondary)
                     TextField(suggestedLabel, text: $label)
                         .font(.frutiger(size: 15))
-                        .padding(12)
+                        .padding(Theme.Spacing.md)
                         .background(Color(.secondarySystemGroupedBackground))
-                        .clipShape(RoundedRectangle(cornerRadius: 12))
+                        .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
                 }
 
                 Button {
@@ -1223,16 +1224,16 @@ struct DepartureReminderSheet: View {
                             .font(.frutiger(size: 16, weight: .semibold))
                     }
                     .frame(maxWidth: .infinity)
-                    .padding(.vertical, 15)
+                    .padding(.vertical, Theme.Spacing.base)
                     .background(saved ? AnyShapeStyle(Theme.green) : AnyShapeStyle(Theme.inkGradient))
                     .foregroundStyle(.white)
-                    .clipShape(RoundedRectangle(cornerRadius: 16))
+                    .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
                 }
                 .buttonStyle(.plain)
                 .disabled(saved)
-                .padding(.top, 4)
+                .padding(.top, Theme.Spacing.xs)
             }
-            .padding(20)
+            .padding(Theme.Spacing.base)
         }
         .background(Color(.systemGroupedBackground))
         .navigationTitle("Vlucht zonder nummer")
@@ -1268,11 +1269,11 @@ struct DepartureReminderSheet: View {
                     .lineLimit(1)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(12)
+            .padding(Theme.Spacing.md)
             .background(Color(.systemBackground))
-            .clipShape(RoundedRectangle(cornerRadius: 14))
+            .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
             .overlay(
-                RoundedRectangle(cornerRadius: 14)
+                RoundedRectangle(cornerRadius: Theme.Radius.md)
                     .strokeBorder(Theme.ink.opacity(0.08), lineWidth: 1)
             )
         }

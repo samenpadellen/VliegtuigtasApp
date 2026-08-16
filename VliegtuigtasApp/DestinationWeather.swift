@@ -160,9 +160,9 @@ struct DestinationWeatherCard: View {
                 .font(.frutiger(size: 10))
                 .foregroundStyle(Theme.textSecondary.opacity(0.8))
         }
-        .padding(16)
+        .padding(Theme.Spacing.base)
         .background(Color(.systemBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 16))
+        .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
     }
 
     /// Uitgelichte regel voor de aankomstdag: precies het weer dat je bij
@@ -182,9 +182,9 @@ struct DestinationWeatherCard: View {
             }
             Spacer()
         }
-        .padding(12)
+        .padding(Theme.Spacing.md)
         .background(Theme.sky.opacity(0.10))
-        .clipShape(RoundedRectangle(cornerRadius: 12))
+        .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
     }
 
     private func dayColumn(_ day: DestinationForecastDay, isArrival: Bool = false) -> some View {
@@ -204,9 +204,9 @@ struct DestinationWeatherCard: View {
                 .foregroundStyle(Theme.textSecondary)
         }
         .frame(width: 44)
-        .padding(.vertical, 6)
+        .padding(.vertical, Theme.Spacing.xs)
         .background(isArrival ? Theme.navy.opacity(0.08) : .clear)
-        .clipShape(RoundedRectangle(cornerRadius: 10))
+        .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.sm))
     }
 
     private func fullDateLabel(_ date: Date) -> String {
@@ -230,9 +230,9 @@ struct DestinationWeatherCard: View {
                 .font(.frutiger(size: 12))
                 .foregroundStyle(Theme.textSecondary)
         }
-        .padding(16)
+        .padding(Theme.Spacing.base)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(Color(.systemBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 16))
+        .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
     }
 }

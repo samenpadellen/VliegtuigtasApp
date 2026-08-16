@@ -116,6 +116,16 @@
     "swift-dependencies" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-iphonesimulator/Vliegtuigtas.build/Objects-normal/arm64/AppStrings.swiftdeps",
     "swiftmodule" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-iphonesimulator/Vliegtuigtas.build/Objects-normal/arm64/AppStrings~partial.swiftmodule"
   },
+  "/Users/wouterschut/Documents/VliegtuigtasApp/VliegtuigtasApp/AppUpdateChecker.swift" : {
+    "const-values" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-iphonesimulator/Vliegtuigtas.build/Objects-normal/arm64/AppUpdateChecker.swiftconstvalues",
+    "dependencies" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-iphonesimulator/Vliegtuigtas.build/Objects-normal/arm64/AppUpdateChecker.d",
+    "diagnostics" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-iphonesimulator/Vliegtuigtas.build/Objects-normal/arm64/AppUpdateChecker.dia",
+    "index-unit-output-path" : "/VliegtuigtasApp.build/Debug-iphonesimulator/Vliegtuigtas.build/Objects-normal/arm64/AppUpdateChecker.o",
+    "llvm-bc" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-iphonesimulator/Vliegtuigtas.build/Objects-normal/arm64/AppUpdateChecker.bc",
+    "object" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-iphonesimulator/Vliegtuigtas.build/Objects-normal/arm64/AppUpdateChecker.o",
+    "swift-dependencies" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-iphonesimulator/Vliegtuigtas.build/Objects-normal/arm64/AppUpdateChecker.swiftdeps",
+    "swiftmodule" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-iphonesimulator/Vliegtuigtas.build/Objects-normal/arm64/AppUpdateChecker~partial.swiftmodule"
+  },
   "/Users/wouterschut/Documents/VliegtuigtasApp/VliegtuigtasApp/AppleSignIn.swift" : {
     "const-values" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-iphonesimulator/Vliegtuigtas.build/Objects-normal/arm64/AppleSignIn.swiftconstvalues",
     "dependencies" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-iphonesimulator/Vliegtuigtas.build/Objects-normal/arm64/AppleSignIn.d",
@@ -545,6 +555,16 @@
     "object" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-iphonesimulator/Vliegtuigtas.build/Objects-normal/arm64/VliegtuigtasApp.o",
     "swift-dependencies" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-iphonesimulator/Vliegtuigtas.build/Objects-normal/arm64/VliegtuigtasApp.swiftdeps",
     "swiftmodule" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-iphonesimulator/Vliegtuigtas.build/Objects-normal/arm64/VliegtuigtasApp~partial.swiftmodule"
+  },
+  "/Users/wouterschut/Documents/VliegtuigtasApp/VliegtuigtasApp/WhatsNewView.swift" : {
+    "const-values" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-iphonesimulator/Vliegtuigtas.build/Objects-normal/arm64/WhatsNewView.swiftconstvalues",
+    "dependencies" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-iphonesimulator/Vliegtuigtas.build/Objects-normal/arm64/WhatsNewView.d",
+    "diagnostics" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-iphonesimulator/Vliegtuigtas.build/Objects-normal/arm64/WhatsNewView.dia",
+    "index-unit-output-path" : "/VliegtuigtasApp.build/Debug-iphonesimulator/Vliegtuigtas.build/Objects-normal/arm64/WhatsNewView.o",
+    "llvm-bc" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-iphonesimulator/Vliegtuigtas.build/Objects-normal/arm64/WhatsNewView.bc",
+    "object" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-iphonesimulator/Vliegtuigtas.build/Objects-normal/arm64/WhatsNewView.o",
+    "swift-dependencies" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-iphonesimulator/Vliegtuigtas.build/Objects-normal/arm64/WhatsNewView.swiftdeps",
+    "swiftmodule" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-iphonesimulator/Vliegtuigtas.build/Objects-normal/arm64/WhatsNewView~partial.swiftmodule"
   },
   "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-iphonesimulator/Vliegtuigtas.build/DerivedSources/GeneratedAssetSymbols.swift" : {
     "const-values" : "/Users/wouterschut/Documents/VliegtuigtasApp/build/VliegtuigtasApp.build/Debug-iphonesimulator/Vliegtuigtas.build/Objects-normal/arm64/GeneratedAssetSymbols.swiftconstvalues",

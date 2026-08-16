@@ -106,9 +106,9 @@ struct AppIconPicker: View {
                             Image(option.previewAsset)
                                 .resizable()
                                 .frame(width: 48, height: 48)
-                                .clipShape(RoundedRectangle(cornerRadius: 12))
+                                .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
                                 .overlay(
-                                    RoundedRectangle(cornerRadius: 12)
+                                    RoundedRectangle(cornerRadius: Theme.Radius.md)
                                         .strokeBorder(Color.black.opacity(0.08), lineWidth: 1)
                                 )
                                 .opacity(option.isLocked ? 0.4 : 1)
@@ -117,7 +117,7 @@ struct AppIconPicker: View {
                                 Image(systemName: "lock.fill")
                                     .font(.system(size: 11, weight: .bold))
                                     .foregroundStyle(.white)
-                                    .padding(5)
+                                    .padding(Theme.Spacing.xs)
                                     .background(Theme.navy, in: Circle())
                                     .offset(x: 4, y: 4)
                             }
@@ -140,10 +140,10 @@ struct AppIconPicker: View {
                                 .foregroundStyle(selected == option ? Theme.green : Theme.textSecondary.opacity(0.35))
                         }
                     }
-                    .padding(12)
+                    .padding(Theme.Spacing.md)
                     .background(Color(.systemBackground))
-                    .clipShape(RoundedRectangle(cornerRadius: 14))
-                    .contentShape(RoundedRectangle(cornerRadius: 14))
+                    .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
+                    .contentShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
                 }
                 .buttonStyle(.plain)
             }

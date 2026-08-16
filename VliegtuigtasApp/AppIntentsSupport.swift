@@ -469,7 +469,7 @@ private struct SavedBagFitSnippet: View {
                 }
             }
         }
-        .padding(16)
+        .padding(Theme.Spacing.base)
         .frame(maxWidth: .infinity, alignment: .leading)
     }
 
@@ -509,7 +509,7 @@ private struct CheckResultSnippet: View {
             }
             Spacer()
         }
-        .padding(16)
+        .padding(Theme.Spacing.base)
     }
 
     private var iconName: String {
@@ -553,7 +553,7 @@ private struct AirlineRulesSnippet: View {
                 }
             }
         }
-        .padding(16)
+        .padding(Theme.Spacing.base)
         .frame(maxWidth: .infinity, alignment: .leading)
     }
 }

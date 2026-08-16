@@ -22,12 +22,12 @@ struct BaggageCheckView: View {
             VStack(spacing: 16) {
                 airlineSelector
                 variantSelector
-                Divider().padding(.horizontal, 16)
+                Divider().padding(.horizontal, Theme.Spacing.base)
                 dimensionsSection
                 weightSection
                 checkButton
             }
-            .padding(.vertical, 16)
+            .padding(.vertical, Theme.Spacing.base)
         }
         .background(Color(.systemGroupedBackground))
         .navigationTitle("Handbagage checker")
@@ -94,10 +94,10 @@ struct BaggageCheckView: View {
                     Spacer()
                     Image(systemName: "chevron.right").foregroundStyle(Theme.textSecondary)
                 }
-                .padding(16)
+                .padding(Theme.Spacing.base)
             }
         }
-        .padding(.horizontal, 16)
+        .padding(.horizontal, Theme.Spacing.base)
     }
 
     @ViewBuilder
@@ -114,12 +114,12 @@ struct BaggageCheckView: View {
                                 }
                             }
                         }
-                        .padding(.horizontal, 4)
+                        .padding(.horizontal, Theme.Spacing.xs)
                     }
                 }
-                .padding(16)
+                .padding(Theme.Spacing.base)
             }
-            .padding(.horizontal, 16)
+            .padding(.horizontal, Theme.Spacing.base)
         }
     }
 
@@ -136,9 +136,9 @@ struct BaggageCheckView: View {
                 MeasurementField(label: "Breedte", unit: "cm", value: $width,  range: 1...80,  step: 1)
                 MeasurementField(label: "Diepte",  unit: "cm", value: $depth,  range: 1...60,  step: 1)
             }
-            .padding(16)
+            .padding(Theme.Spacing.base)
         }
-        .padding(.horizontal, 16)
+        .padding(.horizontal, Theme.Spacing.base)
     }
 
     private var weightSection: some View {
@@ -151,9 +151,9 @@ struct BaggageCheckView: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
                 MeasurementField(label: "Gewicht", unit: "kg", value: $weight, range: 1...40, step: 0.5)
             }
-            .padding(16)
+            .padding(Theme.Spacing.base)
         }
-        .padding(.horizontal, 16)
+        .padding(.horizontal, Theme.Spacing.base)
     }
 
     private var checkButton: some View {
@@ -175,8 +175,8 @@ struct BaggageCheckView: View {
                     .font(.caption1).foregroundStyle(Theme.textSecondary)
             }
         }
-        .padding(.horizontal, 16)
-        .padding(.top, 4)
+        .padding(.horizontal, Theme.Spacing.base)
+        .padding(.top, Theme.Spacing.xs)
     }
 
     // MARK: - Actions
@@ -203,8 +203,8 @@ private struct VariantChip: View {
         Button(action: action) {
             Text(variant.variantName)
                 .font(.frutiger(size: 13, weight: selected ? .semibold : .regular))
-                .padding(.horizontal, 14)
-                .padding(.vertical, 8)
+                .padding(.horizontal, Theme.Spacing.md)
+                .padding(.vertical, Theme.Spacing.sm)
                 .background(selected ? Theme.navy : Theme.card)
                 .foregroundStyle(selected ? .white : Theme.textPrimary)
                 .clipShape(Capsule())

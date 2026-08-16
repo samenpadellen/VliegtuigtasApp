@@ -136,14 +136,14 @@ struct BagDetailView: View {
                             )
                         }
                     }
-                    .padding(.horizontal, 20)
-                    .padding(.top, 20)
-                    .padding(.bottom, 8)
+                    .padding(.horizontal, Theme.Spacing.base)
+                    .padding(.top, Theme.Spacing.base)
+                    .padding(.bottom, Theme.Spacing.sm)
                     .pageEntrance()
 
                     if let similar = d.similarBags, !similar.isEmpty {
                         similarSection(similar)
-                            .padding(.top, 12)
+                            .padding(.top, Theme.Spacing.md)
                             .pageEntrance(delay: 0.06)
                     }
 
@@ -158,8 +158,8 @@ struct BagDetailView: View {
                 FloatingBackButton { dismiss() }
                 Spacer()
             }
-            .padding(.horizontal, 20)
-            .padding(.top, bagDetailStatusBarHeight + 10)
+            .padding(.horizontal, Theme.Spacing.base)
+            .padding(.top, bagDetailStatusBarHeight + Theme.Spacing.sm)
         }
     }
 
@@ -182,7 +182,7 @@ struct BagDetailView: View {
                 // onder afgesneden. De witte hero-achtergrond loopt door, dus
                 // er ontstaan geen zichtbare balken.
                 AuthorisedImage(urlString: images[0])
-                    .padding(.horizontal, 24)
+                    .padding(.horizontal, Theme.Spacing.lg)
                     .padding(.top, bagDetailStatusBarHeight)
                     .frame(maxWidth: .infinity)
                     .frame(height: heroHeight)
@@ -193,7 +193,7 @@ struct BagDetailView: View {
                 TabView(selection: $selectedImage) {
                     ForEach(Array(images.enumerated()), id: \.offset) { idx, url in
                         AuthorisedImage(urlString: url)
-                            .padding(.horizontal, 24)
+                            .padding(.horizontal, Theme.Spacing.lg)
                             .padding(.top, bagDetailStatusBarHeight)
                             .frame(maxWidth: .infinity)
                             .frame(height: heroHeight)
@@ -213,7 +213,7 @@ struct BagDetailView: View {
 
             if images.count > 1 {
                 pageDots(count: images.count)
-                    .padding(.bottom, 74)
+                    .padding(.bottom, Theme.Spacing.section)
             }
         }
         .frame(height: heroHeight)
@@ -226,8 +226,8 @@ struct BagDetailView: View {
         .overlay(alignment: .topTrailing) {
             if !images.isEmpty || hasVideo {
                 galleryButton(imageCount: images.count, hasVideo: hasVideo)
-                    .padding(.top, bagDetailStatusBarHeight + 10)
-                    .padding(.trailing, 20)
+                    .padding(.top, bagDetailStatusBarHeight + Theme.Spacing.sm)
+                    .padding(.trailing, Theme.Spacing.base)
             }
         }
         .overlay {
@@ -238,6 +238,8 @@ struct BagDetailView: View {
                     Image(systemName: "play.circle.fill")
                         .font(.system(size: 54))
                         .foregroundStyle(.white.opacity(0.92))
+                        // bewust eigen schaduw: legibility-schaduw voor het play-icoon
+                        // op wisselende fotobeelden, geen kaart-lift
                         .shadow(color: .black.opacity(0.3), radius: 8, x: 0, y: 2)
                 }
                 .buttonStyle(.plain)
@@ -278,8 +280,8 @@ struct BagDetailView: View {
                     .font(.frutiger(size: 12, weight: .semibold))
             }
             .foregroundStyle(Theme.navy)
-            .padding(.horizontal, 12)
-            .padding(.vertical, 8)
+            .padding(.horizontal, Theme.Spacing.md)
+            .padding(.vertical, Theme.Spacing.sm)
             .background(.ultraThinMaterial, in: Capsule())
         }
         .buttonStyle(.plain)
@@ -312,8 +314,8 @@ struct BagDetailView: View {
                     }
             }
         }
-        .padding(.horizontal, 10)
-        .padding(.vertical, 7)
+        .padding(.horizontal, Theme.Spacing.sm)
+        .padding(.vertical, Theme.Spacing.sm)
         .background(.ultraThinMaterial, in: Capsule())
         .animation(.spring(response: 0.35, dampingFraction: 0.8), value: selectedImage)
     }
@@ -342,16 +344,16 @@ struct BagDetailView: View {
                         Text(label)
                             .font(.system(size: 26, weight: .black, design: .monospaced))
                             .foregroundStyle(Theme.ink)
-                            .padding(.horizontal, 11)
-                            .padding(.vertical, 6)
-                            .background(Theme.yellow, in: RoundedRectangle(cornerRadius: 10))
+                            .padding(.horizontal, Theme.Spacing.md)
+                            .padding(.vertical, Theme.Spacing.xs)
+                            .background(Theme.yellow, in: RoundedRectangle(cornerRadius: Theme.Radius.sm))
                     }
                     if let domain = d.shopDomain {
                         HStack(spacing: 5) {
                             if d.shopLogoUrl != nil {
                                 AuthorisedImage(urlString: d.shopLogoUrl)
                                     .frame(width: 16, height: 16)
-                                    .clipShape(RoundedRectangle(cornerRadius: 3))
+                                    .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.sm))
                             }
                             Text(domain)
                                 .font(.frutiger(size: 11))
@@ -371,10 +373,11 @@ struct BagDetailView: View {
                                 .font(.system(size: 11, weight: .bold))
                         }
                         .foregroundStyle(.white)
-                        .padding(.horizontal, 18)
-                        .padding(.vertical, 14)
+                        .padding(.horizontal, Theme.Spacing.base)
+                        .padding(.vertical, Theme.Spacing.md)
                         .background(Theme.inkGradient)
                         .clipShape(Capsule())
+                        // bewust eigen schaduw: navy-getinte gloed onder de ink-gradient knop, geen neutrale kaart-schaduw.
                         .shadow(color: Theme.navy.opacity(0.28), radius: 10, x: 0, y: 4)
                     }
                 }
@@ -430,12 +433,12 @@ struct BagDetailView: View {
                 .minimumScaleFactor(0.75)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(.horizontal, 11)
-        .padding(.vertical, 10)
+        .padding(.horizontal, Theme.Spacing.md)
+        .padding(.vertical, Theme.Spacing.sm)
         .background(Color(.systemBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 12))
+        .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
         .overlay(
-            RoundedRectangle(cornerRadius: 12)
+            RoundedRectangle(cornerRadius: Theme.Radius.md)
                 .strokeBorder(Theme.ink.opacity(0.08), lineWidth: 1)
         )
     }
@@ -457,14 +460,14 @@ struct BagDetailView: View {
                                 .font(.frutiger(size: 12, weight: .medium))
                                 .foregroundStyle(Theme.textPrimary)
                         }
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 8)
+                        .padding(.horizontal, Theme.Spacing.md)
+                        .padding(.vertical, Theme.Spacing.sm)
                         .background(Color(.systemBackground))
                         .clipShape(Capsule())
                         .overlay(Capsule().strokeBorder(Color(.systemGray5), lineWidth: 1.2))
                     }
                 }
-                .padding(.leading, 1)
+                .padding(.leading, Theme.Spacing.xxs)
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -517,9 +520,10 @@ struct BagDetailView: View {
                             }
                             .foregroundStyle(.white)
                             .frame(maxWidth: .infinity)
-                            .padding(.vertical, 13)
+                            .padding(.vertical, Theme.Spacing.md)
                             .background(Theme.inkGradient)
-                            .clipShape(RoundedRectangle(cornerRadius: 14))
+                            .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
+                            // bewust eigen schaduw: navy-getinte gloed onder de ink-gradient knop, geen neutrale kaart-schaduw.
                             .shadow(color: Theme.navy.opacity(0.25), radius: 8, x: 0, y: 3)
                         }
                         .simultaneousGesture(TapGesture().onEnded {
@@ -527,11 +531,11 @@ struct BagDetailView: View {
                         })
                     }
                 }
-                .padding(14)
+                .padding(Theme.Spacing.md)
                 .background(Theme.green.opacity(0.07))
-                .clipShape(RoundedRectangle(cornerRadius: 16))
+                .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
                 .overlay(
-                    RoundedRectangle(cornerRadius: 16)
+                    RoundedRectangle(cornerRadius: Theme.Radius.md)
                         .strokeBorder(Theme.green.opacity(0.25), lineWidth: 1.2)
                 )
             }
@@ -576,11 +580,11 @@ struct BagDetailView: View {
                         .foregroundStyle(Theme.textSecondary)
                         .rotationEffect(.degrees(isExpanded.wrappedValue ? 180 : 0))
                 }
-                .padding(14)
+                .padding(Theme.Spacing.md)
                 .background(Color(.systemBackground))
-                .clipShape(RoundedRectangle(cornerRadius: 16))
-                .shadow(color: .black.opacity(0.04), radius: 6, x: 0, y: 2)
-                .contentShape(RoundedRectangle(cornerRadius: 16))
+                .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
+                .cardElevation()
+                .contentShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
             }
             .buttonStyle(.plain)
 
@@ -603,22 +607,22 @@ struct BagDetailView: View {
                                     .font(.system(size: 12, weight: .semibold))
                                     .foregroundStyle(Theme.textSecondary.opacity(0.4))
                             }
-                            .padding(.horizontal, 14)
-                            .padding(.vertical, 12)
+                            .padding(.horizontal, Theme.Spacing.md)
+                            .padding(.vertical, Theme.Spacing.md)
                             .background(
                                 style == .rejected
                                     ? Color.red.opacity(0.04)
                                     : Color(.systemBackground)
                             )
-                            .clipShape(RoundedRectangle(cornerRadius: 14))
+                            .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
                             .overlay(
-                                RoundedRectangle(cornerRadius: 14)
+                                RoundedRectangle(cornerRadius: Theme.Radius.md)
                                     .strokeBorder(
                                         style == .rejected ? Color.red.opacity(0.12) : Color.clear,
                                         lineWidth: 1
                                     )
                             )
-                            .shadow(color: .black.opacity(0.04), radius: 6, x: 0, y: 2)
+                            .cardElevation()
                         }
                         .buttonStyle(.pressableCard)
                     }
@@ -634,7 +638,7 @@ struct BagDetailView: View {
     private func similarSection(_ bags: [Bag]) -> some View {
         VStack(alignment: .leading, spacing: 14) {
             sectionHeader("Vergelijkbare tassen")
-                .padding(.horizontal, 20)
+                .padding(.horizontal, Theme.Spacing.base)
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 12) {
                     ForEach(bags) { bag in
@@ -645,7 +649,7 @@ struct BagDetailView: View {
                         .carouselTransition()
                     }
                 }
-                .padding(.horizontal, 20)
+                .padding(.horizontal, Theme.Spacing.base)
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -696,8 +700,8 @@ private struct SimilarBagTile: View {
             }
             .frame(width: 148, height: 148)
             .clipShape(UnevenRoundedRectangle(
-                topLeadingRadius: 14, bottomLeadingRadius: 0,
-                bottomTrailingRadius: 0, topTrailingRadius: 14
+                topLeadingRadius: Theme.Radius.md, bottomLeadingRadius: 0,
+                bottomTrailingRadius: 0, topTrailingRadius: Theme.Radius.md
             ))
 
             VStack(alignment: .leading, spacing: 4) {
@@ -716,15 +720,15 @@ private struct SimilarBagTile: View {
                     Text(label)
                         .font(.frutiger(size: 14, weight: .bold))
                         .foregroundStyle(Theme.navy)
-                        .padding(.top, 2)
+                        .padding(.top, Theme.Spacing.xxs)
                 }
             }
-            .padding(10)
+            .padding(Theme.Spacing.sm)
             .frame(width: 148, alignment: .leading)
         }
         .frame(width: 148)
         .background(Color(.systemBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 14))
-        .shadow(color: .black.opacity(0.06), radius: 8, x: 0, y: 3)
+        .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
+        .cardElevation()
     }
 }

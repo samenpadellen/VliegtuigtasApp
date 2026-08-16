@@ -28,7 +28,9 @@ struct SplashView: View {
                 .resizable()
                 .scaledToFit()
                 .frame(width: 96, height: 96)
-                .clipShape(RoundedRectangle(cornerRadius: 22, style: .continuous))
+                .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.lg, style: .continuous))
+                // bewust eigen schaduw: dramatisch dieper/donkerder dan de standaard
+                // kaartschaduw, om het app-icoon los van de achtergrond te laten zweven
                 .shadow(color: .black.opacity(0.3), radius: 18, x: 0, y: 10)
                 .scaleEffect(reduceMotion ? 1 : iconScale)
                 .opacity(iconOpacity)

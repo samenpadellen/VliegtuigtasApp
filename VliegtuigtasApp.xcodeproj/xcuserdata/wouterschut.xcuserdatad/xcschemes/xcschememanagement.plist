@@ -7,7 +7,17 @@
 		<key>Vliegtuigtas Clip.xcscheme_^#shared#^_</key>
 		<dict>
 			<key>orderHint</key>
-			<integer>5</integer>
+			<integer>7</integer>
+		</dict>
+		<key>Vliegtuigtas Messages.xcscheme_^#shared#^_</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>6</integer>
+		</dict>
+		<key>Vliegtuigtas Stickers.xcscheme_^#shared#^_</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>6</integer>
 		</dict>
 		<key>Vliegtuigtas TV.xcscheme_^#shared#^_</key>
 		<dict>
@@ -22,7 +32,7 @@
 		<key>Vliegtuigtas Watch Widgets.xcscheme_^#shared#^_</key>
 		<dict>
 			<key>orderHint</key>
-			<integer>6</integer>
+			<integer>5</integer>
 		</dict>
 		<key>Vliegtuigtas Watch.xcscheme_^#shared#^_</key>
 		<dict>

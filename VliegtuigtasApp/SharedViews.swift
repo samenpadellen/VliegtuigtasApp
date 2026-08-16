@@ -12,8 +12,8 @@ struct Card<Content: View>: View {
     var body: some View {
         content
             .background(Theme.surface)
-            .clipShape(RoundedRectangle(cornerRadius: 20))
-            .shadow(color: .black.opacity(0.07), radius: 12, x: 0, y: 4)
+            .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.lg))
+            .cardElevation()
     }
 }
 
@@ -30,7 +30,7 @@ struct PrimaryButton: View {
 
     var body: some View {
         Button(action: action) {
-            HStack(spacing: 8) {
+            HStack(spacing: Theme.Spacing.sm) {
                 if let icon {
                     Image(systemName: icon)
                         .font(.system(size: 16, weight: .semibold))
@@ -42,8 +42,8 @@ struct PrimaryButton: View {
             .padding(.vertical, 17)
             .background(Theme.inkGradient)
             .foregroundStyle(.white)
-            .clipShape(RoundedRectangle(cornerRadius: 16))
-            .shadow(color: Theme.ink.opacity(0.35), radius: 10, x: 0, y: 4)
+            .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
+            .cardElevation()
         }
     }
 }
@@ -414,7 +414,7 @@ struct FloatingBackButton: View {
                 .frame(width: 44, height: 44)
                 .glassChrome(in: Circle(), tint: Theme.ink, interactive: true,
                              legacyFill: AnyShapeStyle(Theme.ink.opacity(0.85)))
-                .shadow(color: .black.opacity(0.20), radius: 6, x: 0, y: 2)
+                .cardElevation()
                 .contentShape(Circle().inset(by: -8))
         }
         .buttonStyle(.plain)
@@ -474,7 +474,7 @@ struct AirlineLogo: View {
 
     private var placeholder: some View {
         ZStack {
-            RoundedRectangle(cornerRadius: 8).fill(Theme.skyLight)
+            RoundedRectangle(cornerRadius: Theme.Radius.sm).fill(Theme.skyLight)
             Text(airline.name.prefix(2).uppercased())
                 .font(.frutiger(size: size * 0.25, weight: .bold))
                 .foregroundStyle(Theme.sky)
@@ -527,10 +527,10 @@ struct VerdictBadge: View {
             }
         }
         .foregroundStyle(.white)
-        .padding(.horizontal, 18)
-        .padding(.vertical, 14)
+        .padding(.horizontal, Theme.Spacing.base)
+        .padding(.vertical, Theme.Spacing.md)
         .background(Theme.verdictColor(verdict))
-        .clipShape(RoundedRectangle(cornerRadius: 18))
+        .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.lg))
     }
 
     private var iconName: String {
@@ -823,10 +823,10 @@ struct StatusPill: View {
         Text(text)
             .font(.frutiger(size: 10, weight: .bold))
             .foregroundStyle(color)
-            .padding(.horizontal, 7)
-            .padding(.vertical, 3)
+            .padding(.horizontal, Theme.Spacing.sm)
+            .padding(.vertical, Theme.Spacing.xxs)
             .background(color.opacity(0.12))
-            .clipShape(RoundedRectangle(cornerRadius: 5))
+            .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.sm))
     }
 }
 
@@ -981,14 +981,14 @@ struct PassportStamp: View {
                 .kerning(1.2)
         }
         .foregroundStyle(ink.opacity(0.85))
-        .padding(.horizontal, 14)
-        .padding(.vertical, 10)
+        .padding(.horizontal, Theme.Spacing.md)
+        .padding(.vertical, Theme.Spacing.sm)
         .overlay(
-            RoundedRectangle(cornerRadius: 8)
+            RoundedRectangle(cornerRadius: Theme.Radius.sm)
                 .strokeBorder(ink.opacity(0.6), lineWidth: 2)
         )
         .overlay(
-            RoundedRectangle(cornerRadius: 10)
+            RoundedRectangle(cornerRadius: Theme.Radius.sm + 2)
                 .strokeBorder(ink.opacity(0.25), lineWidth: 1)
                 .padding(-4)
         )
@@ -1083,10 +1083,10 @@ struct MeasurementField: View {
                         .font(.frutiger(size: 22, weight: .bold, relativeTo: .title2)).foregroundStyle(Theme.sky)
                 }
             }
-            .padding(.horizontal, 12)
-            .padding(.vertical, 10)
+            .padding(.horizontal, Theme.Spacing.md)
+            .padding(.vertical, Theme.Spacing.sm)
             .background(Theme.card)
-            .clipShape(RoundedRectangle(cornerRadius: 10))
+            .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.sm))
         }
     }
 }
@@ -1141,11 +1141,11 @@ struct SaveToRemindersButton: View {
                     .font(.frutiger(size: compact ? 12 : 14, weight: .semibold))
             }
             .foregroundStyle(state == .saved ? Theme.green : Theme.navy)
-            .padding(.horizontal, compact ? 12 : 16)
-            .padding(.vertical, compact ? 8 : 12)
+            .padding(.horizontal, compact ? Theme.Spacing.md : Theme.Spacing.base)
+            .padding(.vertical, compact ? Theme.Spacing.sm : Theme.Spacing.md)
             .frame(maxWidth: compact ? nil : .infinity)
             .background((state == .saved ? Theme.green : Theme.navy).opacity(0.10))
-            .clipShape(RoundedRectangle(cornerRadius: compact ? 10 : 14))
+            .clipShape(RoundedRectangle(cornerRadius: compact ? Theme.Radius.sm : Theme.Radius.md))
         }
         .buttonStyle(.plain)
         .disabled(state != .idle)

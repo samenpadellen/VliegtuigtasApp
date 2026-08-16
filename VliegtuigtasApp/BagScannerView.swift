@@ -542,8 +542,8 @@ private struct TapFeedbackView: View {
                 Text(feedback.text)
                     .font(.frutiger(size: 12, weight: .semibold))
                     .foregroundStyle(.white)
-                    .padding(.horizontal, 10)
-                    .padding(.vertical, 6)
+                    .padding(.horizontal, Theme.Spacing.sm)
+                    .padding(.vertical, Theme.Spacing.xs)
                     .background(color.opacity(0.85))
                     .clipShape(Capsule())
                     .fixedSize()
@@ -629,13 +629,13 @@ struct BagScannerView: View {
                         .font(.frutiger(size: 12, weight: .semibold))
                 }
                 .foregroundStyle(.white)
-                .padding(.horizontal, 12)
-                .padding(.vertical, 7)
+                .padding(.horizontal, Theme.Spacing.md)
+                .padding(.vertical, Theme.Spacing.sm)
                 .background(.black.opacity(0.45))
                 .clipShape(Capsule())
             }
         }
-        .padding(16)
+        .padding(Theme.Spacing.base)
     }
 
     @ViewBuilder
@@ -688,8 +688,8 @@ struct BagScannerView: View {
                         Text("Opnieuw tikken")
                             .font(.frutiger(size: 13, weight: .semibold))
                             .foregroundStyle(.white)
-                            .padding(.horizontal, 14)
-                            .padding(.vertical, 11)
+                            .padding(.horizontal, Theme.Spacing.base)
+                            .padding(.vertical, Theme.Spacing.md)
                             .background(.white.opacity(0.18))
                             .clipShape(Capsule())
                     }
@@ -699,20 +699,20 @@ struct BagScannerView: View {
                         Label("Start scannen", systemImage: "viewfinder")
                             .font(.frutiger(size: 14, weight: .bold))
                             .foregroundStyle(Theme.navy)
-                            .padding(.horizontal, 18)
-                            .padding(.vertical, 12)
+                            .padding(.horizontal, Theme.Spacing.base)
+                            .padding(.vertical, Theme.Spacing.md)
                             .background(Theme.yellow)
                             .clipShape(Capsule())
                     }
                 }
-                .padding(.top, 2)
+                .padding(.top, Theme.Spacing.xxs)
             }
         }
         .frame(maxWidth: .infinity)
-        .padding(.horizontal, 20)
-        .padding(.vertical, 18)
-        .background(.black.opacity(0.55), in: RoundedRectangle(cornerRadius: 22))
-        .padding(16)
+        .padding(.horizontal, Theme.Spacing.lg)
+        .padding(.vertical, Theme.Spacing.base)
+        .background(.black.opacity(0.55), in: RoundedRectangle(cornerRadius: Theme.Radius.lg))
+        .padding(Theme.Spacing.base)
     }
 
     private func volumeStepper(icon: String, label: String, adjust: @escaping (Float) -> Void) -> some View {
@@ -778,12 +778,12 @@ struct BagScannerView: View {
                     .font(.frutiger(size: 15, weight: .bold))
                     .foregroundStyle(model.canFinish ? Theme.navy : .white.opacity(0.5))
                     .frame(maxWidth: .infinity)
-                    .padding(.vertical, 13)
+                    .padding(.vertical, Theme.Spacing.md)
                     .background(model.canFinish ? Theme.yellow : Color.white.opacity(0.15))
                     .clipShape(Capsule())
             }
             .disabled(!model.canFinish)
-            .padding(.top, 4)
+            .padding(.top, Theme.Spacing.xs)
 
             Button {
                 model.reset()
@@ -794,10 +794,10 @@ struct BagScannerView: View {
             }
         }
         .frame(maxWidth: .infinity)
-        .padding(.horizontal, 20)
-        .padding(.vertical, 18)
-        .background(.black.opacity(0.55), in: RoundedRectangle(cornerRadius: 22))
-        .padding(16)
+        .padding(.horizontal, Theme.Spacing.lg)
+        .padding(.vertical, Theme.Spacing.base)
+        .background(.black.opacity(0.55), in: RoundedRectangle(cornerRadius: Theme.Radius.lg))
+        .padding(Theme.Spacing.base)
     }
 
     // MARK: Stap 3 — resultaat
@@ -828,8 +828,8 @@ struct BagScannerView: View {
                                 .font(.frutiger(size: 12, weight: .bold))
                         }
                         .foregroundStyle(fits ? Theme.green : Theme.red)
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 7)
+                        .padding(.horizontal, Theme.Spacing.md)
+                        .padding(.vertical, Theme.Spacing.sm)
                         .background((fits ? Theme.green : Theme.red).opacity(0.15))
                         .clipShape(Capsule())
                     }
@@ -841,8 +841,8 @@ struct BagScannerView: View {
                             Label("Opnieuw", systemImage: "arrow.counterclockwise")
                                 .font(.frutiger(size: 14, weight: .semibold))
                                 .foregroundStyle(.white)
-                                .padding(.horizontal, 16)
-                                .padding(.vertical, 12)
+                                .padding(.horizontal, Theme.Spacing.base)
+                                .padding(.vertical, Theme.Spacing.md)
                                 .background(.white.opacity(0.18))
                                 .clipShape(Capsule())
                         }
@@ -854,19 +854,19 @@ struct BagScannerView: View {
                             Label("Gebruik maten", systemImage: "checkmark")
                                 .font(.frutiger(size: 14, weight: .bold))
                                 .foregroundStyle(Theme.navy)
-                                .padding(.horizontal, 18)
-                                .padding(.vertical, 12)
+                                .padding(.horizontal, Theme.Spacing.base)
+                                .padding(.vertical, Theme.Spacing.md)
                                 .background(Theme.yellow)
                                 .clipShape(Capsule())
                         }
                     }
-                    .padding(.top, 2)
+                    .padding(.top, Theme.Spacing.xxs)
                 }
                 .frame(maxWidth: .infinity)
-                .padding(.horizontal, 20)
-                .padding(.vertical, 18)
-                .background(.black.opacity(0.55), in: RoundedRectangle(cornerRadius: 22))
-                .padding(16)
+                .padding(.horizontal, Theme.Spacing.lg)
+                .padding(.vertical, Theme.Spacing.base)
+                .background(.black.opacity(0.55), in: RoundedRectangle(cornerRadius: Theme.Radius.lg))
+                .padding(Theme.Spacing.base)
             }
         }
     }

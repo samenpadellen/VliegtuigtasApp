@@ -7,7 +7,7 @@
 		<key>NSExtensionPointIdentifier</key>
 		<string>com.apple.message-payload-provider</string>
 		<key>NSExtensionPrincipalClass</key>
-		<string>StickerBrowserViewController</string>
+		<string>$(PRODUCT_MODULE_NAME).MessagesViewController</string>
 	</dict>
 </dict>
 </plist>

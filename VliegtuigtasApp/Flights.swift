@@ -418,10 +418,10 @@ struct MyFlightsSection: View {
                 Label("Vlucht toevoegen", systemImage: "plus")
                     .font(.frutiger(size: 13, weight: .semibold))
                     .frame(maxWidth: .infinity)
-                    .padding(.vertical, 11)
+                    .padding(.vertical, Theme.Spacing.md)
                     .background(Theme.navy.opacity(0.07))
                     .foregroundStyle(Theme.navy)
-                    .clipShape(RoundedRectangle(cornerRadius: 12))
+                    .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
             }
             .buttonStyle(.plain)
         }
@@ -451,8 +451,8 @@ struct MyFlightsSection: View {
                 .fixedSize(horizontal: false, vertical: true)
         }
         .frame(maxWidth: .infinity)
-        .padding(.vertical, 20)
-        .padding(.horizontal, 8)
+        .padding(.vertical, Theme.Spacing.lg)
+        .padding(.horizontal, Theme.Spacing.sm)
     }
 }
 
@@ -462,7 +462,7 @@ private struct FlightRow: View {
     var body: some View {
         HStack(spacing: 14) {
             ZStack {
-                RoundedRectangle(cornerRadius: 12)
+                RoundedRectangle(cornerRadius: Theme.Radius.md)
                     .fill(flight.isPast ? Theme.textSecondary.opacity(0.10) : Theme.sky.opacity(0.12))
                 if let photoUrl = flight.photoUrl {
                     AuthorisedImage(urlString: photoUrl, fill: true)
@@ -473,7 +473,7 @@ private struct FlightRow: View {
                 }
             }
             .frame(width: 44, height: 44)
-            .clipShape(RoundedRectangle(cornerRadius: 12))
+            .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
             VStack(alignment: .leading, spacing: 2) {
                 HStack(spacing: 6) {
                     Text(flight.number)
@@ -482,8 +482,8 @@ private struct FlightRow: View {
                         Text("VOLGENDE")
                             .font(.frutiger(size: 8, weight: .black))
                             .foregroundStyle(Theme.navy)
-                            .padding(.horizontal, 6)
-                            .padding(.vertical, 2)
+                            .padding(.horizontal, Theme.Spacing.xs)
+                            .padding(.vertical, Theme.Spacing.xxs)
                             .background(Theme.yellow)
                             .clipShape(Capsule())
                     }
@@ -501,11 +501,11 @@ private struct FlightRow: View {
                 .font(.system(size: 12, weight: .semibold))
                 .foregroundStyle(Theme.textSecondary)
         }
-        .padding(12)
+        .padding(Theme.Spacing.md)
         .background(Color(.systemBackground))
         .opacity(flight.isPast ? 0.6 : 1)
-        .clipShape(RoundedRectangle(cornerRadius: 14))
-        .contentShape(RoundedRectangle(cornerRadius: 14))
+        .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
+        .contentShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
     }
 
     private static let dateFormatter: DateFormatter = {
@@ -565,9 +565,9 @@ struct AddFlightSheet: View {
                                 ProgressView().tint(Theme.sky).scaleEffect(0.8)
                             }
                         }
-                        .padding(12)
+                        .padding(Theme.Spacing.md)
                         .background(Color(.secondarySystemGroupedBackground))
-                        .clipShape(RoundedRectangle(cornerRadius: 12))
+                        .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
                         // We zoeken vanzelf zodra je typt: geen "Zoek"-knop
                         // nodig, en de datum vullen we aan uit de match.
                         Text("Route, maatschappij en vertrekdatum worden automatisch opgehaald zodra we je vlucht herkennen.")
@@ -612,15 +612,15 @@ struct AddFlightSheet: View {
                                 .font(.frutiger(size: 16, weight: .semibold))
                         }
                         .frame(maxWidth: .infinity)
-                        .padding(.vertical, 15)
+                        .padding(.vertical, Theme.Spacing.base)
                         .background(saved ? AnyShapeStyle(Theme.green) : AnyShapeStyle(Theme.inkGradient))
                         .foregroundStyle(.white)
-                        .clipShape(RoundedRectangle(cornerRadius: 14))
+                        .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
                     }
                     .buttonStyle(.plain)
                     .disabled(saved)
                 }
-                .padding(16)
+                .padding(Theme.Spacing.base)
             }
             .background(Color(.systemGroupedBackground))
             .navigationTitle("Vlucht toevoegen")
@@ -661,15 +661,15 @@ struct AddFlightSheet: View {
                 Text(status)
                     .font(.frutiger(size: 10, weight: .bold))
                     .foregroundStyle(Theme.sky)
-                    .padding(.horizontal, 8)
-                    .padding(.vertical, 4)
+                    .padding(.horizontal, Theme.Spacing.sm)
+                    .padding(.vertical, Theme.Spacing.xs)
                     .background(Theme.sky.opacity(0.12))
                     .clipShape(Capsule())
             }
         }
-        .padding(12)
+        .padding(Theme.Spacing.md)
         .background(Theme.green.opacity(0.08))
-        .clipShape(RoundedRectangle(cornerRadius: 12))
+        .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
     }
 
     private func lookupNow() {
@@ -858,9 +858,9 @@ struct FlightDetailView: View {
                                 // throttelt zelf, dus dit is niet duur.
                                 .task { await FlightWatcher.refreshDueFlights() }
                             content(flight)
-                                .padding(.horizontal, 16)
-                                .padding(.top, 20)
-                                .padding(.bottom, 40)
+                                .padding(.horizontal, Theme.Spacing.base)
+                                .padding(.top, Theme.Spacing.base)
+                                .padding(.bottom, Theme.Spacing.xxl)
                         }
                     }
                     .ignoresSafeArea(edges: .top)
@@ -870,8 +870,8 @@ struct FlightDetailView: View {
                         FloatingBackButton { dismiss() }
                         Spacer()
                     }
-                    .padding(.horizontal, 20)
-                    .padding(.top, flightDetailStatusBarHeight + 10)
+                    .padding(.horizontal, Theme.Spacing.base)
+                    .padding(.top, flightDetailStatusBarHeight + Theme.Spacing.sm)
                 }
                 .onAppear {
                     if let url = flight.airlineLogoUrl { logoLoader.load(url) }
@@ -918,29 +918,29 @@ struct FlightDetailView: View {
                 Link("Foto: \(authorName) / Unsplash", destination: authorUrl)
                     .font(.frutiger(size: 9, weight: .semibold))
                     .foregroundStyle(.white.opacity(0.85))
-                    .padding(.horizontal, 8)
-                    .padding(.vertical, 4)
+                    .padding(.horizontal, Theme.Spacing.sm)
+                    .padding(.vertical, Theme.Spacing.xs)
                     .background(.black.opacity(0.25), in: Capsule())
-                    .padding(10)
+                    .padding(Theme.Spacing.sm)
                     .frame(maxWidth: .infinity, alignment: .trailing)
                     .frame(maxHeight: .infinity, alignment: .top)
-                    .padding(.top, flightDetailStatusBarHeight + 4)
+                    .padding(.top, flightDetailStatusBarHeight + Theme.Spacing.xs)
             }
 
             VStack(spacing: 14) {
                 ZStack {
-                    RoundedRectangle(cornerRadius: 24)
+                    RoundedRectangle(cornerRadius: Theme.Radius.lg)
                         .fill(Color(.systemBackground))
                         .frame(width: 88, height: 88)
-                        .shadow(color: .black.opacity(0.08), radius: 12, x: 0, y: 4)
+                        .cardElevation()
                         .overlay(
-                            RoundedRectangle(cornerRadius: 24)
+                            RoundedRectangle(cornerRadius: Theme.Radius.lg)
                                 .strokeBorder(accent.opacity(0.22), lineWidth: 1)
                         )
                     if flight.airlineLogoUrl != nil {
                         AuthorisedImage(urlString: flight.airlineLogoUrl)
                             .frame(width: 60, height: 60)
-                            .clipShape(RoundedRectangle(cornerRadius: 12))
+                            .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
                     } else {
                         Image(systemName: "airplane")
                             .font(.system(size: 30, weight: .semibold))
@@ -963,8 +963,8 @@ struct FlightDetailView: View {
                     Text(flight.countdownLabel)
                         .font(.frutiger(size: 12, weight: .bold))
                         .foregroundStyle(flight.isPast ? Theme.textSecondary : Theme.navy)
-                        .padding(.horizontal, 10)
-                        .padding(.vertical, 5)
+                        .padding(.horizontal, Theme.Spacing.sm)
+                        .padding(.vertical, Theme.Spacing.xs)
                         .background(flight.isPast ? Theme.textSecondary.opacity(0.12) : Theme.yellow)
                         .clipShape(Capsule())
 
@@ -972,14 +972,14 @@ struct FlightDetailView: View {
                         Text(label)
                             .font(.frutiger(size: 12, weight: .bold))
                             .foregroundStyle(flight.statusColor)
-                            .padding(.horizontal, 10)
-                            .padding(.vertical, 5)
+                            .padding(.horizontal, Theme.Spacing.sm)
+                            .padding(.vertical, Theme.Spacing.xs)
                             .background(flight.statusColor.opacity(0.12))
                             .clipShape(Capsule())
                     }
                 }
             }
-            .padding(.bottom, 24)
+            .padding(.bottom, Theme.Spacing.lg)
         }
     }
 
@@ -1022,9 +1022,9 @@ struct FlightDetailView: View {
                             .font(.system(size: 12, weight: .semibold))
                     }
                     .foregroundStyle(Theme.navy)
-                    .padding(14)
+                    .padding(Theme.Spacing.md)
                     .background(Color(.systemBackground))
-                    .clipShape(RoundedRectangle(cornerRadius: 14))
+                    .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
                 }
                 .buttonStyle(.plain)
             }
@@ -1043,10 +1043,10 @@ struct FlightDetailView: View {
                     }
                     .font(.frutiger(size: 13, weight: .semibold))
                     .frame(maxWidth: .infinity)
-                    .padding(.vertical, 12)
+                    .padding(.vertical, Theme.Spacing.md)
                     .background(Theme.navy.opacity(0.07))
                     .foregroundStyle(Theme.navy)
-                    .clipShape(RoundedRectangle(cornerRadius: 12))
+                    .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
                 }
                 .buttonStyle(.plain)
                 .disabled(isRefreshing || flight.number.isEmpty)
@@ -1059,7 +1059,7 @@ struct FlightDetailView: View {
                         .foregroundStyle(Theme.navy)
                         .frame(width: 44, height: 44)
                         .background(Theme.navy.opacity(0.08))
-                        .clipShape(RoundedRectangle(cornerRadius: 12))
+                        .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
                 }
                 .buttonStyle(.plain)
                 .accessibilityLabel("Vlucht aanpassen")
@@ -1072,7 +1072,7 @@ struct FlightDetailView: View {
                         .foregroundStyle(Theme.red)
                         .frame(width: 44, height: 44)
                         .background(Theme.red.opacity(0.08))
-                        .clipShape(RoundedRectangle(cornerRadius: 12))
+                        .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
                 }
                 .buttonStyle(.plain)
             }
@@ -1103,13 +1103,13 @@ struct FlightDetailView: View {
         VStack(spacing: 0) {
             detailRow(icon: "calendar", label: "Vertrek", value: formattedDeparture(flight.departure))
             if let icao = flight.flightIcao {
-                Divider().padding(.leading, 44)
+                Divider().padding(.leading, Theme.Spacing.xxl)
                 detailRow(icon: "number", label: "ICAO-code", value: icao)
             }
         }
-        .padding(.horizontal, 16)
+        .padding(.horizontal, Theme.Spacing.base)
         .background(Color(.systemBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 16))
+        .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
     }
 
     private func detailRow(icon: String, label: String, value: String) -> some View {
@@ -1126,7 +1126,7 @@ struct FlightDetailView: View {
                 .font(.frutiger(size: 13, weight: .semibold))
                 .foregroundStyle(Theme.textPrimary)
         }
-        .padding(.vertical, 12)
+        .padding(.vertical, Theme.Spacing.md)
     }
 
     private static let departureFormatter: DateFormatter = {
@@ -1192,7 +1192,7 @@ private struct FlightBoardingPassCard: View {
                     perforatedLine
                 }
                 .frame(maxWidth: .infinity)
-                .padding(.top, 4)
+                .padding(.top, Theme.Spacing.xs)
                 endpoint(
                     code: flight.arrivalIata, airport: flight.arrivalAirport, alignment: .trailing,
                     terminal: flight.arrivalTerminal, gate: flight.arrivalGate,
@@ -1200,7 +1200,7 @@ private struct FlightBoardingPassCard: View {
                     delayMinutes: flight.arrivalDelayMinutes
                 )
             }
-            .padding(18)
+            .padding(Theme.Spacing.base)
 
             // Aftelstrip onderaan de kaart, zoals luchthaven-apps die tonen:
             // één regel die zegt hoeveel tijd je nog hebt, plus de bagageband
@@ -1222,21 +1222,21 @@ private struct FlightBoardingPassCard: View {
                             Text(belt)
                                 .font(.system(size: 11, weight: .black, design: .monospaced))
                                 .foregroundStyle(Theme.ink)
-                                .padding(.horizontal, 6)
-                                .padding(.vertical, 2)
-                                .background(Theme.yellow, in: RoundedRectangle(cornerRadius: 4))
+                                .padding(.horizontal, Theme.Spacing.xs)
+                                .padding(.vertical, Theme.Spacing.xxs)
+                                .background(Theme.yellow, in: RoundedRectangle(cornerRadius: Theme.Radius.sm))
                         }
                     }
                 }
-                .padding(.horizontal, 18)
-                .padding(.vertical, 12)
+                .padding(.horizontal, Theme.Spacing.base)
+                .padding(.vertical, Theme.Spacing.md)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .background(Theme.skyLight)
             }
         }
         .background(Color(.systemBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 18))
-        .shadow(color: .black.opacity(0.05), radius: 8, x: 0, y: 3)
+        .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.lg))
+        .cardElevation()
     }
 
     /// "4u 3m voor vertrek" — of de fase waarin de vlucht zit als vertrek al
@@ -1509,9 +1509,9 @@ private struct FlightStatusTimeline: View {
                 }
             }
         }
-        .padding(16)
+        .padding(Theme.Spacing.base)
         .background(Color(.systemBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 16))
+        .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
     }
 
     private func phaseView(_ phase: Phase) -> some View {
@@ -1554,9 +1554,9 @@ private struct AircraftInfoChip: View {
             }
             Spacer()
         }
-        .padding(14)
+        .padding(Theme.Spacing.base)
         .background(Color(.systemBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 14))
+        .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
     }
 }
 
@@ -1583,7 +1583,7 @@ private struct LiveFlightMapCard: View {
                         Image(systemName: "airplane")
                             .font(.system(size: 18, weight: .bold))
                             .foregroundStyle(.white)
-                            .padding(8)
+                            .padding(Theme.Spacing.sm)
                             .background(Theme.navy, in: Circle())
                             .rotationEffect(.degrees((flight.liveDirection ?? 0) - 90))
                     }
@@ -1605,10 +1605,10 @@ private struct LiveFlightMapCard: View {
                 }
                 .font(.frutiger(size: 11, weight: .semibold))
                 .foregroundStyle(Theme.textSecondary)
-                .padding(12)
+                .padding(Theme.Spacing.md)
             }
             .background(Color(.systemBackground))
-            .clipShape(RoundedRectangle(cornerRadius: 16))
+            .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
         }
     }
 }

@@ -38,11 +38,11 @@ struct AirlineListView: View {
                             }
                         }
                     }
-                    .padding(.horizontal, 14)
-                    .padding(.vertical, 13)
+                    .padding(.horizontal, Theme.Spacing.md)
+                    .padding(.vertical, Theme.Spacing.md)
                     .background(Color(.systemBackground))
-                    .clipShape(RoundedRectangle(cornerRadius: 16))
-                    .shadow(color: .black.opacity(0.07), radius: 8, x: 0, y: 2)
+                    .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
+                    .cardElevation()
 
                     // Grid — adaptief: 2 kolommen op iPhone, meer op brede schermen
                     LazyVGrid(
@@ -60,8 +60,8 @@ struct AirlineListView: View {
                     }
                 }
                 .frame(maxWidth: Theme.contentMaxWidth)
-                .padding(16)
-                .padding(.bottom, 32)
+                .padding(Theme.Spacing.base)
+                .padding(.bottom, Theme.Spacing.xl)
             }
         }
         .background(Color(.systemGroupedBackground))
@@ -110,8 +110,8 @@ struct AirlineListView: View {
                     .foregroundStyle(.white)
                     .lineSpacing(1)
             }
-            .padding(.horizontal, 20)
-            .padding(.bottom, 22)
+            .padding(.horizontal, Theme.Spacing.lg)
+            .padding(.bottom, Theme.Spacing.lg)
         }
         .clipped()
     }
@@ -138,9 +138,9 @@ private struct AirlineListCard: View {
             .foregroundStyle(Theme.navy)
         }
         .frame(maxWidth: .infinity)
-        .padding(16)
+        .padding(Theme.Spacing.base)
         .background(Color(.systemBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 18))
-        .shadow(color: .black.opacity(0.07), radius: 8, x: 0, y: 3)
+        .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.lg))
+        .cardElevation()
     }
 }

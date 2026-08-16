@@ -98,12 +98,12 @@ struct PurserLogbookView: View {
                     Text("Purser Pim verstopt af en toe iets nieuws. Kom nog eens terug.")
                         .font(.frutiger(size: 11))
                         .foregroundStyle(Theme.textSecondary)
-                        .padding(.top, 4)
+                        .padding(.top, Theme.Spacing.xs)
                 }
                 .frame(maxWidth: Theme.contentMaxWidth)
                 .frame(maxWidth: .infinity)
-                .padding(16)
-                .padding(.bottom, 32)
+                .padding(Theme.Spacing.base)
+                .padding(.bottom, Theme.Spacing.xl)
             }
             .background(Color(.systemGroupedBackground))
             .navigationTitle("Pursers logboek")
@@ -134,9 +134,9 @@ struct PurserLogbookView: View {
                 .fixedSize(horizontal: false, vertical: true)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(16)
+        .padding(Theme.Spacing.base)
         .background(Theme.inkGradient)
-        .clipShape(RoundedRectangle(cornerRadius: 18))
+        .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.lg))
     }
 
     private func row(_ egg: EasterEgg) -> some View {
@@ -166,9 +166,9 @@ struct PurserLogbookView: View {
                     .foregroundStyle(Theme.green)
             }
         }
-        .padding(14)
+        .padding(Theme.Spacing.md)
         .background(Color(.systemBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 14))
+        .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
     }
 }
 
@@ -228,7 +228,7 @@ struct NextBestActionCard: View {
         Button(action: a.run) {
             HStack(spacing: 14) {
                 ZStack {
-                    RoundedRectangle(cornerRadius: 12)
+                    RoundedRectangle(cornerRadius: Theme.Radius.md)
                         .fill(Theme.navy.opacity(0.10))
                         .frame(width: 44, height: 44)
                     Image(systemName: a.icon)
@@ -249,10 +249,10 @@ struct NextBestActionCard: View {
                     .font(.system(size: 12, weight: .semibold))
                     .foregroundStyle(Theme.textSecondary)
             }
-            .padding(16)
+            .padding(Theme.Spacing.base)
             .background(Color(.systemBackground))
-            .clipShape(RoundedRectangle(cornerRadius: 18))
-            .shadow(color: .black.opacity(0.05), radius: 10, x: 0, y: 3)
+            .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.lg))
+            .cardElevation()
         }
         .buttonStyle(.plain)
     }
@@ -306,7 +306,7 @@ struct FirstCheckCelebrationView: View {
                         .multilineTextAlignment(.center)
                         .fixedSize(horizontal: false, vertical: true)
                 }
-                .padding(.horizontal, 32)
+                .padding(.horizontal, Theme.Spacing.xl)
 
                 Spacer()
 
@@ -321,10 +321,10 @@ struct FirstCheckCelebrationView: View {
                         Text("Plan meteen je reis")
                             .font(.frutiger(size: 15, weight: .semibold))
                             .frame(maxWidth: .infinity)
-                            .padding(.vertical, 14)
+                            .padding(.vertical, Theme.Spacing.md)
                             .background(.white)
                             .foregroundStyle(Theme.navy)
-                            .clipShape(RoundedRectangle(cornerRadius: 14))
+                            .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
                     }
                     .buttonStyle(.plain)
 
@@ -332,10 +332,10 @@ struct FirstCheckCelebrationView: View {
                         .font(.frutiger(size: 14, weight: .semibold))
                         .foregroundStyle(.white.opacity(0.8))
                 }
-                .padding(16)
+                .padding(Theme.Spacing.base)
                 .background(.ultraThinMaterial)
-                .clipShape(RoundedRectangle(cornerRadius: 20))
-                .padding(16)
+                .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.lg))
+                .padding(Theme.Spacing.base)
             }
         }
         .onAppear { burst = true }

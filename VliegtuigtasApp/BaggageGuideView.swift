@@ -141,15 +141,15 @@ struct BaggageGuideView: View {
                     ForEach(GuideContent.allowed) { RuleCard(rule: $0) }
 
                     sectionHeader("MAG NIET MEE IN DE CABINE", color: Theme.red)
-                        .padding(.top, 6)
+                        .padding(.top, Theme.Spacing.sm)
                     ForEach(GuideContent.forbidden) { RuleCard(rule: $0) }
 
                     disclaimer
                 }
                 .frame(maxWidth: Theme.contentMaxWidth)
                 .frame(maxWidth: .infinity)
-                .padding(16)
-                .padding(.bottom, 32)
+                .padding(Theme.Spacing.base)
+                .padding(.bottom, Theme.Spacing.xl)
             }
             .background(Color(.systemGroupedBackground))
             .navigationTitle("Wat mag mee?")
@@ -182,9 +182,9 @@ struct BaggageGuideView: View {
                 .lineSpacing(2)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(18)
+        .padding(Theme.Spacing.base)
         .background(Theme.inkGradient)
-        .clipShape(RoundedRectangle(cornerRadius: 20))
+        .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.lg))
     }
 
     private func sectionHeader(_ title: String, color: Color) -> some View {
@@ -207,11 +207,11 @@ struct BaggageGuideView: View {
                 .foregroundStyle(Theme.textSecondary)
                 .fixedSize(horizontal: false, vertical: true)
         }
-        .padding(14)
+        .padding(Theme.Spacing.md)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(Color(.systemBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 14))
-        .padding(.top, 6)
+        .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
+        .padding(.top, Theme.Spacing.sm)
     }
 }
 
@@ -226,7 +226,7 @@ private struct RuleCard: View {
             VStack(alignment: .leading, spacing: 8) {
                 HStack(spacing: 12) {
                     ZStack {
-                        RoundedRectangle(cornerRadius: 11)
+                        RoundedRectangle(cornerRadius: Theme.Radius.sm)
                             .fill(rule.status.color.opacity(0.12))
                             .frame(width: 38, height: 38)
                         Image(systemName: rule.icon)
@@ -248,8 +248,8 @@ private struct RuleCard: View {
                             .font(.frutiger(size: 10, weight: .bold))
                     }
                     .foregroundStyle(rule.status.color)
-                    .padding(.horizontal, 8)
-                    .padding(.vertical, 4)
+                    .padding(.horizontal, Theme.Spacing.sm)
+                    .padding(.vertical, Theme.Spacing.xs)
                     .background(rule.status.color.opacity(0.12))
                     .clipShape(Capsule())
                 }
@@ -262,11 +262,11 @@ private struct RuleCard: View {
                         .fixedSize(horizontal: false, vertical: true)
                 }
             }
-            .padding(13)
+            .padding(Theme.Spacing.md)
             .frame(maxWidth: .infinity, alignment: .leading)
             .background(Color(.systemBackground))
-            .clipShape(RoundedRectangle(cornerRadius: 16))
-            .contentShape(RoundedRectangle(cornerRadius: 16))
+            .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
+            .contentShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
         }
         .buttonStyle(.plain)
     }

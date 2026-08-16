@@ -24,8 +24,8 @@ struct AirportSelectionView: View {
                             .foregroundStyle(Theme.textSecondary)
                             .fixedSize(horizontal: false, vertical: true)
                     }
-                    .padding(.horizontal, 20)
-                    .padding(.top, 4)
+                    .padding(.horizontal, Theme.Spacing.lg)
+                    .padding(.top, Theme.Spacing.xs)
 
                     VStack(spacing: 10) {
                         ForEach(airportsStore.airports) { airport in
@@ -34,7 +34,7 @@ struct AirportSelectionView: View {
                             }
                         }
                     }
-                    .padding(.horizontal, 20)
+                    .padding(.horizontal, Theme.Spacing.lg)
 
                     // Vertrouwensnoot: eerlijk over hoe actueel de info is.
                     Label(
@@ -43,9 +43,9 @@ struct AirportSelectionView: View {
                     )
                     .font(.frutiger(size: 11))
                     .foregroundStyle(Theme.textSecondary)
-                    .padding(.horizontal, 20)
-                    .padding(.top, 6)
-                    .padding(.bottom, 40)
+                    .padding(.horizontal, Theme.Spacing.lg)
+                    .padding(.top, Theme.Spacing.sm)
+                    .padding(.bottom, Theme.Spacing.xl)
                 }
             }
             .background(Color(.systemGroupedBackground))
@@ -75,8 +75,8 @@ struct AirportSelectionView: View {
                     Text(airport.iata)
                         .font(.frutiger(size: 11, weight: .bold))
                         .foregroundStyle(.white)
-                        .padding(.horizontal, 8)
-                        .padding(.vertical, 4)
+                        .padding(.horizontal, Theme.Spacing.sm)
+                        .padding(.vertical, Theme.Spacing.xs)
                         .background(airport.isOperational ? Theme.navy : Color(.systemGray))
                         .clipShape(Capsule())
                     Text(airport.displayType)
@@ -94,16 +94,16 @@ struct AirportSelectionView: View {
                 Text("Binnenkort")
                     .font(.frutiger(size: 10, weight: .bold))
                     .foregroundStyle(Theme.orange)
-                    .padding(.horizontal, 8)
-                    .padding(.vertical, 4)
+                    .padding(.horizontal, Theme.Spacing.sm)
+                    .padding(.vertical, Theme.Spacing.xs)
                     .background(Theme.orange.opacity(0.12))
                     .clipShape(Capsule())
             }
         }
-        .padding(14)
+        .padding(Theme.Spacing.base)
         .background(Theme.surface)
-        .clipShape(RoundedRectangle(cornerRadius: 16))
-        .shadow(color: .black.opacity(0.05), radius: 6, x: 0, y: 2)
+        .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
+        .cardElevation()
         .opacity(airport.isOperational ? 1 : 0.7)
     }
 }
@@ -135,10 +135,10 @@ struct AirportDetailView: View {
                         }
                         websiteLink
                     }
-                    .padding(.horizontal, 20)
-                    .padding(.top, 16)
+                    .padding(.horizontal, Theme.Spacing.lg)
+                    .padding(.top, Theme.Spacing.base)
 
-                    Divider().padding(.horizontal, 20)
+                    Divider().padding(.horizontal, Theme.Spacing.lg)
 
                     // Nog niet operationeel (Lelystad): eerlijk en duidelijk.
                     if !airport.isOperational {
@@ -184,9 +184,9 @@ struct AirportDetailView: View {
                                     .font(.frutiger(size: 13))
                                     .foregroundStyle(Theme.textSecondary)
                             }
-                            .padding(16)
+                            .padding(Theme.Spacing.base)
                         }
-                        .padding(.horizontal, 20)
+                        .padding(.horizontal, Theme.Spacing.lg)
                     }
 
                     Spacer(minLength: 32)
@@ -212,12 +212,12 @@ struct AirportDetailView: View {
                         .font(.system(size: 10, weight: .bold))
                 }
                 .foregroundStyle(Theme.navy)
-                .padding(.horizontal, 12)
-                .padding(.vertical, 8)
+                .padding(.horizontal, Theme.Spacing.md)
+                .padding(.vertical, Theme.Spacing.sm)
                 .background(Theme.navy.opacity(0.08))
                 .clipShape(Capsule())
             }
-            .padding(.top, 2)
+            .padding(.top, Theme.Spacing.xxs)
         }
     }
 
@@ -236,11 +236,11 @@ struct AirportDetailView: View {
                     .fixedSize(horizontal: false, vertical: true)
             }
         }
-        .padding(14)
+        .padding(Theme.Spacing.base)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(Theme.orange.opacity(0.10))
-        .clipShape(RoundedRectangle(cornerRadius: 16))
-        .padding(.horizontal, 20)
+        .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
+        .padding(.horizontal, Theme.Spacing.lg)
     }
 
     private func airlinesSection(_ airlines: [String]) -> some View {
@@ -256,10 +256,10 @@ struct AirportDetailView: View {
             FlowChips(items: airlines)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(16)
+        .padding(Theme.Spacing.base)
         .background(Theme.surface)
-        .clipShape(RoundedRectangle(cornerRadius: 16))
-        .padding(.horizontal, 20)
+        .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
+        .padding(.horizontal, Theme.Spacing.lg)
     }
 
     @ViewBuilder
@@ -300,9 +300,9 @@ struct AirportDetailView: View {
                     )
                 }
             }
-            .padding(16)
+            .padding(Theme.Spacing.base)
         }
-        .padding(.horizontal, 20)
+        .padding(.horizontal, Theme.Spacing.lg)
     }
 
     @ViewBuilder
@@ -340,9 +340,9 @@ struct AirportDetailView: View {
                     recommendationRow(icon: "bolt.fill", label: "Fast-track", value: "vanaf €\(String(format: "%.2f", fastTrack))")
                 }
             }
-            .padding(16)
+            .padding(Theme.Spacing.base)
         }
-        .padding(.horizontal, 20)
+        .padding(.horizontal, Theme.Spacing.lg)
     }
 
     @ViewBuilder
@@ -354,7 +354,7 @@ struct AirportDetailView: View {
                 Text("Handige tips")
                     .font(.frutiger(size: 14, weight: .semibold))
             }
-            .padding(.horizontal, 20)
+            .padding(.horizontal, Theme.Spacing.lg)
 
             VStack(spacing: 12) {
                 ForEach(airport.tips ?? [], id: \.self) { tip in
@@ -362,7 +362,7 @@ struct AirportDetailView: View {
                         Circle()
                             .fill(Theme.navy)
                             .frame(width: 6, height: 6)
-                            .padding(.top, 7)
+                            .padding(.top, Theme.Spacing.sm)
                         Text(tip)
                             .font(.frutiger(size: 13))
                             .foregroundStyle(Theme.textSecondary)
@@ -379,10 +379,10 @@ struct AirportDetailView: View {
                     )
                 }
             }
-            .padding(16)
+            .padding(Theme.Spacing.base)
             .background(Theme.surface)
-            .clipShape(RoundedRectangle(cornerRadius: 16))
-            .padding(.horizontal, 20)
+            .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
+            .padding(.horizontal, Theme.Spacing.lg)
         }
     }
 
@@ -395,7 +395,7 @@ struct AirportDetailView: View {
                 Text("Let op!")
                     .font(.frutiger(size: 14, weight: .semibold))
             }
-            .padding(.horizontal, 20)
+            .padding(.horizontal, Theme.Spacing.lg)
 
             VStack(spacing: 8) {
                 ForEach(airport.warningMessages ?? [], id: \.self) { warning in
@@ -409,10 +409,10 @@ struct AirportDetailView: View {
                     }
                 }
             }
-            .padding(16)
+            .padding(Theme.Spacing.base)
             .background(Theme.red.opacity(0.08))
-            .clipShape(RoundedRectangle(cornerRadius: 16))
-            .padding(.horizontal, 20)
+            .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
+            .padding(.horizontal, Theme.Spacing.lg)
         }
     }
 
@@ -434,7 +434,7 @@ struct AirportDetailView: View {
                 .font(.frutiger(size: 13, weight: .semibold))
                 .foregroundStyle(color)
         }
-        .padding(.vertical, 4)
+        .padding(.vertical, Theme.Spacing.xs)
     }
 
     private func recommendationRow(icon: String, label: String, value: String) -> some View {
@@ -450,7 +450,7 @@ struct AirportDetailView: View {
                 .font(.frutiger(size: 13, weight: .semibold))
                 .foregroundStyle(Theme.navy)
         }
-        .padding(.vertical, 4)
+        .padding(.vertical, Theme.Spacing.xs)
     }
 }
 
@@ -471,8 +471,8 @@ struct EURulesView: View {
                             .font(.frutiger(size: 13))
                             .foregroundStyle(Theme.textSecondary)
                     }
-                    .padding(.horizontal, 20)
-                    .padding(.top, 16)
+                    .padding(.horizontal, Theme.Spacing.lg)
+                    .padding(.top, Theme.Spacing.base)
 
                     if let rules = airportsStore.euRules {
                         // Fluids
@@ -527,16 +527,16 @@ struct EURulesView: View {
                                     }
                                 }
                             }
-                            .padding(16)
+                            .padding(Theme.Spacing.base)
                         }
-                        .padding(.horizontal, 20)
+                        .padding(.horizontal, Theme.Spacing.lg)
 
                         SaveToRemindersButton(
                             titles: reminderTitles(for: rules),
                             notes: "EU-handbagageregels · Vliegtuigtas",
                             label: "Bewaar regels in Herinneringen"
                         )
-                        .padding(.horizontal, 20)
+                        .padding(.horizontal, Theme.Spacing.lg)
 
                         Spacer(minLength: 32)
                     }
@@ -579,9 +579,9 @@ struct EURulesView: View {
                     }
                 }
             }
-            .padding(16)
+            .padding(Theme.Spacing.base)
         }
-        .padding(.horizontal, 20)
+        .padding(.horizontal, Theme.Spacing.lg)
     }
 
     /// Beknopte, actiegerichte samenvatting van de EU-regels als losse
@@ -614,8 +614,8 @@ struct CustomsInfoView: View {
                             .font(.frutiger(size: 13))
                             .foregroundStyle(Theme.textSecondary)
                     }
-                    .padding(.horizontal, 20)
-                    .padding(.top, 16)
+                    .padding(.horizontal, Theme.Spacing.lg)
+                    .padding(.top, Theme.Spacing.base)
 
                     if let customs = airportsStore.customsInfo {
                         // Limits
@@ -631,9 +631,9 @@ struct CustomsInfoView: View {
                                 customsRow(icon: "airplane", label: "Per vliegtuig", value: "€\(String(format: "%.0f", customs.dutyfreeImportLimit))")
                                 customsRow(icon: "figure.walk", label: "Over land", value: "€\(String(format: "%.0f", customs.landImportLimit))")
                             }
-                            .padding(16)
+                            .padding(Theme.Spacing.base)
                         }
-                        .padding(.horizontal, 20)
+                        .padding(.horizontal, Theme.Spacing.lg)
 
                         // Tobacco
                         Card {
@@ -652,9 +652,9 @@ struct CustomsInfoView: View {
                                     customsRow(icon: "circle", label: "Sigaren", value: "\(customs.tobacco.cigars) stuks")
                                 }
                             }
-                            .padding(16)
+                            .padding(Theme.Spacing.base)
                         }
-                        .padding(.horizontal, 20)
+                        .padding(.horizontal, Theme.Spacing.lg)
 
                         // Alcohol
                         Card {
@@ -672,15 +672,15 @@ struct CustomsInfoView: View {
                                 }
 
                                 if let notes = customs.alcohol.notes {
-                                    Divider().padding(.vertical, 4)
+                                    Divider().padding(.vertical, Theme.Spacing.xs)
                                     Text(notes)
                                         .font(.frutiger(size: 12))
                                         .foregroundStyle(Theme.textSecondary)
                                 }
                             }
-                            .padding(16)
+                            .padding(Theme.Spacing.base)
                         }
-                        .padding(.horizontal, 20)
+                        .padding(.horizontal, Theme.Spacing.lg)
 
                         // Cash
                         Card {
@@ -694,9 +694,9 @@ struct CustomsInfoView: View {
 
                                 customsRow(icon: "circle", label: "Aangifte verplicht bij", value: "€\(String(format: "%.0f", customs.cashDeclarationThreshold))+")
                             }
-                            .padding(16)
+                            .padding(Theme.Spacing.base)
                         }
-                        .padding(.horizontal, 20)
+                        .padding(.horizontal, Theme.Spacing.lg)
 
                         // Restricted items
                         Card {
@@ -721,9 +721,9 @@ struct CustomsInfoView: View {
                                     }
                                 }
                             }
-                            .padding(16)
+                            .padding(Theme.Spacing.base)
                         }
-                        .padding(.horizontal, 20)
+                        .padding(.horizontal, Theme.Spacing.lg)
 
                         Spacer(minLength: 32)
                     }
@@ -754,7 +754,7 @@ struct CustomsInfoView: View {
                 .font(.frutiger(size: 13, weight: .semibold))
                 .foregroundStyle(Theme.navy)
         }
-        .padding(.vertical, 4)
+        .padding(.vertical, Theme.Spacing.xs)
     }
 }
 
@@ -775,8 +775,8 @@ struct BaggageIssuesView: View {
                             .font(.frutiger(size: 13))
                             .foregroundStyle(Theme.textSecondary)
                     }
-                    .padding(.horizontal, 20)
-                    .padding(.top, 16)
+                    .padding(.horizontal, Theme.Spacing.lg)
+                    .padding(.top, Theme.Spacing.base)
 
                     if let issues = airportsStore.baggageIssueInfo {
                         // Immediate steps
@@ -793,15 +793,15 @@ struct BaggageIssuesView: View {
                                     .font(.frutiger(size: 13))
                                     .foregroundStyle(Theme.textSecondary)
 
-                                Divider().padding(.vertical, 4)
+                                Divider().padding(.vertical, Theme.Spacing.xs)
 
                                 Text(issues.pirForm)
                                     .font(.frutiger(size: 13))
                                     .foregroundStyle(Theme.textSecondary)
                             }
-                            .padding(16)
+                            .padding(Theme.Spacing.base)
                         }
-                        .padding(.horizontal, 20)
+                        .padding(.horizontal, Theme.Spacing.lg)
 
                         // Claims
                         VStack(alignment: .leading, spacing: 12) {
@@ -811,14 +811,14 @@ struct BaggageIssuesView: View {
                                 Text("Claim-mogelijkheden")
                                     .font(.frutiger(size: 14, weight: .semibold))
                             }
-                            .padding(.horizontal, 20)
+                            .padding(.horizontal, Theme.Spacing.lg)
 
                             VStack(spacing: 12) {
                                 ForEach(issues.claims, id: \.condition) { claim in
                                     claimCard(claim)
                                 }
                             }
-                            .padding(.horizontal, 20)
+                            .padding(.horizontal, Theme.Spacing.lg)
                         }
 
                         // Redelivery
@@ -835,9 +835,9 @@ struct BaggageIssuesView: View {
                                     .font(.frutiger(size: 13))
                                     .foregroundStyle(Theme.textSecondary)
                             }
-                            .padding(16)
+                            .padding(Theme.Spacing.base)
                         }
-                        .padding(.horizontal, 20)
+                        .padding(.horizontal, Theme.Spacing.lg)
 
                         // Tips
                         Card {
@@ -855,7 +855,7 @@ struct BaggageIssuesView: View {
                                             Circle()
                                                 .fill(Theme.navy)
                                                 .frame(width: 4, height: 4)
-                                                .padding(.top, 7)
+                                                .padding(.top, Theme.Spacing.sm)
                                             Text(tip)
                                                 .font(.frutiger(size: 12))
                                                 .foregroundStyle(Theme.textSecondary)
@@ -871,9 +871,9 @@ struct BaggageIssuesView: View {
                                     )
                                 }
                             }
-                            .padding(16)
+                            .padding(Theme.Spacing.base)
                         }
-                        .padding(.horizontal, 20)
+                        .padding(.horizontal, Theme.Spacing.lg)
 
                         Spacer(minLength: 32)
                     }
@@ -926,7 +926,7 @@ struct BaggageIssuesView: View {
                     }
                 }
             }
-            .padding(16)
+            .padding(Theme.Spacing.base)
         }
     }
 }
@@ -941,8 +941,8 @@ private struct Badge: View {
         Text(text)
             .font(.frutiger(size: 11, weight: .bold))
             .foregroundStyle(.white)
-            .padding(.horizontal, 10)
-            .padding(.vertical, 5)
+            .padding(.horizontal, Theme.Spacing.sm)
+            .padding(.vertical, Theme.Spacing.xs)
             .background(color)
             .clipShape(Capsule())
     }
@@ -961,8 +961,8 @@ struct FlowChips: View {
                 Text(item)
                     .font(.frutiger(size: 12, weight: .semibold))
                     .foregroundStyle(Theme.navy)
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 7)
+                    .padding(.horizontal, Theme.Spacing.md)
+                    .padding(.vertical, Theme.Spacing.sm)
                     .background(Theme.skyLight)
                     .clipShape(Capsule())
             }

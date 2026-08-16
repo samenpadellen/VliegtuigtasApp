@@ -34,6 +34,32 @@ enum Theme {
     static let card      = Color(.secondarySystemBackground)
     static let textPrimary   = Color(.label)
     static let textSecondary = Color(.secondaryLabel)
+    /// Voor randen/dividers — één plek i.p.v. losse `Color.black.opacity(0.08)`-achtige
+    /// waarden verspreid door de app.
+    static let hairline = Color.black.opacity(0.08)
+
+    /// Systematische spacing-schaal (basis 4px) — vervangt losse getallen in `.padding(...)`.
+    enum Spacing {
+        static let xxs: CGFloat = 2
+        static let xs: CGFloat = 4
+        static let sm: CGFloat = 8
+        static let md: CGFloat = 12
+        static let base: CGFloat = 16
+        static let lg: CGFloat = 24
+        static let xl: CGFloat = 32
+        static let xxl: CGFloat = 48
+        static let section: CGFloat = 64
+    }
+
+    /// Systematische radius-schaal — `md` is bewust 14: al de meest gebruikte losse
+    /// waarde in de app, dus canoniek maken kost de minste migratie-pijn.
+    enum Radius {
+        static let sm: CGFloat = 8
+        static let md: CGFloat = 14
+        static let lg: CGFloat = 20
+        static let xl: CGFloat = 28
+        static let full: CGFloat = 999
+    }
 
     // Gradients
     static let heroGradient = LinearGradient(
@@ -68,4 +94,12 @@ extension Font {
     static let headline2 = Font.frutiger(size: 20, weight: .semibold, relativeTo: .title3)
     static let body1     = Font.frutiger(size: 16, weight: .regular,  relativeTo: .body)
     static let caption1  = Font.frutiger(size: 13, weight: .regular,  relativeTo: .footnote)
+}
+
+extension View {
+    /// De ene systematische elevation-laag van de app — vervangt losse
+    /// `.shadow(...)`-aanroepen met elk hun eigen opacity/radius/offset.
+    func cardElevation() -> some View {
+        shadow(color: .black.opacity(0.08), radius: 12, x: 0, y: 4)
+    }
 }

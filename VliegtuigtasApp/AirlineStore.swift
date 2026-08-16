@@ -30,8 +30,8 @@ final class AirlineStore: ObservableObject {
         error = nil
         do {
             airlines = try await APIClient.shared.airlines(forceRefresh: forceRefresh)
-            // Niet in de App Clip: die bevat geen App Intents-laag.
-            #if os(iOS) && !APPCLIP
+            // Niet in de App Clip of de iMessage-extensie: die bevatten geen App Intents-laag.
+            #if os(iOS) && !APPCLIP && !MESSAGES_EXTENSION
             // Spotlight-index + Siri-zinnen met maatschappijnamen bijwerken.
             IntentDonations.airlinesLoaded(airlines)
             #endif
@@ -64,7 +64,7 @@ final class CheckStore: ObservableObject {
                 email: email, firstName: firstName
             )
             APIClient.shared.sendEvent("bag_check", path: "/check")
-            #if os(iOS) && !APPCLIP
+            #if os(iOS) && !APPCLIP && !MESSAGES_EXTENSION
             if result?.status == "fit" {
                 FlightLiveActivityManager.shared.markBagChecked()
             }

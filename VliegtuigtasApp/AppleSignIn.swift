@@ -80,6 +80,6 @@ struct AppleSignInButton: View {
         }
         .signInWithAppleButtonStyle(style)
         .frame(height: 50)
-        .clipShape(RoundedRectangle(cornerRadius: 14))
+        .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
     }
 }

@@ -30,8 +30,8 @@ struct AirlineDetailView: View {
                 VStack(spacing: 0) {
                     heroHeader
                     content
-                        .padding(.horizontal, 16)
-                        .padding(.bottom, 40)
+                        .padding(.horizontal, Theme.Spacing.base)
+                        .padding(.bottom, Theme.Spacing.xxl)
                 }
             }
             .ignoresSafeArea(edges: .top)
@@ -44,7 +44,7 @@ struct AirlineDetailView: View {
                 FloatingBackButton { dismiss() }
                 Spacer()
             }
-            .padding(.horizontal, 20)
+            .padding(.horizontal, Theme.Spacing.base)
             .padding(.top, airlineDetailStatusBarHeight + 10)
         }
         .navigationBarHidden(true)
@@ -84,19 +84,19 @@ struct AirlineDetailView: View {
                 // achtergrondvlak, zoals TUI) krijgen ronde hoeken en vullen
                 // de tegel netjes; brede wordmarks passen er ook gewoon in.
                 ZStack {
-                    RoundedRectangle(cornerRadius: 24)
+                    RoundedRectangle(cornerRadius: Theme.Radius.lg)
                         .fill(Color(.systemBackground))
                         .frame(width: 96, height: 96)
-                        .shadow(color: .black.opacity(0.08), radius: 12, x: 0, y: 4)
+                        .cardElevation()
                         .overlay(
-                            RoundedRectangle(cornerRadius: 24)
+                            RoundedRectangle(cornerRadius: Theme.Radius.lg)
                                 .strokeBorder(accent.opacity(0.22), lineWidth: 1)
                         )
 
                     if display.bestLogoUrl != nil {
                         AuthorisedImage(urlString: display.bestLogoUrl)
                             .frame(width: 66, height: 66)
-                            .clipShape(RoundedRectangle(cornerRadius: 14))
+                            .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
                     } else {
                         Text(display.name.prefix(2).uppercased())
                             .font(.frutiger(size: 26, weight: .bold))
@@ -121,7 +121,7 @@ struct AirlineDetailView: View {
                     }
                 }
             }
-            .padding(.bottom, 24)
+            .padding(.bottom, Theme.Spacing.lg)
         }
     }
 
@@ -140,10 +140,12 @@ struct AirlineDetailView: View {
                         .font(.frutiger(size: 16, weight: .semibold))
                 }
                 .frame(maxWidth: .infinity)
-                .padding(.vertical, 16)
+                .padding(.vertical, Theme.Spacing.base)
                 .background(Theme.inkGradient)
                 .foregroundStyle(.white)
-                .clipShape(RoundedRectangle(cornerRadius: 16))
+                .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
+                // bewust eigen schaduw: primaire CTA-knop krijgt een navy-tinted
+                // schaduw die de merkkleur oppikt, niet de standaard kaartschaduw
                 .shadow(color: Theme.navy.opacity(0.30), radius: 10, x: 0, y: 4)
             }
             .buttonStyle(.plain)
@@ -179,11 +181,11 @@ struct AirlineDetailView: View {
                         .foregroundStyle(Theme.textSecondary)
                         .fixedSize(horizontal: false, vertical: true)
                 }
-                .padding(16)
+                .padding(Theme.Spacing.base)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .background(Color(.systemBackground))
-                .clipShape(RoundedRectangle(cornerRadius: 16))
-                .shadow(color: .black.opacity(0.04), radius: 6, x: 0, y: 2)
+                .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
+                .cardElevation()
             }
 
             // Tassen die gegarandeerd passen: het logische koopmoment als je
@@ -203,10 +205,10 @@ struct AirlineDetailView: View {
                             .buttonStyle(.plain)
                         }
                     }
-                    .padding(.horizontal, 16)
-                    .padding(.vertical, 4)
+                    .padding(.horizontal, Theme.Spacing.base)
+                    .padding(.vertical, Theme.Spacing.xs)
                 }
-                .padding(.horizontal, -16)
+                .padding(.horizontal, -Theme.Spacing.base)
 
                 Button {
                     UIImpactFeedbackGenerator(style: .light).impactOccurred()
@@ -220,10 +222,10 @@ struct AirlineDetailView: View {
                             .font(.system(size: 11, weight: .semibold))
                     }
                     .frame(maxWidth: .infinity)
-                    .padding(.vertical, 13)
+                    .padding(.vertical, Theme.Spacing.md)
                     .background(Theme.navy.opacity(0.07))
                     .foregroundStyle(Theme.navy)
-                    .clipShape(RoundedRectangle(cornerRadius: 14))
+                    .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
                 }
                 .buttonStyle(.plain)
             }
@@ -239,9 +241,9 @@ struct AirlineDetailView: View {
                             .font(.system(size: 12))
                     }
                     .foregroundStyle(Theme.sky)
-                    .padding(14)
+                    .padding(Theme.Spacing.md)
                     .background(Color(.systemBackground))
-                    .clipShape(RoundedRectangle(cornerRadius: 14))
+                    .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
                 }
             }
         }
@@ -338,10 +340,10 @@ struct AirlineDetailView: View {
                     SpecRow(icon: "star.fill", label: "Priority boarding", value: fee)
                 }
             }
-            .padding(.horizontal, 16)
+            .padding(.horizontal, Theme.Spacing.base)
             .background(Color(.systemBackground))
-            .clipShape(RoundedRectangle(cornerRadius: 16))
-            .shadow(color: .black.opacity(0.04), radius: 6, x: 0, y: 2)
+            .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
+            .cardElevation()
         }
     }
 
@@ -362,7 +364,7 @@ struct AirlineDetailView: View {
             .font(.frutiger(size: 13, weight: .semibold))
             .foregroundStyle(Theme.textSecondary)
             .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(.top, 4)
+            .padding(.top, Theme.Spacing.xs)
     }
 
     private static let isoDateFormatter: ISO8601DateFormatter = {
@@ -405,7 +407,7 @@ private struct BaggageTypeCard: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
             ZStack {
-                RoundedRectangle(cornerRadius: 14)
+                RoundedRectangle(cornerRadius: Theme.Radius.md)
                     .fill(color.opacity(0.12))
                     .frame(width: 44, height: 44)
                 Image(systemName: icon)
@@ -435,17 +437,17 @@ private struct BaggageTypeCard: View {
                 Text(priceLabel)
                     .font(.frutiger(size: 10, weight: .semibold))
                     .foregroundStyle(color)
-                    .padding(.horizontal, 9)
-                    .padding(.vertical, 5)
+                    .padding(.horizontal, Theme.Spacing.sm)
+                    .padding(.vertical, Theme.Spacing.xs)
                     .background(color.opacity(0.12))
                     .clipShape(Capsule())
             }
         }
-        .padding(13)
+        .padding(Theme.Spacing.md)
         .frame(maxWidth: .infinity, minHeight: 148, alignment: .leading)
         .background(Color(.systemBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 16))
-        .shadow(color: .black.opacity(0.05), radius: 6, x: 0, y: 3)
+        .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
+        .cardElevation()
     }
 }
 
@@ -460,7 +462,7 @@ private struct MatchingBagCard: View {
                 Color.white
                 if bag.imageUrl != nil {
                     AuthorisedImage(urlString: bag.imageUrl)
-                        .padding(8)
+                        .padding(Theme.Spacing.sm)
                 } else {
                     Image(systemName: "bag")
                         .font(.system(size: 26, weight: .light))
@@ -468,7 +470,7 @@ private struct MatchingBagCard: View {
                 }
             }
             .frame(width: 128, height: 96)
-            .clipShape(RoundedRectangle(cornerRadius: 12))
+            .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
 
             Text(bag.name)
                 .font(.frutiger(size: 11, weight: .semibold))
@@ -490,12 +492,12 @@ private struct MatchingBagCard: View {
                     .foregroundStyle(Theme.green)
             }
         }
-        .padding(8)
+        .padding(Theme.Spacing.sm)
         .frame(width: 144)
         .background(Color(.systemBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 14))
-        .shadow(color: .black.opacity(0.05), radius: 6, x: 0, y: 2)
-        .contentShape(RoundedRectangle(cornerRadius: 14))
+        .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
+        .cardElevation()
+        .contentShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
     }
 }
 
@@ -520,7 +522,7 @@ private struct SpecRow: View {
                 .font(.frutiger(size: 13, weight: .semibold))
                 .foregroundStyle(Theme.textPrimary)
         }
-        .padding(.vertical, 11)
+        .padding(.vertical, Theme.Spacing.md)
     }
 }
 
@@ -550,7 +552,7 @@ private struct VariantCard: View {
                         Image(systemName: large ? "bag.fill" : "bag")
                             .font(.system(size: 14))
                             .foregroundStyle(large ? Theme.green : Theme.orange)
-                            .padding(8)
+                            .padding(Theme.Spacing.sm)
                             .background((large ? Theme.green : Theme.orange).opacity(0.1))
                             .clipShape(Circle())
                     }
@@ -558,12 +560,12 @@ private struct VariantCard: View {
                         .font(.system(size: 12, weight: .semibold))
                         .foregroundStyle(Theme.textSecondary)
                 }
-                .padding(16)
+                .padding(Theme.Spacing.base)
             }
             .buttonStyle(.plain)
 
             if expanded {
-                Divider().padding(.horizontal, 16)
+                Divider().padding(.horizontal, Theme.Spacing.base)
 
                 VStack(spacing: 10) {
                     DimBlock(
@@ -591,7 +593,7 @@ private struct VariantCard: View {
                             Text("Max. gewicht: \(String(format: "%.0f", w)) kg")
                                 .font(.frutiger(size: 14))
                         }
-                        .padding(.horizontal, 16)
+                        .padding(.horizontal, Theme.Spacing.base)
                     }
 
                     if let notes = variant.notes {
@@ -604,15 +606,15 @@ private struct VariantCard: View {
                                 .foregroundStyle(Theme.textSecondary)
                                 .fixedSize(horizontal: false, vertical: true)
                         }
-                        .padding(.horizontal, 16)
+                        .padding(.horizontal, Theme.Spacing.base)
                     }
                 }
-                .padding(.vertical, 14)
+                .padding(.vertical, Theme.Spacing.base)
             }
         }
         .background(Color(.systemBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 18))
-        .shadow(color: .black.opacity(0.05), radius: 8, x: 0, y: 3)
+        .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.lg))
+        .cardElevation()
     }
 }
 
@@ -629,7 +631,7 @@ private struct DimBlock: View {
     var body: some View {
         HStack(spacing: 14) {
             ZStack {
-                RoundedRectangle(cornerRadius: 10)
+                RoundedRectangle(cornerRadius: Theme.Radius.sm)
                     .fill(color.opacity(0.12))
                     .frame(width: 42, height: 42)
                 Image(systemName: icon)
@@ -656,7 +658,7 @@ private struct DimBlock: View {
                 }
             }
         }
-        .padding(.horizontal, 16)
-        .padding(.vertical, 8)
+        .padding(.horizontal, Theme.Spacing.base)
+        .padding(.vertical, Theme.Spacing.sm)
     }
 }

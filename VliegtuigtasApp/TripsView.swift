@@ -28,8 +28,8 @@ struct TripsListView: View {
             }
             .frame(maxWidth: Theme.contentMaxWidth)
             .frame(maxWidth: .infinity)
-            .padding(16)
-            .padding(.bottom, 32)
+            .padding(Theme.Spacing.base)
+            .padding(.bottom, Theme.Spacing.xl)
         }
         .background(Color(.systemGroupedBackground))
         .navigationTitle("Reizen")
@@ -103,10 +103,10 @@ struct TripsListView: View {
                         .font(.frutiger(size: 15, weight: .semibold))
                 }
                 .frame(maxWidth: .infinity)
-                .padding(.vertical, 15)
+                .padding(.vertical, Theme.Spacing.base)
                 .background(Theme.inkGradient)
                 .foregroundStyle(.white)
-                .clipShape(RoundedRectangle(cornerRadius: 16))
+                .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
             }
             .buttonStyle(.plain)
         }
@@ -167,9 +167,9 @@ struct TripsListView: View {
                                 .font(.frutiger(size: 12, weight: .bold))
                                 .foregroundStyle(Theme.navy)
                         }
-                        .padding(14)
+                        .padding(Theme.Spacing.base)
                         .background(Color(.systemBackground))
-                        .clipShape(RoundedRectangle(cornerRadius: 14))
+                        .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
                     }
                     .buttonStyle(.plain)
 
@@ -220,10 +220,10 @@ struct TripsListView: View {
             }
             Spacer(minLength: 0)
         }
-        .padding(16)
+        .padding(Theme.Spacing.base)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(Color(.systemBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 18))
+        .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.lg))
     }
 
     /// Verwijst naar je laatste reis, zodat de kaart persoonlijk aanvoelt in
@@ -268,7 +268,7 @@ struct TripsListView: View {
                         .buttonStyle(.pressableCard)
                     }
                 }
-                .padding(.vertical, 2)
+                .padding(.vertical, Theme.Spacing.xxs)
             }
         }
     }
@@ -285,10 +285,10 @@ struct TripsListView: View {
                       systemImage: "bell.badge.fill")
                     .font(.frutiger(size: 13, weight: .semibold))
                     .frame(maxWidth: .infinity)
-                    .padding(.vertical, 11)
+                    .padding(.vertical, Theme.Spacing.md)
                     .background(Theme.navy.opacity(0.07))
                     .foregroundStyle(Theme.navy)
-                    .clipShape(RoundedRectangle(cornerRadius: 12))
+                    .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
             }
             .buttonStyle(.plain)
         }
@@ -322,9 +322,9 @@ struct TripsListView: View {
                     .font(.system(size: 12, weight: .semibold))
                     .foregroundStyle(Theme.textSecondary)
             }
-            .padding(14)
+            .padding(Theme.Spacing.base)
             .background(Color(.systemBackground))
-            .clipShape(RoundedRectangle(cornerRadius: 14))
+            .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
         }
         .buttonStyle(.pressableCard)
     }
@@ -390,9 +390,9 @@ struct TripsListView: View {
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(18)
+        .padding(Theme.Spacing.base)
         .background(Theme.inkGradient)
-        .clipShape(RoundedRectangle(cornerRadius: 18))
+        .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.lg))
     }
 
     private func emptyPerk(icon: String, text: String) -> some View {
@@ -466,9 +466,9 @@ struct BucketListPreviewCard: View {
 
                 worldProgressBar
             }
-            .padding(14)
+            .padding(Theme.Spacing.base)
             .background(Color(.systemBackground))
-            .clipShape(RoundedRectangle(cornerRadius: 14))
+            .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
         }
         .buttonStyle(.plain)
     }
@@ -636,11 +636,11 @@ private struct EigenReisstijlSheet: View {
                         .font(.frutiger(size: 16))
                         .lineLimit(1...3)
                         .focused($focused)
-                        .padding(14)
+                        .padding(Theme.Spacing.base)
                         .background(Color(.systemBackground))
-                        .clipShape(RoundedRectangle(cornerRadius: 14))
+                        .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
                         .overlay(
-                            RoundedRectangle(cornerRadius: 14)
+                            RoundedRectangle(cornerRadius: Theme.Radius.md)
                                 .strokeBorder(Theme.ink.opacity(0.08), lineWidth: 1)
                         )
 
@@ -657,8 +657,8 @@ private struct EigenReisstijlSheet: View {
                                         Text(voorbeeld)
                                             .font(.frutiger(size: 12, weight: .semibold))
                                             .foregroundStyle(Theme.navy)
-                                            .padding(.horizontal, 12)
-                                            .padding(.vertical, 8)
+                                            .padding(.horizontal, Theme.Spacing.md)
+                                            .padding(.vertical, Theme.Spacing.sm)
                                             .background(Theme.skyLight)
                                             .clipShape(Capsule())
                                     }
@@ -678,10 +678,10 @@ private struct EigenReisstijlSheet: View {
                                 .font(.frutiger(size: 15, weight: .semibold))
                         }
                         .frame(maxWidth: .infinity)
-                        .padding(.vertical, 14)
+                        .padding(.vertical, Theme.Spacing.base)
                         .background(canAsk ? AnyShapeStyle(Theme.inkGradient) : AnyShapeStyle(Color(.systemGray4)))
                         .foregroundStyle(.white)
-                        .clipShape(RoundedRectangle(cornerRadius: 14))
+                        .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
                     }
                     .buttonStyle(.plain)
                     .disabled(!canAsk)
@@ -694,7 +694,7 @@ private struct EigenReisstijlSheet: View {
                                 .foregroundStyle(Theme.textSecondary)
                         }
                         .frame(maxWidth: .infinity)
-                        .padding(.top, 8)
+                        .padding(.top, Theme.Spacing.sm)
                     }
 
                     if let stijl = model.stijl {
@@ -707,7 +707,7 @@ private struct EigenReisstijlSheet: View {
                             .foregroundStyle(Theme.red)
                     }
                 }
-                .padding(16)
+                .padding(Theme.Spacing.base)
             }
             .background(Color(.systemGroupedBackground))
             .navigationTitle("Eigen reistype")
@@ -762,16 +762,16 @@ private struct EigenReisstijlSheet: View {
                 Text("Gebruik dit type")
                     .font(.frutiger(size: 15, weight: .semibold))
                     .frame(maxWidth: .infinity)
-                    .padding(.vertical, 14)
+                    .padding(.vertical, Theme.Spacing.base)
                     .background(Theme.yellow)
                     .foregroundStyle(Theme.ink)
-                    .clipShape(RoundedRectangle(cornerRadius: 14))
+                    .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
             }
             .buttonStyle(.plain)
         }
-        .padding(16)
+        .padding(Theme.Spacing.base)
         .background(Color(.systemBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 16))
+        .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
     }
 }
 
@@ -800,7 +800,7 @@ private struct PimPaklijstSheet: View {
                                 .foregroundStyle(Theme.textSecondary)
                         }
                         .frame(maxWidth: .infinity)
-                        .padding(.top, 50)
+                        .padding(.top, Theme.Spacing.xxl)
                     } else if let suggesties = model.suggesties {
                         Text(suggesties.toelichting)
                             .font(.frutiger(size: 14))
@@ -814,15 +814,15 @@ private struct PimPaklijstSheet: View {
                         Text("Voorgesteld op je toestel met Apple Intelligence, op basis van je bestemming, reisduur en wat er al op je lijst staat.")
                             .font(.frutiger(size: 11))
                             .foregroundStyle(Theme.textSecondary)
-                            .padding(.top, 4)
+                            .padding(.top, Theme.Spacing.xs)
                     } else if let error = model.error {
                         Label(error, systemImage: "exclamationmark.circle.fill")
                             .font(.system(size: 14))
                             .foregroundStyle(Theme.red)
-                            .padding(.top, 40)
+                            .padding(.top, Theme.Spacing.xxl)
                     }
                 }
-                .padding(16)
+                .padding(Theme.Spacing.base)
             }
             .background(Color(.systemGroupedBackground))
             .navigationTitle("Wat vergeet ik?")
@@ -860,10 +860,10 @@ private struct PimPaklijstSheet: View {
                         .foregroundStyle(Theme.green)
                 }
             }
-            .padding(14)
+            .padding(Theme.Spacing.base)
             .frame(maxWidth: .infinity, alignment: .leading)
             .background(Color(.systemBackground))
-            .clipShape(RoundedRectangle(cornerRadius: 14))
+            .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
         }
         .buttonStyle(.plain)
         .disabled(isAdded)
@@ -918,8 +918,8 @@ private struct TripHeroCard: View {
                 footer
             }
             .background(Color(.systemBackground))
-            .clipShape(RoundedRectangle(cornerRadius: 20))
-            .shadow(color: Theme.ink.opacity(0.12), radius: 14, x: 0, y: 6)
+            .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.lg))
+            .cardElevation()
         }
         .buttonStyle(.pressableCard)
     }
@@ -959,17 +959,17 @@ private struct TripHeroCard: View {
                 .font(.frutiger(size: 12, weight: .medium))
                 .foregroundStyle(.white.opacity(0.85))
             }
-            .padding(16)
+            .padding(Theme.Spacing.base)
 
             // Aftelling rechtsboven, als bordje op de foto.
             Text(trip.countdownLabel.uppercased())
                 .font(.system(size: 10, weight: .black, design: .monospaced))
                 .kerning(0.8)
                 .foregroundStyle(Theme.ink)
-                .padding(.horizontal, 10)
-                .padding(.vertical, 5)
+                .padding(.horizontal, Theme.Spacing.md)
+                .padding(.vertical, Theme.Spacing.xs)
                 .background(Theme.yellow, in: Capsule())
-                .padding(14)
+                .padding(Theme.Spacing.base)
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topTrailing)
         }
         .frame(height: 172)
@@ -1011,7 +1011,7 @@ private struct TripHeroCard: View {
                 }
             }
         }
-        .padding(16)
+        .padding(Theme.Spacing.base)
     }
 }
 
@@ -1046,10 +1046,10 @@ private struct MemoryCard: View {
                 Text(year)
                     .font(.system(size: 9, weight: .black, design: .monospaced))
                     .foregroundStyle(Theme.ink)
-                    .padding(.horizontal, 6)
-                    .padding(.vertical, 3)
+                    .padding(.horizontal, Theme.Spacing.sm)
+                    .padding(.vertical, Theme.Spacing.xs)
                     .background(Theme.yellow, in: Capsule())
-                    .padding(7)
+                    .padding(Theme.Spacing.sm)
             }
 
             VStack(alignment: .leading, spacing: 1) {
@@ -1063,13 +1063,13 @@ private struct MemoryCard: View {
                     .lineLimit(1)
             }
             .frame(width: 148, alignment: .leading)
-            .padding(.horizontal, 10)
-            .padding(.vertical, 9)
+            .padding(.horizontal, Theme.Spacing.md)
+            .padding(.vertical, Theme.Spacing.sm)
         }
         .frame(width: 148)
         .background(Color(.systemBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 14))
-        .shadow(color: Theme.ink.opacity(0.08), radius: 8, x: 0, y: 3)
+        .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
+        .cardElevation()
     }
 }
 
@@ -1079,7 +1079,7 @@ private struct TripRow: View {
     var body: some View {
         HStack(spacing: 14) {
             ZStack {
-                RoundedRectangle(cornerRadius: 12)
+                RoundedRectangle(cornerRadius: Theme.Radius.md)
                     .fill(trip.isPast ? Theme.textSecondary.opacity(0.10) : Theme.navy.opacity(0.10))
                 if let photoUrl = trip.photoUrl {
                     AuthorisedImage(urlString: photoUrl, fill: true)
@@ -1090,7 +1090,7 @@ private struct TripRow: View {
                 }
             }
             .frame(width: 44, height: 44)
-            .clipShape(RoundedRectangle(cornerRadius: 12))
+            .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
             VStack(alignment: .leading, spacing: 4) {
                 Text(trip.name)
                     .font(.frutiger(size: 15, weight: .bold))
@@ -1108,8 +1108,8 @@ private struct TripRow: View {
                 Text(trip.countdownLabel)
                     .font(.frutiger(size: 11, weight: .bold))
                     .foregroundStyle(trip.isPast ? Theme.textSecondary : Theme.navy)
-                    .padding(.horizontal, 9)
-                    .padding(.vertical, 4)
+                    .padding(.horizontal, Theme.Spacing.sm)
+                    .padding(.vertical, Theme.Spacing.xs)
                     .background(trip.isPast ? Theme.textSecondary.opacity(0.10) : Theme.yellow)
                     .clipShape(Capsule())
                 Image(systemName: "chevron.right")
@@ -1117,11 +1117,11 @@ private struct TripRow: View {
                     .foregroundStyle(Theme.textSecondary)
             }
         }
-        .padding(12)
+        .padding(Theme.Spacing.md)
         .background(Color(.systemBackground))
         .opacity(trip.isPast ? 0.6 : 1)
-        .clipShape(RoundedRectangle(cornerRadius: 14))
-        .contentShape(RoundedRectangle(cornerRadius: 14))
+        .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
+        .contentShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
     }
 
     private static let dateFormatter: DateFormatter = {
@@ -1149,7 +1149,7 @@ struct TripCarouselCard: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             ZStack {
-                RoundedRectangle(cornerRadius: 14)
+                RoundedRectangle(cornerRadius: Theme.Radius.md)
                     .fill(Theme.navy.opacity(0.08))
                 if let photoUrl = trip.photoUrl {
                     AuthorisedImage(urlString: photoUrl, fill: true)
@@ -1160,7 +1160,7 @@ struct TripCarouselCard: View {
                 }
             }
             .frame(height: 70)
-            .clipShape(RoundedRectangle(cornerRadius: 14))
+            .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
             VStack(alignment: .leading, spacing: 2) {
                 Text(trip.name)
                     .font(.frutiger(size: 13, weight: .bold))
@@ -1175,11 +1175,11 @@ struct TripCarouselCard: View {
                     .tint(Theme.navy)
             }
         }
-        .padding(10)
+        .padding(Theme.Spacing.md)
         .frame(width: 160)
         .background(Color(.systemBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 16))
-        .shadow(color: .black.opacity(0.05), radius: 8, x: 0, y: 3)
+        .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
+        .cardElevation()
     }
 }
 
@@ -1286,9 +1286,9 @@ struct TripDetailView: View {
                                 .font(.frutiger(size: 14, weight: .semibold))
                                 .foregroundStyle(Theme.navy)
                                 .frame(maxWidth: .infinity)
-                                .padding(.vertical, 13)
+                                .padding(.vertical, Theme.Spacing.md)
                                 .background(Theme.navy.opacity(0.07))
-                                .clipShape(RoundedRectangle(cornerRadius: 14))
+                                .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
                         }
                         .buttonStyle(.plain)
 
@@ -1299,12 +1299,12 @@ struct TripDetailView: View {
                                 .font(.frutiger(size: 13, weight: .semibold))
                                 .foregroundStyle(Theme.red)
                                 .frame(maxWidth: .infinity)
-                                .padding(.vertical, 10)
+                                .padding(.vertical, Theme.Spacing.md)
                         }
                         .buttonStyle(.plain)
                     }
-                    .padding(16)
-                    .padding(.bottom, 32)
+                    .padding(Theme.Spacing.base)
+                    .padding(.bottom, Theme.Spacing.xl)
                 }
                 .background(Color(.systemGroupedBackground))
                 // Nodig voor het reisverslag: TextEditor heeft geen "klaar"-
@@ -1341,7 +1341,7 @@ struct TripDetailView: View {
                 AuthorisedImage(urlString: photoUrl, fill: true)
                     .frame(height: 180)
                     .frame(maxWidth: .infinity)
-                    .clipShape(RoundedRectangle(cornerRadius: 18))
+                    .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.lg))
 
                 if let authorName = trip.photoAuthorName,
                    let authorUrl = trip.photoAuthorUrl.flatMap({ URL(string: $0 + "?utm_source=vliegtuigtas&utm_medium=referral") }),
@@ -1408,10 +1408,10 @@ struct TripDetailView: View {
                         angle: Double((abs(trip.id.hashValue) % 9) - 4)
                     )
                     .frame(maxWidth: .infinity)
-                    .padding(.top, 4)
+                    .padding(.top, Theme.Spacing.xs)
                 }
             }
-            .padding(18)
+            .padding(Theme.Spacing.base)
 
             if progress.total > 0 {
                 InfoStrip(
@@ -1426,8 +1426,8 @@ struct TripDetailView: View {
         }
         .frame(maxWidth: .infinity)
         .background(Color(.systemBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 18))
-        .shadow(color: Theme.ink.opacity(0.06), radius: 8, x: 0, y: 3)
+        .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.lg))
+        .cardElevation()
     }
 
     private func tripStatus(_ trip: Trip) -> (text: String, tone: StatusPill.Tone) {
@@ -1472,9 +1472,9 @@ struct TripDetailView: View {
                     .foregroundStyle(Theme.orange)
             }
         }
-        .padding(16)
+        .padding(Theme.Spacing.base)
         .background(Color(.systemBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 16))
+        .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
     }
 
     private func bucketListBanner(country: Country) -> some View {
@@ -1497,9 +1497,9 @@ struct TripDetailView: View {
                 Image(systemName: "checkmark.circle")
                     .foregroundStyle(Theme.green)
             }
-            .padding(14)
+            .padding(Theme.Spacing.base)
             .background(Theme.green.opacity(0.08))
-            .clipShape(RoundedRectangle(cornerRadius: 14))
+            .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
         }
         .buttonStyle(.plain)
     }
@@ -1537,9 +1537,9 @@ struct TripDetailView: View {
                 JournalTextEditor(trip: trip)
             }
         }
-        .padding(16)
+        .padding(Theme.Spacing.base)
         .background(Color(.systemBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 16))
+        .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
     }
 
     private func checklistCard(_ trip: Trip) -> some View {
@@ -1566,8 +1566,8 @@ struct TripDetailView: View {
                                     Text("×\(item.quantity)")
                                         .font(.frutiger(size: 12, weight: .bold))
                                         .foregroundStyle(Theme.textSecondary)
-                                        .padding(.horizontal, 8)
-                                        .padding(.vertical, 3)
+                                        .padding(.horizontal, Theme.Spacing.sm)
+                                        .padding(.vertical, Theme.Spacing.xs)
                                         .background(Theme.textSecondary.opacity(0.10))
                                         .clipShape(Capsule())
                                 }
@@ -1598,9 +1598,9 @@ struct TripDetailView: View {
             addItemRow(trip)
             pimSuggestionButton(trip)
         }
-        .padding(16)
+        .padding(Theme.Spacing.base)
         .background(Color(.systemBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 16))
+        .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
     }
 
     /// Zelf iets toevoegen: elke paklijst mist wel iets persoonlijks
@@ -1649,10 +1649,10 @@ struct TripDetailView: View {
                         .foregroundStyle(Theme.textSecondary)
                 }
                 .foregroundStyle(Theme.navy)
-                .padding(.vertical, 12)
-                .padding(.horizontal, 14)
+                .padding(.vertical, Theme.Spacing.md)
+                .padding(.horizontal, Theme.Spacing.base)
                 .background(Theme.skyLight)
-                .clipShape(RoundedRectangle(cornerRadius: 14))
+                .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
             }
             .buttonStyle(.plain)
             .sheet(isPresented: $showPimSuggestions) {
@@ -1683,9 +1683,9 @@ struct TripDetailView: View {
                 }
             }
         }
-        .padding(14)
+        .padding(Theme.Spacing.base)
         .background(Color(.systemBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 14))
+        .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
     }
 }
 
@@ -1715,17 +1715,17 @@ private struct JournalTextEditor: View {
             .foregroundStyle(Theme.textPrimary)
             .scrollContentBackground(.hidden)
             .frame(minHeight: 110)
-            .padding(10)
+            .padding(Theme.Spacing.md)
             .background(Color(.secondarySystemBackground))
-            .clipShape(RoundedRectangle(cornerRadius: 10))
+            .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.sm))
             .focused($focused)
             .overlay(alignment: .topLeading) {
                 if text.isEmpty {
                     Text("Wat waren de hoogtepunten? Wat zou je anders doen?")
                         .font(.frutiger(size: 14))
                         .foregroundStyle(Theme.textSecondary.opacity(0.6))
-                        .padding(.horizontal, 15)
-                        .padding(.vertical, 18)
+                        .padding(.horizontal, Theme.Spacing.base)
+                        .padding(.vertical, Theme.Spacing.base)
                         .allowsHitTesting(false)
                 }
             }
@@ -1838,12 +1838,12 @@ struct TripWizardView: View {
                         header
                         stepContent
                     }
-                    .padding(20)
-                    .padding(.bottom, 12)
+                    .padding(Theme.Spacing.lg)
+                    .padding(.bottom, Theme.Spacing.md)
                 }
 
                 nextButton
-                    .padding(20)
+                    .padding(Theme.Spacing.lg)
             }
             .background(Color(.systemGroupedBackground))
             .navigationBarTitleDisplayMode(.inline)
@@ -1888,7 +1888,7 @@ struct TripWizardView: View {
                     Image(systemName: "airplane")
                         .font(.system(size: 15, weight: .bold))
                         .foregroundStyle(Theme.ink)
-                        .padding(5)
+                        .padding(Theme.Spacing.xs)
                         .background(Theme.yellow, in: Circle())
                         .offset(x: max(min(width * progress - 14, width - 28), 0))
                 }
@@ -1903,8 +1903,8 @@ struct TripWizardView: View {
                 Spacer()
             }
         }
-        .padding(.horizontal, 20)
-        .padding(.top, 10)
+        .padding(.horizontal, Theme.Spacing.lg)
+        .padding(.top, Theme.Spacing.md)
         .animation(.spring(response: 0.45, dampingFraction: 0.8), value: step)
     }
 
@@ -1955,11 +1955,11 @@ struct TripWizardView: View {
                 .foregroundStyle(Theme.textSecondary)
             TextField(placeholder, text: text)
                 .font(.frutiger(size: 17))
-                .padding(14)
+                .padding(Theme.Spacing.base)
                 .background(Color(.systemBackground))
-                .clipShape(RoundedRectangle(cornerRadius: 14))
+                .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
                 .overlay(
-                    RoundedRectangle(cornerRadius: 14)
+                    RoundedRectangle(cornerRadius: Theme.Radius.md)
                         .strokeBorder(Theme.ink.opacity(0.08), lineWidth: 1)
                 )
         }
@@ -1976,9 +1976,9 @@ struct TripWizardView: View {
             }
             .font(.frutiger(size: 15, weight: .semibold))
             .tint(Theme.navy)
-            .padding(16)
+            .padding(Theme.Spacing.base)
             .background(Color(.systemBackground))
-            .clipShape(RoundedRectangle(cornerRadius: 16))
+            .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
 
             // Directe terugkoppeling op je keuze — je ziet meteen hoe lang je weg bent.
             HStack(spacing: 8) {
@@ -1991,8 +1991,8 @@ struct TripWizardView: View {
                     .contentTransition(.numericText())
             }
             .frame(maxWidth: .infinity)
-            .padding(.vertical, 12)
-            .background(Theme.yellow, in: RoundedRectangle(cornerRadius: 14))
+            .padding(.vertical, Theme.Spacing.md)
+            .background(Theme.yellow, in: RoundedRectangle(cornerRadius: Theme.Radius.md))
             .animation(.snappy, value: days)
 
             if !flightsStore.flights.isEmpty {
@@ -2009,9 +2009,9 @@ struct TripWizardView: View {
                     }
                     .pickerStyle(.menu)
                     .tint(Theme.navy)
-                    .padding(12)
+                    .padding(Theme.Spacing.md)
                     .background(Color(.systemBackground))
-                    .clipShape(RoundedRectangle(cornerRadius: 14))
+                    .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
                 }
             }
         }
@@ -2074,11 +2074,11 @@ struct TripWizardView: View {
                         .font(.system(size: selected ? 17 : 12, weight: .semibold))
                         .foregroundStyle(selected ? Theme.yellow : Theme.textSecondary)
                 }
-                .padding(14)
+                .padding(Theme.Spacing.base)
                 .background(selected ? AnyShapeStyle(Theme.inkGradient) : AnyShapeStyle(Color(.systemBackground)))
-                .clipShape(RoundedRectangle(cornerRadius: 18))
+                .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.lg))
                 .overlay(
-                    RoundedRectangle(cornerRadius: 18)
+                    RoundedRectangle(cornerRadius: Theme.Radius.lg)
                         .strokeBorder(selected ? Theme.yellow : Theme.ink.opacity(0.07), lineWidth: selected ? 2 : 1)
                 )
             }
@@ -2118,11 +2118,11 @@ struct TripWizardView: View {
                 .fixedSize(horizontal: false, vertical: true)
         }
         .frame(maxWidth: .infinity, minHeight: 128, alignment: .topLeading)
-        .padding(14)
+        .padding(Theme.Spacing.base)
         .background(selected ? AnyShapeStyle(Theme.inkGradient) : AnyShapeStyle(Color(.systemBackground)))
-        .clipShape(RoundedRectangle(cornerRadius: 18))
+        .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.lg))
         .overlay(
-            RoundedRectangle(cornerRadius: 18)
+            RoundedRectangle(cornerRadius: Theme.Radius.lg)
                 .strokeBorder(selected ? Theme.yellow : Theme.ink.opacity(0.07), lineWidth: selected ? 2 : 1)
         )
         .scaleEffect(selected ? 1.02 : 1)
@@ -2155,11 +2155,11 @@ struct TripWizardView: View {
                                 .foregroundStyle(Theme.yellow)
                         }
                     }
-                    .padding(14)
+                    .padding(Theme.Spacing.base)
                     .background(luggageType == type ? AnyShapeStyle(Theme.inkGradient) : AnyShapeStyle(Color(.systemBackground)))
-                    .clipShape(RoundedRectangle(cornerRadius: 16))
+                    .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
                     .overlay(
-                        RoundedRectangle(cornerRadius: 16)
+                        RoundedRectangle(cornerRadius: Theme.Radius.md)
                             .strokeBorder(luggageType == type ? Theme.yellow : Theme.ink.opacity(0.07), lineWidth: luggageType == type ? 2 : 1)
                     )
                 }
@@ -2193,11 +2193,11 @@ struct TripWizardView: View {
                 }
             }
             .tint(Theme.navy)
-            .padding(14)
+            .padding(Theme.Spacing.base)
             .background(Color(.systemBackground))
-            .clipShape(RoundedRectangle(cornerRadius: 16))
+            .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
             .overlay(
-                RoundedRectangle(cornerRadius: 16)
+                RoundedRectangle(cornerRadius: Theme.Radius.md)
                     .strokeBorder(createHidden ? Theme.yellow : Theme.ink.opacity(0.07),
                                   lineWidth: createHidden ? 2 : 1)
             )
@@ -2209,7 +2209,7 @@ struct TripWizardView: View {
                     .fixedSize(horizontal: false, vertical: true)
             }
         }
-        .padding(.top, 4)
+        .padding(.top, Theme.Spacing.xs)
     }
 
     // MARK: - Stap 5: instapkaart
@@ -2248,7 +2248,7 @@ struct TripWizardView: View {
 
                     Barcode(seed: "\(name)-\(destination)-\(days)", height: 28)
                 }
-                .padding(16)
+                .padding(Theme.Spacing.base)
             }
 
             if createdItemCount > 0 {
@@ -2260,8 +2260,8 @@ struct TripWizardView: View {
                 }
                 .foregroundStyle(Theme.ink)
                 .frame(maxWidth: .infinity)
-                .padding(.vertical, 12)
-                .background(Theme.yellow, in: RoundedRectangle(cornerRadius: 14))
+                .padding(.vertical, Theme.Spacing.md)
+                .background(Theme.yellow, in: RoundedRectangle(cornerRadius: Theme.Radius.md))
             }
         }
     }
@@ -2281,10 +2281,10 @@ struct TripWizardView: View {
                 }
             }
             .frame(maxWidth: .infinity)
-            .padding(.vertical, 16)
+            .padding(.vertical, Theme.Spacing.base)
             .background(canAdvance ? AnyShapeStyle(Theme.inkGradient) : AnyShapeStyle(Color(.systemGray4)))
             .foregroundStyle(.white)
-            .clipShape(RoundedRectangle(cornerRadius: 16))
+            .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
         }
         .buttonStyle(.plain)
         .disabled(!canAdvance)

@@ -80,9 +80,9 @@ struct PimPreviewCard: View {
                             .italic()
                             .lineLimit(2)
                             .fixedSize(horizontal: false, vertical: true)
-                            .padding(.horizontal, 10)
-                            .padding(.vertical, 7)
-                            .background(Theme.yellow.opacity(0.16), in: RoundedRectangle(cornerRadius: 10))
+                            .padding(.horizontal, Theme.Spacing.md)
+                            .padding(.vertical, Theme.Spacing.sm)
+                            .background(Theme.yellow.opacity(0.16), in: RoundedRectangle(cornerRadius: Theme.Radius.sm))
                     } else {
                         Text("Vraag Pim om paklijst- of alarmadvies voor je volgende reis.")
                             .font(.frutiger(size: 12))
@@ -95,9 +95,9 @@ struct PimPreviewCard: View {
                     .font(.system(size: 12, weight: .semibold))
                     .foregroundStyle(Theme.textSecondary)
             }
-            .padding(14)
+            .padding(Theme.Spacing.base)
             .background(Color(.systemBackground))
-            .clipShape(RoundedRectangle(cornerRadius: 14))
+            .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
         }
         .buttonStyle(.plain)
     }
@@ -129,7 +129,7 @@ struct AIAssistentHomeCard: View {
             } label: {
                 HStack(spacing: 14) {
                     ZStack {
-                        RoundedRectangle(cornerRadius: 14)
+                        RoundedRectangle(cornerRadius: Theme.Radius.md)
                             .fill(.white.opacity(0.15))
                             .frame(width: 44, height: 44)
                         PurserPimCap(size: 28)
@@ -149,9 +149,10 @@ struct AIAssistentHomeCard: View {
                         .font(.system(size: 13, weight: .semibold))
                         .foregroundStyle(.white.opacity(0.7))
                 }
-                .padding(16)
+                .padding(Theme.Spacing.base)
                 .background(Theme.skyGradient)
-                .clipShape(RoundedRectangle(cornerRadius: 20))
+                .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.lg))
+                // bewust eigen schaduw: navy-getinte merkschaduw voor de gradient-kaart, sterker dan de standaard kaartschaduw
                 .shadow(color: Theme.navy.opacity(0.25), radius: 10, x: 0, y: 4)
             }
             .buttonStyle(.plain)
@@ -177,7 +178,7 @@ struct AIAssistentHomeCard: View {
                             }
                         }
                     )
-                    .padding(16)
+                    .padding(Theme.Spacing.base)
                 }
                 .background(Color(.systemGroupedBackground))
                 .presentationDetents([.medium, .large])
@@ -247,7 +248,7 @@ struct BagageAssistentView: View {
                                 actionRow
                             }
                         }
-                        .padding(16)
+                        .padding(Theme.Spacing.base)
                     }
                     .onChange(of: assistent.messages) { _, messages in
                         if let last = messages.last {
@@ -289,8 +290,8 @@ struct BagageAssistentView: View {
                             .font(.system(size: 10, weight: .bold))
                     }
                     .foregroundStyle(.white)
-                    .padding(.horizontal, 14)
-                    .padding(.vertical, 10)
+                    .padding(.horizontal, Theme.Spacing.md)
+                    .padding(.vertical, Theme.Spacing.sm)
                     .background(Theme.inkGradient)
                     .clipShape(Capsule())
                 }
@@ -306,8 +307,8 @@ struct BagageAssistentView: View {
                             Text(vraag)
                                 .font(.frutiger(size: 12, weight: .medium))
                                 .foregroundStyle(Theme.navy)
-                                .padding(.horizontal, 11)
-                                .padding(.vertical, 7)
+                                .padding(.horizontal, Theme.Spacing.md)
+                                .padding(.vertical, Theme.Spacing.sm)
                                 .background(Theme.skyLight)
                                 .clipShape(Capsule())
                         }
@@ -316,13 +317,13 @@ struct BagageAssistentView: View {
                 }
             }
         }
-        .padding(.top, 2)
+        .padding(.top, Theme.Spacing.xxs)
     }
 
     private var introBlock: some View {
         VStack(spacing: 14) {
             PurserPimCap(size: 52)
-                .padding(.top, 24)
+                .padding(.top, Theme.Spacing.lg)
             Text("Vraag Purser Pim alles over handbagage")
                 .font(.frutiger(size: 17, weight: .bold))
             Text("Pim antwoordt via Apple Intelligence op je iPhone en gebruikt de actuele regels uit onze database. Niets verlaat je toestel.")
@@ -338,8 +339,8 @@ struct BagageAssistentView: View {
                         Text(suggestie)
                             .font(.frutiger(size: 13, weight: .medium))
                             .foregroundStyle(Theme.navy)
-                            .padding(.horizontal, 14)
-                            .padding(.vertical, 9)
+                            .padding(.horizontal, Theme.Spacing.md)
+                            .padding(.vertical, Theme.Spacing.sm)
                             .frame(maxWidth: .infinity)
                             .background(Theme.skyLight)
                             .clipShape(Capsule())
@@ -347,7 +348,7 @@ struct BagageAssistentView: View {
                     .buttonStyle(.plain)
                 }
             }
-            .padding(.top, 6)
+            .padding(.top, Theme.Spacing.sm)
         }
     }
 
@@ -357,8 +358,8 @@ struct BagageAssistentView: View {
                 .font(.frutiger(size: 15))
                 .submitLabel(.send)
                 .onSubmit(send)
-                .padding(.horizontal, 14)
-                .padding(.vertical, 11)
+                .padding(.horizontal, Theme.Spacing.md)
+                .padding(.vertical, Theme.Spacing.md)
                 .background(Color(.secondarySystemGroupedBackground))
                 .clipShape(Capsule())
 
@@ -369,8 +370,8 @@ struct BagageAssistentView: View {
             }
             .disabled(input.isEmpty || assistent.isThinking)
         }
-        .padding(.horizontal, 16)
-        .padding(.vertical, 10)
+        .padding(.horizontal, Theme.Spacing.base)
+        .padding(.vertical, Theme.Spacing.md)
         .background(Color(.systemBackground))
     }
 
@@ -419,11 +420,11 @@ private struct PimThinkingView: View {
 
             Spacer()
         }
-        .padding(.horizontal, 12)
-        .padding(.vertical, 10)
+        .padding(.horizontal, Theme.Spacing.md)
+        .padding(.vertical, Theme.Spacing.sm)
         .background(Color(.systemBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 16))
-        .shadow(color: .black.opacity(0.04), radius: 4, x: 0, y: 2)
+        .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
+        .cardElevation()
         .onAppear { rocking = true }
         .onReceive(timer) { _ in
             withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
@@ -467,15 +468,15 @@ private struct ChatBubble: View {
             Text(message.text)
                 .font(.frutiger(size: 14))
                 .foregroundStyle(message.role == .user ? .white : Theme.textPrimary)
-                .padding(.horizontal, 14)
-                .padding(.vertical, 10)
+                .padding(.horizontal, Theme.Spacing.md)
+                .padding(.vertical, Theme.Spacing.sm)
                 .background(
                     message.role == .user
                         ? AnyShapeStyle(Theme.inkGradient)
                         : AnyShapeStyle(Color(.systemBackground))
                 )
-                .clipShape(RoundedRectangle(cornerRadius: 16))
-                .shadow(color: .black.opacity(0.04), radius: 4, x: 0, y: 2)
+                .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
+                .cardElevation()
             if message.role == .assistant { Spacer(minLength: 40) }
         }
     }
@@ -506,10 +507,10 @@ struct PakAdviesButton: View {
                         .font(.frutiger(size: 15, weight: .semibold))
                 }
                 .frame(maxWidth: .infinity)
-                .padding(.vertical, 14)
+                .padding(.vertical, Theme.Spacing.base)
                 .background(Theme.skyLight)
                 .foregroundStyle(Theme.navy)
-                .clipShape(RoundedRectangle(cornerRadius: 16))
+                .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
             }
             .buttonStyle(.plain)
             .sheet(isPresented: $showSheet) {
@@ -529,7 +530,7 @@ struct PakAdviesButton: View {
                             }
                         }
                     )
-                    .padding(16)
+                    .padding(Theme.Spacing.base)
                 }
                 .background(Color(.systemGroupedBackground))
                 .presentationDetents([.medium, .large])
@@ -557,7 +558,7 @@ private struct PakAdviesSheet: View {
                                 .foregroundStyle(Theme.textSecondary)
                         }
                         .frame(maxWidth: .infinity)
-                        .padding(.top, 60)
+                        .padding(.top, Theme.Spacing.section)
                     } else if let advies = model.advies {
                         Text(advies.titel)
                             .font(.frutiger(size: 20, weight: .bold))
@@ -574,10 +575,10 @@ private struct PakAdviesSheet: View {
                                     .font(.frutiger(size: 14))
                                     .fixedSize(horizontal: false, vertical: true)
                             }
-                            .padding(14)
+                            .padding(Theme.Spacing.md)
                             .frame(maxWidth: .infinity, alignment: .leading)
                             .background(Color(.systemBackground))
-                            .clipShape(RoundedRectangle(cornerRadius: 14))
+                            .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
                         }
 
                         HStack(alignment: .top, spacing: 10) {
@@ -587,10 +588,10 @@ private struct PakAdviesSheet: View {
                                 .font(.frutiger(size: 13, weight: .medium))
                                 .fixedSize(horizontal: false, vertical: true)
                         }
-                        .padding(14)
+                        .padding(Theme.Spacing.md)
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .background(Theme.orange.opacity(0.10))
-                        .clipShape(RoundedRectangle(cornerRadius: 14))
+                        .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
 
                         Text("Gegenereerd op je toestel met Apple Intelligence, op basis van de bagageregels van \(airline.name).")
                             .font(.frutiger(size: 11))
@@ -599,10 +600,10 @@ private struct PakAdviesSheet: View {
                         Label(error, systemImage: "exclamationmark.circle.fill")
                             .font(.system(size: 14))
                             .foregroundStyle(Theme.red)
-                            .padding(.top, 40)
+                            .padding(.top, Theme.Spacing.xl)
                     }
                 }
-                .padding(16)
+                .padding(Theme.Spacing.base)
             }
             .background(Color(.systemGroupedBackground))
             .navigationTitle("Pakadvies van Pim")

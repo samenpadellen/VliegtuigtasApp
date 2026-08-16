@@ -68,7 +68,7 @@ struct OnboardingView: View {
         }
         .overlay(alignment: .top) {
             progressDots
-                .padding(.top, 60)
+                .padding(.top, Theme.Spacing.section)
         }
         // App Review 5.1.1(v): naam/e-mail zijn optioneel — de app werkt
         // volledig zonder. Overslaan is daarom altijd één tik.
@@ -80,15 +80,15 @@ struct OnboardingView: View {
                 Text("Sla over")
                     .font(.frutiger(size: 13, weight: .semibold))
                     .foregroundStyle(.white)
-                    .padding(.horizontal, 14)
-                    .padding(.vertical, 8)
+                    .padding(.horizontal, Theme.Spacing.md)
+                    .padding(.vertical, Theme.Spacing.sm)
                     .background(.black.opacity(0.30))
                     .clipShape(Capsule())
                     .contentShape(Capsule())
             }
             .buttonStyle(.plain)
-            .padding(.top, 54)
-            .padding(.trailing, 16)
+            .padding(.top, Theme.Spacing.xxl)
+            .padding(.trailing, Theme.Spacing.base)
         }
     }
 
@@ -106,7 +106,7 @@ struct OnboardingView: View {
                     .animation(.spring(response: 0.4), value: page)
             }
         }
-        .shadow(color: .black.opacity(0.2), radius: 3)
+        .cardElevation()
     }
 
     // MARK: - Logic
@@ -212,17 +212,17 @@ private struct WelcomePage: View {
                             .font(.system(size: 15, weight: .semibold))
                     }
                     .frame(maxWidth: .infinity)
-                    .padding(.vertical, 17)
+                    .padding(.vertical, Theme.Spacing.base)
                     .background(.white)
                     .foregroundStyle(Theme.navy)
-                    .clipShape(RoundedRectangle(cornerRadius: 16))
+                    .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
                 }
                 .buttonStyle(.plain)
-                .padding(.top, 6)
+                .padding(.top, Theme.Spacing.sm)
             }
             .frame(maxWidth: Theme.contentMaxWidth)
-            .padding(.horizontal, 24)
-            .padding(.bottom, 24)
+            .padding(.horizontal, Theme.Spacing.lg)
+            .padding(.bottom, Theme.Spacing.lg)
         }
         .background(Theme.navyDark)
         .ignoresSafeArea(edges: .top)
@@ -255,7 +255,7 @@ private struct WelcomeFeatureRow: View {
                 .foregroundStyle(tint)
                 .frame(width: 34, height: 34)
                 .background(.white.opacity(0.12))
-                .clipShape(RoundedRectangle(cornerRadius: 10))
+                .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.sm))
             Text(text)
                 .font(.frutiger(size: 14, weight: .medium))
                 .foregroundStyle(.white.opacity(0.92))
@@ -331,17 +331,17 @@ private struct FeaturePage: View {
                             .font(.system(size: 15, weight: .semibold))
                     }
                     .frame(maxWidth: .infinity)
-                    .padding(.vertical, 17)
+                    .padding(.vertical, Theme.Spacing.base)
                     .background(.white)
                     .foregroundStyle(Theme.navy)
-                    .clipShape(RoundedRectangle(cornerRadius: 16))
+                    .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
                 }
                 .buttonStyle(.plain)
-                .padding(.top, 6)
+                .padding(.top, Theme.Spacing.sm)
             }
             .frame(maxWidth: Theme.contentMaxWidth)
-            .padding(.horizontal, 24)
-            .padding(.bottom, 24)
+            .padding(.horizontal, Theme.Spacing.lg)
+            .padding(.bottom, Theme.Spacing.lg)
         }
         .background(Theme.navyDark)
         .ignoresSafeArea(edges: .top)
@@ -577,8 +577,8 @@ private struct OnboardFormScaffold<Content: View>: View {
 
             content
                 .frame(maxWidth: Theme.contentMaxWidth)
-                .padding(.horizontal, 24)
-                .padding(.bottom, 24)
+                .padding(.horizontal, Theme.Spacing.lg)
+                .padding(.bottom, Theme.Spacing.lg)
         }
         .background(Theme.navyDark)
         .ignoresSafeArea(edges: .top)
@@ -631,11 +631,11 @@ private struct DarkInputField: View {
                 .submitLabel(submitLabel)
                 .onSubmit(onSubmit)
         }
-        .padding(16)
+        .padding(Theme.Spacing.base)
         .background(.white.opacity(0.12))
-        .clipShape(RoundedRectangle(cornerRadius: 14))
+        .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
         .overlay(
-            RoundedRectangle(cornerRadius: 14)
+            RoundedRectangle(cornerRadius: Theme.Radius.md)
                 .strokeBorder(
                     error ? Theme.red : (isFocused ? Theme.yellow : .white.opacity(0.15)),
                     lineWidth: 1.5
@@ -666,13 +666,13 @@ private struct OnboardPrimaryButton: View {
                 }
             }
             .frame(maxWidth: .infinity)
-            .padding(.vertical, 17)
+            .padding(.vertical, Theme.Spacing.base)
             .background(.white)
             .foregroundStyle(Theme.navy)
-            .clipShape(RoundedRectangle(cornerRadius: 16))
+            .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
         }
         .buttonStyle(.plain)
-        .padding(.top, 6)
+        .padding(.top, Theme.Spacing.sm)
     }
 }
 
@@ -734,7 +734,7 @@ private struct FeatureRow: View {
     var body: some View {
         HStack(spacing: 14) {
             ZStack {
-                RoundedRectangle(cornerRadius: 11).fill(color.opacity(0.12))
+                RoundedRectangle(cornerRadius: Theme.Radius.sm).fill(color.opacity(0.12))
                     .frame(width: 40, height: 40)
                 Image(systemName: icon)
                     .font(.system(size: 17))
@@ -771,10 +771,12 @@ private struct OnboardButton: View {
                 }
             }
             .frame(maxWidth: .infinity)
-            .padding(.vertical, 17)
+            .padding(.vertical, Theme.Spacing.base)
             .background(Theme.inkGradient)
             .foregroundStyle(.white)
-            .clipShape(RoundedRectangle(cornerRadius: 16))
+            .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
+            // bewust eigen schaduw: navy-getinte gloed onder de CTA-knop op de
+            // inktgradiënt, geen generieke kaart-lift (cardElevation is te subtiel)
             .shadow(color: Theme.navy.opacity(0.35), radius: 12, x: 0, y: 5)
         }
         .buttonStyle(.plain)
