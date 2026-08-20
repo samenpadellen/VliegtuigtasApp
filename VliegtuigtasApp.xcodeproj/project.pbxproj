@@ -42,29 +42,6 @@
 		AAW00001 /* VliegtuigtasWidgets.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAW10001 /* VliegtuigtasWidgets.swift */; };
 		TRW00001 /* TripCountdownWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = TRW10001 /* TripCountdownWidget.swift */; };
 		AAW00002 /* Vliegtuigtas Widgets.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = AAW10003 /* Vliegtuigtas Widgets.appex */; settings = {ATTRIBUTES = (RemoveHeaderOnCopy, ); }; };
-		MSG00001 /* MessagesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = MSG10002 /* MessagesViewController.swift */; };
-		MSG00002 /* QuickBaggageCheckView.swift in Sources */ = {isa = PBXBuildFile; fileRef = MSG10003 /* QuickBaggageCheckView.swift */; };
-		MSG00003 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = MSG10004 /* Assets.xcassets */; };
-		MSG00004 /* Vliegtuigtas Messages.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = MSG10005 /* Vliegtuigtas Messages.appex */; settings = {ATTRIBUTES = (RemoveHeaderOnCopy, ); }; };
-		MSG00005 /* MessagesRootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = MSG10006 /* MessagesRootView.swift */; };
-		MSG00006 /* StickerPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = MSG10007 /* StickerPickerView.swift */; };
-		MSGSTK01 /* pim.png in Resources */ = {isa = PBXBuildFile; fileRef = MSGSTKR01 /* pim.png */; };
-		MSGSTK02 /* boarding.png in Resources */ = {isa = PBXBuildFile; fileRef = MSGSTKR02 /* boarding.png */; };
-		MSGSTK03 /* gate.png in Resources */ = {isa = PBXBuildFile; fileRef = MSGSTKR03 /* gate.png */; };
-		MSGSTK04 /* vertrek.png in Resources */ = {isa = PBXBuildFile; fileRef = MSGSTKR04 /* vertrek.png */; };
-		MSGSTK05 /* optijd.png in Resources */ = {isa = PBXBuildFile; fileRef = MSGSTKR05 /* optijd.png */; };
-		MSGSTK06 /* vertraagd.png in Resources */ = {isa = PBXBuildFile; fileRef = MSGSTKR06 /* vertraagd.png */; };
-		MSGSTK07 /* ingechecked.png in Resources */ = {isa = PBXBuildFile; fileRef = MSGSTKR07 /* ingechecked.png */; };
-		MSGSTK08 /* bagage.png in Resources */ = {isa = PBXBuildFile; fileRef = MSGSTKR08 /* bagage.png */; };
-		MSGSTK09 /* goedereis.png in Resources */ = {isa = PBXBuildFile; fileRef = MSGSTKR09 /* goedereis.png */; };
-		MSGSTK10 /* flap.png in Resources */ = {isa = PBXBuildFile; fileRef = MSGSTKR10 /* flap.png */; };
-		MSGT0001 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA100003 /* Theme.swift */; };
-		MSGM0001 /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA100004 /* Models.swift */; };
-		MSGA0001 /* APIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA100005 /* APIClient.swift */; };
-		MSGL0001 /* AirlineStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA100006 /* AirlineStore.swift */; };
-		TYPO_MSG /* Typography.swift in Sources */ = {isa = PBXBuildFile; fileRef = TYPOREF1 /* Typography.swift */; };
-		FRG_MSG /* Frutiger.ttf in Resources */ = {isa = PBXBuildFile; fileRef = FRUTREG1 /* Frutiger.ttf */; };
-		FBL_MSG /* Frutiger_bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = FRUTBLD1 /* Frutiger_bold.ttf */; };
 		AB61B0FF462FD1FB680C4E54 /* content.js in Resources */ = {isa = PBXBuildFile; fileRef = D21544F7D8CDB9643A45CBB3 /* content.js */; };
 		AC000001 /* BagScannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC100001 /* BagScannerView.swift */; };
 		ACL00001 /* VliegtuigtasClipApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACL10001 /* VliegtuigtasClipApp.swift */; };
@@ -182,13 +159,6 @@
 			remoteGlobalIDString = AAWTGT01;
 			remoteInfo = "Vliegtuigtas Widgets";
 		};
-		MSGPRX01 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = AAPROJECT1 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = MSGTGT01;
-			remoteInfo = "Vliegtuigtas Messages";
-		};
 		ACLPRX01 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = AAPROJECT1 /* Project object */;
@@ -221,7 +191,6 @@
 			files = (
 				BE744C57DCD58610FDB56695 /* Vliegtuigtas Extension.appex in Embed Foundation Extensions */,
 				AAW00002 /* Vliegtuigtas Widgets.appex in Embed Foundation Extensions */,
-				MSG00004 /* Vliegtuigtas Messages.appex in Embed Foundation Extensions */,
 			);
 			name = "Embed Foundation Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -304,23 +273,6 @@
 		TRW10001 /* TripCountdownWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TripCountdownWidget.swift; sourceTree = "<group>"; };
 		AAW10002 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		AAW10003 /* Vliegtuigtas Widgets.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "Vliegtuigtas Widgets.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
-		MSG10001 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		MSG10002 /* MessagesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessagesViewController.swift; sourceTree = "<group>"; };
-		MSG10003 /* QuickBaggageCheckView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuickBaggageCheckView.swift; sourceTree = "<group>"; };
-		MSG10004 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		MSG10005 /* Vliegtuigtas Messages.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "Vliegtuigtas Messages.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
-		MSG10006 /* MessagesRootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessagesRootView.swift; sourceTree = "<group>"; };
-		MSG10007 /* StickerPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StickerPickerView.swift; sourceTree = "<group>"; };
-		MSGSTKR01 /* pim.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = pim.png; sourceTree = "<group>"; };
-		MSGSTKR02 /* boarding.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = boarding.png; sourceTree = "<group>"; };
-		MSGSTKR03 /* gate.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = gate.png; sourceTree = "<group>"; };
-		MSGSTKR04 /* vertrek.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = vertrek.png; sourceTree = "<group>"; };
-		MSGSTKR05 /* optijd.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = optijd.png; sourceTree = "<group>"; };
-		MSGSTKR06 /* vertraagd.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = vertraagd.png; sourceTree = "<group>"; };
-		MSGSTKR07 /* ingechecked.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = ingechecked.png; sourceTree = "<group>"; };
-		MSGSTKR08 /* bagage.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = bagage.png; sourceTree = "<group>"; };
-		MSGSTKR09 /* goedereis.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = goedereis.png; sourceTree = "<group>"; };
-		MSGSTKR10 /* flap.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = flap.png; sourceTree = "<group>"; };
 		AAW10004 /* VliegtuigtasWidgets.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = VliegtuigtasWidgets.entitlements; sourceTree = "<group>"; };
 		AC100001 /* BagScannerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BagScannerView.swift; sourceTree = "<group>"; };
 		ACL10001 /* VliegtuigtasClipApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VliegtuigtasClipApp.swift; sourceTree = "<group>"; };
@@ -451,13 +403,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		MSGPH002 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -500,7 +445,6 @@
 				AAGRP002 /* Products */,
 				0FDF3B46CEF837A2E0680C07 /* VliegtuigtasExtension */,
 				AAWGRP01 /* VliegtuigtasWidgets */,
-				MSGGRP01 /* VliegtuigtasMessages */,
 				AWGRP01 /* VliegtuigtasWatch */,
 				AWWGRP01 /* VliegtuigtasWatchWidgets */,
 				ACLGRP01 /* VliegtuigtasClip */,
@@ -588,7 +532,6 @@
 				AAPROD001 /* Vliegtuigtas.app */,
 				1777E1FA4F444DC27257F0E8 /* Vliegtuigtas Extension.appex */,
 				AAW10003 /* Vliegtuigtas Widgets.appex */,
-				MSG10005 /* Vliegtuigtas Messages.appex */,
 				AWPROD01 /* Vliegtuigtas Watch.app */,
 				ACLPROD1 /* Vliegtuigtas Clip.app */,
 				AWWPROD1 /* Vliegtuigtas Watch Widgets.appex */,
@@ -596,29 +539,6 @@
 				ATVPROD1 /* Vliegtuigtas TV.app */,
 			);
 			name = Products;
-			sourceTree = "<group>";
-		};
-		MSGGRP01 /* VliegtuigtasMessages */ = {
-			isa = PBXGroup;
-			children = (
-				MSG10002 /* MessagesViewController.swift */,
-				MSG10006 /* MessagesRootView.swift */,
-				MSG10003 /* QuickBaggageCheckView.swift */,
-				MSG10007 /* StickerPickerView.swift */,
-				MSG10004 /* Assets.xcassets */,
-				MSGSTKR01 /* pim.png */,
-				MSGSTKR02 /* boarding.png */,
-				MSGSTKR03 /* gate.png */,
-				MSGSTKR04 /* vertrek.png */,
-				MSGSTKR05 /* optijd.png */,
-				MSGSTKR06 /* vertraagd.png */,
-				MSGSTKR07 /* ingechecked.png */,
-				MSGSTKR08 /* bagage.png */,
-				MSGSTKR09 /* goedereis.png */,
-				MSGSTKR10 /* flap.png */,
-				MSG10001 /* Info.plist */,
-			);
-			path = VliegtuigtasMessages;
 			sourceTree = "<group>";
 		};
 		AAWGRP01 /* VliegtuigtasWidgets */ = {
@@ -734,7 +654,6 @@
 			dependencies = (
 				56539FABA16615F638E56135 /* PBXTargetDependency */,
 				AAWDEP01 /* PBXTargetDependency */,
-				MSGDEP01 /* PBXTargetDependency */,
 				AWDEP01 /* PBXTargetDependency */,
 				ACLDEP01 /* PBXTargetDependency */,
 			);
@@ -759,23 +678,6 @@
 			productName = "Vliegtuigtas Widgets";
 			productReference = AAW10003 /* Vliegtuigtas Widgets.appex */;
 			productType = "com.apple.product-type.app-extension";
-		};
-		MSGTGT01 /* Vliegtuigtas Messages */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = MSGCFGL1 /* Build configuration list for PBXNativeTarget "Vliegtuigtas Messages" */;
-			buildPhases = (
-				MSGPH001 /* Sources */,
-				MSGPH002 /* Frameworks */,
-				MSGPH003 /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			name = "Vliegtuigtas Messages";
-			productName = "Vliegtuigtas Messages";
-			productReference = MSG10005 /* Vliegtuigtas Messages.appex */;
-			productType = "com.apple.product-type.app-extension.messages";
 		};
 		ACLTGT01 /* Vliegtuigtas Clip */ = {
 			isa = PBXNativeTarget;
@@ -896,7 +798,6 @@
 				AATARGET1 /* Vliegtuigtas */,
 				1CA59C60E1B2ACA8433200B3 /* Vliegtuigtas Extension */,
 				AAWTGT01 /* Vliegtuigtas Widgets */,
-				MSGTGT01 /* Vliegtuigtas Messages */,
 				AWTGT01 /* Vliegtuigtas Watch */,
 				ACLTGT01 /* Vliegtuigtas Clip */,
 				AWWTGT01 /* Vliegtuigtas Watch Widgets */,
@@ -991,26 +892,6 @@
 				FRG_TV /* Frutiger.ttf in Resources */,
 				FBL_TV /* Frutiger_bold.ttf in Resources */,
 				ATV00004 /* Assets.xcassets in Resources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		MSGPH003 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				MSG00003 /* Assets.xcassets in Resources */,
-				FRG_MSG /* Frutiger.ttf in Resources */,
-				FBL_MSG /* Frutiger_bold.ttf in Resources */,
-				MSGSTK01 /* pim.png in Resources */,
-				MSGSTK02 /* boarding.png in Resources */,
-				MSGSTK03 /* gate.png in Resources */,
-				MSGSTK04 /* vertrek.png in Resources */,
-				MSGSTK05 /* optijd.png in Resources */,
-				MSGSTK06 /* vertraagd.png in Resources */,
-				MSGSTK07 /* ingechecked.png in Resources */,
-				MSGSTK08 /* bagage.png in Resources */,
-				MSGSTK09 /* goedereis.png in Resources */,
-				MSGSTK10 /* flap.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1171,22 +1052,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		MSGPH001 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				TYPO_MSG /* Typography.swift in Sources */,
-				MSGT0001 /* Theme.swift in Sources */,
-				MSGM0001 /* Models.swift in Sources */,
-				MSGA0001 /* APIClient.swift in Sources */,
-				MSGL0001 /* AirlineStore.swift in Sources */,
-				MSG00001 /* MessagesViewController.swift in Sources */,
-				MSG00005 /* MessagesRootView.swift in Sources */,
-				MSG00002 /* QuickBaggageCheckView.swift in Sources */,
-				MSG00006 /* StickerPickerView.swift in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -1202,12 +1067,6 @@
 			name = "Vliegtuigtas Widgets";
 			target = AAWTGT01 /* Vliegtuigtas Widgets */;
 			targetProxy = AAWPRX01 /* PBXContainerItemProxy */;
-		};
-		MSGDEP01 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			name = "Vliegtuigtas Messages";
-			target = MSGTGT01 /* Vliegtuigtas Messages */;
-			targetProxy = MSGPRX01 /* PBXContainerItemProxy */;
 		};
 		ACLDEP01 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -1831,62 +1690,6 @@
 			};
 			name = Release;
 		};
-		MSGCFG01 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = "iMessage App Icon";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 311;
-				DEVELOPMENT_TEAM = FDH27DW6H2;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = VliegtuigtasMessages/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = Vliegtuigtas;
-				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@executable_path/../../Frameworks",
-				);
-				MARKETING_VERSION = 3.1.1;
-				PRODUCT_BUNDLE_IDENTIFIER = com.vliegtuigtas.app.Messages;
-				PRODUCT_MODULE_NAME = VliegtuigtasMessages;
-				PRODUCT_NAME = "Vliegtuigtas Messages";
-				SDKROOT = iphoneos;
-				SKIP_INSTALL = YES;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "MESSAGES_EXTENSION $(inherited)";
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-			};
-			name = Debug;
-		};
-		MSGCFG02 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = "iMessage App Icon";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 311;
-				DEVELOPMENT_TEAM = FDH27DW6H2;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = VliegtuigtasMessages/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = Vliegtuigtas;
-				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@executable_path/../../Frameworks",
-				);
-				MARKETING_VERSION = 3.1.1;
-				PRODUCT_BUNDLE_IDENTIFIER = com.vliegtuigtas.app.Messages;
-				PRODUCT_MODULE_NAME = VliegtuigtasMessages;
-				PRODUCT_NAME = "Vliegtuigtas Messages";
-				SDKROOT = iphoneos;
-				SKIP_INSTALL = YES;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "MESSAGES_EXTENSION $(inherited)";
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-			};
-			name = Release;
-		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -1967,15 +1770,6 @@
 			buildConfigurations = (
 				ATVCFG01 /* Debug */,
 				ATVCFG02 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		MSGCFGL1 /* Build configuration list for PBXNativeTarget "Vliegtuigtas Messages" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				MSGCFG01 /* Debug */,
-				MSGCFG02 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
